@@ -1,0 +1,156 @@
+/* ============================================
+   صفحة تسجيل الدخول
+   ============================================ */
+
+html:has(body.login-page) {
+  height: auto !important;
+  min-height: 100%;
+  overflow-y: auto !important;
+}
+
+body.login-page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f5f5f5;
+  padding: 20px;
+  min-height: 100vh !important;
+  height: auto !important;
+  overflow-y: auto !important;
+  box-sizing: border-box;
+  margin: 0;
+}
+
+.login-page .auth-box {
+  background: white;
+  padding: 28px 24px;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  width: 100%;
+  max-width: 400px;
+  margin: auto;
+  box-sizing: border-box;
+}
+
+.login-page .auth-box h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 4px;
+  color: #171717;
+}
+
+.login-page .auth-box .subtitle {
+  text-align: center;
+  color: #737373;
+  font-size: 14px;
+  margin-bottom: 24px;
+}
+
+.login-page .form-group {
+  margin-bottom: 16px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.login-page .form-group label {
+  display: block;
+  font-size: 14px;
+  color: #404040;
+  margin-bottom: 6px;
+}
+
+.login-page .form-group input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #d4d4d4;
+  border-radius: 8px;
+  background: white;
+  outline: none;
+  font-size: 14px;
+  font-family: inherit;
+  box-sizing: border-box;
+}
+
+.login-page .form-group input:focus {
+  border-color: #171717;
+}
+
+.login-page .btn-primary {
+  width: 100%;
+  justify-content: center;
+  background: #171717;
+  color: white;
+  padding: 12px 16px;
+  font-size: 15px;
+  box-sizing: border-box;
+}
+
+.login-page .btn-primary:hover {
+  background: #404040;
+}
+
+.login-page .btn-secondary {
+  width: 100%;
+  justify-content: center;
+  padding: 12px 16px;
+  font-size: 15px;
+  box-sizing: border-box;
+}
+
+.login-page .password-wrapper {
+  position: relative;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.login-page .password-wrapper input {
+  width: 100%;
+  padding-left: 42px !important;
+  box-sizing: border-box;
+}
+
+.login-page .toggle-password {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: #a3a3a3;
+  cursor: pointer;
+  padding: 4px;
+  font-size: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+.login-page .toggle-password:hover {
+  color: #171717;
+}
+
+.login-page .auth-footer {
+  text-align: center;
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid #e5e5e5;
+}
+
+.login-page .auth-footer p {
+  color: #737373;
+  font-size: 14px;
+  margin-bottom: 12px;
+}
+
+@media (max-width: 480px) {
+  .login-page .auth-box {
+    padding: 24px 18px;
+    max-width: 100%;
+  }
+
+  .login-page .auth-box h1 {
+    font-size: 1.6rem;
+  }
+}

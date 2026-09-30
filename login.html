@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>تسجيل الدخول - MyStock</title>
+  <link rel="stylesheet" href="/assets/css/base.css">
+  <link rel="stylesheet" href="/assets/css/components.css">
+  <link rel="stylesheet" href="/assets/css/pages/login.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body class="login-page">
+  <form class="auth-box" id="login-form">
+    <h1>MyStock</h1>
+    <p class="subtitle">نظام إدارة المخزون</p>
+
+    <div class="alert alert-error" id="login-error" style="display:none;"></div>
+
+    <div class="form-group">
+      <label>البريد الإلكتروني</label>
+      <input type="email" id="email" required dir="ltr">
+    </div>
+
+    <div class="form-group">
+      <label>كلمة السر</label>
+      <div class="password-wrapper">
+        <input type="password" id="password" required dir="ltr">
+        <button type="button" class="toggle-password" id="toggle-password">
+          <i class="fas fa-eye"></i>
+        </button>
+      </div>
+    </div>
+
+    <button type="submit" class="btn-primary" style="width:100%; justify-content:center;" id="login-btn">
+      <i class="fas fa-right-to-bracket"></i>
+      <span>دخول</span>
+    </button>
+
+    <div class="auth-footer">
+      <p>ليس لديك حساب؟</p>
+      <a href="/register.html" class="btn-secondary" style="width:100%; justify-content:center;">
+        <i class="fas fa-user-plus"></i>
+        <span>إنشاء حساب جديد</span>
+      </a>
+    </div>
+  </form>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="/js/core/supabase.js"></script>
+  <script src="/js/core/auth.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const toggleBtn = document.getElementById('toggle-password');
+      const passwordInput = document.getElementById('password');
+      if (!toggleBtn || !passwordInput) return;
+      toggleBtn.addEventListener('click', () => {
+        const isPassword = passwordInput.type === 'password';
+        passwordInput.type = isPassword ? 'text' : 'password';
+        toggleBtn.innerHTML = isPassword
+          ? '<i class="fas fa-eye-slash"></i>'
+          : '<i class="fas fa-eye"></i>';
+      });
+    });
+  </script>
+</body>
+</html>

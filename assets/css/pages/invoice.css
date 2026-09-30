@@ -1,0 +1,356 @@
+/* ============================================
+   صفحة الفاتورة الواحدة
+   ============================================ */
+/* ============================================
+   ✅ إصلاح: السماح بالتمرير على الجوال
+   ============================================ */
+
+html, body {
+  height: auto !important;
+  min-height: 100vh;
+  overflow-x: hidden;
+  overflow-y: auto !important;
+}
+
+/* الحاوية الرئيسية للـ layout (إن وُجدت) */
+.main-content,
+#main-content,
+.app-layout,
+.layout-main,
+main {
+  height: auto !important;
+  min-height: 100vh;
+  overflow-y: auto !important;
+  overflow: visible !important;
+}
+
+/* صفحة الفاتورة */
+.invoice-page {
+  min-height: 100vh;
+  height: auto !important;
+  overflow-y: auto !important;
+  overflow-x: hidden;
+  padding-bottom: 100px; /* ✅ مساحة للأزرار السفلية */
+  box-sizing: border-box;
+}
+
+/* الأزرار السفلية لا تختفي */
+.invoice-actions {
+  position: relative;
+  z-index: 5;
+  margin-bottom: 30px;
+  flex-wrap: wrap;
+}
+
+.invoice-page {
+  background: #f5f5f5;
+  padding: 20px;
+  min-height: 100vh;
+  height: auto;
+  overflow-y: auto;
+}
+
+.invoice-container {
+  background: white;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px 24px;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  box-sizing: border-box;
+}
+
+/* ============================================
+   الرأس: شعار + اسم المنظمة في الوسط
+   ============================================ */
+.invoice-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  min-height: 2.5cm;
+  padding: 8px 0 12px;
+  border-bottom: 2px solid #171717;
+  margin-bottom: 12px;
+}
+
+.invoice-logo {
+  width: 60px;
+  height: 60px;
+  border-radius: 8px;
+  background: #f5f5f5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  flex-shrink: 0;
+  margin-bottom: 6px;
+}
+
+.invoice-logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.logo-placeholder {
+  font-size: 26px;
+  color: #171717;
+}
+
+.invoice-org h1 {
+  font-size: 1.4rem;
+  font-weight: 700;
+  margin: 0;
+  color: #171717;
+}
+
+/* ============================================
+   صف المعلومات: المنظمة | المورد (متقابلان)
+   ============================================ */
+.invoice-info-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 12px;
+}
+
+.info-box {
+  background: #fafafa;
+  padding: 10px 12px;
+  border-radius: 8px;
+}
+
+.info-box h3 {
+  font-size: 12px;
+  font-weight: 700;
+  margin: 0 0 6px;
+  color: #171717;
+  padding-bottom: 4px;
+  border-bottom: 1px solid #e5e5e5;
+}
+
+.info-row {
+  display: flex;
+  gap: 6px;
+  font-size: 12px;
+  margin-bottom: 3px;
+  line-height: 1.4;
+}
+
+.info-row strong {
+  color: #737373;
+  font-weight: 500;
+  flex-shrink: 0;
+}
+
+.info-row span {
+  color: #171717;
+  word-break: break-word;
+}
+
+/* ============================================
+   جدول المنتجات
+   ============================================ */
+.invoice-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 12px;
+  font-size: 12px;
+}
+
+.invoice-table thead {
+  background: #171717;
+  color: white;
+}
+
+.invoice-table th {
+  padding: 8px 6px;
+  text-align: right;
+  font-weight: 600;
+  font-size: 11px;
+}
+
+.invoice-table th:first-child {
+  border-radius: 6px 0 0 0;
+  text-align: center;
+  width: 36px;
+}
+
+.invoice-table th:last-child {
+  border-radius: 0 6px 0 0;
+}
+
+.invoice-table td {
+  padding: 6px;
+  border-bottom: 1px solid #f0f0f0;
+  text-align: right;
+}
+
+.invoice-table td:first-child {
+  text-align: center;
+  color: #737373;
+}
+
+.invoice-table tbody tr:last-child td {
+  border-bottom: 2px solid #e5e5e5;
+}
+
+.invoice-table tfoot td {
+  padding: 10px 6px;
+  font-size: 13px;
+  background: #fafafa;
+  border-top: 2px solid #171717;
+}
+
+.invoice-table tfoot td:first-child {
+  border-radius: 0 0 0 6px;
+  text-align: right;
+}
+
+.invoice-table tfoot td:last-child {
+  border-radius: 0 0 6px 0;
+  color: #171717;
+  font-size: 1rem;
+}
+
+/* ============================================
+   التوقيعات
+   ============================================ */
+.invoice-footer {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 32px;
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid #e5e5e5;
+}
+
+.footer-signature p {
+  font-size: 12px;
+  color: #404040;
+  margin-bottom: 3px;
+}
+
+.footer-signature p:first-child {
+  color: #737373;
+  font-weight: 500;
+}
+
+.signature-line {
+  margin-top: 32px;
+  border-top: 1px dashed #a3a3a3;
+}
+
+/* ============================================
+   الأزرار
+   ============================================ */
+.invoice-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid #e5e5e5;
+}
+
+/* ============================================
+   الطباعة
+   ============================================ */
+@media print {
+  @page {
+    size: A4;
+    margin: 10mm;
+  }
+
+  .invoice-page {
+    background: white;
+    padding: 0;
+  }
+
+  .invoice-container {
+    box-shadow: none;
+    border-radius: 0;
+    padding: 0;
+    max-width: 100%;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+
+  .invoice-table thead {
+    background: #000 !important;
+    color: white !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .info-box {
+    background: #f5f5f5 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}
+
+/* ============================================
+   الهاتف
+   ============================================ */
+@media (max-width: 768px) {
+  .invoice-page {
+    padding: 8px;
+  }
+
+  .invoice-container {
+    padding: 16px 12px;
+    border-radius: 10px;
+  }
+
+  .invoice-header {
+    padding: 6px 0 10px;
+    min-height: 2cm;
+  }
+
+  .invoice-logo {
+    width: 50px;
+    height: 50px;
+  }
+
+  .invoice-org h1 {
+    font-size: 1.1rem;
+  }
+
+  .invoice-info-row {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .invoice-table {
+    font-size: 10px;
+  }
+
+  .invoice-table th,
+  .invoice-table td {
+    padding: 5px 3px;
+  }
+
+  .invoice-footer {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .signature-line {
+    margin-top: 24px;
+  }
+
+  .invoice-actions {
+    flex-direction: column;
+  }
+
+  .invoice-actions .btn-primary,
+  .invoice-actions .btn-secondary {
+    width: 100%;
+    justify-content: center;
+  }
+}

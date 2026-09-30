@@ -1,0 +1,296 @@
+/* ============================================
+   صفحة تفاصيل المنتج
+   ============================================ */
+
+.product-card-detail {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  max-width: 520px;
+  width: 100%;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+/* الصورة */
+.product-image {
+  position: relative;
+  background: #fafafa;
+  border-radius: 12px;
+  width: 100%;
+  height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  margin-bottom: 18px;
+}
+
+.product-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.product-image i {
+  font-size: 4rem;
+  color: #d4d4d4;
+}
+
+/* زر تعديل الصورة - مصغّر */
+.image-edit-btn {
+  position: absolute;
+  bottom: 8px;
+  left: 8px;
+  background: rgba(23, 23, 23, 0.9);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 2;
+  padding: 0;
+  transition: transform 0.2s, background 0.2s;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.image-edit-btn i {
+  font-size: 12px;
+  line-height: 1;
+}
+
+.image-edit-btn:hover {
+  background: #171717;
+  transform: scale(1.08);
+}
+
+/* العنوان */
+.detail-title {
+  font-size: 1.35rem;
+  font-weight: 700;
+  margin-bottom: 4px;
+  line-height: 1.4;
+}
+
+.detail-sku {
+  color: #737373;
+  font-size: 13px;
+  margin-bottom: 16px;
+}
+
+/* الصناديق */
+.product-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 18px;
+}
+
+.stat {
+  background: #fafafa;
+  border-radius: 10px;
+  padding: 12px 8px;
+  text-align: center;
+}
+
+.stat-label {
+  font-size: 11px;
+  color: #737373;
+  margin-bottom: 6px;
+  font-weight: 500;
+}
+
+.stat-value {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #171717;
+}
+
+.stat-value.low {
+  color: #dc2626;
+}
+
+/* المعلومات الإضافية */
+.product-extra {
+  border-top: 1px solid #f0f0f0;
+  padding-top: 8px;
+  margin-bottom: 18px;
+}
+
+.product-extra .row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid #f5f5f5;
+  font-size: 14px;
+}
+
+.product-extra .row:last-child {
+  border-bottom: none;
+}
+
+.product-extra .row > span {
+  color: #737373;
+  flex-shrink: 0;
+}
+
+.product-extra .row > strong {
+  font-weight: 500;
+  color: #171717;
+  text-align: left;
+  min-width: 0;
+}
+
+/* الأزرار */
+.actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* التعديل المباشر */
+.edit-field {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 4px;
+  cursor: pointer;
+  padding: 4px 8px;
+  margin: -4px -8px;
+  border-radius: 6px;
+  transition: background 0.15s;
+  min-height: 24px;
+  position: relative;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.edit-field:hover {
+  background: #f0f0f0;
+}
+
+.edit-field.editing {
+  background: transparent;
+  padding: 0;
+  margin: 0;
+  cursor: text;
+}
+
+.edit-field.center {
+  justify-content: center;
+  text-align: center;
+  width: 100%;
+  margin: -4px 0;
+}
+
+.inline-display {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.inline-input {
+  border: 2px solid #171717;
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-size: inherit;
+  font-weight: inherit;
+  font-family: inherit;
+  color: inherit;
+  background: white;
+  outline: none;
+  width: 100%;
+  min-width: 60px;
+  max-width: 100%;
+  box-sizing: border-box;
+  box-shadow: 0 0 0 4px rgba(23, 23, 23, 0.05);
+}
+
+.product-stats .inline-input {
+  text-align: center;
+  font-size: 1.05rem;
+  padding: 6px;
+}
+
+/* مؤشر الحفظ */
+.save-indicator {
+  color: #16a34a;
+  font-size: 12px;
+  margin-right: 4px;
+  animation: fadeInCheck 0.2s ease-out;
+}
+
+@keyframes fadeInCheck {
+  from { opacity: 0; transform: scale(0.7); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* ============================================
+   الهاتف
+   ============================================ */
+@media (max-width: 768px) {
+  .product-card-detail {
+    max-width: 100%;
+    padding: 16px;
+    border-radius: 12px;
+  }
+
+  .product-image {
+    height: 160px;
+    border-radius: 10px;
+    margin-bottom: 14px;
+  }
+
+  .detail-title {
+    font-size: 1.15rem;
+  }
+
+  .detail-sku {
+    font-size: 12px;
+    margin-bottom: 12px;
+  }
+
+  .product-stats {
+    gap: 6px;
+    margin-bottom: 14px;
+  }
+
+  .stat {
+    padding: 10px 4px;
+    border-radius: 8px;
+  }
+
+  .stat-label {
+    font-size: 10px;
+  }
+
+  .stat-value {
+    font-size: 0.95rem;
+  }
+
+  .product-extra .row {
+    font-size: 13px;
+    padding: 8px 0;
+  }
+
+  .image-edit-btn {
+    width: 28px;
+    height: 28px;
+    bottom: 6px;
+    left: 6px;
+  }
+
+  .image-edit-btn i {
+    font-size: 11px;
+  }
+}

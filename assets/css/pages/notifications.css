@@ -1,0 +1,177 @@
+/* ============================================
+   صفحة الإشعارات
+   ============================================ */
+
+.notifications-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 700px;
+  margin: 0 auto 20px;
+}
+
+.notifications-header h2 {
+  margin: 0;
+}
+
+.notifications-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.notification-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: white;
+  padding: 16px;
+  border-radius: 10px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  cursor: pointer;
+  transition: box-shadow 0.15s, background 0.15s;
+}
+
+.notification-item:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.notification-item.read {
+  background: #fafafa;
+}
+
+.notification-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 16px;
+}
+
+.notification-icon.info { background: #f0f0f0; color: #404040; }
+.notification-icon.success { background: #dcfce7; color: #16a34a; }
+.notification-icon.warning { background: #fef3c7; color: #d97706; }
+.notification-icon.danger { background: #fee2e2; color: #dc2626; }
+
+.notification-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.notification-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #171717;
+  margin-bottom: 4px;
+}
+
+.notification-user {
+  color: #737373;
+  font-weight: 500;
+  font-size: 12px;
+  margin-right: 4px;
+}
+
+.notification-message {
+  font-size: 13px;
+  color: #737373;
+  line-height: 1.5;
+  margin-bottom: 6px;
+}
+
+.notification-time {
+  font-size: 11px;
+  color: #a3a3a3;
+}
+
+/* ============================================
+   علامتا القراءة (RTL)
+   ============================================ */
+.notification-checks {
+  position: relative;
+  width: 22px;
+  height: 16px;
+  flex-shrink: 0;
+  margin-right: 4px;
+}
+
+.notification-checks i {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 11px;
+  color: #d4d4d4;
+  transition: color 0.2s;
+}
+
+/* العلامة الأولى (يمين في RTL) */
+.notification-checks i:first-child {
+  right: 6px;
+}
+
+/* العلامة الثانية (يسار في RTL) */
+.notification-checks i:last-child {
+  right: 0;
+}
+
+/* عند دخول الصفحة ← العلامة الثانية (اليسار) تُصبِح زرقاء أولاً */
+.notification-item.seen .notification-checks i:last-child {
+  color: #3b82f6;
+}
+
+/* عند قراءة الإشعار ← العلامة الأولى (اليمين) تُصبِح زرقاء أيضاً */
+.notification-item.read .notification-checks i:first-child,
+.notification-item.read .notification-checks i:last-child {
+  color: #3b82f6;
+}
+
+/* حالة فارغة */
+.notifications-empty {
+  background: white;
+  padding: 60px 24px;
+  border-radius: 10px;
+  text-align: center;
+  color: #737373;
+  max-width: 700px;
+  margin: 0 auto;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+.notifications-empty i {
+  font-size: 3.5rem;
+  color: #d4d4d4;
+  margin-bottom: 16px;
+}
+
+.notifications-empty p {
+  font-size: 15px;
+}
+
+/* ============================================
+   الهاتف
+   ============================================ */
+@media (max-width: 768px) {
+  .notification-item {
+    padding: 12px;
+    gap: 10px;
+  }
+
+  .notification-icon {
+    width: 36px;
+    height: 36px;
+    font-size: 14px;
+  }
+
+  .notification-title {
+    font-size: 13px;
+  }
+
+  .notification-message {
+    font-size: 12px;
+  }
+}

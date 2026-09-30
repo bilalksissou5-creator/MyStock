@@ -1,0 +1,395 @@
+/* ============================================
+   صفحة الموردين
+   ============================================ */
+
+/* قائمة الموردين */
+.suppliers-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 16px;
+}
+
+.supplier-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: white;
+  padding: 16px;
+  border-radius: 10px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  text-decoration: none;
+  color: inherit;
+  transition: box-shadow 0.15s, transform 0.15s;
+}
+
+.supplier-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+.supplier-avatar {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: #f0f0f0;
+  color: #404040;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 20px;
+}
+
+.supplier-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+  flex: 1;
+}
+
+.supplier-info strong {
+  font-size: 15px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.supplier-phone,
+.supplier-email {
+  font-size: 12px;
+  color: #737373;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.supplier-phone i,
+.supplier-email i {
+  font-size: 11px;
+  color: #a3a3a3;
+  width: 14px;
+}
+
+/* ============================================
+   نموذج إضافة مورد
+   ============================================ */
+.add-form {
+  background: white;
+  padding: 24px;
+  border-radius: 10px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  max-width: 600px;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+.add-form .form-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.add-form textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+/* ============================================
+   صفحة تفاصيل المورد
+   ============================================ */
+.supplier-detail {
+  max-width: 700px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* بطاقة المورد */
+.supplier-card-detail {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+.supplier-header {
+  text-align: center;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #f5f5f5;
+  margin-bottom: 16px;
+}
+
+.supplier-avatar-large {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: #f0f0f0;
+  color: #404040;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 12px;
+  font-size: 32px;
+}
+
+.detail-title {
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.supplier-specialty {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #f0f0f0;
+  color: #404040;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+  margin-top: 8px;
+}
+
+.supplier-specialty i {
+  font-size: 11px;
+  color: #737373;
+}
+
+/* معلومات إضافية */
+.supplier-extra .row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid #f5f5f5;
+  font-size: 14px;
+  gap: 12px;
+}
+
+.supplier-extra .row:last-child {
+  border-bottom: none;
+}
+
+.supplier-extra .row > span {
+  color: #737373;
+  flex-shrink: 0;
+}
+
+.supplier-extra .row > strong {
+  font-weight: 500;
+  color: #171717;
+  text-align: left;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* إحصاءات */
+.supplier-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.supplier-stats .stat {
+  background: white;
+  padding: 14px 8px;
+  border-radius: 10px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  text-align: center;
+}
+
+.supplier-stats .stat-label {
+  font-size: 11px;
+  color: #737373;
+  margin-bottom: 6px;
+}
+
+.supplier-stats .stat-value {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #171717;
+}
+
+/* فواتير المورد */
+.supplier-products {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+.supplier-products h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  margin-bottom: 14px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #f5f5f5;
+}
+
+.invoices-list-simple {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.invoice-row-simple {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px;
+  border-radius: 8px;
+  background: #fafafa;
+  text-decoration: none;
+  color: inherit;
+  transition: background 0.15s;
+}
+
+.invoice-row-simple:hover {
+  background: #f0f0f0;
+}
+
+.invoice-icon-small {
+  width: 40px;
+  height: 40px;
+  border-radius: 6px;
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border: 1px solid #e5e5e5;
+}
+
+.invoice-icon-small i {
+  color: #404040;
+  font-size: 16px;
+}
+
+.invoice-info-simple {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.invoice-info-simple strong {
+  font-size: 13px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.invoice-info-simple span {
+  font-size: 11px;
+  color: #737373;
+}
+
+.invoice-stats-simple {
+  display: flex;
+  gap: 12px;
+  font-size: 11px;
+  color: #737373;
+  flex-shrink: 0;
+}
+
+.invoice-stats-simple b {
+  color: #171717;
+}
+
+/* ============================================
+   الهاتف
+   ============================================ */
+@media (max-width: 768px) {
+  .suppliers-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .supplier-card {
+    padding: 12px;
+    gap: 12px;
+  }
+
+  .supplier-avatar {
+    width: 42px;
+    height: 42px;
+    font-size: 18px;
+  }
+
+  .supplier-info strong {
+    font-size: 14px;
+  }
+
+  .add-form {
+    padding: 16px;
+  }
+
+  .add-form .form-actions {
+    flex-direction: column;
+  }
+
+  .add-form .form-actions .btn-primary,
+  .add-form .form-actions .btn-secondary {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .supplier-card-detail {
+    padding: 16px;
+  }
+
+  .supplier-avatar-large {
+    width: 64px;
+    height: 64px;
+    font-size: 26px;
+  }
+
+  .detail-title {
+    font-size: 1.1rem;
+  }
+
+  .supplier-extra .row {
+    padding: 8px 0;
+    font-size: 13px;
+  }
+
+  .supplier-stats .stat {
+    padding: 10px 6px;
+  }
+
+  .supplier-stats .stat-value {
+    font-size: 0.95rem;
+  }
+
+  .supplier-products {
+    padding: 16px;
+  }
+
+  .invoice-row-simple {
+    padding: 8px;
+    gap: 8px;
+  }
+
+  .invoice-icon-small {
+    width: 36px;
+    height: 36px;
+  }
+
+  .invoice-icon-small i {
+    font-size: 14px;
+  }
+
+  .invoice-stats-simple {
+    flex-direction: column;
+    gap: 2px;
+    font-size: 10px;
+  }
+}

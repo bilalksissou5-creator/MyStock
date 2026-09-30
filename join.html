@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>الانضمام - MyStock</title>
+  <link rel="stylesheet" href="/assets/css/common.css">
+  <link rel="stylesheet" href="/assets/css/pages/join.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+  <div class="join-page">
+    <div class="join-logo">
+      <i class="fas fa-boxes-stacked"></i>
+      <h1>MyStock</h1>
+    </div>
+
+    <div class="join-card">
+      <h2>الانضمام للفريق</h2>
+      <p class="join-subtitle">أدخل الكود المُرسل إليك من المدير</p>
+
+      <div class="alert alert-error" id="join-error" style="display:none;"></div>
+      <div class="alert alert-success" id="join-success" style="display:none;"></div>
+
+      <div class="form-group">
+        <label>كود الدعوة *</label>
+        <input type="text" id="invite-code" placeholder="000000" maxlength="6" 
+               inputmode="numeric" pattern="[0-9]*" dir="ltr"
+               style="text-align:center; font-size:24px; letter-spacing:12px; font-weight:700;">
+      </div>
+
+      <div class="form-group">
+        <label>الاسم الكامل *</label>
+        <input type="text" id="full-name" placeholder="اسمك الكامل...">
+      </div>
+
+      <div class="form-group">
+        <label>البريد الإلكتروني *</label>
+        <input type="email" id="email" placeholder="email@example.com" dir="ltr">
+      </div>
+
+      <div class="form-group">
+        <label>كلمة المرور *</label>
+        <input type="password" id="password" placeholder="6 أحرف على الأقل" dir="ltr">
+      </div>
+
+      <button type="button" class="btn-primary join-submit" id="join-btn">
+        <i class="fas fa-user-plus"></i>
+        <span>إنشاء حسابي</span>
+      </button>
+
+      <p class="join-footer">
+        لديك حساب بالفعل؟ <a href="/login.html">تسجيل الدخول</a>
+      </p>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="/js/core/supabase.js"></script>
+  <script src="/js/core/auth.js"></script>
+  <script src="/js/pages/join.js"></script>
+</body>
+</html>

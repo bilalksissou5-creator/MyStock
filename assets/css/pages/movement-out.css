@@ -1,0 +1,156 @@
+/* ============================================
+   صفحة إخراج منتج - تنسيقات خاصة فقط
+   ============================================ */
+
+.out-form {
+  background: white;
+  padding: 24px;
+  border-radius: 10px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  max-width: 500px;
+  margin: 0 auto;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.suggestions-box {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  left: 0;
+  background: white;
+  border: 1px solid #e5e5e5;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  margin-top: 4px;
+  z-index: 100;
+  max-height: 320px;
+  overflow-y: auto;
+  display: none;
+}
+
+.suggestion-card {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  cursor: pointer;
+  border-bottom: 1px solid #f5f5f5;
+  transition: background 0.15s;
+}
+
+.suggestion-card:last-child { border-bottom: none; }
+.suggestion-card:hover { background: #f5f5f5; }
+
+.suggestion-image {
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+  flex-shrink: 0;
+  border-radius: 6px;
+  background: #f5f5f5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.suggestion-image img {
+  width: 40px;
+  height: 40px;
+  object-fit: cover;
+  display: block;
+}
+
+.suggestion-image i {
+  color: #a3a3a3;
+  font-size: 16px;
+}
+
+.suggestion-info {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.suggestion-info strong {
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
+}
+
+.suggestion-sku {
+  font-size: 10px;
+  color: #737373;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
+}
+
+.suggestion-stats {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  font-size: 10px;
+  flex-shrink: 0;
+  color: #737373;
+  white-space: nowrap;
+}
+
+.suggestion-stats b {
+  color: #171717;
+  font-weight: 700;
+}
+
+.suggestion-stats b.low {
+  color: #dc2626;
+}
+
+.suggestion-empty {
+  padding: 16px;
+  text-align: center;
+  color: #737373;
+  font-size: 13px;
+}
+
+@media (max-width: 768px) {
+  .out-form {
+    padding: 16px;
+  }
+
+  .suggestion-card {
+    padding: 6px 8px;
+    gap: 8px;
+  }
+
+  .suggestion-image {
+    width: 34px;
+    height: 34px;
+    min-width: 34px;
+  }
+
+  .suggestion-image img {
+    width: 34px;
+    height: 34px;
+  }
+
+  .suggestion-info strong {
+    font-size: 11px;
+  }
+
+  .suggestion-sku {
+    font-size: 9px;
+  }
+
+  .suggestion-stats {
+    font-size: 9px;
+    gap: 6px;
+  }
+}

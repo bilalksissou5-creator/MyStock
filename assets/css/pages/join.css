@@ -1,0 +1,161 @@
+/* ============================================
+   صفحة الانضمام
+   ============================================ */
+
+body {
+  background: #f5f5f5;
+  min-height: 100vh;
+  margin: 0;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+.join-page {
+  width: 100%;
+  max-width: 420px;
+}
+
+.join-logo {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.join-logo i {
+  font-size: 48px;
+  color: #171717;
+  background: white;
+  width: 80px;
+  height: 80px;
+  border-radius: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  margin-bottom: 12px;
+}
+
+.join-logo h1 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #171717;
+  margin: 0;
+}
+
+.join-card {
+  background: white;
+  border-radius: 16px;
+  padding: 28px 24px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.join-card h2 {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #171717;
+  margin: 0 0 6px;
+  text-align: center;
+}
+
+.join-subtitle {
+  font-size: 13px;
+  color: #737373;
+  text-align: center;
+  margin: 0 0 20px;
+}
+
+.join-card .form-group {
+  margin-bottom: 14px;
+}
+
+.join-card .form-group label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: #404040;
+  margin-bottom: 6px;
+}
+
+.join-card .form-group input {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid #e5e5e5;
+  border-radius: 10px;
+  font-size: 14px;
+  box-sizing: border-box;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  font-family: inherit;
+}
+
+.join-card .form-group input:focus {
+  outline: none;
+  border-color: #171717;
+  box-shadow: 0 0 0 3px rgba(23, 23, 23, 0.08);
+}
+
+.join-submit {
+  width: 100%;
+  padding: 14px;
+  background: #171717;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 8px;
+  transition: background 0.15s;
+}
+
+.join-submit:hover:not(:disabled) {
+  background: #000;
+}
+
+.join-submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.join-footer {
+  text-align: center;
+  font-size: 13px;
+  color: #737373;
+  margin: 16px 0 0;
+}
+
+.join-footer a {
+  color: #171717;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.join-footer a:hover {
+  text-decoration: underline;
+}
+
+/* الأخطاء والنجاح */
+.join-card .alert {
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  margin-bottom: 14px;
+}
+
+.join-card .alert-error {
+  background: #fef2f2;
+  color: #dc2626;
+  border: 1px solid #fecaca;
+}
+
+.join-card .alert-success {
+  background: #f0fdf4;
+  color: #16a34a;
+  border: 1px solid #bbf7d0;
+}

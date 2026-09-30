@@ -1,0 +1,459 @@
+/* ============================================
+   صفحة الملف الشخصي — تصميم Facebook
+   ============================================ */
+
+.profile-fb-wrapper {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0 0 20px;
+  box-sizing: border-box;
+}
+
+/* ============================================
+   الغلاف (Cover)
+   ============================================ */
+.profile-cover {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 6;
+  background: linear-gradient(135deg, #171717 0%, #404040 100%);
+  border-radius: 12px 12px 0 0;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+.profile-cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.cover-placeholder {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #171717 0%, #404040 100%);
+}
+
+.cover-edit-btn {
+  position: absolute;
+  bottom: 12px;
+  left: 12px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  border: 2px solid rgba(255, 255, 255, 0.9);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  z-index: 10;
+  pointer-events: auto;
+  transition: background 0.15s, transform 0.15s;
+  backdrop-filter: blur(4px);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.cover-edit-btn:hover,
+.cover-edit-btn:active {
+  background: rgba(0, 0, 0, 0.9);
+  transform: scale(1.05);
+}
+
+/* ============================================
+   الصورة الشخصية (Avatar)
+   ============================================ */
+.profile-avatar-fb-wrap {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  margin-top: -60px;
+  margin-bottom: 12px;
+  z-index: 5;
+  pointer-events: none;
+}
+
+.profile-avatar-fb {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: #f5f5f5;
+  border: 4px solid white;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  position: relative;
+  pointer-events: auto;
+}
+
+.profile-avatar-fb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.profile-avatar-fb i {
+  font-size: 48px;
+  color: #a3a3a3;
+}
+
+.avatar-edit-btn {
+  position: absolute;
+  bottom: 8px;
+  left: calc(50% + 32px);
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #171717;
+  color: white;
+  border: 3px solid white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  z-index: 10;
+  pointer-events: auto;
+  transition: background 0.15s, transform 0.15s;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.avatar-edit-btn:hover,
+.avatar-edit-btn:active {
+  background: #000;
+  transform: scale(1.05);
+}
+
+/* ============================================
+   معلومات المستخدم
+   ============================================ */
+.profile-fb-info {
+  text-align: center;
+  padding: 4px 16px 20px;
+  border-bottom: 1px solid #f0f0f0;
+  margin-bottom: 16px;
+}
+
+.profile-fb-info h3 {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #171717;
+  margin: 0 0 4px;
+}
+
+.profile-fb-email {
+  font-size: 13px;
+  color: #a3a3a3;
+  margin: 0 0 12px;
+}
+
+.profile-fb-badges {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.badge-role,
+.badge-status {
+  display: inline-block;
+  padding: 4px 14px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.badge-role {
+  background: #171717;
+  color: white;
+}
+
+.badge-status {
+  background: #f0fdf4;
+  color: #16a34a;
+}
+
+/* ============================================
+   ✅ القسم الأول: شريط الأزرار
+   ============================================ */
+.profile-actions-bar {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 16px;
+  padding: 0 4px;
+}
+
+.profile-actions-bar .btn-primary,
+.profile-actions-bar .btn-secondary {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 16px;
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.profile-actions-bar .btn-primary {
+  background: #171717;
+  color: white;
+  border: none;
+}
+
+.profile-actions-bar .btn-secondary {
+  background: white;
+  color: #171717;
+  border: 1px solid #e5e5e5;
+}
+
+.profile-actions-bar .btn-primary:hover,
+.profile-actions-bar .btn-secondary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+/* ============================================
+   ✅ القسم الثاني: بطاقات العمال
+   ============================================ */
+.workers-section {
+  background: white;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 16px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+.workers-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: #171717;
+  margin: 0 0 14px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.workers-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 12px;
+}
+
+.workers-empty {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 32px 16px;
+  color: #a3a3a3;
+}
+
+.workers-empty i {
+  font-size: 2rem;
+  margin-bottom: 8px;
+  display: block;
+  color: #d4d4d4;
+}
+
+.workers-empty p {
+  font-size: 13px;
+  margin: 0;
+}
+
+/* ══════ بطاقة العامل ══════ */
+.worker-card {
+  background: #fafafa;
+  border: 1px solid #f0f0f0;
+  border-radius: 12px;
+  padding: 16px 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  transition: background 0.15s, transform 0.15s;
+}
+
+.worker-card:hover {
+  background: #f5f5f5;
+  transform: translateY(-2px);
+}
+
+.worker-avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: #e5e5e5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  margin-bottom: 10px;
+  border: 2px solid white;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  flex-shrink: 0;
+}
+
+.worker-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.worker-avatar i {
+  font-size: 26px;
+  color: #a3a3a3;
+}
+
+.worker-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: #171717;
+  margin-bottom: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 100%;
+}
+
+.worker-role {
+  font-size: 11px;
+  color: #737373;
+  margin-bottom: 8px;
+  padding: 2px 10px;
+  background: #f0f0f0;
+  border-radius: 20px;
+  display: inline-block;
+}
+
+.worker-status {
+  font-size: 10px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border-radius: 20px;
+}
+
+.worker-status.online {
+  color: #16a34a;
+  background: #f0fdf4;
+}
+
+.worker-status.offline {
+  color: #737373;
+  background: #f5f5f5;
+}
+
+.status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  flex-shrink: 0;
+}
+
+/* ============================================
+   الهاتف
+   ============================================ */
+@media (max-width: 768px) {
+  .profile-fb-wrapper {
+    padding: 0 8px 20px;
+  }
+
+  .profile-cover {
+    aspect-ratio: 16 / 7;
+    border-radius: 10px 10px 0 0;
+  }
+
+  .profile-avatar-fb-wrap {
+    margin-top: -50px;
+  }
+
+  .profile-avatar-fb {
+    width: 100px;
+    height: 100px;
+    border-width: 3px;
+  }
+
+  .profile-avatar-fb i {
+    font-size: 40px;
+  }
+
+  .avatar-edit-btn {
+    left: calc(50% + 24px);
+    width: 32px;
+    height: 32px;
+    font-size: 12px;
+    border-width: 2px;
+  }
+
+  .cover-edit-btn {
+    width: 40px;
+    height: 40px;
+    font-size: 15px;
+    bottom: 10px;
+    left: 10px;
+  }
+
+  .profile-fb-info h3 {
+    font-size: 1.2rem;
+  }
+
+  .profile-fb-email {
+    font-size: 12px;
+  }
+
+  /* شريط الأزرار */
+  .profile-actions-bar {
+    gap: 8px;
+    padding: 0;
+  }
+
+  .profile-actions-bar .btn-primary,
+  .profile-actions-bar .btn-secondary {
+    padding: 10px 12px;
+    font-size: 13px;
+    gap: 6px;
+  }
+
+  /* بطاقات العمال */
+  .workers-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+
+  .worker-card {
+    padding: 12px 8px;
+  }
+
+  .worker-avatar {
+    width: 54px;
+    height: 54px;
+  }
+
+  .worker-avatar i {
+    font-size: 22px;
+  }
+
+  .worker-name {
+    font-size: 12px;
+  }
+
+  .worker-role {
+    font-size: 10px;
+  }
+
+  .worker-status {
+    font-size: 9px;
+  }
+}

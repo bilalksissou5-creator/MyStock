@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>الانضمام - MyStock</title>
+  <link rel="stylesheet" href="/assets/css/base.css">
+  <link rel="stylesheet" href="/assets/css/components.css">
+  <link rel="stylesheet" href="/assets/css/pages/register.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body class="register-page">
+  <form class="auth-box" id="register-worker-form">
+    <h1>MyStock</h1>
+    <p class="subtitle">الانضمام إلى الفريق</p>
+
+    <div class="alert alert-error" id="reg-error" style="display:none;"></div>
+    <div class="alert alert-success" id="reg-success" style="display:none;"></div>
+
+    <div class="section-title">معلوماتك الشخصية</div>
+
+    <div class="row-2">
+      <div class="form-group">
+        <label>الإسم الشخصي *</label>
+        <input type="text" id="first_name" required>
+      </div>
+      <div class="form-group">
+        <label>الإسم العائلي *</label>
+        <input type="text" id="last_name" required>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>رقم الهاتف *</label>
+      <input type="tel" id="phone" required dir="ltr" placeholder="+212 6XX XXX XXX">
+    </div>
+
+    <div class="form-group">
+      <label>البريد الإلكتروني *</label>
+      <input type="email" id="email" required dir="ltr" readonly style="background:#f5f5f5;">
+    </div>
+
+    <div class="form-group">
+      <label>كلمة السر *</label>
+      <div class="password-wrapper">
+        <input type="password" id="password" required minlength="6" dir="ltr">
+        <button type="button" class="toggle-password" data-target="password">
+          <i class="fas fa-eye"></i>
+        </button>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>تأكيد كلمة السر *</label>
+      <div class="password-wrapper">
+        <input type="password" id="password_confirm" required minlength="6" dir="ltr">
+        <button type="button" class="toggle-password" data-target="password_confirm">
+          <i class="fas fa-eye"></i>
+        </button>
+      </div>
+    </div>
+
+    <button type="submit" class="btn-primary" style="width:100%; justify-content:center; margin-top: 20px;" id="register-btn">
+      <i class="fas fa-user-plus"></i>
+      <span>إنشاء حسابي</span>
+    </button>
+
+    <div class="auth-footer">
+      <p>لديك حساب؟</p>
+      <a href="/login.html" class="btn-secondary" style="width:100%; justify-content:center;">
+        <i class="fas fa-right-to-bracket"></i>
+        <span>تسجيل الدخول</span>
+      </a>
+    </div>
+  </form>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="/js/core/supabase.js"></script>
+  <script src="/js/core/register-worker.js"></script>
+</body>
+</html>

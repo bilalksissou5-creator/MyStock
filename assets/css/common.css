@@ -1,0 +1,415 @@
+/* ============================================
+   الأساسيات
+   ============================================ */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+html, body {
+  height: 100%;
+  height: 100dvh;
+  overflow: hidden;
+}
+
+body {
+  background: #f5f5f5;
+  color: #171717;
+  direction: rtl;
+}
+
+a { color: inherit; text-decoration: none; }
+button { font-family: inherit; }
+
+.app {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+}
+
+/* ============================================
+   Header
+   ============================================ */
+.header {
+  background: #fff;
+  border-bottom: 1px solid #e5e5e5;
+  height: 60px;
+  padding: 0 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  flex-shrink: 0;
+  z-index: 100;
+}
+
+.logo {
+  font-size: 1.4rem;
+  font-weight: 700;
+  margin: 0;
+  flex-shrink: 0;
+}
+
+.search {
+  flex: 1;
+  max-width: 500px;
+  position: relative;
+}
+
+.search i {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #a3a3a3;
+  font-size: 14px;
+}
+
+.search input {
+  width: 100%;
+  padding: 9px 38px 9px 12px;
+  border: 1px solid #d4d4d4;
+  border-radius: 8px;
+  background: #fafafa;
+  outline: none;
+  font-size: 14px;
+  box-sizing: border-box;
+}
+
+.search input:focus { border-color: #171717; }
+
+/* ============================================
+   زر الإشعارات - تنسيق موحّد
+   ============================================ */
+.notif {
+  position: relative;
+  background: none;
+  border: none;
+  padding: 8px;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  cursor: pointer;
+  color: #404040;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  transition: background 0.15s;
+  overflow: visible;
+}
+
+.notif:hover {
+  background: #f5f5f5;
+}
+
+.notif > i {
+  font-size: 18px;
+  line-height: 1;
+  display: block;
+}
+
+.notif-count {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  min-width: 17px;
+  height: 17px;
+  padding: 2px 2px;
+  background: #ef4444;
+  color: white;
+  border-radius: 50%;
+  font-size: 9px;
+  font-weight: 700;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  border: 2px solid #fff;
+  box-sizing: border-box;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.notif-count.has-count {
+  display: flex;
+}
+
+/* ============================================
+   Body
+   ============================================ */
+.body {
+  display: flex;
+  flex: 1 1 auto;
+  overflow: hidden;
+  min-height: 0;
+  min-width: 0;
+  height: 0;
+}
+
+/* ============================================
+   Sidebar
+   ============================================ */
+.sidebar {
+  width: 240px;
+  background: #fff;
+  border-left: 1px solid #e5e5e5;
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  overflow: hidden;
+  height: 100%;
+}
+
+.nav {
+  flex: 1 1 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 16px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-height: 0;
+}
+
+.nav::-webkit-scrollbar { width: 4px; }
+.nav::-webkit-scrollbar-thumb { background: #d4d4d4; border-radius: 4px; }
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 8px;
+  color: #171717;
+  font-size: 14px;
+  cursor: pointer;
+  border: none;
+  background: none;
+  width: 100%;
+  text-align: right;
+  flex-shrink: 0;
+  white-space: nowrap;
+  transition: background 0.15s;
+}
+
+.nav-item i { width: 24px; text-align: center; flex-shrink: 0; }
+.nav-item:hover { background: #f5f5f5; }
+.nav-item.active { background: #e5e5e5; font-weight: 600; }
+
+.sidebar-footer {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px;
+  border-top: 1px solid #e5e5e5;
+  background: #fff;
+  flex-shrink: 0;
+  flex-grow: 0;
+  flex-basis: auto;
+}
+
+/* ============================================
+   Main
+   ============================================ */
+.main {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 24px;
+  padding-bottom: 80px;
+  min-height: 0;
+  min-width: 0;
+  height: 100%;
+  box-sizing: border-box;
+}
+
+/* ============================================
+   أزرار
+   ============================================ */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #171717;
+  color: white;
+  padding: 10px 16px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+}
+.btn-primary:hover { background: #404040; }
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #e5e5e5;
+  color: #171717;
+  padding: 10px 16px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+}
+.btn-secondary:hover { background: #d4d4d4; }
+
+.btn-danger {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #dc2626;
+  color: white;
+  padding: 10px 16px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+}
+.btn-danger:hover { background: #b91c1c; }
+
+/* صفحة الرأس */
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.page-header h2 { margin: 0; font-size: 1.75rem; font-weight: 700; }
+
+/* البحث */
+.search-bar {
+  position: relative;
+  margin-bottom: 20px;
+  max-width: 400px;
+}
+.search-bar i {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #a3a3a3;
+  font-size: 14px;
+}
+.search-bar input {
+  width: 100%;
+  padding: 10px 36px 10px 12px;
+  border: 1px solid #d4d4d4;
+  border-radius: 8px;
+  background: white;
+  outline: none;
+  font-size: 14px;
+  box-sizing: border-box;
+}
+
+/* النماذج */
+.form-group { margin-bottom: 16px; }
+.form-group label {
+  display: block;
+  font-size: 14px;
+  color: #404040;
+  margin-bottom: 6px;
+}
+.form-group input,
+.form-group select,
+.form-group textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #d4d4d4;
+  border-radius: 8px;
+  background: white;
+  outline: none;
+  font-size: 14px;
+  font-family: inherit;
+  box-sizing: border-box;
+}
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus { border-color: #171717; }
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+/* تنبيهات */
+.alert {
+  padding: 12px 16px;
+  border-radius: 8px;
+  margin-bottom: 16px;
+  font-size: 14px;
+}
+.alert-error { background: #fee2e2; color: #991b1b; }
+.alert-success { background: #dcfce7; color: #166534; }
+
+/* حالات فارغة */
+.empty-state {
+  background: white;
+  padding: 48px 24px;
+  border-radius: 10px;
+  text-align: center;
+  color: #737373;
+}
+.empty-state i {
+  font-size: 3rem;
+  color: #d4d4d4;
+  margin-bottom: 12px;
+}
+
+/* ============================================
+   الهاتف
+   ============================================ */
+@media (max-width: 768px) {
+  .header { padding: 0 12px; gap: 10px; }
+  .logo { font-size: 1.1rem; }
+
+  /* ⚠️ لا توجد قواعد للجرس ← موحّد دائماً */
+
+  .sidebar { width: 65px; min-width: 65px; max-width: 65px; }
+  .nav { padding: 8px 4px; }
+  .nav-item {
+    padding: 12px 4px;
+    justify-content: center;
+    gap: 0;
+    font-size: 0;
+  }
+  .nav-item span { display: none; }
+  .nav-item i { font-size: 18px; width: auto; }
+  .sidebar-footer { padding: 8px 4px; }
+  .sidebar-footer .nav-item { padding: 12px 4px; justify-content: center; }
+  .sidebar-footer .nav-item i { font-size: 18px; }
+  .main { padding: 12px; padding-bottom: 80px; }
+}
+
+/* ============================================
+   Landscape
+   ============================================ */
+@media (orientation: landscape) and (max-height: 500px) {
+  .header { height: 45px; padding: 0 12px; gap: 10px; }
+  .logo { font-size: 1rem; }
+  .search input { padding: 6px 32px 6px 10px; font-size: 12px; }
+
+  /* ⚠️ لا توجد قواعد للجرس ← موحّد دائماً */
+
+  .sidebar { width: 200px; min-width: 200px; max-width: 200px; }
+  .nav { padding: 6px 8px; gap: 2px; }
+  .nav-item { padding: 6px 10px; font-size: 12px; gap: 8px; }
+  .nav-item i { font-size: 14px; width: 18px; }
+  .sidebar-footer { padding: 6px 8px; gap: 2px; }
+  .sidebar-footer .nav-item { padding: 6px 10px; font-size: 12px; }
+  .sidebar-footer .nav-item i { font-size: 14px; }
+  .main { padding: 12px; padding-bottom: 40px; }
+}
