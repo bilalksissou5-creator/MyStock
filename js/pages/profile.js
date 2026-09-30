@@ -15,18 +15,24 @@ document.addEventListener('DOMContentLoaded', async () => {
     .eq('id', user.id)
     .single();
 
-  const isAdmin = profile?.role === 'admin';
+  const currentRole = profile?.role; // admin / deputy / worker
+  const isAdmin = currentRole === 'admin';
+  const isAdminOrDeputy = currentRole === 'admin' || currentRole === 'deputy';
 
   // جلب أعضاء المنظمة
-  let workers = [];
+  let members = [];
   if (profile?.organization_id) {
     const { data } = await db
       .from('profiles')
       .select('*')
       .eq('organization_id', profile.organization_id)
-      .order('created_at', { ascending: false });
-    workers = data ?? [];
+      .order('created_at', { ascending: true });
+    members = data ?? [];
   }
+
+  const admin = members.find(m => m.role === 'admin');
+  const deputies = members.filter(m => m.role === 'deputy');
+  const workers = members.filter(m => m.role === 'worker');
 
   main.innerHTML = `
     <div class="profile-fb-wrapper">
@@ -60,14 +66,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         <h3 id="fb-name">${profile?.full_name ?? 'بدون اسم'}</h3>
         <p class="profile-fb-email" dir="ltr">${user.email}</p>
         <div class="profile-fb-badges">
-          <span class="badge-role">${profile?.role === 'admin' ? 'مدير' : 'عامل'}</span>
+          <span class="badge-role">${currentRole === 'admin' ? 'مدير' : currentRole === 'deputy' ? 'نائب' : 'عامل'}</span>
           <span class="badge-status">${profile?.status ?? 'offline'}</span>
         </div>
       </div>
 
       <!-- ══════ شريط الأزرار ══════ -->
       <div class="profile-actions-bar">
-        ${isAdmin ? `
+        ${isAdminOrDeputy ? `
           <button type="button" class="btn-secondary" id="add-worker-btn">
             <i class="fas fa-user-plus"></i>
             <span>إضافة عامل</span>
@@ -79,29 +85,107 @@ document.addEventListener('DOMContentLoaded', async () => {
         </button>
       </div>
 
-      <!-- ══════ بطاقات الأعضاء ══════ -->
-      <div class="workers-section">
-        <h3 class="workers-title">أعضاء المنظمة (${workers.length})</h3>
-
-        <div class="workers-grid">
-          ${workers.length === 0 ? `
-            <div class="workers-empty">
-              <i class="fas fa-users"></i>
-              <p>لا يوجد عمال</p>
+      <!-- ═══════════════════════════════════════
+           قسم المدير (بطاقة كاملة)
+           ═══════════════════════════════════════ -->
+      ${admin ? `
+        <div class="team-section">
+          <h3 class="team-title">
+            <i class="fas fa-crown" style="color:#fbbf24;"></i>
+            المدير
+          </h3>
+          <div class="admin-card">
+            <div class="admin-avatar">
+              ${admin.avatar_url
+                ? `<img src="${admin.avatar_url}" alt="${admin.full_name}">`
+                : `<i class="fas fa-user"></i>`}
             </div>
-          ` : workers.map(w => `
-            <div class="worker-card">
-              <div class="worker-avatar">
+            <div class="admin-info">
+              <div class="admin-name">${admin.full_name ?? 'بدون اسم'}</div>
+              <div class="admin-badges">
+                <span class="badge-crown">👑 مدير</span>
+                <span class="badge-status-inline ${admin.status === 'online' ? 'online' : 'offline'}">
+                  ${admin.status === 'online' ? 'متصل' : 'غير متصل'}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      ` : ''}
+
+      <!-- ═══════════════════════════════════════
+           قسم النواب
+           ═══════════════════════════════════════ -->
+      <div class="team-section">
+        <h3 class="team-title">
+          <i class="fas fa-star" style="color:#fbbf24;"></i>
+          النواب (${deputies.length})
+        </h3>
+
+        <div class="team-grid">
+          ${deputies.length === 0 ? `
+            <div class="team-empty">
+              <i class="fas fa-user-tie"></i>
+              <p>لا يوجد نواب</p>
+            </div>
+          ` : deputies.map(w => `
+            <div class="member-card deputy-card">
+              <div class="member-star gold-star">⭐</div>
+              <div class="member-avatar">
                 ${w.avatar_url
                   ? `<img src="${w.avatar_url}" alt="${w.full_name}">`
                   : `<i class="fas fa-user"></i>`}
               </div>
-              <div class="worker-name">${w.full_name ?? 'بدون اسم'}</div>
-              <div class="worker-role">${w.role === 'admin' ? 'مدير' : 'عامل'}</div>
-              <div class="worker-status ${w.status === 'online' ? 'online' : 'offline'}">
+              <div class="member-name">${w.full_name ?? 'بدون اسم'}</div>
+              <div class="member-role deputy">نائب</div>
+              <div class="member-status ${w.status === 'online' ? 'online' : 'offline'}">
                 <span class="status-dot"></span>
                 ${w.status === 'online' ? 'متصل' : 'غير متصل'}
               </div>
+              ${isAdmin ? `
+                <button type="button" class="member-action-btn remove-deputy-btn" data-id="${w.id}" title="إلغاء النيابة">
+                  <i class="fas fa-xmark"></i>
+                </button>
+              ` : ''}
+            </div>
+          `).join('')}
+        </div>
+      </div>
+
+      <!-- ═══════════════════════════════════════
+           قسم العمال
+           ═══════════════════════════════════════ -->
+      <div class="team-section">
+        <h3 class="team-title">
+          <i class="fas fa-users" style="color:#a16207;"></i>
+          العمال (${workers.length})
+        </h3>
+
+        <div class="team-grid">
+          ${workers.length === 0 ? `
+            <div class="team-empty">
+              <i class="fas fa-users"></i>
+              <p>لا يوجد عمال</p>
+            </div>
+          ` : workers.map(w => `
+            <div class="member-card worker-card">
+              <div class="member-star bronze-star">⭐</div>
+              <div class="member-avatar">
+                ${w.avatar_url
+                  ? `<img src="${w.avatar_url}" alt="${w.full_name}">`
+                  : `<i class="fas fa-user"></i>`}
+              </div>
+              <div class="member-name">${w.full_name ?? 'بدون اسم'}</div>
+              <div class="member-role worker">عامل</div>
+              <div class="member-status ${w.status === 'online' ? 'online' : 'offline'}">
+                <span class="status-dot"></span>
+                ${w.status === 'online' ? 'متصل' : 'غير متصل'}
+              </div>
+              ${isAdmin ? `
+                <button type="button" class="member-action-btn make-deputy-btn" data-id="${w.id}" title="تعيين نائباً">
+                  <i class="fas fa-crown"></i>
+                </button>
+              ` : ''}
             </div>
           `).join('')}
         </div>
@@ -132,9 +216,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     </div>
 
-    <!-- ═══════════════════════════════════════
-         Modal: إضافة عامل
-         ═══════════════════════════════════════ -->
+    <!-- Modal إضافة عامل -->
     <div class="modal-overlay" id="add-worker-modal" style="display:none;">
       <div class="modal-box">
         <div class="modal-header">
@@ -282,6 +364,49 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
 
   // ============================================
+  // تعيين/إلغاء النيابة (المدير فقط)
+  // ============================================
+  document.querySelectorAll('.make-deputy-btn').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      if (!confirm('تعيين هذا العامل نائباً؟')) return;
+
+      const memberId = btn.dataset.id;
+
+      const { error } = await db
+        .from('profiles')
+        .update({ role: 'deputy' })
+        .eq('id', memberId);
+
+      if (error) {
+        alert('خطأ: ' + error.message);
+        return;
+      }
+
+      window.location.reload();
+    });
+  });
+
+  document.querySelectorAll('.remove-deputy-btn').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      if (!confirm('إلغاء صفة النائب عن هذا العضو؟')) return;
+
+      const memberId = btn.dataset.id;
+
+      const { error } = await db
+        .from('profiles')
+        .update({ role: 'worker' })
+        .eq('id', memberId);
+
+      if (error) {
+        alert('خطأ: ' + error.message);
+        return;
+      }
+
+      window.location.reload();
+    });
+  });
+
+  // ============================================
   // Modal "إضافة عامل"
   // ============================================
   const addWorkerBtn = document.getElementById('add-worker-btn');
@@ -318,7 +443,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   modal?.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
 
   // ============================================
-  // إرسال الدعوة — Edge Function تُرسل البريد
+  // إرسال الدعوة
   // ============================================
   document.getElementById('modal-send-btn')?.addEventListener('click', async () => {
     const sendBtn = document.getElementById('modal-send-btn');
