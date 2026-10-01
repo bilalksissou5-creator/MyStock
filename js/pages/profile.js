@@ -36,42 +36,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   const deputies = others.filter(m => m.role === 'deputy');
   const workers = others.filter(m => m.role === 'worker');
 
-  // ═══════════════════════════════════════════
-  // بيانات بطاقات التعديل
-  // ═══════════════════════════════════════════
-  const editCards = [
-    {
-      id: 'cover',
-      icon: 'fa-image',
-      title: 'صورة الغلاف',
-      value: profile?.cover_url ? 'مُعدَّلة' : 'غير مُعدَّلة',
-    },
-    {
-      id: 'avatar',
-      icon: 'fa-user-circle',
-      title: 'صورة المستخدم',
-      value: profile?.avatar_url ? 'مُعدَّلة' : 'غير مُعدَّلة',
-    },
-    {
-      id: 'name',
-      icon: 'fa-user-pen',
-      title: 'الاسم',
-      value: profile?.full_name || 'لم يُحدَّد',
-    },
-    {
-      id: 'email-password',
-      icon: 'fa-envelope',
-      title: 'البريد وكلمة المرور',
-      value: user.email,
-    },
-    {
-      id: 'phone',
-      icon: 'fa-phone',
-      title: 'رقم الهاتف',
-      value: profile?.phone || 'لم يُحدَّد',
-    },
-  ];
-
   main.innerHTML = `
     <div class="profile-fb-wrapper">
 
@@ -101,37 +65,18 @@ document.addEventListener('DOMContentLoaded', async () => {
         </div>
       </div>
 
-      <!-- ══════ زر إضافة عامل (للمدير والنائب) ══════ -->
-      ${isAdminOrDeputy ? `
-        <div class="profile-actions-bar">
-          <a href="/add-worker.html" class="btn-primary full-width">
+      <!-- ══════ شريط الأزرار ══════ -->
+      <div class="profile-actions-bar">
+        ${isAdminOrDeputy ? `
+          <a href="/add-worker.html" class="btn-secondary">
             <i class="fas fa-user-plus"></i>
             <span>إضافة عامل</span>
           </a>
-        </div>
-      ` : ''}
-
-      <!-- ═══════════════════════════════════════
-           بطاقات تعديل المعلومات
-           ═══════════════════════════════════════ -->
-      <div class="edit-cards-section">
-        <h3 class="edit-cards-title">معلوماتي</h3>
-        <div class="edit-cards-list">
-          ${editCards.map(card => `
-            <a href="/profile-edit.html?section=${card.id}" class="edit-card">
-              <div class="edit-card-icon">
-                <i class="fas ${card.icon}"></i>
-              </div>
-              <div class="edit-card-body">
-                <div class="edit-card-title">${card.title}</div>
-                <div class="edit-card-value" dir="auto">${card.value}</div>
-              </div>
-              <div class="edit-card-arrow">
-                <i class="fas fa-chevron-left"></i>
-              </div>
-            </a>
-          `).join('')}
-        </div>
+        ` : ''}
+        <a href="/profile-dashboard.html" class="btn-primary">
+          <i class="fas fa-sliders"></i>
+          <span>لوحة المعلومات</span>
+        </a>
       </div>
 
       <!-- ═══════════════════════════════════════

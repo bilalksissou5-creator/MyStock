@@ -164,101 +164,6 @@
 }
 
 /* ============================================
-   بطاقات تعديل المعلومات
-   ============================================ */
-.edit-cards-section {
-  margin: 20px 0;
-  padding: 0 4px;
-}
-
-.edit-cards-title {
-  font-size: 15px;
-  font-weight: 700;
-  color: #171717;
-  margin: 0 0 12px 4px;
-  text-align: right;
-}
-
-.edit-cards-list {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.edit-card {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  padding: 14px 16px;
-  background: #ffffff;
-  border: 1px solid #e5e5e5;
-  border-radius: 14px;
-  text-decoration: none;
-  color: inherit;
-  transition: all 0.15s ease;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
-  cursor: pointer;
-}
-
-.edit-card:hover {
-  border-color: #d4d4d4;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
-  transform: translateY(-1px);
-}
-
-.edit-card:active {
-  transform: translateY(0);
-}
-
-.edit-card-icon {
-  width: 44px;
-  height: 44px;
-  border-radius: 12px;
-  background: #f5f5f5;
-  color: #171717;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 18px;
-  flex-shrink: 0;
-}
-
-.edit-card-body {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-  min-width: 0;
-}
-
-.edit-card-title {
-  font-size: 15px;
-  font-weight: 600;
-  color: #171717;
-  text-align: right;
-}
-
-.edit-card-value {
-  font-size: 13px;
-  color: #737373;
-  text-align: right;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.edit-card-arrow {
-  color: #d4d4d4;
-  font-size: 14px;
-  flex-shrink: 0;
-  transition: color 0.15s;
-}
-
-.edit-card:hover .edit-card-arrow {
-  color: #171717;
-}
-
-/* ============================================
    قسم الفريق (النواب + العمال)
    ============================================ */
 .team-section {
@@ -576,25 +481,6 @@
     padding: 10px 12px;
     font-size: 13px;
     gap: 6px;
-  }
-
-  .edit-card {
-    padding: 12px 14px;
-    gap: 12px;
-  }
-
-  .edit-card-icon {
-    width: 40px;
-    height: 40px;
-    font-size: 16px;
-  }
-
-  .edit-card-title {
-    font-size: 14px;
-  }
-
-  .edit-card-value {
-    font-size: 12px;
   }
 
   .team-grid {
