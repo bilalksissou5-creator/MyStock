@@ -1,0 +1,265 @@
+/* ============================================
+   صفحة إضافة عامل
+   ============================================ */
+
+.add-worker-page {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* ══════ اختيار الطريقة ══════ */
+.method-section {
+  margin-top: 20px;
+}
+
+.method-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #404040;
+  margin: 0 0 14px;
+  text-align: center;
+}
+
+.method-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.method-card {
+  background: white;
+  border: 1px solid #e5e5e5;
+  border-radius: 14px;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  cursor: pointer;
+  transition: border-color 0.15s, box-shadow 0.15s, transform 0.15s;
+  text-align: right;
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.method-card:hover,
+.method-card:active {
+  border-color: #171717;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  transform: translateY(-1px);
+}
+
+.method-icon {
+  width: 54px;
+  height: 54px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  flex-shrink: 0;
+}
+
+.email-icon {
+  background: #eff6ff;
+  color: #2563eb;
+}
+
+.qr-icon {
+  background: #f0fdf4;
+  color: #16a34a;
+}
+
+.method-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.method-info strong {
+  font-size: 15px;
+  font-weight: 700;
+  color: #171717;
+}
+
+.method-info span {
+  font-size: 12px;
+  color: #737373;
+}
+
+/* ══════ لوحة الطريقة ══════ */
+.method-panel {
+  background: white;
+  border-radius: 14px;
+  padding: 20px;
+  margin-top: 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+.back-btn {
+  background: none;
+  border: none;
+  color: #737373;
+  cursor: pointer;
+  font-size: 13px;
+  padding: 6px 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 14px;
+  font-family: inherit;
+}
+
+.back-btn:hover {
+  color: #171717;
+}
+
+.panel-header {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.panel-header .panel-icon {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  margin: 0 auto 12px;
+}
+
+.panel-header h3 {
+  font-size: 16px;
+  font-weight: 700;
+  color: #171717;
+  margin: 0;
+}
+
+/* ══════ الحقول والأزرار ══════ */
+.full-width {
+  width: 100%;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+/* ══════ QR Container ══════ */
+.qr-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 260px;
+  background: #fafafa;
+  border-radius: 12px;
+  border: 2px dashed #e5e5e5;
+  padding: 20px;
+  margin-bottom: 16px;
+}
+
+.qr-container canvas {
+  border-radius: 12px;
+  display: block;
+}
+
+.qr-loading {
+  text-align: center;
+  color: #737373;
+}
+
+.qr-loading i {
+  font-size: 32px;
+  margin-bottom: 8px;
+  display: block;
+  color: #171717;
+}
+
+.qr-loading p {
+  font-size: 13px;
+  margin: 0;
+}
+
+.qr-note {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  background: #fffbeb;
+  border: 1px solid #fde68a;
+  border-radius: 10px;
+  font-size: 12px;
+  color: #92400e;
+  margin-bottom: 14px;
+}
+
+.qr-note i {
+  flex-shrink: 0;
+}
+
+.qr-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.qr-actions button {
+  justify-content: center;
+  padding: 12px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* ══════ زر إضافة عامل آخر ══════ */
+.add-another-section {
+  margin-top: 16px;
+}
+
+/* ══════ التنبيهات ══════ */
+.alert-info {
+  background: #eff6ff;
+  color: #1d4ed8;
+  border: 1px solid #bfdbfe;
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-size: 13px;
+  margin-bottom: 14px;
+}
+
+/* ══════ الهاتف ══════ */
+@media (max-width: 768px) {
+  .add-worker-page {
+    padding: 0 4px;
+  }
+
+  .method-card {
+    padding: 16px;
+    gap: 12px;
+  }
+
+  .method-icon {
+    width: 48px;
+    height: 48px;
+    font-size: 20px;
+  }
+
+  .method-info strong {
+    font-size: 14px;
+  }
+
+  .method-info span {
+    font-size: 11px;
+  }
+
+  .method-panel {
+    padding: 16px;
+  }
+
+  .qr-container {
+    min-height: 220px;
+    padding: 16px;
+  }
+}
