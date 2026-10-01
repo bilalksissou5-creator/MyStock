@@ -1,0 +1,179 @@
+/* ============================================
+   صفحة تعديل الملف الشخصي
+   ============================================ */
+
+/* ══════ الحاوية العامة ══════ */
+.edit-section-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+/* ══════ بطاقة القسم ══════ */
+.edit-section {
+  background: #ffffff;
+  border: 1px solid #e5e5e5;
+  border-radius: 14px;
+  padding: 24px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+}
+
+.edit-section-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  background: #f5f5f5;
+  color: #171717;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  margin: 0 auto;
+}
+
+.edit-section h3 {
+  font-size: 17px;
+  font-weight: 700;
+  color: #171717;
+  text-align: center;
+  margin: 0;
+}
+
+.edit-hint {
+  font-size: 13px;
+  color: #737373;
+  text-align: center;
+  margin: 0 0 8px;
+  line-height: 1.5;
+}
+
+/* ══════ المعاينة: الغلاف ══════ */
+.preview-cover {
+  width: 100%;
+  aspect-ratio: 16 / 6;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #f5f5f5;
+  border: 1px dashed #d4d4d4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 8px 0;
+}
+
+.preview-cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.cover-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  color: #a3a3a3;
+  font-size: 13px;
+}
+
+.cover-empty i {
+  font-size: 28px;
+}
+
+/* ══════ المعاينة: الصورة الشخصية ══════ */
+.preview-avatar {
+  width: 130px;
+  height: 130px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: #f5f5f5;
+  border: 3px solid #ffffff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 8px auto;
+  color: #a3a3a3;
+  font-size: 50px;
+}
+
+.preview-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* ══════ الحقول ══════ */
+.edit-section .form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0;
+}
+
+.edit-section .form-group label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #404040;
+}
+
+.edit-section .form-group input {
+  padding: 12px 14px;
+  border: 1px solid #e5e5e5;
+  border-radius: 10px;
+  font-size: 15px;
+  background: #fafafa;
+  transition: all 0.15s;
+  font-family: inherit;
+  color: #171717;
+}
+
+.edit-section .form-group input:focus {
+  outline: none;
+  border-color: #171717;
+  background: #ffffff;
+}
+
+.edit-section .form-group input:disabled {
+  background: #f0f0f0;
+  color: #737373;
+  cursor: not-allowed;
+}
+
+/* ══════ زر الحفظ (footer) ══════ */
+.edit-footer {
+  position: sticky;
+  bottom: 16px;
+  margin-top: 8px;
+  z-index: 10;
+}
+
+.edit-footer .btn-primary {
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+}
+
+/* ══════ الأزرار العامة ══════ */
+.full-width {
+  width: 100%;
+  justify-content: center;
+}
+
+/* ══════ Responsive ══════ */
+@media (max-width: 480px) {
+  .edit-section {
+    padding: 20px 16px;
+    border-radius: 12px;
+  }
+
+  .preview-avatar {
+    width: 110px;
+    height: 110px;
+    font-size: 42px;
+  }
+}
