@@ -1,23 +1,20 @@
 /* ============================================
-   صفحة ملف عضو — نسخة profile.html
+   صفحة ملف عضو — إضافات على profile.css
    ============================================ */
 
 /* ══════════════════════════════════════════
    ✅ نقطة الاتصال على حافة الصورة
+   (بنفس حجم profile.css)
    ══════════════════════════════════════════ */
-.profile-avatar-fb-wrap {
-  position: relative;
-}
-
 .mp-status-dot-large {
   position: absolute;
-  bottom: -2px;
-  right: calc(50% - 62px);
-  width: 26px;
-  height: 26px;
+  bottom: 8px;
+  right: calc(50% - 58px);
+  width: 16px;
+  height: 16px;
   border-radius: 50%;
-  border: 4px solid #ffffff;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+  border: 3px solid #ffffff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
   z-index: 10;
   pointer-events: auto;
 }
@@ -31,7 +28,7 @@
 }
 
 /* ══════════════════════════════════════════
-   الاسم + النجمة في profile-fb-info
+   الاسم + النجمة
    ══════════════════════════════════════════ */
 .profile-fb-info h3 {
   display: flex;
@@ -189,11 +186,11 @@
   }
 
   .mp-status-dot-large {
-    width: 22px;
-    height: 22px;
-    border-width: 3px;
-    right: calc(50% - 52px);
-    bottom: -2px;
+    width: 14px;
+    height: 14px;
+    border-width: 2.5px;
+    right: calc(50% - 48px);
+    bottom: 6px;
   }
 }
 
@@ -203,9 +200,9 @@
   }
 
   .mp-status-dot-large {
-    width: 20px;
-    height: 20px;
-    border-width: 3px;
-    right: calc(50% - 48px);
+    width: 13px;
+    height: 13px;
+    right: calc(50% - 44px);
+    bottom: 6px;
   }
 }
