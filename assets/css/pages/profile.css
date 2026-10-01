@@ -267,14 +267,18 @@
 
 /* ══════ بطاقة المدير (مُصغَّرة) ══════ */
 .admin-card {
-  background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
-  border: 1px solid #fbbf24;
+  background: #fafafa;
+  border: 1px solid #f0f0f0;
   border-radius: 10px;
   padding: 10px 14px;
   display: flex;
   align-items: center;
   gap: 10px;
-  box-shadow: 0 1px 4px rgba(251, 191, 36, 0.1);
+  transition: background 0.15s;
+}
+
+.admin-card:hover {
+  background: #f5f5f5;
 }
 
 .admin-avatar {
@@ -282,7 +286,7 @@
   height: 42px;
   border-radius: 50%;
   background: white;
-  border: 2px solid #fbbf24;
+  border: 2px solid #e5e5e5;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -298,7 +302,7 @@
 
 .admin-avatar i {
   font-size: 16px;
-  color: #fbbf24;
+  color: #a3a3a3;
 }
 
 .admin-info {
@@ -324,7 +328,7 @@
 }
 
 .badge-crown {
-  background: #fbbf24;
+  background: #171717;
   color: white;
   padding: 2px 8px;
   border-radius: 20px;
@@ -371,16 +375,6 @@
   transform: translateY(-2px);
 }
 
-.deputy-card {
-  background: #fffbeb;
-  border-color: #fde68a;
-}
-
-.worker-card {
-  background: #fef9f3;
-  border-color: #f5e6d3;
-}
-
 /* النجمة */
 .member-star {
   position: absolute;
@@ -420,14 +414,6 @@
   flex-shrink: 0;
 }
 
-.deputy-card .member-avatar {
-  border-color: #fbbf24;
-}
-
-.worker-card .member-avatar {
-  border-color: #d97706;
-}
-
 .member-avatar img {
   width: 100%;
   height: 100%;
@@ -457,16 +443,8 @@
   border-radius: 20px;
   margin-bottom: 8px;
   display: inline-block;
-}
-
-.member-role.deputy {
-  background: #fef3c7;
-  color: #92400e;
-}
-
-.member-role.worker {
-  background: #fef3e2;
-  color: #a16207;
+  background: #f0f0f0;
+  color: #404040;
 }
 
 .member-status {
