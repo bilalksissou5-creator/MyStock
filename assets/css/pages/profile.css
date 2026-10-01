@@ -105,23 +105,14 @@
   flex-wrap: wrap;
 }
 
-.badge-role,
-.badge-status {
+.badge-role {
   display: inline-block;
   padding: 4px 14px;
   border-radius: 20px;
   font-size: 11px;
   font-weight: 600;
-}
-
-.badge-role {
   background: #171717;
   color: white;
-}
-
-.badge-status {
-  background: #f0fdf4;
-  color: #16a34a;
 }
 
 /* ============================================
@@ -188,7 +179,40 @@
   gap: 12px;
 }
 
-/* ══════ بطاقة المدير (مُصغَّرة) ══════ */
+/* ══════════════════════════════════════════
+   ✅ نقطة الاتصال على الصورة
+   ══════════════════════════════════════════ */
+.member-avatar-wrap,
+.admin-avatar-wrap {
+  position: relative;
+  display: inline-block;
+  margin-bottom: 10px;
+}
+
+.member-status-dot {
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2.5px solid #ffffff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  transition: background-color 0.2s;
+  z-index: 2;
+}
+
+.member-status-dot.online {
+  background: #22c55e;
+}
+
+.member-status-dot.offline {
+  background: #d4d4d4;
+}
+
+/* ══════════════════════════════════════════
+   ✅ بطاقة المدير (مُصغَّرة)
+   ══════════════════════════════════════════ */
 .admin-card {
   background: #fafafa;
   border: 1px solid #f0f0f0;
@@ -228,6 +252,14 @@
   color: #a3a3a3;
 }
 
+.admin-avatar-wrap .member-status-dot {
+  width: 11px;
+  height: 11px;
+  border-width: 2px;
+  bottom: 0;
+  right: 0;
+}
+
 .admin-info {
   flex: 1;
   min-width: 0;
@@ -262,26 +294,10 @@
   gap: 3px;
 }
 
-.badge-status-inline {
-  padding: 2px 8px;
-  border-radius: 20px;
-  font-size: 10px;
-  font-weight: 600;
-}
-
-.badge-status-inline.online {
-  background: #f0fdf4;
-  color: #16a34a;
-}
-
-.badge-status-inline.offline {
-  background: #f5f5f5;
-  color: #737373;
-}
-
-/* ══════ بطاقة العضو (نائب / عامل) ══════ */
+/* ══════════════════════════════════════════
+   ✅ بطاقة العضو (نائب / عامل)
+   ══════════════════════════════════════════ */
 .member-card {
-  position: relative;
   background: #fafafa;
   border: 1px solid #f0f0f0;
   border-radius: 12px;
@@ -298,30 +314,6 @@
   transform: translateY(-2px);
 }
 
-/* النجمة */
-.member-star {
-  position: absolute;
-  top: -8px;
-  right: -8px;
-  width: 26px;
-  height: 26px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 14px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
-  border: 2px solid white;
-}
-
-.gold-star {
-  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
-}
-
-.bronze-star {
-  background: linear-gradient(135deg, #d97706 0%, #a16207 100%);
-}
-
 .member-avatar {
   width: 60px;
   height: 60px;
@@ -331,7 +323,6 @@
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  margin-bottom: 10px;
   border: 2px solid white;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
   flex-shrink: 0;
@@ -348,92 +339,55 @@
   color: #a3a3a3;
 }
 
+/* ══════════════════════════════════════════
+   ✅ صف الاسم + النجمة
+   ══════════════════════════════════════════ */
+.member-name-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  margin-bottom: 6px;
+  width: 100%;
+  padding: 0 4px;
+}
+
 .member-name {
   font-size: 13px;
   font-weight: 600;
   color: #171717;
-  margin-bottom: 4px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  width: 100%;
+  max-width: calc(100% - 22px);
 }
 
+.member-star-icon {
+  font-size: 13px;
+  flex-shrink: 0;
+}
+
+/* ══════ نجمة النائب (ذهبية) ══════ */
+.member-star-icon.deputy-star {
+  color: #fbbf24;
+}
+
+/* ══════ نجمة العامل (رمادية) ══════ */
+.member-star-icon.worker-star {
+  color: #a3a3a3;
+}
+
+/* ══════════════════════════════════════════
+   ✅ الدور (نائب / عامل)
+   ══════════════════════════════════════════ */
 .member-role {
   font-size: 11px;
   font-weight: 600;
   padding: 2px 10px;
   border-radius: 20px;
-  margin-bottom: 8px;
   display: inline-block;
   background: #f0f0f0;
   color: #404040;
-}
-
-.member-status {
-  font-size: 10px;
-  font-weight: 500;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  padding: 3px 8px;
-  border-radius: 20px;
-}
-
-.member-status.online {
-  color: #16a34a;
-  background: #f0fdf4;
-}
-
-.member-status.offline {
-  color: #737373;
-  background: #f5f5f5;
-}
-
-.member-status .status-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: currentColor;
-  flex-shrink: 0;
-}
-
-/* ══════ أزرار الإجراءات ══════ */
-.member-action-btn {
-  position: absolute;
-  bottom: 8px;
-  right: 8px;
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  border: none;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 12px;
-  transition: transform 0.15s, box-shadow 0.15s;
-  z-index: 5;
-}
-
-.make-deputy-btn {
-  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
-  color: white;
-  box-shadow: 0 2px 6px rgba(251, 191, 36, 0.4);
-}
-
-.make-deputy-btn:hover {
-  transform: scale(1.1);
-}
-
-.remove-deputy-btn {
-  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-  color: white;
-  box-shadow: 0 2px 6px rgba(239, 68, 68, 0.4);
-}
-
-.remove-deputy-btn:hover {
-  transform: scale(1.1);
 }
 
 /* ============================================
@@ -501,16 +455,22 @@
     font-size: 22px;
   }
 
+  .member-status-dot {
+    width: 12px;
+    height: 12px;
+    border-width: 2px;
+  }
+
   .member-name {
+    font-size: 12px;
+  }
+
+  .member-star-icon {
     font-size: 12px;
   }
 
   .member-role {
     font-size: 10px;
-  }
-
-  .member-status {
-    font-size: 9px;
   }
 
   .admin-card {
@@ -523,19 +483,17 @@
     height: 38px;
   }
 
+  .admin-avatar-wrap .member-status-dot {
+    width: 10px;
+    height: 10px;
+  }
+
   .admin-name {
     font-size: 12px;
   }
 
-  .badge-crown,
-  .badge-status-inline {
+  .badge-crown {
     font-size: 9px;
     padding: 2px 6px;
-  }
-
-  .member-action-btn {
-    width: 24px;
-    height: 24px;
-    font-size: 10px;
   }
 }

@@ -46,7 +46,7 @@ function renderLayout(activePage) {
             <i class="fas fa-user"></i>
             <span>الملف الشخصي</span>
           </a>
-          <button class="nav-item logout">
+          <button class="nav-item logout" id="logout-btn">
             <i class="fas fa-right-from-bracket"></i>
             <span>تسجيل الخروج</span>
           </button>
@@ -59,11 +59,17 @@ function renderLayout(activePage) {
   const app = document.querySelector('.app');
   if (app) app.innerHTML = layout;
 
-  // زر تسجيل الخروج
+  // ✅ زر تسجيل الخروج — يستخدم دالة logout من auth.js
   document.querySelectorAll('.logout').forEach(b => {
-    b.addEventListener('click', async () => {
-      await db.auth.signOut();
-      window.location.href = '/login.html';
+    b.addEventListener('click', async (e) => {
+      e.preventDefault();
+      if (typeof logout === 'function') {
+        await logout();
+      } else {
+        // fallback: إذا لم تُحمَّل auth.js
+        await db.auth.signOut();
+        window.location.href = '/login.html';
+      }
     });
   });
 
