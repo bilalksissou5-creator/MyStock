@@ -4,12 +4,11 @@
 
 /* ══════════════════════════════════════════
    ✅ نقطة الاتصال على حافة الصورة
-   (بنفس حجم profile.css)
    ══════════════════════════════════════════ */
 .mp-status-dot-large {
   position: absolute;
-  bottom: 8px;
-  right: calc(50% - 58px);
+  bottom: 10px;
+  right: calc(50% - 60px);
   width: 16px;
   height: 16px;
   border-radius: 50%;
@@ -189,8 +188,8 @@
     width: 14px;
     height: 14px;
     border-width: 2.5px;
-    right: calc(50% - 48px);
-    bottom: 6px;
+    right: calc(50% - 50px);
+    bottom: 8px;
   }
 }
 
@@ -202,7 +201,7 @@
   .mp-status-dot-large {
     width: 13px;
     height: 13px;
-    right: calc(50% - 44px);
-    bottom: 6px;
+    right: calc(50% - 46px);
+    bottom: 8px;
   }
 }
