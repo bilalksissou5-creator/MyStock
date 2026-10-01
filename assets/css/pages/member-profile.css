@@ -17,7 +17,7 @@
    ══════════════════════════════════════════ */
 .mp-status-dot-large {
   position: absolute;
-  bottom: 4px;
+  bottom: 10px;
   right: 6px;
   width: 20px;
   height: 20px;
