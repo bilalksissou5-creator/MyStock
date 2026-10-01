@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   main.innerHTML = `
     <div class="page-header">
       <h2>الموردون</h2>
-      <a href="add.html" class="btn-primary">
+      <a href="/suppliers/add.html" class="btn-primary">
         <i class="fas fa-plus"></i>
         <span>إضافة مورد</span>
       </a>
@@ -65,7 +65,7 @@ async function loadSuppliers() {
   container.innerHTML = `
     <div class="suppliers-grid">
       ${data.map(s => `
-        <a href="detail.html?id=${s.id}" class="supplier-card">
+        <a href="/suppliers/detail.html?id=${s.id}" class="supplier-card">
           <div class="supplier-avatar">
             <i class="fas fa-truck"></i>
           </div>
