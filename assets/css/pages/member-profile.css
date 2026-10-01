@@ -12,13 +12,13 @@
 }
 
 /* ══════════════════════════════════════════
-   ✅ النقطة على الزاوية اليمنى السفلية
-   (مثل بطاقات النواب)
+   ✅ النقطة على حافة الدائرة
+   (بنفس تنسيق بطاقات النواب لكن بقيم مضاعفة)
    ══════════════════════════════════════════ */
 .mp-status-dot-large {
   position: absolute;
-  bottom: 0;
-  right: 0;
+  bottom: 10px;
+  right: 4px;
   width: 18px;
   height: 18px;
   border-radius: 50%;
@@ -197,6 +197,8 @@
     width: 16px;
     height: 16px;
     border-width: 2.5px;
+    bottom: 3px;
+    right: 3px;
   }
 }
 
@@ -209,5 +211,7 @@
     width: 14px;
     height: 14px;
     border-width: 2.5px;
+    bottom: 2px;
+    right: 2px;
   }
 }
