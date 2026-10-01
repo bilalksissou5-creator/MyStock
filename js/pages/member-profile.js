@@ -9,7 +9,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   const main = document.getElementById('main-content');
 
-  // جلب بروفايل المستخدم الحالي
   const { data: myProfile } = await db
     .from('profiles')
     .select('*')
@@ -21,13 +20,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     return;
   }
 
-  // قراءة id العضو
   const params = new URLSearchParams(window.location.search);
   const memberId = params.get('id') || user.id;
   const isMe = memberId === user.id;
   const isAdmin = myProfile.role === 'admin';
 
-  // جلب بيانات العضو
   const { data: member, error } = await db
     .from('profiles')
     .select('*')
@@ -39,7 +36,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     return;
   }
 
-  // التحقق أن العضو في نفس المنظمة
   if (!isMe && member.organization_id !== myProfile.organization_id) {
     main.innerHTML = `<div class="alert alert-error">هذا العضو ليس في منظمتك</div>`;
     return;
@@ -82,20 +78,16 @@ document.addEventListener('DOMContentLoaded', async () => {
   const roleLabel = member.role === 'admin' ? 'مدير' : member.role === 'deputy' ? 'نائب' : 'عامل';
   const starClass = member.role === 'deputy' ? 'deputy-star' : 'worker-star';
 
-  // ═══════════════════════════════════════════
-  // بناء الواجهة
-  // ═══════════════════════════════════════════
   main.innerHTML = `
     <div class="profile-fb-wrapper">
 
-      <!-- ══════ الغلاف ══════ -->
       <div class="profile-cover">
         ${member.cover_url
           ? `<img src="${member.cover_url}" alt="cover">`
           : `<div class="cover-placeholder"></div>`}
       </div>
 
-      <!-- ══════ الصورة الشخصية + النقطة (على الحافة) ══════ -->
+      <!-- ══════ الصورة الشخصية + النقطة ══════ -->
       <div class="profile-avatar-fb-wrap">
         <div class="avatar-dot-wrap">
           <div class="profile-avatar-fb">
@@ -108,7 +100,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         </div>
       </div>
 
-      <!-- ══════ معلومات العضو ══════ -->
       <div class="profile-fb-info">
         <h3>
           ${member.full_name ?? 'بدون اسم'}
@@ -120,7 +111,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         </div>
       </div>
 
-      <!-- ══════ الأزرار (للمدير فقط — وليس لملفه) ══════ -->
       ${isAdmin && !isMe ? `
         <div class="profile-actions-bar">
           <a href="/profile-dashboard.html?id=${member.id}" class="btn-secondary">
@@ -134,9 +124,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         </div>
       ` : ''}
 
-      <!-- ═══════════════════════════════════════
-           السجل
-           ═══════════════════════════════════════ -->
       <div class="team-section">
         <h3 class="team-title">
           <i class="fas fa-chart-simple"></i>
@@ -170,9 +157,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         </div>
       </div>
 
-      <!-- ═══════════════════════════════════════
-           معلومات إضافية
-           ═══════════════════════════════════════ -->
       <div class="team-section">
         <h3 class="team-title">
           <i class="fas fa-info-circle"></i>
