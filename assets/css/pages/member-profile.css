@@ -3,18 +3,28 @@
    ============================================ */
 
 /* ══════════════════════════════════════════
-   ✅ نقطة الاتصال على حافة الصورة
+   ✅ غلاف النقطة (بحجم الصورة بالضبط)
+   ══════════════════════════════════════════ */
+.avatar-dot-wrap {
+  position: relative;
+  display: inline-block;
+  line-height: 0;
+}
+
+/* ══════════════════════════════════════════
+   ✅ النقطة على حافة الدائرة (المركز على الحد)
    ══════════════════════════════════════════ */
 .mp-status-dot-large {
   position: absolute;
-  bottom: 10px;
-  right: calc(50% - 60px);
+  bottom: 0;
+  right: 0;
   width: 16px;
   height: 16px;
   border-radius: 50%;
   border: 3px solid #ffffff;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
   z-index: 10;
+  transform: translate(50%, 50%);
   pointer-events: auto;
 }
 
@@ -188,8 +198,6 @@
     width: 14px;
     height: 14px;
     border-width: 2.5px;
-    right: calc(50% - 50px);
-    bottom: 8px;
   }
 }
 
@@ -201,7 +209,6 @@
   .mp-status-dot-large {
     width: 13px;
     height: 13px;
-    right: calc(50% - 46px);
-    bottom: 8px;
+    border-width: 2.5px;
   }
 }

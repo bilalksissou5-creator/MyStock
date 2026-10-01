@@ -62,7 +62,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     suppliers: suppliersRes.count ?? 0,
   };
 
-  // آخر حركة
   const { data: lastMovement } = await db
     .from('stock_movements')
     .select('created_at')
@@ -71,7 +70,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     .limit(1)
     .maybeSingle();
 
-  // آخر فاتورة
   const { data: lastInvoice } = await db
     .from('invoices')
     .select('created_at')
@@ -97,15 +95,17 @@ document.addEventListener('DOMContentLoaded', async () => {
           : `<div class="cover-placeholder"></div>`}
       </div>
 
-      <!-- ══════ الصورة الشخصية + النقطة ══════ -->
+      <!-- ══════ الصورة الشخصية + النقطة (على الحافة) ══════ -->
       <div class="profile-avatar-fb-wrap">
-        <div class="profile-avatar-fb">
-          ${member.avatar_url
-            ? `<img src="${member.avatar_url}" alt="avatar">`
-            : `<i class="fas fa-user"></i>`}
+        <div class="avatar-dot-wrap">
+          <div class="profile-avatar-fb">
+            ${member.avatar_url
+              ? `<img src="${member.avatar_url}" alt="avatar">`
+              : `<i class="fas fa-user"></i>`}
+          </div>
+          <span class="mp-status-dot-large ${isOnline ? 'online' : 'offline'}"
+                title="${isOnline ? 'متصل' : 'غير متصل'}"></span>
         </div>
-        <span class="mp-status-dot-large ${isOnline ? 'online' : 'offline'}"
-              title="${isOnline ? 'متصل' : 'غير متصل'}"></span>
       </div>
 
       <!-- ══════ معلومات العضو ══════ -->
