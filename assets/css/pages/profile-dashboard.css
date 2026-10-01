@@ -163,6 +163,24 @@
   color: #171717;
 }
 
+/* ══════════════════════════════════════════
+   ✅ بطاقة معطّلة (للعرض فقط)
+   ══════════════════════════════════════════ */
+.pd-card-disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.pd-card-disabled .pd-card-arrow {
+  color: #d4d4d4;
+}
+
+.pd-card-disabled .pd-card-icon {
+  background: #f0f0f0;
+  color: #a3a3a3;
+}
+
 /* ══════ Responsive ══════ */
 @media (max-width: 480px) {
   .pd-user-card {

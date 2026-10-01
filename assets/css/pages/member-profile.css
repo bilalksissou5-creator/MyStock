@@ -1,174 +1,137 @@
 /* ============================================
-   صفحة ملف عضو (للمدير)
+   صفحة ملف عضو — نسخة profile.html
    ============================================ */
 
-.mp-wrapper {
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 0 4px 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
+/* ══════════════════════════════════════════
+   نقطة الاتصال الكبيرة على الصورة
+   ══════════════════════════════════════════ */
+.profile-avatar-fb {
+  position: relative;
 }
 
-/* ══════ بطاقة العضو ══════ */
-.mp-card {
-  background: #ffffff;
-  border: 1px solid #e5e5e5;
-  border-radius: 16px;
-  padding: 28px 20px 22px;
+.mp-status-dot-large {
+  position: absolute;
+  bottom: 4px;
+  right: 4px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 3px solid #ffffff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  z-index: 2;
+}
+
+.mp-status-dot-large.online {
+  background: #22c55e;
+}
+
+.mp-status-dot-large.offline {
+  background: #d4d4d4;
+}
+
+/* ══════════════════════════════════════════
+   الاسم + النجمة في profile-fb-info
+   ══════════════════════════════════════════ */
+.profile-fb-info h3 {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.profile-fb-info h3 .member-star-icon {
+  font-size: 1rem;
+}
+
+.profile-fb-info h3 .member-star-icon.deputy-star {
+  color: #fbbf24;
+}
+
+.profile-fb-info h3 .member-star-icon.worker-star {
+  color: #a3a3a3;
+}
+
+/* ══════════════════════════════════════════
+   شبكة السجل
+   ══════════════════════════════════════════ */
+.log-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+
+.log-card {
+  background: #fafafa;
+  border: 1px solid #f0f0f0;
+  border-radius: 12px;
+  padding: 16px 8px 12px;
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+  gap: 6px;
+  transition: background 0.15s, transform 0.15s;
 }
 
-.mp-avatar-wrap {
-  position: relative;
-  display: inline-block;
-  margin-bottom: 14px;
-}
-
-.mp-avatar {
-  width: 100px;
-  height: 100px;
-  border-radius: 50%;
+.log-card:hover {
   background: #f5f5f5;
-  border: 4px solid #ffffff;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+.log-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  background: #171717;
+  color: #ffffff;
   display: flex;
   align-items: center;
   justify-content: center;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+.log-value {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: #171717;
+  line-height: 1;
+}
+
+.log-label {
+  font-size: 11px;
+  color: #737373;
+  font-weight: 600;
+}
+
+/* ══════════════════════════════════════════
+   قائمة المعلومات
+   ══════════════════════════════════════════ */
+.info-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  background: #fafafa;
+  border: 1px solid #f0f0f0;
+  border-radius: 12px;
   overflow: hidden;
 }
 
-.mp-avatar img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.mp-avatar i {
-  font-size: 40px;
-  color: #a3a3a3;
-}
-
-.mp-status-dot {
-  position: absolute;
-  bottom: 4px;
-  right: 4px;
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  border: 3px solid #ffffff;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
-}
-
-.mp-status-dot.online {
-  background: #22c55e;
-}
-
-.mp-status-dot.offline {
-  background: #d4d4d4;
-}
-
-.mp-name {
-  font-size: 1.3rem;
-  font-weight: 700;
-  color: #171717;
-  margin: 0 0 6px;
-}
-
-.mp-role {
-  display: inline-block;
-  padding: 4px 14px;
-  border-radius: 20px;
-  font-size: 12px;
-  font-weight: 600;
-  background: #171717;
-  color: #ffffff;
-  margin: 0 0 8px;
-}
-
-.mp-status-text {
-  font-size: 13px;
-  color: #737373;
-  margin: 0;
-}
-
-/* ══════ الأزرار ══════ */
-.mp-actions {
-  display: flex;
-  gap: 10px;
-}
-
-.mp-actions .btn-primary,
-.mp-actions .btn-secondary {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 12px 16px;
-  font-size: 14px;
-  font-weight: 600;
-  border-radius: 10px;
-  cursor: pointer;
-  text-decoration: none;
-  transition: transform 0.15s, box-shadow 0.15s;
-}
-
-.mp-actions .btn-primary {
-  background: #171717;
-  color: white;
-  border: none;
-}
-
-.mp-actions .btn-secondary {
-  background: white;
-  color: #171717;
-  border: 1px solid #e5e5e5;
-}
-
-.mp-actions .btn-primary:active,
-.mp-actions .btn-secondary:active {
-  transform: scale(0.98);
-}
-
-/* ══════ قسم المعلومات ══════ */
-.mp-info-section {
-  background: #ffffff;
-  border: 1px solid #e5e5e5;
-  border-radius: 16px;
-  padding: 20px;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
-}
-
-.mp-info-section h3 {
-  font-size: 14px;
-  font-weight: 700;
-  color: #171717;
-  margin: 0 0 14px;
-  padding-bottom: 10px;
-  border-bottom: 1px solid #f0f0f0;
-}
-
-.mp-info-row {
+.info-row {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 10px 0;
-  font-size: 14px;
+  padding: 14px 16px;
+  font-size: 13px;
   color: #404040;
-  border-bottom: 1px solid #f5f5f5;
+  border-bottom: 1px solid #f0f0f0;
 }
 
-.mp-info-row:last-child {
+.info-row:last-child {
   border-bottom: none;
 }
 
-.mp-info-row i {
+.info-row i {
   width: 20px;
   color: #a3a3a3;
   font-size: 15px;
@@ -176,28 +139,63 @@
   flex-shrink: 0;
 }
 
-/* ══════ Responsive ══════ */
-@media (max-width: 480px) {
-  .mp-card {
-    padding: 22px 16px 18px;
+.info-label {
+  flex: 1;
+  font-weight: 600;
+  color: #737373;
+}
+
+.info-value {
+  font-weight: 600;
+  color: #171717;
+  text-align: left;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 55%;
+}
+
+/* ══════════════════════════════════════════
+   Responsive
+   ══════════════════════════════════════════ */
+@media (max-width: 768px) {
+  .log-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
   }
 
-  .mp-avatar {
-    width: 88px;
-    height: 88px;
+  .log-card {
+    padding: 14px 6px 10px;
   }
 
-  .mp-avatar i {
-    font-size: 34px;
-  }
-
-  .mp-name {
-    font-size: 1.15rem;
-  }
-
-  .mp-actions .btn-primary,
-  .mp-actions .btn-secondary {
-    padding: 10px 12px;
+  .log-icon {
+    width: 30px;
+    height: 30px;
     font-size: 13px;
+  }
+
+  .log-value {
+    font-size: 1.2rem;
+  }
+
+  .log-label {
+    font-size: 10px;
+  }
+
+  .info-row {
+    padding: 12px 14px;
+    font-size: 12px;
+  }
+
+  .mp-status-dot-large {
+    width: 17px;
+    height: 17px;
+    border-width: 2.5px;
+  }
+}
+
+@media (max-width: 380px) {
+  .log-grid {
+    grid-template-columns: repeat(2, 1fr);
   }
 }
