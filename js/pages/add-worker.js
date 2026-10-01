@@ -261,7 +261,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
 
   // ═══════════════════════════════════════════
-  // توليد QR
+  // توليد QR (باستخدام qrcodejs)
   // ═══════════════════════════════════════════
   async function generateQR() {
     const container = document.getElementById('qr-container');
@@ -299,16 +299,20 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       const qrUrl = `${window.location.origin}/register-worker.html?token=${token}`;
 
-      // توليد QR
-      container.innerHTML = `<canvas id="qr-canvas"></canvas>`;
+      // توليد QR باستخدام qrcodejs
+      container.innerHTML = '';
 
-      await QRCode.toCanvas(document.getElementById('qr-canvas'), qrUrl, {
+      if (typeof QRCode === 'undefined') {
+        throw new Error('مكتبة QR غير محمّلة');
+      }
+
+      new QRCode(container, {
+        text: qrUrl,
         width: 240,
-        margin: 2,
-        color: {
-          dark: '#171717',
-          light: '#ffffff',
-        },
+        height: 240,
+        colorDark: '#171717',
+        colorLight: '#ffffff',
+        correctLevel: QRCode.CorrectLevel.H,
       });
 
       // عرض زر "إضافة عامل آخر"
