@@ -12,17 +12,18 @@
 }
 
 /* ══════════════════════════════════════════
-   ✅ النقطة على حافة الدائرة (المركز على الحد)
+   ✅ النقطة على حافة الدائرة
+   (المركز على الحد بالضبط)
    ══════════════════════════════════════════ */
 .mp-status-dot-large {
   position: absolute;
   bottom: 0;
   right: 0;
-  width: 16px;
-  height: 16px;
+  width: 18px;
+  height: 18px;
   border-radius: 50%;
   border: 3px solid #ffffff;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
   z-index: 10;
   transform: translate(50%, 50%);
   pointer-events: auto;
@@ -195,8 +196,8 @@
   }
 
   .mp-status-dot-large {
-    width: 14px;
-    height: 14px;
+    width: 16px;
+    height: 16px;
     border-width: 2.5px;
   }
 }
@@ -207,8 +208,8 @@
   }
 
   .mp-status-dot-large {
-    width: 13px;
-    height: 13px;
+    width: 14px;
+    height: 14px;
     border-width: 2.5px;
   }
 }
