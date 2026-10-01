@@ -12,8 +12,8 @@
 }
 
 /* ══════════════════════════════════════════
-   ✅ النقطة على حافة الدائرة
-   (translate 30% = النقطة أقرب للحافة)
+   ✅ النقطة على الزاوية اليمنى السفلية
+   (مثل بطاقات النواب)
    ══════════════════════════════════════════ */
 .mp-status-dot-large {
   position: absolute;
@@ -23,10 +23,8 @@
   height: 18px;
   border-radius: 50%;
   border: 3px solid #ffffff;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
   z-index: 10;
-  transform: translate(30%, 30%);
-  pointer-events: auto;
 }
 
 .mp-status-dot-large.online {
