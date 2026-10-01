@@ -307,6 +307,7 @@
   align-items: center;
   text-align: center;
   transition: background 0.15s, transform 0.15s;
+  position: relative;
 }
 
 .member-card:hover {
@@ -388,6 +389,33 @@
   display: inline-block;
   background: #f0f0f0;
   color: #404040;
+}
+
+/* ══════════════════════════════════════════
+   ✅ بطاقة العضو القابلة للضغط (للمدير)
+   ══════════════════════════════════════════ */
+.member-card-link {
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.member-card-link:active {
+  transform: scale(0.98);
+}
+
+.member-card-link::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 12px;
+  pointer-events: none;
+  transition: background 0.15s;
+}
+
+.member-card-link:active::after {
+  background: rgba(0, 0, 0, 0.03);
 }
 
 /* ============================================

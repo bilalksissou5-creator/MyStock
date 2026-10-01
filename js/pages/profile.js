@@ -37,33 +37,43 @@ document.addEventListener('DOMContentLoaded', async () => {
   const workers = others.filter(m => m.role === 'worker');
 
   // ═══════════════════════════════════════════
-  // ✅ دالة بناء بطاقة عضو (نائب أو عامل)
+  // ✅ بناء بطاقة عضو (قابلة للضغط للمدير)
   // ═══════════════════════════════════════════
   function buildMemberCard(member, type) {
     const isOnline = typeof isUserOnline === 'function' && isUserOnline(member);
     const starClass = type === 'deputy' ? 'deputy-star' : 'worker-star';
     const roleLabel = type === 'deputy' ? 'نائب' : 'عامل';
 
-    return `
-      <div class="member-card">
-        <div class="member-avatar-wrap">
-          <div class="member-avatar">
-            ${member.avatar_url
-              ? `<img src="${member.avatar_url}" alt="${member.full_name}">`
-              : `<i class="fas fa-user"></i>`}
-          </div>
-          <span class="member-status-dot ${isOnline ? 'online' : 'offline'}"
-                title="${isOnline ? 'متصل' : 'غير متصل'}"></span>
+    const inner = `
+      <div class="member-avatar-wrap">
+        <div class="member-avatar">
+          ${member.avatar_url
+            ? `<img src="${member.avatar_url}" alt="${member.full_name}">`
+            : `<i class="fas fa-user"></i>`}
         </div>
-
-        <div class="member-name-row">
-          <span class="member-name">${member.full_name ?? 'بدون اسم'}</span>
-          <i class="fas fa-star member-star-icon ${starClass}"></i>
-        </div>
-
-        <div class="member-role ${type}">${roleLabel}</div>
+        <span class="member-status-dot ${isOnline ? 'online' : 'offline'}"
+              title="${isOnline ? 'متصل' : 'غير متصل'}"></span>
       </div>
+
+      <div class="member-name-row">
+        <span class="member-name">${member.full_name ?? 'بدون اسم'}</span>
+        <i class="fas fa-star member-star-icon ${starClass}"></i>
+      </div>
+
+      <div class="member-role ${type}">${roleLabel}</div>
     `;
+
+    // ✅ للمدير: رابط قابل للضغط
+    if (isAdmin) {
+      return `
+        <a href="/member-profile.html?id=${member.id}" class="member-card member-card-link">
+          ${inner}
+        </a>
+      `;
+    }
+
+    // لغير المدير: بطاقة عادية
+    return `<div class="member-card">${inner}</div>`;
   }
 
   main.innerHTML = `
@@ -172,35 +182,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   `;
 
   // ============================================
-  // ✅ تحديث تلقائي كل 30 ثانية (للحالة)
-  // ============================================
-  const statusRefresh = setInterval(async () => {
-    const { data: freshMembers } = await db
-      .from('profiles')
-      .select('id, status, last_active_at')
-      .eq('organization_id', profile.organization_id);
-
-    if (!freshMembers) return;
-
-    freshMembers.forEach(m => {
-      const card = document.querySelector(`[data-member-id="${m.id}"]`);
-      if (!card) return;
-      const dot = card.querySelector('.member-status-dot');
-      if (!dot) return;
-
-      const isOnline = typeof isUserOnline === 'function' && isUserOnline(m);
-      dot.classList.toggle('online', isOnline);
-      dot.classList.toggle('offline', !isOnline);
-    });
-  }, 30000);
-
-  window.addEventListener('beforeunload', () => clearInterval(statusRefresh));
-
-  // ============================================
-  // ⚠️ دوال معطّلة (للاحتفاظ بها مستقبلاً)
+  // ⚠️ دوال معطّلة (محفوظة للاستخدام المستقبلي)
   // ============================================
   /*
-  // تعيين نائب:
   async function makeDeputy(memberId) {
     if (!confirm('تعيين هذا العامل نائباً؟')) return;
     const { error } = await db
@@ -211,7 +195,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     window.location.reload();
   }
 
-  // إلغاء النيابة:
   async function removeDeputy(memberId) {
     if (!confirm('إلغاء صفة النائب عن هذا العضو؟')) return;
     const { error } = await db
