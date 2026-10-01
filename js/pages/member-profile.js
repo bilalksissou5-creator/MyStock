@@ -46,7 +46,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   // ═══════════════════════════════════════════
-  // جلب السجل (Statistiques)
+  // جلب السجل
   // ═══════════════════════════════════════════
   const [productsRes, movementsRes, invoicesRes, suppliersRes] = await Promise.all([
     db.from('products').select('id', { count: 'exact', head: true }).eq('created_by', memberId),
@@ -65,13 +65,13 @@ document.addEventListener('DOMContentLoaded', async () => {
   // آخر حركة
   const { data: lastMovement } = await db
     .from('stock_movements')
-    .select('created_at, type, quantity')
+    .select('created_at')
     .eq('performed_by', memberId)
     .order('created_at', { ascending: false })
     .limit(1)
     .maybeSingle();
 
-  // آخر دخول
+  // آخر فاتورة
   const { data: lastInvoice } = await db
     .from('invoices')
     .select('created_at')
@@ -97,21 +97,22 @@ document.addEventListener('DOMContentLoaded', async () => {
           : `<div class="cover-placeholder"></div>`}
       </div>
 
-      <!-- ══════ الصورة الشخصية ══════ -->
+      <!-- ══════ الصورة الشخصية + النقطة ══════ -->
       <div class="profile-avatar-fb-wrap">
         <div class="profile-avatar-fb">
           ${member.avatar_url
             ? `<img src="${member.avatar_url}" alt="avatar">`
             : `<i class="fas fa-user"></i>`}
-          <span class="mp-status-dot-large ${isOnline ? 'online' : 'offline'}"></span>
         </div>
+        <span class="mp-status-dot-large ${isOnline ? 'online' : 'offline'}"
+              title="${isOnline ? 'متصل' : 'غير متصل'}"></span>
       </div>
 
       <!-- ══════ معلومات العضو ══════ -->
       <div class="profile-fb-info">
         <h3>
           ${member.full_name ?? 'بدون اسم'}
-          <i class="fas fa-star member-star-icon ${starClass}"></i>
+          ${member.role !== 'admin' ? `<i class="fas fa-star member-star-icon ${starClass}"></i>` : ''}
         </h3>
         <p class="profile-fb-email">${isOnline ? '🟢 متصل الآن' : '⚪ غير متصل'}</p>
         <div class="profile-fb-badges">
@@ -119,7 +120,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         </div>
       </div>
 
-      <!-- ══════ شريط الأزرار (للمدير فقط) ══════ -->
+      <!-- ══════ الأزرار (للمدير فقط — وليس لملفه) ══════ -->
       ${isAdmin && !isMe ? `
         <div class="profile-actions-bar">
           <a href="/profile-dashboard.html?id=${member.id}" class="btn-secondary">
@@ -144,33 +145,25 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         <div class="log-grid">
           <div class="log-card">
-            <div class="log-icon">
-              <i class="fas fa-box"></i>
-            </div>
+            <div class="log-icon"><i class="fas fa-box"></i></div>
             <div class="log-value">${stats.products}</div>
             <div class="log-label">منتج</div>
           </div>
 
           <div class="log-card">
-            <div class="log-icon">
-              <i class="fas fa-right-left"></i>
-            </div>
+            <div class="log-icon"><i class="fas fa-right-left"></i></div>
             <div class="log-value">${stats.movements}</div>
             <div class="log-label">حركة</div>
           </div>
 
           <div class="log-card">
-            <div class="log-icon">
-              <i class="fas fa-file-invoice"></i>
-            </div>
+            <div class="log-icon"><i class="fas fa-file-invoice"></i></div>
             <div class="log-value">${stats.invoices}</div>
             <div class="log-label">فاتورة</div>
           </div>
 
           <div class="log-card">
-            <div class="log-icon">
-              <i class="fas fa-truck"></i>
-            </div>
+            <div class="log-icon"><i class="fas fa-truck"></i></div>
             <div class="log-value">${stats.suppliers}</div>
             <div class="log-label">مورد</div>
           </div>
