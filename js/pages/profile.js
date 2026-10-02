@@ -37,7 +37,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const workers = others.filter(m => m.role === 'worker');
 
   // ═══════════════════════════════════════════
-  // ✅ بناء بطاقة عضو (قابلة للضغط للمدير)
+  // ✅ بناء بطاقة عضو (نائب / عامل)
   // ═══════════════════════════════════════════
   function buildMemberCard(member, type) {
     const isOnline = typeof isUserOnline === 'function' && isUserOnline(member);
@@ -63,7 +63,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       <div class="member-role ${type}">${roleLabel}</div>
     `;
 
-    // ✅ للمدير: رابط قابل للضغط
     if (isAdmin) {
       return `
         <a href="/member-profile.html?id=${member.id}" class="member-card member-card-link">
@@ -72,8 +71,35 @@ document.addEventListener('DOMContentLoaded', async () => {
       `;
     }
 
-    // لغير المدير: بطاقة عادية
     return `<div class="member-card">${inner}</div>`;
+  }
+
+  // ═══════════════════════════════════════════
+  // ✅ بناء بطاقة المدير (بنفس تنسيق النواب)
+  // ═══════════════════════════════════════════
+  function buildAdminCard(member) {
+    const isOnline = typeof isUserOnline === 'function' && isUserOnline(member);
+
+    return `
+      <div class="member-card member-card-admin">
+        <div class="member-avatar-wrap">
+          <div class="member-avatar">
+            ${member.avatar_url
+              ? `<img src="${member.avatar_url}" alt="${member.full_name}">`
+              : `<i class="fas fa-user"></i>`}
+          </div>
+          <span class="member-status-dot ${isOnline ? 'online' : 'offline'}"
+                title="${isOnline ? 'متصل' : 'غير متصل'}"></span>
+        </div>
+
+        <div class="member-name-row">
+          <span class="member-name">${member.full_name ?? 'بدون اسم'}</span>
+          <i class="fas fa-crown member-star-icon crown-star"></i>
+        </div>
+
+        <div class="member-role admin">مدير</div>
+      </div>
+    `;
   }
 
   main.innerHTML = `
@@ -119,7 +145,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       </div>
 
       <!-- ═══════════════════════════════════════
-           قسم المدير
+           قسم المدير (بنفس تنسيق النواب)
            ═══════════════════════════════════════ -->
       ${admin ? `
         <div class="team-section">
@@ -127,21 +153,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             <i class="fas fa-crown" style="color:#fbbf24;"></i>
             المدير
           </h3>
-          <div class="admin-card">
-            <div class="admin-avatar-wrap">
-              <div class="admin-avatar">
-                ${admin.avatar_url
-                  ? `<img src="${admin.avatar_url}" alt="${admin.full_name}">`
-                  : `<i class="fas fa-user"></i>`}
-              </div>
-              <span class="member-status-dot ${isUserOnline(admin) ? 'online' : 'offline'}"></span>
-            </div>
-            <div class="admin-info">
-              <div class="admin-name">${admin.full_name ?? 'بدون اسم'}</div>
-              <div class="admin-badges">
-                <span class="badge-crown">👑 مدير</span>
-              </div>
-            </div>
+
+          <div class="team-grid">
+            ${buildAdminCard(admin)}
           </div>
         </div>
       ` : ''}
@@ -180,30 +194,4 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     </div>
   `;
-
-  // ============================================
-  // ⚠️ دوال معطّلة (محفوظة للاستخدام المستقبلي)
-  // ============================================
-  /*
-  async function makeDeputy(memberId) {
-    if (!confirm('تعيين هذا العامل نائباً؟')) return;
-    const { error } = await db
-      .from('profiles')
-      .update({ role: 'deputy' })
-      .eq('id', memberId);
-    if (error) { alert('خطأ: ' + error.message); return; }
-    window.location.reload();
-  }
-
-  async function removeDeputy(memberId) {
-    if (!confirm('إلغاء صفة النائب عن هذا العضو؟')) return;
-    const { error } = await db
-      .from('profiles')
-      .update({ role: 'worker' })
-      .eq('id', memberId);
-    if (error) { alert('خطأ: ' + error.message); return; }
-    window.location.reload();
-  }
-  */
-
 });
