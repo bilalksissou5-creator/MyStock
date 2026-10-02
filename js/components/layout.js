@@ -24,15 +24,15 @@ function renderLayout(activePage) {
 
   const layout = `
     <header class="header">
-      <h1 class="logo">MyStock</h1>
-      <div class="search">
-        <i class="fas fa-search"></i>
-        <input type="text" placeholder="بحث...">
-      </div>
       <a href="/notifications.html" class="notif" id="notif-btn" title="الإشعارات">
         <i class="fas fa-bell"></i>
         <span class="notif-count" id="notif-count">0</span>
       </a>
+      <div class="search">
+        <i class="fas fa-search"></i>
+        <input type="text" placeholder="بحث...">
+      </div>
+      <h1 class="logo">MyStock</h1>
     </header>
 
     <div class="body">
@@ -66,7 +66,6 @@ function renderLayout(activePage) {
       if (typeof logout === 'function') {
         await logout();
       } else {
-        // fallback: إذا لم تُحمَّل auth.js
         await db.auth.signOut();
         window.location.href = '/login.html';
       }
