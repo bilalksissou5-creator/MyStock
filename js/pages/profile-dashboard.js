@@ -27,7 +27,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   const isMe = targetId === user.id;
   const isAdmin = myProfile.role === 'admin';
 
-  // إذا ليس نفسه وليس مدير → ممنوع
   if (!isMe && !isAdmin) {
     main.innerHTML = `<div class="alert alert-error">ليس لديك صلاحية</div>`;
     return;
@@ -45,16 +44,59 @@ document.addEventListener('DOMContentLoaded', async () => {
     return;
   }
 
-  // التحقق أن العضو في نفس المنظمة
   if (target.organization_id !== myProfile.organization_id) {
     main.innerHTML = `<div class="alert alert-error">هذا العضو ليس في منظمتك</div>`;
     return;
   }
 
+  // جلب بيانات المنظمة
+  const { data: org } = await db
+    .from('organizations')
+    .select('*')
+    .eq('id', myProfile.organization_id)
+    .single();
+
   const isOnline = typeof isUserOnline === 'function' && isUserOnline(target);
 
   // ═══════════════════════════════════════════
-  // بيانات البطاقات
+  // ✅ بطاقة المنظمة (تظهر للجميع)
+  // ═══════════════════════════════════════════
+  const orgCard = `
+    ${isAdmin ? `
+      <a href="/org-edit.html" class="pd-card">
+        <div class="pd-card-icon">
+          <i class="fas fa-building"></i>
+        </div>
+        <div class="pd-card-body">
+          <div class="pd-card-title">المنظمة</div>
+          <div class="pd-card-value" dir="auto">
+            ${org?.name ?? 'منظمتي'}
+          </div>
+        </div>
+        <div class="pd-card-arrow">
+          <i class="fas fa-chevron-left"></i>
+        </div>
+      </a>
+    ` : `
+      <div class="pd-card pd-card-disabled">
+        <div class="pd-card-icon">
+          <i class="fas fa-building"></i>
+        </div>
+        <div class="pd-card-body">
+          <div class="pd-card-title">المنظمة</div>
+          <div class="pd-card-value" dir="auto">
+            ${org?.name ?? 'منظمتي'}
+          </div>
+        </div>
+        <div class="pd-card-arrow">
+          <i class="fas fa-lock"></i>
+        </div>
+      </div>
+    `}
+  `;
+
+  // ═══════════════════════════════════════════
+  // بيانات البطاقات العادية
   // ═══════════════════════════════════════════
   const cards = [
     {
@@ -95,9 +137,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     },
   ];
 
-  // ═══════════════════════════════════════════
-  // بناء الواجهة
-  // ═══════════════════════════════════════════
   const title = isMe ? 'لوحة المعلومات' : `لوحة ${target.full_name ?? 'العضو'}`;
 
   main.innerHTML = `
@@ -124,10 +163,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         </div>
       </div>
 
-      <!-- ══════ البطاقات ══════ -->
+      <!-- ══════ بطاقة المنظمة + البطاقات ══════ -->
       <div class="pd-cards-list">
+        ${orgCard}
+
         ${cards.map(card => {
-          // إذا البطاقة معطلة (مثلاً البريد ليس بريده)
           if (card.disabled) {
             return `
               <div class="pd-card pd-card-disabled">
@@ -145,7 +185,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             `;
           }
 
-          // رابط التعديل: إذا نفسه → يمكنه التعديل، إذا مدير يعرض لغيره → عرض فقط
           const canEdit = isMe;
           const href = canEdit
             ? `/profile-edit.html?section=${card.id}`
