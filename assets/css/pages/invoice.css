@@ -12,7 +12,6 @@ html, body {
   overflow-y: auto !important;
 }
 
-/* الحاوية الرئيسية للـ layout (إن وُجدت) */
 .main-content,
 #main-content,
 .app-layout,
@@ -24,17 +23,15 @@ main {
   overflow: visible !important;
 }
 
-/* صفحة الفاتورة */
 .invoice-page {
   min-height: 100vh;
   height: auto !important;
   overflow-y: auto !important;
   overflow-x: hidden;
-  padding-bottom: 100px; /* ✅ مساحة للأزرار السفلية */
+  padding-bottom: 100px;
   box-sizing: border-box;
 }
 
-/* الأزرار السفلية لا تختفي */
 .invoice-actions {
   position: relative;
   z-index: 5;
@@ -86,6 +83,7 @@ main {
   overflow: hidden;
   flex-shrink: 0;
   margin-bottom: 6px;
+  transition: all 0.2s ease;
 }
 
 .invoice-logo img {
@@ -97,6 +95,24 @@ main {
 .logo-placeholder {
   font-size: 26px;
   color: #171717;
+}
+
+/* ══════════════════════════════════════════
+   ✅ أشكال الشعار
+   ══════════════════════════════════════════ */
+.invoice-logo.shape-circle {
+  border-radius: 50%;
+}
+
+.invoice-logo.shape-square {
+  border-radius: 12px;
+  aspect-ratio: 1 / 1;
+}
+
+.invoice-logo.shape-rectangle {
+  border-radius: 12px;
+  width: 100px;
+  height: 60px;
 }
 
 .invoice-org h1 {
@@ -314,6 +330,11 @@ main {
 
   .invoice-logo {
     width: 50px;
+    height: 50px;
+  }
+
+  .invoice-logo.shape-rectangle {
+    width: 80px;
     height: 50px;
   }
 

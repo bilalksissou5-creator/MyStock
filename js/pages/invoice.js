@@ -68,9 +68,12 @@ function renderInvoice({ invoice, products }) {
   const dateStr = date.toLocaleDateString('ar-MA');
   const timeStr = date.toLocaleTimeString('ar-MA', { hour: '2-digit', minute: '2-digit' });
 
+  // ✅ شكل الشعار
+  const logoShape = org?.logo_shape || 'circle';
+
   container.innerHTML = `
     <div class="invoice-header">
-      <div class="invoice-logo">
+      <div class="invoice-logo shape-${logoShape}">
         ${org?.logo_url
           ? `<img src="${org.logo_url}" alt="logo">`
           : `<div class="logo-placeholder"><i class="fas fa-boxes-stacked"></i></div>`}
