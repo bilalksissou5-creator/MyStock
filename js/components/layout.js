@@ -24,6 +24,9 @@ function renderLayout(activePage) {
 
   const layout = `
     <header class="header">
+      <button type="button" class="sidebar-toggle" id="sidebar-toggle" title="القائمة">
+        <i class="fas fa-bars"></i>
+      </button>
       <a href="/notifications.html" class="notif" id="notif-btn" title="الإشعارات">
         <i class="fas fa-bell"></i>
         <span class="notif-count" id="notif-count">0</span>
@@ -35,8 +38,8 @@ function renderLayout(activePage) {
       <h1 class="logo">MyStock</h1>
     </header>
 
-    <div class="body">
-      <aside class="sidebar">
+    <div class="body" id="app-body">
+      <aside class="sidebar" id="app-sidebar">
         <nav class="nav">
           ${navHTML}
         </nav>
@@ -59,7 +62,7 @@ function renderLayout(activePage) {
   const app = document.querySelector('.app');
   if (app) app.innerHTML = layout;
 
-  // ✅ زر تسجيل الخروج — يستخدم دالة logout من auth.js
+  // ✅ زر تسجيل الخروج
   document.querySelectorAll('.logout').forEach(b => {
     b.addEventListener('click', async (e) => {
       e.preventDefault();
@@ -71,6 +74,24 @@ function renderLayout(activePage) {
       }
     });
   });
+
+  // ✅ زر فتح/إغلاق sidebar
+  const toggleBtn = document.getElementById('sidebar-toggle');
+  const bodyEl = document.getElementById('app-body');
+
+  // استرجاع الحالة المحفوظة
+  const savedState = localStorage.getItem('sidebar_closed');
+  if (savedState === 'true') {
+    bodyEl.classList.add('sidebar-closed');
+  }
+
+  if (toggleBtn && bodyEl) {
+    toggleBtn.addEventListener('click', () => {
+      bodyEl.classList.toggle('sidebar-closed');
+      const isClosed = bodyEl.classList.contains('sidebar-closed');
+      localStorage.setItem('sidebar_closed', isClosed ? 'true' : 'false');
+    });
+  }
 
   // بدء تحديث عداد الإشعارات
   if (typeof startNotifPolling === 'function') {

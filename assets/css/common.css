@@ -83,6 +83,36 @@ button { font-family: inherit; }
 .search input:focus { border-color: #171717; }
 
 /* ============================================
+   ✅ زر فتح/إغلاق Sidebar
+   ============================================ */
+.sidebar-toggle {
+  background: none;
+  border: none;
+  padding: 8px;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  cursor: pointer;
+  color: #404040;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.sidebar-toggle:hover {
+  background: #f5f5f5;
+}
+
+.sidebar-toggle i {
+  font-size: 18px;
+  line-height: 1;
+  display: block;
+}
+
+/* ============================================
    زر الإشعارات - تنسيق موحّد
    ============================================ */
 .notif {
@@ -150,6 +180,13 @@ button { font-family: inherit; }
   min-height: 0;
   min-width: 0;
   height: 0;
+}
+
+/* ============================================
+   ✅ حالة sidebar المغلقة
+   ============================================ */
+.body.sidebar-closed .sidebar {
+  display: none;
 }
 
 /* ============================================
@@ -376,8 +413,6 @@ button { font-family: inherit; }
   .header { padding: 0 12px; gap: 10px; }
   .logo { font-size: 1.1rem; }
 
-  /* ⚠️ لا توجد قواعد للجرس ← موحّد دائماً */
-
   .sidebar { width: 65px; min-width: 65px; max-width: 65px; }
   .nav { padding: 8px 4px; }
   .nav-item {
@@ -401,8 +436,6 @@ button { font-family: inherit; }
   .header { height: 45px; padding: 0 12px; gap: 10px; }
   .logo { font-size: 1rem; }
   .search input { padding: 6px 32px 6px 10px; font-size: 12px; }
-
-  /* ⚠️ لا توجد قواعد للجرس ← موحّد دائماً */
 
   .sidebar { width: 200px; min-width: 200px; max-width: 200px; }
   .nav { padding: 6px 8px; gap: 2px; }
