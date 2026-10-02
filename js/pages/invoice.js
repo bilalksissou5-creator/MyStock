@@ -60,7 +60,6 @@ function renderInvoice({ invoice, products }) {
   const org = invoice.organizations;
   const createdBy = invoice.profiles;
 
-  // ⚠️ الإجماليات من جدول invoices (الحقيقة المخزّنة)
   const totalQty = invoice.total_qty ?? 0;
   const totalValue = Number(invoice.total_value ?? 0);
 
@@ -164,6 +163,7 @@ function renderInvoice({ invoice, products }) {
       </div>
       <div class="footer-signature">
         <p><strong>توقيع المورد:</strong></p>
+        <p class="supplier-name">${supplier?.name ?? '—'}</p>
         <div class="signature-line"></div>
       </div>
     </div>

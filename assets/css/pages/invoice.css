@@ -259,6 +259,14 @@ main {
   font-weight: 500;
 }
 
+/* ✅ اسم المورد تحت "توقيع المورد" */
+.footer-signature .supplier-name {
+  font-size: 12px;
+  font-weight: 700;
+  color: #171717;
+  margin-bottom: 4px;
+}
+
 .signature-line {
   margin-top: 24px;
   border-top: 1px dashed #a3a3a3;
@@ -410,6 +418,10 @@ main {
 
   .footer-signature p {
     font-size: 10px;
+  }
+
+  .footer-signature .supplier-name {
+    font-size: 11px;
   }
 
   .signature-line {
