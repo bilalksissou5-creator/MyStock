@@ -1,9 +1,5 @@
 // ============================================
-// صفحة إخراج منتجات (متعددة) — بنمط product-add
-// ⚠️ قاعدة ذهبية:
-// - لا تُحدّث products.qty يدوياً أبداً
-// - استخدم stock_movements.insert() فقط
-// - الـ Trigger on_stock_movement_created سيتولى تحديث qty
+// صفحة إخراج منتجات (متعددة) + إيصال بيع
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   if (window.__movementOutLoaded) return;
@@ -199,7 +195,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
 
   // ============================================
-  // عرض المنتجات المضافة (نفس تصميم product-add)
+  // عرض المنتجات المضافة
   // ============================================
   function renderAddedProducts() {
     if (addedProducts.length === 0) {
@@ -306,7 +302,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       return;
     }
 
-    // منع تكرار نفس المنتج
     if (addedProducts.find(p => p.id === selectedProduct.id)) {
       errBox.textContent = 'هذا المنتج مضاف مسبقاً';
       errBox.style.display = 'block';
@@ -325,7 +320,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       available: available,
     });
 
-    // تفريغ الحقول
     productInput.value = '';
     hiddenId.value = '';
     availableQtyInput.value = '—';
@@ -358,8 +352,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
 
   // ============================================
-  // ✅ حفظ الإخراج — stock_movements فقط
-  // الـ Trigger on_stock_movement_created يُحدّث qty
+  // ✅ حفظ الإخراج + إنشاء إيصال
   // ============================================
   saveBtn.addEventListener('click', async (e) => {
     e.preventDefault();
@@ -397,7 +390,68 @@ document.addEventListener('DOMContentLoaded', async () => {
         throw new Error('لا يمكن تحديد المنظمة');
       }
 
-      // ✅ إدراج الحركات فقط — الـ Trigger يتولى qty
+      // ═══════════════════════════════════════════
+      // 1. توليد رقم الإيصال التسلسلي (RCP-001, RCP-002...)
+      // ═══════════════════════════════════════════
+      const { data: lastReceipt } = await db
+        .from('receipts')
+        .select('receipt_number')
+        .eq('organization_id', profile.organization_id)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      let nextNumber = 1;
+      if (lastReceipt?.receipt_number) {
+        const match = lastReceipt.receipt_number.match(/RCP-(\d+)/);
+        if (match) nextNumber = parseInt(match[1], 10) + 1;
+      }
+      const receiptNumber = 'RCP-' + String(nextNumber).padStart(3, '0');
+
+      // ═══════════════════════════════════════════
+      // 2. حساب الإجماليات
+      // ═══════════════════════════════════════════
+      const totalQty = addedProducts.reduce((s, p) => s + Number(p.qty), 0);
+      const totalValue = addedProducts.reduce((s, p) => s + Number(p.qty) * Number(p.price), 0);
+
+      // ═══════════════════════════════════════════
+      // 3. إنشاء الإيصال
+      // ═══════════════════════════════════════════
+      const { data: newReceipt, error: receiptErr } = await db
+        .from('receipts')
+        .insert({
+          receipt_number: receiptNumber,
+          organization_id: profile.organization_id,
+          total_qty: totalQty,
+          total_value: totalValue,
+          created_by: user.id,
+        })
+        .select()
+        .single();
+
+      if (receiptErr) throw new Error('فشل إنشاء الإيصال: ' + receiptErr.message);
+
+      // ═══════════════════════════════════════════
+      // 4. إدراج عناصر الإيصال
+      // ═══════════════════════════════════════════
+      const receiptItems = addedProducts.map(p => ({
+        receipt_id: newReceipt.id,
+        product_id: p.id,
+        product_name: p.name,
+        qty: Number(p.qty),
+        price: Number(p.price),
+        total: Number(p.qty) * Number(p.price),
+      }));
+
+      const { error: itemsErr } = await db
+        .from('receipt_items')
+        .insert(receiptItems);
+
+      if (itemsErr) throw new Error('فشل حفظ عناصر الإيصال: ' + itemsErr.message);
+
+      // ═══════════════════════════════════════════
+      // 5. إدراج stock_movements (الـ Trigger يُنقص qty)
+      // ═══════════════════════════════════════════
       const movements = addedProducts.map(p => ({
         organization_id: profile.organization_id,
         product_id: p.id,
@@ -413,20 +467,20 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       if (moveError) throw new Error('فشل تسجيل الحركات: ' + moveError.message);
 
-      // الإشعار
+      // ═══════════════════════════════════════════
+      // 6. الإشعار
+      // ═══════════════════════════════════════════
       if (typeof notifyOrganization === 'function') {
         try {
           const count = addedProducts.length;
-          const totalQty = addedProducts.reduce((s, p) => s + Number(p.qty), 0);
-          const totalValue = addedProducts.reduce((s, p) => s + Number(p.qty) * Number(p.price), 0);
           const namesList = addedProducts.map(p => p.name).join('، ');
 
           await notifyOrganization({
             orgId: profile.organization_id,
-            title: count === 1 ? 'إخراج منتج' : `إخراج ${count} منتجات`,
-            message: `${profile.full_name || 'مستخدم'} أخرج ${totalQty} وحدة (قيمة ${totalValue.toFixed(2)}) من: ${namesList}`,
+            title: count === 1 ? 'إيصال بيع' : `إيصال بيع (${count} منتجات)`,
+            message: `${profile.full_name || 'مستخدم'} أخرج ${totalQty} وحدة بقيمة ${totalValue.toFixed(2)} — ${receiptNumber}`,
             type: 'warning',
-            link: '/movements/list.html',
+            link: `/receipt.html?id=${newReceipt.id}`,
             userName: profile.full_name || null,
           });
         } catch (notifErr) {
@@ -434,17 +488,19 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
       }
 
-      // نجاح — إعادة تعيين
+      // ═══════════════════════════════════════════
+      // 7. نجاح → التحويل إلى الإيصال
+      // ═══════════════════════════════════════════
+      successBox.textContent = `✅ تم إنشاء الإيصال ${receiptNumber}`;
+      successBox.style.display = 'block';
+
       addedProducts.length = 0;
       renderAddedProducts();
       document.getElementById('note').value = '';
 
-      successBox.textContent = '✅ تم حفظ الإخراج بنجاح!';
-      successBox.style.display = 'block';
-
-      saveBtn.disabled = false;
-      saveBtn.querySelector('span').textContent = 'حفظ الإخراج';
-      isSaving = false;
+      setTimeout(() => {
+        window.location.href = `/receipt.html?id=${newReceipt.id}`;
+      }, 1200);
 
     } catch (error) {
       errBox.textContent = error.message;

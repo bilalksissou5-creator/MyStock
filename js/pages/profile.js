@@ -303,7 +303,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     `;
   }
 
-  // ✅ سجل الإخراج
+  // ✅ سجل الإخراج (مع روابط للإيصالات)
   async function loadOut() {
     logOut.innerHTML = `
       <div class="log-loading">
@@ -313,10 +313,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     `;
 
     const { data, error } = await db
-      .from('stock_movements')
-      .select('quantity, created_at, products (name)')
-      .eq('performed_by', user.id)
-      .eq('type', 'out')
+      .from('receipts')
+      .select('id, receipt_number, total_qty, total_value, created_at')
+      .eq('created_by', user.id)
       .order('created_at', { ascending: false });
 
     if (error) {
@@ -331,21 +330,21 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     logOut.innerHTML = `
       <div class="log-list">
-        ${data.map(m => `
-          <div class="log-row">
+        ${data.map(r => `
+          <a href="/receipt.html?id=${r.id}" class="log-row log-row-link">
             <div class="log-row-main">
-              <strong>${m.products?.name ?? 'منتج محذوف'}</strong>
-              <span>الكمية: ${m.quantity}</span>
+              <strong>${r.receipt_number}</strong>
+              <span>${r.total_qty ?? 0} قطعة • ${Number(r.total_value ?? 0).toFixed(2)}</span>
             </div>
-            <div class="log-row-date">${new Date(m.created_at).toLocaleDateString('ar-MA')}</div>
-          </div>
+            <div class="log-row-date">${new Date(r.created_at).toLocaleDateString('ar-MA')}</div>
+          </a>
         `).join('')}
       </div>
     `;
   }
 
   // ═══════════════════════════════════════════
-  // ✅ التفاعل مع الأزرار
+  // التفاعل مع الأزرار
   // ═══════════════════════════════════════════
   const btnInvoices = document.querySelector('.record-item[data-record="invoices"]');
   const btnOut = document.querySelector('.record-item[data-record="out"]');
@@ -356,12 +355,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const isOpen = logInvoices.style.display !== 'none';
 
-    // أغلق الكل
     logInvoices.style.display = 'none';
     logOut.style.display = 'none';
     document.querySelectorAll('.record-item.active').forEach(x => x.classList.remove('active'));
 
-    // إذا كان مغلقاً → افتحه
     if (!isOpen) {
       logInvoices.style.display = 'block';
       btnInvoices.classList.add('active');
@@ -388,14 +385,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // ✅ الضغط خارج السجلات → إغلاق
   document.addEventListener('click', (e) => {
-    // إذا كان الضغط داخل الأزرار → تجاهل
     if (e.target.closest('.record-item[data-record="invoices"]')) return;
     if (e.target.closest('.record-item[data-record="out"]')) return;
-    // إذا كان الضغط داخل السجلات → تجاهل
     if (e.target.closest('#log-invoices')) return;
     if (e.target.closest('#log-out')) return;
 
-    // أغلق الكل
     logInvoices.style.display = 'none';
     logOut.style.display = 'none';
     document.querySelectorAll('.record-item.active').forEach(x => x.classList.remove('active'));

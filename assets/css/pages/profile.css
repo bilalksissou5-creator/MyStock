@@ -592,6 +592,24 @@
   white-space: nowrap;
 }
 
+/* ✅ سطر السجل القابل للضغط */
+.log-row-link {
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.log-row-link:hover {
+  background: #f5f5f5;
+  border-color: #d4d4d4;
+}
+
+.log-row-link:active {
+  background: #f0f0f0;
+  transform: scale(0.99);
+}
+
 /* ============================================
    الهاتف
    ============================================ */
