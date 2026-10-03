@@ -155,20 +155,11 @@
 }
 
 /* ============================================
-   ✅ Accordion (قابل للفتح والإغلاق)
+   ✅ Accordion (مسطّح — بدون بطاقة)
    ============================================ */
 .team-accordion {
-  margin-bottom: 12px;
-  background: #ffffff;
-  border: 1px solid #e5e5e5;
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
-  transition: box-shadow 0.15s;
-}
-
-.team-accordion.open {
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  margin-bottom: 8px;
+  border-bottom: 1px solid #f0f0f0;
 }
 
 /* ══════ العنوان (Header) ══════ */
@@ -177,8 +168,8 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 14px 16px;
-  background: #ffffff;
+  padding: 14px 4px;
+  background: transparent;
   border: none;
   cursor: pointer;
   font-family: inherit;
@@ -192,11 +183,6 @@
 
 .team-accordion-header:hover {
   background: #fafafa;
-}
-
-.team-accordion.open .team-accordion-header {
-  background: #fafafa;
-  border-bottom: 1px solid #f0f0f0;
 }
 
 /* ══════ عنوان القسم ══════ */
@@ -218,6 +204,7 @@
   color: #a3a3a3;
   transition: transform 0.2s ease, color 0.15s;
   flex-shrink: 0;
+  margin-left: 4px;
 }
 
 .team-accordion.open .team-accordion-arrow {
@@ -227,7 +214,7 @@
 
 /* ══════ المحتوى (Body) ══════ */
 .team-accordion-body {
-  padding: 16px;
+  padding: 12px 0 16px;
   animation: accordionOpen 0.2s ease;
 }
 
@@ -475,12 +462,12 @@
   }
 
   .team-accordion-header {
-    padding: 12px 14px;
+    padding: 12px 4px;
     font-size: 14px;
   }
 
   .team-accordion-body {
-    padding: 12px;
+    padding: 10px 0 14px;
   }
 
   .team-grid {

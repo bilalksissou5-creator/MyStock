@@ -198,7 +198,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   `;
 
   // ═══════════════════════════════════════════
-  // ✅ تفعيل Accordion
+  // ✅ تفعيل Accordion (فتح حصري)
   // ═══════════════════════════════════════════
   document.querySelectorAll('[data-toggle]').forEach(btn => {
     btn.addEventListener('click', () => {
@@ -210,10 +210,16 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       const isOpen = body.style.display !== 'none';
 
-      if (isOpen) {
-        body.style.display = 'none';
-        accordion.classList.remove('open');
-      } else {
+      // ✅ إغلاق كل الأقسام أولاً
+      document.querySelectorAll('.team-accordion-body').forEach(b => {
+        b.style.display = 'none';
+      });
+      document.querySelectorAll('.team-accordion').forEach(a => {
+        a.classList.remove('open');
+      });
+
+      // ✅ إذا كان مغلقاً → افتحه
+      if (!isOpen) {
         body.style.display = 'block';
         accordion.classList.add('open');
       }
