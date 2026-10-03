@@ -1,7 +1,7 @@
 // ============================================
 // الهيكل المشترك (Header + Sidebar)
 // الدور: يُنشئ الواجهة المشتركة في كل الصفحات
-// ✅ سلوك Drawer في الموبايل
+// ✅ على الموبايل: sidebar مخفية افتراضياً + زر ☰ يفتح/يغلق
 // ============================================
 function renderLayout(activePage) {
   const navItems = [
@@ -58,9 +58,6 @@ function renderLayout(activePage) {
       </aside>
       <main class="main" id="main-content"></main>
     </div>
-
-    <!-- ✅ خلفية معتمة للموبايل -->
-    <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
   `;
 
   const app = document.querySelector('.app');
@@ -83,25 +80,27 @@ function renderLayout(activePage) {
   const toggleBtn = document.getElementById('sidebar-toggle');
   const bodyEl = document.getElementById('app-body');
   const sidebar = document.getElementById('app-sidebar');
-  const backdrop = document.getElementById('sidebar-backdrop');
 
   // ✅ دالة: هل الموبايل؟
   const isMobile = () => window.matchMedia('(max-width: 768px)').matches;
 
-  // ✅ فتح/إغلاق sidebar (Drawer في الموبايل / toggle في سطح المكتب)
+  // ✅ فتح/إغلاق sidebar
   function toggleSidebar() {
     if (isMobile()) {
-      bodyEl.classList.toggle('sidebar-open');
+      // على الموبايل: sidebar مخفية بـ display
+      bodyEl.classList.toggle('sidebar-hidden-mobile');
     } else {
+      // على سطح المكتب: sidebar-closed
       bodyEl.classList.toggle('sidebar-closed');
       const isClosed = bodyEl.classList.contains('sidebar-closed');
       localStorage.setItem('sidebar_closed', isClosed ? 'true' : 'false');
     }
   }
 
-  // ✅ إغلاق sidebar
-  function closeSidebar() {
-    bodyEl.classList.remove('sidebar-open');
+  function closeSidebarMobile() {
+    if (isMobile()) {
+      bodyEl.classList.add('sidebar-hidden-mobile');
+    }
   }
 
   // ✅ زر ☰
@@ -118,63 +117,55 @@ function renderLayout(activePage) {
     if (savedState === 'true') {
       bodyEl.classList.add('sidebar-closed');
     }
+  } else {
+    // على الموبايل: مخفية افتراضياً
+    bodyEl.classList.add('sidebar-hidden-mobile');
   }
 
   // ✅ الضغط على أي رابط في sidebar → يُغلق (موبايل فقط)
   if (sidebar) {
     sidebar.querySelectorAll('a.nav-item').forEach(link => {
       link.addEventListener('click', () => {
-        if (isMobile()) closeSidebar();
+        if (isMobile()) closeSidebarMobile();
       });
     });
-  }
-
-  // ✅ الضغط على الخلفية → يُغلق
-  if (backdrop) {
-    backdrop.addEventListener('click', closeSidebar);
   }
 
   // ✅ الضغط خارج sidebar → يُغلق (موبايل فقط)
   document.addEventListener('click', (e) => {
     if (!isMobile()) return;
-    if (!bodyEl.classList.contains('sidebar-open')) return;
+    if (!bodyEl.classList.contains('sidebar-hidden-mobile') === false) {
+      // sidebar مخفية → تجاهل
+      return;
+    }
 
-    // إذا كان الضغط داخل sidebar → تجاهل
     if (sidebar && sidebar.contains(e.target)) return;
-    // إذا كان الضغط على زر ☰ → تجاهل
     if (toggleBtn && toggleBtn.contains(e.target)) return;
 
-    closeSidebar();
+    closeSidebarMobile();
   });
 
   // ✅ السحب (swipe) على sidebar → يُغلق (موبايل فقط)
   if (sidebar) {
     let touchStartX = 0;
-    let touchEndX = 0;
 
     sidebar.addEventListener('touchstart', (e) => {
       touchStartX = e.changedTouches[0].screenX;
     }, { passive: true });
 
     sidebar.addEventListener('touchend', (e) => {
-      touchEndX = e.changedTouches[0].screenX;
-      handleSwipe();
-    }, { passive: true });
-
-    function handleSwipe() {
       if (!isMobile()) return;
-      const diff = touchEndX - touchStartX;
-      // ✅ سحب لليسار (20px على الأقل) → إغلاق
-      if (diff < -30) {
-        closeSidebar();
-      }
-    }
+      const diff = e.changedTouches[0].screenX - touchStartX;
+      if (diff < -30) closeSidebarMobile();
+    }, { passive: true });
   }
 
-  // ✅ عند تغيير حجم الشاشة: نظّف الحالات
+  // ✅ تنظيف عند تغيير الحجم
   window.addEventListener('resize', () => {
     if (!isMobile()) {
-      bodyEl.classList.remove('sidebar-open');
+      bodyEl.classList.remove('sidebar-hidden-mobile');
+    } else {
+      bodyEl.classList.add('sidebar-hidden-mobile');
     }
   });
 
