@@ -396,7 +396,7 @@
 }
 
 /* ============================================
-   ✅ السجلات — السجل يمين، الفواتير+إخراج يسار
+   ✅ السجلات — بدون حاوية، السجل يمين والفواتير+إخراج يسار
    ============================================ */
 .records-row {
   display: flex;
@@ -404,20 +404,19 @@
   justify-content: space-between;
   gap: 0;
   margin-top: 20px;
-  padding: 8px 0;
-  background: #fafafa;
-  border: 1px solid #f0f0f0;
-  border-radius: 12px;
+  padding: 0;
+  background: transparent;
+  border: none;
+  border-radius: 0;
 }
 
-/* ══════ السجل (كبير — يمين) ══════ */
 .record-item {
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  padding: 10px 14px;
+  padding: 8px 6px;
   background: transparent;
   border: none;
   border-radius: 8px;
@@ -429,13 +428,13 @@
 }
 
 .record-item:hover {
-  background: #f0f0f0;
+  background: transparent;
   color: #171717;
 }
 
 .record-item:active {
-  background: #e5e5e5;
-  transform: scale(0.97);
+  background: transparent;
+  transform: none;
 }
 
 .record-item i {
@@ -451,7 +450,7 @@
   white-space: nowrap;
 }
 
-/* ══════ مجموعة الفواتير + إخراج (يسار، متلاصقان) ══════ */
+/* ══════ الفواتير + إخراج (يسار، متلاصقان) ══════ */
 .records-left {
   display: flex;
   align-items: center;
@@ -460,7 +459,7 @@
 
 .record-item[data-record="invoices"],
 .record-item[data-record="out"] {
-  padding: 8px 10px;
+  padding: 8px 8px;
   gap: 5px;
 }
 
@@ -567,12 +566,8 @@
     font-size: 10px;
   }
 
-  .records-row {
-    padding: 8px 0;
-  }
-
   .record-item {
-    padding: 10px 10px;
+    padding: 8px 4px;
     gap: 6px;
   }
 
@@ -586,7 +581,7 @@
 
   .record-item[data-record="invoices"],
   .record-item[data-record="out"] {
-    padding: 8px 6px;
+    padding: 6px 4px;
     gap: 4px;
   }
 
@@ -603,7 +598,7 @@
 
 @media (max-width: 380px) {
   .record-item {
-    padding: 8px 8px;
+    padding: 6px 2px;
     gap: 5px;
   }
 
