@@ -447,13 +447,15 @@
   transform: none;
 }
 
-/* ══════ ✅ السجل — أيقونة بنفس حجم النص 13px ══════ */
+/* ══════ ✅ السجل — بنفس حجم ولون أيقونة العمال ══════ */
 .record-item[data-record="log"] i {
-  font-size: 13px;
+  font-size: 16px;
+  color: #171717;
 }
 
 .record-item[data-record="log"] span {
-  font-size: 13px;
+  font-size: 16px;
+  color: #171717;
 }
 
 /* ══════ الفواتير + إخراج (مع تأثير) ══════ */
@@ -589,13 +591,14 @@
     gap: 6px;
   }
 
-  /* ✅ السجل — أيقونة بنفس حجم النص 13px */
   .record-item[data-record="log"] i {
-    font-size: 13px;
+    font-size: 16px;
+    color: #171717;
   }
 
   .record-item[data-record="log"] span {
-    font-size: 13px;
+    font-size: 16px;
+    color: #171717;
   }
 
   .record-item[data-record="invoices"],
@@ -623,7 +626,8 @@
 
   .record-item[data-record="log"] i,
   .record-item[data-record="log"] span {
-    font-size: 12px;
+    font-size: 15px;
+    color: #171717;
   }
 
   .record-item[data-record="invoices"] i,
