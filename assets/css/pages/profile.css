@@ -396,13 +396,14 @@
 }
 
 /* ============================================
-   ✅ السجلات — 3 عناصر أفقية داخل بطاقة واحدة
+   ✅ السجلات — 3 عناصر أفقية
+   السجل بحجم ضعف (2fr)، الفواتير+إخراج (1fr+1fr)
    ============================================ */
 .records-row {
-  display: flex;
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;   /* ← السجل ضعف الحجم */
   align-items: center;
-  justify-content: space-around;
-  gap: 4px;
+  gap: 10px;
   margin-top: 20px;
   padding: 12px 8px;
   background: #fafafa;
@@ -410,48 +411,66 @@
   border-radius: 12px;
 }
 
+/* ══════ السجل (كبير) ══════ */
 .record-item {
-  flex: 1;
   display: flex;
-  flex-direction: row;       /* ← أيقونة بجانب النص */
+  flex-direction: row;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  padding: 8px 6px;
-  background: transparent;
-  border: none;
-  border-radius: 8px;
+  gap: 8px;
+  padding: 12px 10px;
+  background: #ffffff;
+  border: 1px solid #e5e5e5;
+  border-radius: 10px;
   text-decoration: none;
   color: #404040;
   cursor: pointer;
-  transition: background 0.15s, color 0.15s;
+  transition: background 0.15s, color 0.15s, transform 0.15s;
   -webkit-tap-highlight-color: transparent;
   min-width: 0;
 }
 
 .record-item:hover {
-  background: #f0f0f0;
+  background: #f5f5f5;
   color: #171717;
 }
 
 .record-item:active {
   background: #e5e5e5;
-  transform: scale(0.96);
+  transform: scale(0.97);
 }
 
 .record-item i {
-  font-size: 16px;
+  font-size: 18px;
   color: #171717;
   flex-shrink: 0;
 }
 
 .record-item span {
-  font-size: 12px;
-  font-weight: 600;
+  font-size: 13px;
+  font-weight: 700;
   color: #404040;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+/* ══════ الفواتير + إخراج (صغيران) ══════ */
+.record-item[data-record="invoices"],
+.record-item[data-record="out"] {
+  padding: 10px 8px;
+  gap: 5px;
+}
+
+.record-item[data-record="invoices"] i,
+.record-item[data-record="out"] i {
+  font-size: 14px;
+}
+
+.record-item[data-record="invoices"] span,
+.record-item[data-record="out"] span {
+  font-size: 11px;
+  font-weight: 600;
 }
 
 /* ============================================
@@ -546,14 +565,50 @@
     font-size: 10px;
   }
 
-  /* ✅ السجلات — 3 أفقية داخل بطاقة واحدة */
+  /* ✅ السجلات — تصغير للهاتف */
   .records-row {
-    padding: 10px 4px;
-    gap: 2px;
+    padding: 10px 6px;
+    gap: 6px;
   }
 
   .record-item {
-    padding: 6px 4px;
+    padding: 10px 6px;
+    gap: 6px;
+  }
+
+  .record-item i {
+    font-size: 16px;
+  }
+
+  .record-item span {
+    font-size: 12px;
+  }
+
+  .record-item[data-record="invoices"],
+  .record-item[data-record="out"] {
+    padding: 8px 5px;
+    gap: 4px;
+  }
+
+  .record-item[data-record="invoices"] i,
+  .record-item[data-record="out"] i {
+    font-size: 13px;
+  }
+
+  .record-item[data-record="invoices"] span,
+  .record-item[data-record="out"] span {
+    font-size: 10px;
+  }
+}
+
+@media (max-width: 380px) {
+  .records-row {
+    padding: 8px 4px;
+    gap: 4px;
+  }
+
+  .record-item {
+    padding: 8px 4px;
     gap: 4px;
   }
 
@@ -564,23 +619,14 @@
   .record-item span {
     font-size: 11px;
   }
-}
 
-@media (max-width: 380px) {
-  .records-row {
-    padding: 8px 2px;
+  .record-item[data-record="invoices"] i,
+  .record-item[data-record="out"] i {
+    font-size: 12px;
   }
 
-  .record-item {
-    padding: 5px 2px;
-    gap: 3px;
-  }
-
-  .record-item i {
-    font-size: 13px;
-  }
-
-  .record-item span {
-    font-size: 10px;
+  .record-item[data-record="invoices"] span,
+  .record-item[data-record="out"] span {
+    font-size: 9px;
   }
 }
