@@ -501,6 +501,98 @@
 }
 
 /* ============================================
+   ✅ السجلات المنبثقة (الفواتير + الإخراج)
+   ============================================ */
+.log-panel {
+  margin-top: 12px;
+  background: #fafafa;
+  border: 1px solid #f0f0f0;
+  border-radius: 12px;
+  padding: 8px;
+  animation: logOpen 0.2s ease;
+}
+
+@keyframes logOpen {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.log-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 20px;
+  color: #737373;
+  font-size: 13px;
+}
+
+.log-loading i {
+  font-size: 16px;
+  color: #171717;
+}
+
+.log-empty {
+  text-align: center;
+  padding: 20px;
+  color: #a3a3a3;
+  font-size: 13px;
+}
+
+/* ══════ قائمة السجل ══════ */
+.log-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.log-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 12px;
+  background: #ffffff;
+  border: 1px solid #f0f0f0;
+  border-radius: 8px;
+}
+
+.log-row-main {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  flex: 1;
+}
+
+.log-row-main strong {
+  font-size: 13px;
+  font-weight: 700;
+  color: #171717;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.log-row-main span {
+  font-size: 11px;
+  color: #737373;
+}
+
+.log-row-date {
+  font-size: 11px;
+  color: #737373;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+/* ============================================
    الهاتف
    ============================================ */
 @media (max-width: 768px) {
@@ -624,6 +716,19 @@
 
   .record-item[data-record="invoices"] span,
   .record-item[data-record="out"] span {
+    font-size: 10px;
+  }
+
+  .log-row {
+    padding: 8px 10px;
+  }
+
+  .log-row-main strong {
+    font-size: 12px;
+  }
+
+  .log-row-main span,
+  .log-row-date {
     font-size: 10px;
   }
 }

@@ -211,6 +211,22 @@ document.addEventListener('DOMContentLoaded', async () => {
         </div>
       </div>
 
+      <!-- ══════ سجل الفواتير (مخفي) ══════ -->
+      <div id="log-invoices" class="log-panel" style="display:none;">
+        <div class="log-loading">
+          <i class="fas fa-spinner fa-spin"></i>
+          <span>جارٍ التحميل...</span>
+        </div>
+      </div>
+
+      <!-- ══════ سجل الإخراج (مخفي) ══════ -->
+      <div id="log-out" class="log-panel" style="display:none;">
+        <div class="log-loading">
+          <i class="fas fa-spinner fa-spin"></i>
+          <span>جارٍ التحميل...</span>
+        </div>
+      </div>
+
     </div>
   `;
 
@@ -242,26 +258,146 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
 
   // ═══════════════════════════════════════════
-  // ✅ Toggle على الفواتير + إخراج
-  // عند الضغط: البطاقة + الخط يظهران ويبقيان
-  // عند الضغط مرة أخرى: يختفيان
-  // عند الضغط على الآخر: يختفي الأول ويظهر الثاني
+  // السجلات — فواتير / إخراج
   // ═══════════════════════════════════════════
-  document.querySelectorAll('.record-item[data-record="invoices"], .record-item[data-record="out"]').forEach(el => {
-    el.addEventListener('click', (e) => {
-      e.preventDefault();
+  const logInvoices = document.getElementById('log-invoices');
+  const logOut = document.getElementById('log-out');
 
-      const isActive = el.classList.contains('active');
+  // ✅ سجل الفواتير
+  async function loadInvoices() {
+    logInvoices.innerHTML = `
+      <div class="log-loading">
+        <i class="fas fa-spinner fa-spin"></i>
+        <span>جارٍ التحميل...</span>
+      </div>
+    `;
 
-      // أغلق الكل
-      document.querySelectorAll('.record-item.active').forEach(x => {
-        x.classList.remove('active');
-      });
+    const { data, error } = await db
+      .from('invoices')
+      .select('invoice_number, total_qty, total_value, created_at')
+      .eq('created_by', user.id)
+      .order('created_at', { ascending: false });
 
-      // إذا لم يكن نشطاً → نشّطه
-      if (!isActive) {
-        el.classList.add('active');
-      }
-    });
+    if (error) {
+      logInvoices.innerHTML = `<div class="log-empty">خطأ: ${error.message}</div>`;
+      return;
+    }
+
+    if (!data || data.length === 0) {
+      logInvoices.innerHTML = `<div class="log-empty">لا توجد فواتير بعد</div>`;
+      return;
+    }
+
+    logInvoices.innerHTML = `
+      <div class="log-list">
+        ${data.map(inv => `
+          <div class="log-row">
+            <div class="log-row-main">
+              <strong>${inv.invoice_number}</strong>
+              <span>${inv.total_qty ?? 0} قطعة • ${Number(inv.total_value ?? 0).toFixed(2)}</span>
+            </div>
+            <div class="log-row-date">${new Date(inv.created_at).toLocaleDateString('ar-MA')}</div>
+          </div>
+        `).join('')}
+      </div>
+    `;
+  }
+
+  // ✅ سجل الإخراج
+  async function loadOut() {
+    logOut.innerHTML = `
+      <div class="log-loading">
+        <i class="fas fa-spinner fa-spin"></i>
+        <span>جارٍ التحميل...</span>
+      </div>
+    `;
+
+    const { data, error } = await db
+      .from('stock_movements')
+      .select('quantity, created_at, products (name)')
+      .eq('performed_by', user.id)
+      .eq('type', 'out')
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      logOut.innerHTML = `<div class="log-empty">خطأ: ${error.message}</div>`;
+      return;
+    }
+
+    if (!data || data.length === 0) {
+      logOut.innerHTML = `<div class="log-empty">لا توجد عمليات إخراج بعد</div>`;
+      return;
+    }
+
+    logOut.innerHTML = `
+      <div class="log-list">
+        ${data.map(m => `
+          <div class="log-row">
+            <div class="log-row-main">
+              <strong>${m.products?.name ?? 'منتج محذوف'}</strong>
+              <span>الكمية: ${m.quantity}</span>
+            </div>
+            <div class="log-row-date">${new Date(m.created_at).toLocaleDateString('ar-MA')}</div>
+          </div>
+        `).join('')}
+      </div>
+    `;
+  }
+
+  // ═══════════════════════════════════════════
+  // ✅ التفاعل مع الأزرار
+  // ═══════════════════════════════════════════
+  const btnInvoices = document.querySelector('.record-item[data-record="invoices"]');
+  const btnOut = document.querySelector('.record-item[data-record="out"]');
+
+  btnInvoices.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    const isOpen = logInvoices.style.display !== 'none';
+
+    // أغلق الكل
+    logInvoices.style.display = 'none';
+    logOut.style.display = 'none';
+    document.querySelectorAll('.record-item.active').forEach(x => x.classList.remove('active'));
+
+    // إذا كان مغلقاً → افتحه
+    if (!isOpen) {
+      logInvoices.style.display = 'block';
+      btnInvoices.classList.add('active');
+      loadInvoices();
+    }
+  });
+
+  btnOut.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    const isOpen = logOut.style.display !== 'none';
+
+    logInvoices.style.display = 'none';
+    logOut.style.display = 'none';
+    document.querySelectorAll('.record-item.active').forEach(x => x.classList.remove('active'));
+
+    if (!isOpen) {
+      logOut.style.display = 'block';
+      btnOut.classList.add('active');
+      loadOut();
+    }
+  });
+
+  // ✅ الضغط خارج السجلات → إغلاق
+  document.addEventListener('click', (e) => {
+    // إذا كان الضغط داخل الأزرار → تجاهل
+    if (e.target.closest('.record-item[data-record="invoices"]')) return;
+    if (e.target.closest('.record-item[data-record="out"]')) return;
+    // إذا كان الضغط داخل السجلات → تجاهل
+    if (e.target.closest('#log-invoices')) return;
+    if (e.target.closest('#log-out')) return;
+
+    // أغلق الكل
+    logInvoices.style.display = 'none';
+    logOut.style.display = 'none';
+    document.querySelectorAll('.record-item.active').forEach(x => x.classList.remove('active'));
   });
 });
