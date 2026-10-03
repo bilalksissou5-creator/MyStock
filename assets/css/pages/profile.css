@@ -396,7 +396,7 @@
 }
 
 /* ============================================
-   ✅ السجلات — بدون حاوية، السجل يمين والفواتير+إخراج يسار
+   السجلات
    ============================================ */
 .records-row {
   display: flex;
@@ -427,16 +427,6 @@
   -webkit-tap-highlight-color: transparent;
 }
 
-.record-item:hover {
-  background: transparent;
-  color: #171717;
-}
-
-.record-item:active {
-  background: transparent;
-  transform: none;
-}
-
 .record-item i {
   font-size: 18px;
   color: #171717;
@@ -450,7 +440,23 @@
   white-space: nowrap;
 }
 
-/* ══════ الفواتير + إخراج (يسار، متلاصقان) ══════ */
+/* ══════ السجل (بدون تأثير) ══════ */
+.record-item[data-record="log"]:hover,
+.record-item[data-record="log"]:active {
+  background: transparent;
+  transform: none;
+}
+
+/* ══════ ✅ السجل — أيقونة بنفس حجم النص 13px ══════ */
+.record-item[data-record="log"] i {
+  font-size: 13px;
+}
+
+.record-item[data-record="log"] span {
+  font-size: 13px;
+}
+
+/* ══════ الفواتير + إخراج (مع تأثير) ══════ */
 .records-left {
   display: flex;
   align-items: center;
@@ -461,6 +467,18 @@
 .record-item[data-record="out"] {
   padding: 8px 8px;
   gap: 5px;
+}
+
+.record-item[data-record="invoices"]:hover,
+.record-item[data-record="out"]:hover {
+  background: #f0f0f0;
+  color: #171717;
+}
+
+.record-item[data-record="invoices"]:active,
+.record-item[data-record="out"]:active {
+  background: #e5e5e5;
+  transform: scale(0.97);
 }
 
 .record-item[data-record="invoices"] i,
@@ -571,12 +589,13 @@
     gap: 6px;
   }
 
-  .record-item i {
-    font-size: 16px;
+  /* ✅ السجل — أيقونة بنفس حجم النص 13px */
+  .record-item[data-record="log"] i {
+    font-size: 13px;
   }
 
-  .record-item span {
-    font-size: 12px;
+  .record-item[data-record="log"] span {
+    font-size: 13px;
   }
 
   .record-item[data-record="invoices"],
@@ -602,12 +621,9 @@
     gap: 5px;
   }
 
-  .record-item i {
-    font-size: 14px;
-  }
-
-  .record-item span {
-    font-size: 11px;
+  .record-item[data-record="log"] i,
+  .record-item[data-record="log"] span {
+    font-size: 12px;
   }
 
   .record-item[data-record="invoices"] i,
