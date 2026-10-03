@@ -447,7 +447,6 @@
   transform: none;
 }
 
-/* ══════ ✅ السجل — بنفس حجم ولون أيقونة العمال ══════ */
 .record-item[data-record="log"] i {
   font-size: 16px;
   color: #171717;
@@ -458,29 +457,33 @@
   color: #171717;
 }
 
-/* ══════ الفواتير + إخراج (مع تأثير) ══════ */
+/* ══════ ✅ الفواتير + إخراج ══════ */
 .records-left {
   display: flex;
   align-items: center;
-  gap: 2px;
+  gap: 10px;                    /* ← زيادة 10px */
 }
 
 .record-item[data-record="invoices"],
 .record-item[data-record="out"] {
   padding: 8px 8px;
   gap: 5px;
+  border-radius: 8px 8px 0 0;   /* ← حواف دائرية من فوق فقط */
+  transition: background 0.15s, color 0.15s, border-bottom 0.15s;
+}
+
+/* ══════ عند الضغط (active) ══════ */
+.record-item[data-record="invoices"]:active,
+.record-item[data-record="out"]:active {
+  background: #f0f0f0;                          /* خلفية خفيفة */
+  border-bottom: 2px solid #000;                /* خط أسود من تحت */
+  border-radius: 8px 8px 0 0;                   /* حواف دائرية من فوق */
+  transform: none;
 }
 
 .record-item[data-record="invoices"]:hover,
 .record-item[data-record="out"]:hover {
-  background: #f0f0f0;
-  color: #171717;
-}
-
-.record-item[data-record="invoices"]:active,
-.record-item[data-record="out"]:active {
-  background: #e5e5e5;
-  transform: scale(0.97);
+  background: #fafafa;
 }
 
 .record-item[data-record="invoices"] i,
@@ -601,9 +604,14 @@
     color: #171717;
   }
 
+  /* ✅ الفواتير + إخراج — gap 10px */
+  .records-left {
+    gap: 10px;
+  }
+
   .record-item[data-record="invoices"],
   .record-item[data-record="out"] {
-    padding: 6px 4px;
+    padding: 6px 6px;
     gap: 4px;
   }
 
@@ -628,6 +636,10 @@
   .record-item[data-record="log"] span {
     font-size: 15px;
     color: #171717;
+  }
+
+  .records-left {
+    gap: 10px;
   }
 
   .record-item[data-record="invoices"] i,
