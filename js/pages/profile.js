@@ -194,6 +194,30 @@ document.addEventListener('DOMContentLoaded', async () => {
         content: workers.map(w => buildMemberCard(w, 'worker')).join(''),
       }) : ''}
 
+      <!-- ═══════════════════════════════════════
+           ✅ قسم السجلات (3 بطاقات أفقية)
+           ═══════════════════════════════════════ -->
+      <div class="records-section">
+        <h3 class="records-title">السجلات</h3>
+
+        <div class="records-row">
+          <a href="#" class="record-card" data-record="log">
+            <i class="fas fa-clipboard-list"></i>
+            <span>السجل</span>
+          </a>
+
+          <a href="#" class="record-card" data-record="invoices">
+            <i class="fas fa-file-invoice"></i>
+            <span>الفواتير</span>
+          </a>
+
+          <a href="#" class="record-card" data-record="out">
+            <i class="fas fa-arrow-up-from-bracket"></i>
+            <span>إخراج</span>
+          </a>
+        </div>
+      </div>
+
     </div>
   `;
 
@@ -210,7 +234,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       const isOpen = body.style.display !== 'none';
 
-      // ✅ إغلاق كل الأقسام أولاً
+      // إغلاق كل الأقسام أولاً
       document.querySelectorAll('.team-accordion-body').forEach(b => {
         b.style.display = 'none';
       });
@@ -218,7 +242,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         a.classList.remove('open');
       });
 
-      // ✅ إذا كان مغلقاً → افتحه
+      // إذا كان مغلقاً → افتحه
       if (!isOpen) {
         body.style.display = 'block';
         accordion.classList.add('open');
