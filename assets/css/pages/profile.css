@@ -396,12 +396,12 @@
 }
 
 /* ============================================
-   ✅ السجلات — 3 عناصر أفقية
-   السجل بحجم ضعف (2fr)، الفواتير+إخراج (1fr+1fr)
+   ✅ السجلات — 3 عناصر (بدون إطارات)
+   السجل: 2fr، الفواتير+إخراج: 1fr
    ============================================ */
 .records-row {
   display: grid;
-  grid-template-columns: 2fr 1fr 1fr;   /* ← السجل ضعف الحجم */
+  grid-template-columns: 2fr 1fr 1fr;
   align-items: center;
   gap: 10px;
   margin-top: 20px;
@@ -419,19 +419,19 @@
   justify-content: center;
   gap: 8px;
   padding: 12px 10px;
-  background: #ffffff;
-  border: 1px solid #e5e5e5;
-  border-radius: 10px;
+  background: transparent;
+  border: none;
+  border-radius: 8px;
   text-decoration: none;
   color: #404040;
   cursor: pointer;
-  transition: background 0.15s, color 0.15s, transform 0.15s;
+  transition: background 0.15s, color 0.15s;
   -webkit-tap-highlight-color: transparent;
   min-width: 0;
 }
 
 .record-item:hover {
-  background: #f5f5f5;
+  background: #f0f0f0;
   color: #171717;
 }
 
@@ -565,7 +565,6 @@
     font-size: 10px;
   }
 
-  /* ✅ السجلات — تصغير للهاتف */
   .records-row {
     padding: 10px 6px;
     gap: 6px;
