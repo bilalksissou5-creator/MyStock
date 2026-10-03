@@ -190,7 +190,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       }) : ''}
 
       <!-- ═══════════════════════════════════════
-           ✅ قسم السجلات (3 أيقونات في بطاقة واحدة)
+           ✅ السجلات — السجل يمين، الفواتير+إخراج يسار
            ═══════════════════════════════════════ -->
       <div class="records-row">
         <a href="#" class="record-item" data-record="log">
@@ -198,15 +198,17 @@ document.addEventListener('DOMContentLoaded', async () => {
           <span>السجل</span>
         </a>
 
-        <a href="#" class="record-item" data-record="invoices">
-          <i class="fas fa-file-invoice"></i>
-          <span>الفواتير</span>
-        </a>
+        <div class="records-left">
+          <a href="#" class="record-item" data-record="invoices">
+            <i class="fas fa-file-invoice"></i>
+            <span>الفواتير</span>
+          </a>
 
-        <a href="#" class="record-item" data-record="out">
-          <i class="fas fa-arrow-up-from-bracket"></i>
-          <span>إخراج</span>
-        </a>
+          <a href="#" class="record-item" data-record="out">
+            <i class="fas fa-arrow-up-from-bracket"></i>
+            <span>إخراج</span>
+          </a>
+        </div>
       </div>
 
     </div>

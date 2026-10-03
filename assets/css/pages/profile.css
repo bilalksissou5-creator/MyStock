@@ -396,29 +396,28 @@
 }
 
 /* ============================================
-   ✅ السجلات — 3 عناصر (بدون إطارات)
-   السجل: 2fr، الفواتير+إخراج: 1fr
+   ✅ السجلات — السجل يمين، الفواتير+إخراج يسار
    ============================================ */
 .records-row {
-  display: grid;
-  grid-template-columns: 2fr 1fr 1fr;
+  display: flex;
   align-items: center;
-  gap: 10px;
+  justify-content: space-between;
+  gap: 0;
   margin-top: 20px;
-  padding: 12px 8px;
+  padding: 8px 0;
   background: #fafafa;
   border: 1px solid #f0f0f0;
   border-radius: 12px;
 }
 
-/* ══════ السجل (كبير) ══════ */
+/* ══════ السجل (كبير — يمين) ══════ */
 .record-item {
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  padding: 12px 10px;
+  padding: 10px 14px;
   background: transparent;
   border: none;
   border-radius: 8px;
@@ -427,7 +426,6 @@
   cursor: pointer;
   transition: background 0.15s, color 0.15s;
   -webkit-tap-highlight-color: transparent;
-  min-width: 0;
 }
 
 .record-item:hover {
@@ -451,14 +449,18 @@
   font-weight: 700;
   color: #404040;
   white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
-/* ══════ الفواتير + إخراج (صغيران) ══════ */
+/* ══════ مجموعة الفواتير + إخراج (يسار، متلاصقان) ══════ */
+.records-left {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
 .record-item[data-record="invoices"],
 .record-item[data-record="out"] {
-  padding: 10px 8px;
+  padding: 8px 10px;
   gap: 5px;
 }
 
@@ -566,12 +568,11 @@
   }
 
   .records-row {
-    padding: 10px 6px;
-    gap: 6px;
+    padding: 8px 0;
   }
 
   .record-item {
-    padding: 10px 6px;
+    padding: 10px 10px;
     gap: 6px;
   }
 
@@ -585,7 +586,7 @@
 
   .record-item[data-record="invoices"],
   .record-item[data-record="out"] {
-    padding: 8px 5px;
+    padding: 8px 6px;
     gap: 4px;
   }
 
@@ -601,14 +602,9 @@
 }
 
 @media (max-width: 380px) {
-  .records-row {
-    padding: 8px 4px;
-    gap: 4px;
-  }
-
   .record-item {
-    padding: 8px 4px;
-    gap: 4px;
+    padding: 8px 8px;
+    gap: 5px;
   }
 
   .record-item i {
