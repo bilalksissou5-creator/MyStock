@@ -242,19 +242,26 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
 
   // ═══════════════════════════════════════════
-  // ✅ إضافة/إزالة .pressed على الفواتير + إخراج
-  // لضمان ظهور الخط والخلفية معاً أثناء الضغط
+  // ✅ Toggle على الفواتير + إخراج
+  // عند الضغط: البطاقة + الخط يظهران ويبقيان
+  // عند الضغط مرة أخرى: يختفيان
+  // عند الضغط على الآخر: يختفي الأول ويظهر الثاني
   // ═══════════════════════════════════════════
   document.querySelectorAll('.record-item[data-record="invoices"], .record-item[data-record="out"]').forEach(el => {
-    const press = () => el.classList.add('pressed');
-    const release = () => el.classList.remove('pressed');
+    el.addEventListener('click', (e) => {
+      e.preventDefault();
 
-    el.addEventListener('touchstart', press, { passive: true });
-    el.addEventListener('touchend', release);
-    el.addEventListener('touchcancel', release);
+      const isActive = el.classList.contains('active');
 
-    el.addEventListener('mousedown', press);
-    el.addEventListener('mouseup', release);
-    el.addEventListener('mouseleave', release);
+      // أغلق الكل
+      document.querySelectorAll('.record-item.active').forEach(x => {
+        x.classList.remove('active');
+      });
+
+      // إذا لم يكن نشطاً → نشّطه
+      if (!isActive) {
+        el.classList.add('active');
+      }
+    });
   });
 });
