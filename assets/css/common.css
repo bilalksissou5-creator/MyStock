@@ -180,10 +180,11 @@ button { font-family: inherit; }
   min-height: 0;
   min-width: 0;
   height: 0;
+  position: relative;
 }
 
 /* ============================================
-   ✅ حالة sidebar المغلقة
+   حالة sidebar المغلقة (سطح المكتب)
    ============================================ */
 .body.sidebar-closed .sidebar {
   display: none;
@@ -264,6 +265,19 @@ button { font-family: inherit; }
   min-width: 0;
   height: 100%;
   box-sizing: border-box;
+}
+
+/* ============================================
+   ✅ Sidebar Backdrop (خلفية معتمة للموبايل)
+   ============================================ */
+.sidebar-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 90;
+  opacity: 0;
+  transition: opacity 0.25s ease;
 }
 
 /* ============================================
@@ -407,26 +421,69 @@ button { font-family: inherit; }
 }
 
 /* ============================================
-   الهاتف
+   ✅ الموبايل: Sidebar Drawer
    ============================================ */
 @media (max-width: 768px) {
   .header { padding: 0 12px; gap: 10px; }
   .logo { font-size: 1.1rem; }
 
-  .sidebar { width: 65px; min-width: 65px; max-width: 65px; }
-  .nav { padding: 8px 4px; }
-  .nav-item {
-    padding: 12px 4px;
-    justify-content: center;
-    gap: 0;
-    font-size: 0;
+  /* ✅ backdrop يظهر في الموبايل */
+  .sidebar-backdrop {
+    display: block;
+    pointer-events: none;
   }
-  .nav-item span { display: none; }
-  .nav-item i { font-size: 18px; width: auto; }
-  .sidebar-footer { padding: 8px 4px; }
-  .sidebar-footer .nav-item { padding: 12px 4px; justify-content: center; }
-  .sidebar-footer .nav-item i { font-size: 18px; }
-  .main { padding: 12px; padding-bottom: 80px; }
+
+  /* ✅ sidebar: يتحول إلى Drawer */
+  .sidebar {
+    position: fixed;
+    top: 60px;
+    bottom: 0;
+    right: 0;
+    width: 240px;
+    max-width: 80vw;
+    z-index: 95;
+    transform: translateX(100%);       /* ← مخفي خارج الشاشة */
+    transition: transform 0.25s ease;
+    box-shadow: -4px 0 20px rgba(0, 0, 0, 0.1);
+    border-left: 1px solid #e5e5e5;
+  }
+
+  /* ✅ عند الفتح */
+  .body.sidebar-open .sidebar {
+    transform: translateX(0);
+  }
+
+  /* ✅ عند الفتح: backdrop يظهر */
+  .body.sidebar-open .sidebar-backdrop {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  /* ✅ على الموبايل: إلغاء قاعدة الإغلاق (لأن sidebar يتحرك بـ transform) */
+  .body.sidebar-closed .sidebar {
+    display: flex;
+  }
+
+  /* ✅ main يأخذ كل العرض */
+  .main {
+    padding: 12px;
+    padding-bottom: 80px;
+    width: 100%;
+  }
+
+  /* ✅ sidebar: تصميم داخلي بدون تغيير */
+  .nav { padding: 8px 12px; }
+  .nav-item {
+    padding: 12px 14px;
+    justify-content: flex-start;
+    gap: 12px;
+    font-size: 14px;
+  }
+  .nav-item span { display: inline; }
+  .nav-item i { font-size: 16px; width: 24px; }
+  .sidebar-footer { padding: 12px; }
+  .sidebar-footer .nav-item { padding: 12px 14px; justify-content: flex-start; }
+  .sidebar-footer .nav-item i { font-size: 16px; }
 }
 
 /* ============================================
@@ -437,12 +494,6 @@ button { font-family: inherit; }
   .logo { font-size: 1rem; }
   .search input { padding: 6px 32px 6px 10px; font-size: 12px; }
 
-  .sidebar { width: 200px; min-width: 200px; max-width: 200px; }
-  .nav { padding: 6px 8px; gap: 2px; }
-  .nav-item { padding: 6px 10px; font-size: 12px; gap: 8px; }
-  .nav-item i { font-size: 14px; width: 18px; }
-  .sidebar-footer { padding: 6px 8px; gap: 2px; }
-  .sidebar-footer .nav-item { padding: 6px 10px; font-size: 12px; }
-  .sidebar-footer .nav-item i { font-size: 14px; }
-  .main { padding: 12px; padding-bottom: 40px; }
+  /* ✅ على landscape: sidebar يبقى مصغّر مثل السابق (65px) */
+  /* ملاحظة: هذا للشاشات الكبيرة المنخفضة، ليس للموبايل */
 }
