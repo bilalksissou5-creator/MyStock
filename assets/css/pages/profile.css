@@ -468,22 +468,22 @@
 .record-item[data-record="out"] {
   padding: 8px 8px;
   gap: 5px;
-  border-radius: 8px 8px 0 0;         /* حواف دائرية من فوق */
-  border-bottom: 2px solid transparent; /* ← مكان الخط محفوظ */
+  border-radius: 8px 8px 0 0;
+  border-bottom: 2px solid transparent;
   transition: background 0.15s, color 0.15s, border-bottom-color 0.1s;
-}
-
-/* ══════ عند الضغط والإبقاء ══════ */
-.record-item[data-record="invoices"]:active,
-.record-item[data-record="out"]:active {
-  background: #f0f0f0;                    /* خلفية خفيفة */
-  border-bottom-color: #000;              /* خط أسود يظهر */
-  transform: none;
 }
 
 .record-item[data-record="invoices"]:hover,
 .record-item[data-record="out"]:hover {
   background: #fafafa;
+}
+
+/* ══════ ✅ .pressed (يُضاف بواسطة JS) ══════ */
+.record-item[data-record="invoices"].pressed,
+.record-item[data-record="out"].pressed {
+  background: #f0f0f0;
+  border-bottom-color: #000;
+  transform: none;
 }
 
 .record-item[data-record="invoices"] i,

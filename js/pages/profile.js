@@ -190,7 +190,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       }) : ''}
 
       <!-- ═══════════════════════════════════════
-           ✅ السجلات — السجل يمين، الفواتير+إخراج يسار
+           السجلات
            ═══════════════════════════════════════ -->
       <div class="records-row">
         <a href="#" class="record-item" data-record="log">
@@ -239,5 +239,22 @@ document.addEventListener('DOMContentLoaded', async () => {
         accordion.classList.add('open');
       }
     });
+  });
+
+  // ═══════════════════════════════════════════
+  // ✅ إضافة/إزالة .pressed على الفواتير + إخراج
+  // لضمان ظهور الخط والخلفية معاً أثناء الضغط
+  // ═══════════════════════════════════════════
+  document.querySelectorAll('.record-item[data-record="invoices"], .record-item[data-record="out"]').forEach(el => {
+    const press = () => el.classList.add('pressed');
+    const release = () => el.classList.remove('pressed');
+
+    el.addEventListener('touchstart', press, { passive: true });
+    el.addEventListener('touchend', release);
+    el.addEventListener('touchcancel', release);
+
+    el.addEventListener('mousedown', press);
+    el.addEventListener('mouseup', release);
+    el.addEventListener('mouseleave', release);
   });
 });
