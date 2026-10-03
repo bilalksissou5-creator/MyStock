@@ -19,7 +19,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   const isAdmin = currentRole === 'admin';
   const isAdminOrDeputy = currentRole === 'admin' || currentRole === 'deputy';
 
-  // جلب أعضاء المنظمة
   let members = [];
   if (profile?.organization_id) {
     const { data } = await db
@@ -30,7 +29,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     members = data ?? [];
   }
 
-  // استبعاد المستخدم الحالي
   const others = members.filter(m => m.id !== user.id);
   const admin = others.find(m => m.role === 'admin');
   const deputies = others.filter(m => m.role === 'deputy');
@@ -99,9 +97,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     `;
   }
 
-  // ═══════════════════════════════════════════
-  // بناء قسم Accordion
-  // ═══════════════════════════════════════════
   function buildTeamSection({ id, icon, iconColor, label, count, content }) {
     return `
       <div class="team-accordion" data-section="${id}">
@@ -164,7 +159,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         </a>
       </div>
 
-      <!-- ══════ قسم المدير (Accordion) ══════ -->
+      <!-- ══════ قسم المدير ══════ -->
       ${admin ? buildTeamSection({
         id: 'admin',
         icon: 'fa-crown',
@@ -174,7 +169,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         content: buildAdminCard(admin),
       }) : ''}
 
-      <!-- ══════ قسم النواب (Accordion) ══════ -->
+      <!-- ══════ قسم النواب ══════ -->
       ${deputies.length > 0 ? buildTeamSection({
         id: 'deputies',
         icon: 'fa-star',
@@ -184,7 +179,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         content: deputies.map(w => buildMemberCard(w, 'deputy')).join(''),
       }) : ''}
 
-      <!-- ══════ قسم العمال (Accordion) ══════ -->
+      <!-- ══════ قسم العمال ══════ -->
       ${workers.length > 0 ? buildTeamSection({
         id: 'workers',
         icon: 'fa-users',
@@ -195,34 +190,30 @@ document.addEventListener('DOMContentLoaded', async () => {
       }) : ''}
 
       <!-- ═══════════════════════════════════════
-           ✅ قسم السجلات (3 بطاقات أفقية)
+           ✅ قسم السجلات (3 أيقونات في بطاقة واحدة)
            ═══════════════════════════════════════ -->
-      <div class="records-section">
-        <h3 class="records-title">السجلات</h3>
+      <div class="records-row">
+        <a href="#" class="record-item" data-record="log">
+          <i class="fas fa-clipboard-list"></i>
+          <span>السجل</span>
+        </a>
 
-        <div class="records-row">
-          <a href="#" class="record-card" data-record="log">
-            <i class="fas fa-clipboard-list"></i>
-            <span>السجل</span>
-          </a>
+        <a href="#" class="record-item" data-record="invoices">
+          <i class="fas fa-file-invoice"></i>
+          <span>الفواتير</span>
+        </a>
 
-          <a href="#" class="record-card" data-record="invoices">
-            <i class="fas fa-file-invoice"></i>
-            <span>الفواتير</span>
-          </a>
-
-          <a href="#" class="record-card" data-record="out">
-            <i class="fas fa-arrow-up-from-bracket"></i>
-            <span>إخراج</span>
-          </a>
-        </div>
+        <a href="#" class="record-item" data-record="out">
+          <i class="fas fa-arrow-up-from-bracket"></i>
+          <span>إخراج</span>
+        </a>
       </div>
 
     </div>
   `;
 
   // ═══════════════════════════════════════════
-  // ✅ تفعيل Accordion (فتح حصري)
+  // Accordion (فتح حصري)
   // ═══════════════════════════════════════════
   document.querySelectorAll('[data-toggle]').forEach(btn => {
     btn.addEventListener('click', () => {
@@ -234,7 +225,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       const isOpen = body.style.display !== 'none';
 
-      // إغلاق كل الأقسام أولاً
       document.querySelectorAll('.team-accordion-body').forEach(b => {
         b.style.display = 'none';
       });
@@ -242,7 +232,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         a.classList.remove('open');
       });
 
-      // إذا كان مغلقاً → افتحه
       if (!isOpen) {
         body.style.display = 'block';
         accordion.classList.add('open');

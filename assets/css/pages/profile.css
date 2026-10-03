@@ -162,7 +162,6 @@
   border-bottom: 1px solid #f0f0f0;
 }
 
-/* ══════ العنوان (Header) ══════ */
 .team-accordion-header {
   width: 100%;
   display: flex;
@@ -185,7 +184,6 @@
   background: #fafafa;
 }
 
-/* ══════ عنوان القسم ══════ */
 .team-accordion-title {
   display: flex;
   align-items: center;
@@ -198,7 +196,6 @@
   text-align: center;
 }
 
-/* ══════ السهم ══════ */
 .team-accordion-arrow {
   font-size: 14px;
   color: #a3a3a3;
@@ -212,7 +209,6 @@
   color: #171717;
 }
 
-/* ══════ المحتوى (Body) ══════ */
 .team-accordion-body {
   padding: 12px 0 16px;
   animation: accordionOpen 0.2s ease;
@@ -239,7 +235,7 @@
 }
 
 /* ══════════════════════════════════════════
-   ✅ نقطة الاتصال على الصورة
+   نقطة الاتصال على الصورة
    ══════════════════════════════════════════ */
 .member-avatar-wrap {
   position: relative;
@@ -269,7 +265,7 @@
 }
 
 /* ══════════════════════════════════════════
-   ✅ بطاقة العضو (نائب / عامل / مدير)
+   بطاقة العضو
    ══════════════════════════════════════════ */
 .member-card {
   background: #fafafa;
@@ -314,9 +310,6 @@
   color: #a3a3a3;
 }
 
-/* ══════════════════════════════════════════
-   ✅ صف الاسم + الأيقونة
-   ══════════════════════════════════════════ */
 .member-name-row {
   display: flex;
   align-items: center;
@@ -342,24 +335,18 @@
   flex-shrink: 0;
 }
 
-/* ══════ نجمة النائب (ذهبية) ══════ */
 .member-star-icon.deputy-star {
   color: #fbbf24;
 }
 
-/* ══════ نجمة العامل (رمادية) ══════ */
 .member-star-icon.worker-star {
   color: #a3a3a3;
 }
 
-/* ══════ تاج المدير (ذهبي) ══════ */
 .member-star-icon.crown-star {
   color: #fbbf24;
 }
 
-/* ══════════════════════════════════════════
-   ✅ الدور (نائب / عامل / مدير)
-   ══════════════════════════════════════════ */
 .member-role {
   font-size: 11px;
   font-weight: 600;
@@ -375,9 +362,6 @@
   color: #ffffff;
 }
 
-/* ══════════════════════════════════════════
-   ✅ بطاقة المدير (تمييز ذهبي خفيف)
-   ══════════════════════════════════════════ */
 .member-card-admin {
   border-color: #fbbf24;
   background: #fffbeb;
@@ -387,9 +371,6 @@
   background: #fef3c7;
 }
 
-/* ══════════════════════════════════════════
-   ✅ بطاقة العضو القابلة للضغط
-   ══════════════════════════════════════════ */
 .member-card-link {
   text-decoration: none;
   color: inherit;
@@ -415,66 +396,63 @@
 }
 
 /* ============================================
-   ✅ قسم السجلات — 3 بطاقات أفقية
+   ✅ السجلات — 3 أيقونات أفقية (بدون بطاقات)
    ============================================ */
-.records-section {
-  margin-top: 20px;
-  padding: 0 4px;
-}
-
-.records-title {
-  font-size: 15px;
-  font-weight: 700;
-  color: #171717;
-  margin: 0 0 12px;
-  padding-bottom: 10px;
-  border-bottom: 1px solid #f0f0f0;
-  text-align: right;
-}
-
 .records-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  gap: 4px;
+  margin-top: 20px;
+  padding: 12px 4px;
+  background: #fafafa;
+  border: 1px solid #f0f0f0;
+  border-radius: 12px;
 }
 
-.record-card {
+.record-item {
+  flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  padding: 18px 8px;
-  background: #fafafa;
-  border: 1px solid #f0f0f0;
-  border-radius: 12px;
+  gap: 5px;
+  padding: 8px 4px;
+  background: transparent;
+  border: none;
+  border-radius: 8px;
   text-decoration: none;
-  color: #171717;
-  transition: all 0.15s;
-  -webkit-tap-highlight-color: transparent;
+  color: #404040;
   cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  -webkit-tap-highlight-color: transparent;
+  min-width: 0;
 }
 
-.record-card:hover {
+.record-item:hover {
   background: #f5f5f5;
-  border-color: #e5e5e5;
-  transform: translateY(-2px);
-}
-
-.record-card:active {
-  transform: scale(0.97);
-}
-
-.record-card i {
-  font-size: 22px;
   color: #171717;
 }
 
-.record-card span {
-  font-size: 12px;
+.record-item:active {
+  background: #e5e5e5;
+  transform: scale(0.95);
+}
+
+.record-item i {
+  font-size: 18px;
+  color: #171717;
+}
+
+.record-item span {
+  font-size: 11px;
   font-weight: 600;
   color: #404040;
   text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
 }
 
 /* ============================================
@@ -569,40 +547,41 @@
     font-size: 10px;
   }
 
-  /* ✅ السجلات — تبقى 3 أفقية */
+  /* ✅ السجلات — تبقى 3 أفقية، أحجام أصغر */
   .records-row {
-    grid-template-columns: 1fr 1fr 1fr;
-    gap: 8px;
+    padding: 10px 2px;
+    gap: 2px;
   }
 
-  .record-card {
-    padding: 14px 6px;
-    gap: 6px;
+  .record-item {
+    padding: 6px 2px;
+    gap: 4px;
   }
 
-  .record-card i {
-    font-size: 18px;
+  .record-item i {
+    font-size: 16px;
   }
 
-  .record-card span {
-    font-size: 11px;
+  .record-item span {
+    font-size: 10px;
   }
 }
 
 @media (max-width: 380px) {
   .records-row {
-    gap: 6px;
+    padding: 8px 2px;
   }
 
-  .record-card {
-    padding: 12px 4px;
+  .record-item {
+    padding: 4px 2px;
+    gap: 3px;
   }
 
-  .record-card i {
-    font-size: 16px;
+  .record-item i {
+    font-size: 14px;
   }
 
-  .record-card span {
-    font-size: 10px;
+  .record-item span {
+    font-size: 9px;
   }
 }
