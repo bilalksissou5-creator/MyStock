@@ -226,6 +226,42 @@
 }
 
 /* ============================================
+   ✅ المعلومات الشخصية (Info List)
+   ============================================ */
+.info-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 4px 0;
+}
+
+.info-row {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 8px 4px;
+}
+
+.info-icon {
+  font-size: 18px;
+  color: #171717;
+  width: 24px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.info-text {
+  font-size: 14px;
+  font-weight: 600;
+  color: #171717;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
+  text-align: right;
+}
+
+/* ============================================
    شبكة الفريق
    ============================================ */
 .team-grid {
@@ -481,7 +517,6 @@
   background: #fafafa;
 }
 
-/* ✅ عند الضغط مرة واحدة: البطاقة + الخط يبقيان */
 .record-item[data-record="invoices"].active,
 .record-item[data-record="out"].active {
   background: #f0f0f0;
@@ -501,7 +536,7 @@
 }
 
 /* ============================================
-   ✅ السجلات المنبثقة (الفواتير + الإخراج)
+   السجلات المنبثقة
    ============================================ */
 .log-panel {
   margin-top: 12px;
@@ -545,7 +580,6 @@
   font-size: 13px;
 }
 
-/* ══════ قائمة السجل ══════ */
 .log-list {
   display: flex;
   flex-direction: column;
@@ -592,7 +626,6 @@
   white-space: nowrap;
 }
 
-/* ✅ سطر السجل القابل للضغط */
 .log-row-link {
   text-decoration: none;
   color: inherit;
@@ -664,6 +697,19 @@
 
   .team-accordion-body {
     padding: 10px 0 14px;
+  }
+
+  .info-icon {
+    font-size: 16px;
+    width: 22px;
+  }
+
+  .info-text {
+    font-size: 13px;
+  }
+
+  .info-row {
+    gap: 15px;
   }
 
   .team-grid {

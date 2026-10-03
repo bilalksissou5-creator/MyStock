@@ -34,6 +34,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   const deputies = others.filter(m => m.role === 'deputy');
   const workers = others.filter(m => m.role === 'worker');
 
+  // ═══════════════════════════════════════════
+  // بناء بطاقة عضو
+  // ═══════════════════════════════════════════
   function buildMemberCard(member, type) {
     const isOnline = typeof isUserOnline === 'function' && isUserOnline(member);
     const starClass = type === 'deputy' ? 'deputy-star' : 'worker-star';
@@ -106,13 +109,46 @@ document.addEventListener('DOMContentLoaded', async () => {
         </button>
 
         <div class="team-accordion-body" data-body="${id}" style="display:none;">
-          <div class="team-grid">
-            ${content}
-          </div>
+          ${content}
         </div>
       </div>
     `;
   }
+
+  // ═══════════════════════════════════════════
+  // بناء معلومات المستخدم الحالي
+  // ═══════════════════════════════════════════
+  const roleIcon = currentRole === 'admin'
+    ? '<i class="fas fa-crown info-icon" style="color:#fbbf24;"></i>'
+    : currentRole === 'deputy'
+      ? '<i class="fas fa-star info-icon" style="color:#fbbf24;"></i>'
+      : '<i class="fas fa-users info-icon"></i>';
+
+  const roleLabel = currentRole === 'admin' ? 'مدير' : currentRole === 'deputy' ? 'نائب' : 'عامل';
+
+  const personalInfoContent = `
+    <div class="info-list">
+      <div class="info-row">
+        <i class="fas fa-user info-icon"></i>
+        <span class="info-text">${profile?.full_name ?? 'بدون اسم'}</span>
+      </div>
+
+      <div class="info-row">
+        <i class="fas fa-envelope info-icon"></i>
+        <span class="info-text" dir="ltr">${user.email}</span>
+      </div>
+
+      <div class="info-row">
+        <i class="fab fa-whatsapp info-icon" style="color:#25d366;"></i>
+        <span class="info-text" dir="ltr">${profile?.phone ?? '—'}</span>
+      </div>
+
+      <div class="info-row">
+        ${roleIcon}
+        <span class="info-text">${roleLabel}</span>
+      </div>
+    </div>
+  `;
 
   main.innerHTML = `
     <div class="profile-fb-wrapper">
@@ -138,7 +174,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         <h3>${profile?.full_name ?? 'بدون اسم'}</h3>
         <p class="profile-fb-email" dir="ltr">${user.email}</p>
         <div class="profile-fb-badges">
-          <span class="badge-role">${currentRole === 'admin' ? 'مدير' : currentRole === 'deputy' ? 'نائب' : 'عامل'}</span>
+          <span class="badge-role">${roleLabel}</span>
         </div>
       </div>
 
@@ -156,6 +192,17 @@ document.addEventListener('DOMContentLoaded', async () => {
         </a>
       </div>
 
+      <!-- ═══════════════════════════════════════
+           ✅ المعلومات الشخصية (Accordion)
+           ═══════════════════════════════════════ -->
+      ${buildTeamSection({
+        id: 'personal-info',
+        icon: 'fa-user',
+        label: 'المعلومات الشخصية',
+        count: undefined,
+        content: personalInfoContent,
+      })}
+
       <!-- ══════ قسم المدير ══════ -->
       ${admin ? buildTeamSection({
         id: 'admin',
@@ -163,7 +210,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         iconColor: '#fbbf24',
         label: 'المدير',
         count: undefined,
-        content: buildAdminCard(admin),
+        content: `<div class="team-grid">${buildAdminCard(admin)}</div>`,
       }) : ''}
 
       <!-- ══════ قسم النواب ══════ -->
@@ -173,7 +220,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         iconColor: '#fbbf24',
         label: 'النواب',
         count: deputies.length,
-        content: deputies.map(w => buildMemberCard(w, 'deputy')).join(''),
+        content: `<div class="team-grid">${deputies.map(w => buildMemberCard(w, 'deputy')).join('')}</div>`,
       }) : ''}
 
       <!-- ══════ قسم العمال ══════ -->
@@ -183,7 +230,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         iconColor: '#171717',
         label: 'العمال',
         count: workers.length,
-        content: workers.map(w => buildMemberCard(w, 'worker')).join(''),
+        content: `<div class="team-grid">${workers.map(w => buildMemberCard(w, 'worker')).join('')}</div>`,
       }) : ''}
 
       <!-- ═══════════════════════════════════════
@@ -260,7 +307,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   const logInvoices = document.getElementById('log-invoices');
   const logOut = document.getElementById('log-out');
 
-  // ✅ سجل الفواتير (مع روابط)
   async function loadInvoices() {
     logInvoices.innerHTML = `
       <div class="log-loading">
@@ -300,7 +346,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     `;
   }
 
-  // ✅ سجل الإخراج (روابط للإيصالات)
   async function loadOut() {
     logOut.innerHTML = `
       <div class="log-loading">
@@ -340,9 +385,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     `;
   }
 
-  // ═══════════════════════════════════════════
-  // التفاعل مع الأزرار
-  // ═══════════════════════════════════════════
   const btnInvoices = document.querySelector('.record-item[data-record="invoices"]');
   const btnOut = document.querySelector('.record-item[data-record="out"]');
 
