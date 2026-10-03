@@ -15,32 +15,50 @@ document.addEventListener('DOMContentLoaded', async () => {
     return;
   }
 
-  // 1. جلب الإيصال + المنظمة
+  // 1. جلب الإيصال
   const { data: receipt, error } = await db
     .from('receipts')
-    .select(`
-      *,
-      organizations (*),
-      profiles:created_by (full_name)
-    `)
+    .select('*')
     .eq('id', receiptId)
     .single();
 
   if (error || !receipt) {
     document.getElementById('receipt-content').innerHTML = `
-      <div class="alert alert-error">الإيصال غير موجود</div>
+      <div class="alert alert-error">
+        الإيصال غير موجود
+        <br>
+        <small style="font-size:10px; opacity:0.7;">${error?.message || 'no receipt'}</small>
+      </div>
     `;
     return;
   }
 
-  // 2. جلب عناصر الإيصال
+  // 2. جلب المنظمة
+  const { data: org } = await db
+    .from('organizations')
+    .select('name, logo_url, logo_shape')
+    .eq('id', receipt.organization_id)
+    .single();
+
+  // 3. جلب الكاشير
+  const { data: cashier } = await db
+    .from('profiles')
+    .select('full_name')
+    .eq('id', receipt.created_by)
+    .single();
+
+  // 4. جلب عناصر الإيصال
   const { data: items } = await db
     .from('receipt_items')
     .select('*')
     .eq('receipt_id', receiptId)
     .order('created_at', { ascending: true });
 
-  // 3. عرض الإيصال
+  // 5. ربط البيانات
+  receipt.organizations = org;
+  receipt.profiles = cashier;
+
+  // 6. عرض الإيصال
   renderReceipt({
     receipt,
     items: items ?? [],
@@ -56,7 +74,6 @@ function renderReceipt({ receipt, items }) {
   const org = receipt.organizations;
   const cashier = receipt.profiles;
 
-  const totalQty = receipt.total_qty ?? 0;
   const totalValue = Number(receipt.total_value ?? 0);
 
   const date = new Date(receipt.created_at);
