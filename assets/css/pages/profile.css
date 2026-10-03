@@ -155,24 +155,96 @@
 }
 
 /* ============================================
-   قسم الفريق
+   ✅ Accordion (قابل للفتح والإغلاق)
    ============================================ */
-.team-section {
-  margin-bottom: 20px;
+.team-accordion {
+  margin-bottom: 12px;
+  background: #ffffff;
+  border: 1px solid #e5e5e5;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+  transition: box-shadow 0.15s;
 }
 
-.team-title {
+.team-accordion.open {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+/* ══════ العنوان (Header) ══════ */
+.team-accordion-header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  background: #ffffff;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
   font-size: 15px;
   font-weight: 700;
   color: #171717;
-  margin: 0 0 12px;
-  padding-bottom: 10px;
-  border-bottom: 1px solid #f0f0f0;
-  display: flex;
-  align-items: center;
-  gap: 8px;
+  text-align: right;
+  -webkit-tap-highlight-color: transparent;
+  transition: background 0.15s;
 }
 
+.team-accordion-header:hover {
+  background: #fafafa;
+}
+
+.team-accordion.open .team-accordion-header {
+  background: #fafafa;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+/* ══════ عنوان القسم ══════ */
+.team-accordion-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.team-accordion-title i {
+  font-size: 16px;
+  width: 20px;
+  text-align: center;
+}
+
+/* ══════ السهم ══════ */
+.team-accordion-arrow {
+  font-size: 14px;
+  color: #a3a3a3;
+  transition: transform 0.2s ease, color 0.15s;
+  flex-shrink: 0;
+}
+
+.team-accordion.open .team-accordion-arrow {
+  transform: rotate(-90deg);
+  color: #171717;
+}
+
+/* ══════ المحتوى (Body) ══════ */
+.team-accordion-body {
+  padding: 16px;
+  animation: accordionOpen 0.2s ease;
+}
+
+@keyframes accordionOpen {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ============================================
+   شبكة الفريق
+   ============================================ */
 .team-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
@@ -400,6 +472,15 @@
     padding: 10px 12px;
     font-size: 13px;
     gap: 6px;
+  }
+
+  .team-accordion-header {
+    padding: 12px 14px;
+    font-size: 14px;
+  }
+
+  .team-accordion-body {
+    padding: 12px;
   }
 
   .team-grid {

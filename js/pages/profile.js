@@ -1,5 +1,5 @@
 // ============================================
-// صفحة الملف الشخصي — تصميم Facebook
+// صفحة الملف الشخصي — تصميم Facebook + Accordion
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   const user = await requireAuth();
@@ -30,14 +30,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     members = data ?? [];
   }
 
-  // استبعاد المستخدم الحالي من كل الأقسام
+  // استبعاد المستخدم الحالي
   const others = members.filter(m => m.id !== user.id);
   const admin = others.find(m => m.role === 'admin');
   const deputies = others.filter(m => m.role === 'deputy');
   const workers = others.filter(m => m.role === 'worker');
 
   // ═══════════════════════════════════════════
-  // ✅ بناء بطاقة عضو (نائب / عامل)
+  // بناء بطاقة عضو
   // ═══════════════════════════════════════════
   function buildMemberCard(member, type) {
     const isOnline = typeof isUserOnline === 'function' && isUserOnline(member);
@@ -74,9 +74,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     return `<div class="member-card">${inner}</div>`;
   }
 
-  // ═══════════════════════════════════════════
-  // ✅ بناء بطاقة المدير (بنفس تنسيق النواب)
-  // ═══════════════════════════════════════════
   function buildAdminCard(member) {
     const isOnline = typeof isUserOnline === 'function' && isUserOnline(member);
 
@@ -98,6 +95,29 @@ document.addEventListener('DOMContentLoaded', async () => {
         </div>
 
         <div class="member-role admin">مدير</div>
+      </div>
+    `;
+  }
+
+  // ═══════════════════════════════════════════
+  // بناء قسم Accordion
+  // ═══════════════════════════════════════════
+  function buildTeamSection({ id, icon, iconColor, label, count, content }) {
+    return `
+      <div class="team-accordion" data-section="${id}">
+        <button type="button" class="team-accordion-header" data-toggle="${id}">
+          <div class="team-accordion-title">
+            <i class="fas ${icon}" ${iconColor ? `style="color:${iconColor};"` : ''}></i>
+            <span>${label}${count !== undefined ? ` (${count})` : ''}</span>
+          </div>
+          <i class="fas fa-chevron-left team-accordion-arrow"></i>
+        </button>
+
+        <div class="team-accordion-body" data-body="${id}" style="display:none;">
+          <div class="team-grid">
+            ${content}
+          </div>
+        </div>
       </div>
     `;
   }
@@ -144,54 +164,59 @@ document.addEventListener('DOMContentLoaded', async () => {
         </a>
       </div>
 
-      <!-- ═══════════════════════════════════════
-           قسم المدير (بنفس تنسيق النواب)
-           ═══════════════════════════════════════ -->
-      ${admin ? `
-        <div class="team-section">
-          <h3 class="team-title">
-            <i class="fas fa-crown" style="color:#fbbf24;"></i>
-            المدير
-          </h3>
+      <!-- ══════ قسم المدير (Accordion) ══════ -->
+      ${admin ? buildTeamSection({
+        id: 'admin',
+        icon: 'fa-crown',
+        iconColor: '#fbbf24',
+        label: 'المدير',
+        count: undefined,
+        content: buildAdminCard(admin),
+      }) : ''}
 
-          <div class="team-grid">
-            ${buildAdminCard(admin)}
-          </div>
-        </div>
-      ` : ''}
+      <!-- ══════ قسم النواب (Accordion) ══════ -->
+      ${deputies.length > 0 ? buildTeamSection({
+        id: 'deputies',
+        icon: 'fa-star',
+        iconColor: '#fbbf24',
+        label: 'النواب',
+        count: deputies.length,
+        content: deputies.map(w => buildMemberCard(w, 'deputy')).join(''),
+      }) : ''}
 
-      <!-- ═══════════════════════════════════════
-           قسم النواب
-           ═══════════════════════════════════════ -->
-      ${deputies.length > 0 ? `
-        <div class="team-section">
-          <h3 class="team-title">
-            <i class="fas fa-star" style="color:#fbbf24;"></i>
-            النواب (${deputies.length})
-          </h3>
-
-          <div class="team-grid">
-            ${deputies.map(w => buildMemberCard(w, 'deputy')).join('')}
-          </div>
-        </div>
-      ` : ''}
-
-      <!-- ═══════════════════════════════════════
-           قسم العمال
-           ═══════════════════════════════════════ -->
-      ${workers.length > 0 ? `
-        <div class="team-section">
-          <h3 class="team-title">
-            <i class="fas fa-users" style="color:#171717;"></i>
-            العمال (${workers.length})
-          </h3>
-
-          <div class="team-grid">
-            ${workers.map(w => buildMemberCard(w, 'worker')).join('')}
-          </div>
-        </div>
-      ` : ''}
+      <!-- ══════ قسم العمال (Accordion) ══════ -->
+      ${workers.length > 0 ? buildTeamSection({
+        id: 'workers',
+        icon: 'fa-users',
+        iconColor: '#171717',
+        label: 'العمال',
+        count: workers.length,
+        content: workers.map(w => buildMemberCard(w, 'worker')).join(''),
+      }) : ''}
 
     </div>
   `;
+
+  // ═══════════════════════════════════════════
+  // ✅ تفعيل Accordion
+  // ═══════════════════════════════════════════
+  document.querySelectorAll('[data-toggle]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const id = btn.dataset.toggle;
+      const body = document.querySelector(`[data-body="${id}"]`);
+      const accordion = btn.closest('.team-accordion');
+
+      if (!body) return;
+
+      const isOpen = body.style.display !== 'none';
+
+      if (isOpen) {
+        body.style.display = 'none';
+        accordion.classList.remove('open');
+      } else {
+        body.style.display = 'block';
+        accordion.classList.add('open');
+      }
+    });
+  });
 });
