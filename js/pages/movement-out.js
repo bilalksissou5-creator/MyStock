@@ -1,7 +1,14 @@
 // ============================================
 // صفحة إخراج منتجات (متعددة) — بنمط product-add
+// ⚠️ قاعدة ذهبية:
+// - لا تُحدّث products.qty يدوياً أبداً
+// - استخدم stock_movements.insert() فقط
+// - الـ Trigger on_stock_movement_created سيتولى تحديث qty
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
+  if (window.__movementOutLoaded) return;
+  window.__movementOutLoaded = true;
+
   const user = await requireAuth();
   if (!user) return;
 
@@ -20,7 +27,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       <h2>إخراج منتجات</h2>
       <a href="/movements/list.html" class="btn-secondary">
         <i class="fas fa-arrow-right"></i>
-        <span>الحركات</span>
+        <span>العودة</span>
       </a>
     </div>
 
@@ -30,14 +37,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     <div class="out-form">
 
       <!-- ══════ ملاحظة عامة ══════ -->
-      <div class="form-group">
-        <label>ملاحظة عامة (اختياري)</label>
-        <input type="text" id="note" placeholder="سبب الإخراج...">
+      <div class="product-input-card">
+        <div class="form-group">
+          <label>ملاحظة عامة (اختياري)</label>
+          <input type="text" id="note" placeholder="سبب الإخراج...">
+        </div>
       </div>
 
       <!-- ══════ إضافة منتج ══════ -->
       <div class="product-input-card">
-        <div class="form-group" style="position:relative;">
+        <div class="form-group" style="position:relative;margin-bottom:12px;">
           <label>المنتج *</label>
           <input type="text" id="product-input" placeholder="اكتب اسم المنتج..." autocomplete="off">
           <div id="product-suggestions" class="suggestions-box"></div>
@@ -48,6 +57,10 @@ document.addEventListener('DOMContentLoaded', async () => {
           <div class="form-group">
             <label>الكمية *</label>
             <input type="number" id="quantity" value="1" min="1">
+          </div>
+          <div class="form-group">
+            <label>السعر *</label>
+            <input type="number" id="price" value="0" min="0" step="0.01">
           </div>
           <div class="form-group">
             <label>المتوفر</label>
@@ -78,17 +91,21 @@ document.addEventListener('DOMContentLoaded', async () => {
           <span>عدد المنتجات</span>
           <strong id="sum-rows">0</strong>
         </div>
-        <div class="summary-row highlight">
+        <div class="summary-row">
           <span>إجمالي الكمية</span>
           <strong id="sum-qty">0</strong>
+        </div>
+        <div class="summary-row highlight">
+          <span>القيمة الإجمالية</span>
+          <strong id="sum-total">0.00</strong>
         </div>
       </div>
 
       <!-- ══════ الأزرار ══════ -->
       <div class="form-actions">
         <button type="button" class="btn-primary" id="save-btn">
-          <i class="fas fa-check"></i>
-          <span>حفظ الكل</span>
+          <i class="fas fa-save"></i>
+          <span>حفظ الإخراج</span>
         </button>
         <a href="/movements/list.html" class="btn-secondary">إلغاء</a>
       </div>
@@ -104,9 +121,15 @@ document.addEventListener('DOMContentLoaded', async () => {
   const hiddenId = document.getElementById('product_id');
   const suggestions = document.getElementById('product-suggestions');
   const quantityInput = document.getElementById('quantity');
+  const priceInput = document.getElementById('price');
   const availableQtyInput = document.getElementById('available-qty');
   const addedContainer = document.getElementById('added-products');
+  const addBtn = document.getElementById('add-product-btn');
+  const saveBtn = document.getElementById('save-btn');
+
   let selectedProduct = null;
+  let isAdding = false;
+  let isSaving = false;
 
   // ============================================
   // اقتراحات المنتج
@@ -155,6 +178,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           productInput.value = `${selectedProduct.name} (${selectedProduct.sku ?? '—'})`;
           hiddenId.value = selectedProduct.id;
           availableQtyInput.value = selectedProduct.qty ?? 0;
+          priceInput.value = Number(selectedProduct.price ?? 0).toFixed(2);
           suggestions.style.display = 'none';
         }
       });
@@ -175,7 +199,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
 
   // ============================================
-  // عرض المنتجات المضافة
+  // عرض المنتجات المضافة (نفس تصميم product-add)
   // ============================================
   function renderAddedProducts() {
     if (addedProducts.length === 0) {
@@ -192,7 +216,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     addedContainer.innerHTML = addedProducts.map((p, index) => `
       <div class="added-product-card">
         <div class="added-product-image">
-          ${p.image_url ? `<img src="${p.image_url}" alt="${p.name}">` : '<i class="fas fa-box-open"></i>'}
+          <i class="fas fa-box-open"></i>
         </div>
         <div class="added-product-info">
           <strong>${p.name}</strong>
@@ -204,8 +228,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             <b>${p.qty}</b>
           </div>
           <div class="stat-mini">
-            <span>المتوفر بعد</span>
-            <b class="${(p.available - p.qty) < 10 ? 'low' : ''}">${p.available - p.qty}</b>
+            <span>السعر</span>
+            <b>${Number(p.price).toFixed(2)}</b>
+          </div>
+          <div class="stat-mini highlight">
+            <span>المجموع</span>
+            <b>${(Number(p.qty) * Number(p.price)).toFixed(2)}</b>
           </div>
         </div>
         <button type="button" class="added-product-delete" data-index="${index}" title="حذف">
@@ -216,8 +244,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     addedContainer.querySelectorAll('.added-product-delete').forEach(btn => {
       btn.addEventListener('click', () => {
-        const index = Number(btn.dataset.index);
-        addedProducts.splice(index, 1);
+        addedProducts.splice(Number(btn.dataset.index), 1);
         renderAddedProducts();
       });
     });
@@ -227,16 +254,24 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   function updateSummary() {
     let totalQty = 0;
-    addedProducts.forEach(p => { totalQty += p.qty; });
-
+    let totalValue = 0;
+    addedProducts.forEach(p => {
+      totalQty += Number(p.qty);
+      totalValue += Number(p.qty) * Number(p.price);
+    });
     document.getElementById('sum-rows').textContent = addedProducts.length;
     document.getElementById('sum-qty').textContent = totalQty;
+    document.getElementById('sum-total').textContent = totalValue.toFixed(2);
   }
 
   // ============================================
-  // زر إضافة المنتج
+  // زر "إضافة المنتج"
   // ============================================
-  document.getElementById('add-product-btn').addEventListener('click', () => {
+  function addProduct() {
+    if (isAdding || addBtn.disabled) return;
+    isAdding = true;
+    addBtn.disabled = true;
+
     const errBox = document.getElementById('form-error');
     errBox.style.display = 'none';
 
@@ -244,16 +279,21 @@ document.addEventListener('DOMContentLoaded', async () => {
       errBox.textContent = 'اختر منتجاً من القائمة';
       errBox.style.display = 'block';
       productInput.focus();
+      isAdding = false;
+      addBtn.disabled = false;
       return;
     }
 
     const qty = Number(quantityInput.value);
+    const price = Number(priceInput.value) || 0;
     const available = Number(selectedProduct.qty ?? 0);
 
     if (qty <= 0) {
       errBox.textContent = 'الكمية يجب أن تكون أكبر من صفر';
       errBox.style.display = 'block';
       quantityInput.focus();
+      isAdding = false;
+      addBtn.disabled = false;
       return;
     }
 
@@ -261,14 +301,17 @@ document.addEventListener('DOMContentLoaded', async () => {
       errBox.textContent = `الكمية المتوفرة ${available} فقط`;
       errBox.style.display = 'block';
       quantityInput.focus();
+      isAdding = false;
+      addBtn.disabled = false;
       return;
     }
 
-    // تحقق: هل المنتج مضاف مسبقاً؟
-    const existing = addedProducts.findIndex(p => p.id === selectedProduct.id);
-    if (existing !== -1) {
+    // منع تكرار نفس المنتج
+    if (addedProducts.find(p => p.id === selectedProduct.id)) {
       errBox.textContent = 'هذا المنتج مضاف مسبقاً';
       errBox.style.display = 'block';
+      isAdding = false;
+      addBtn.disabled = false;
       return;
     }
 
@@ -278,6 +321,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       sku: selectedProduct.sku,
       image_url: selectedProduct.image_url,
       qty: qty,
+      price: price,
       available: available,
     });
 
@@ -286,27 +330,45 @@ document.addEventListener('DOMContentLoaded', async () => {
     hiddenId.value = '';
     availableQtyInput.value = '—';
     quantityInput.value = '1';
+    priceInput.value = '0';
     selectedProduct = null;
     productInput.focus();
 
     renderAddedProducts();
+
+    setTimeout(() => {
+      isAdding = false;
+      addBtn.disabled = false;
+    }, 400);
+  }
+
+  addBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    addProduct();
   });
 
-  // Enter يضيف المنتج
-  [productInput, quantityInput].forEach(input => {
+  [productInput, quantityInput, priceInput].forEach(input => {
     input.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') {
         e.preventDefault();
-        document.getElementById('add-product-btn').click();
+        addBtn.click();
       }
     });
   });
 
   // ============================================
-  // حفظ الكل
+  // ✅ حفظ الإخراج — stock_movements فقط
+  // الـ Trigger on_stock_movement_created يُحدّث qty
   // ============================================
-  document.getElementById('save-btn').addEventListener('click', async () => {
-    const btn = document.getElementById('save-btn');
+  saveBtn.addEventListener('click', async (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (isSaving || saveBtn.disabled) return;
+    isSaving = true;
+    saveBtn.disabled = true;
+
     const errBox = document.getElementById('form-error');
     const successBox = document.getElementById('form-success');
 
@@ -316,35 +378,32 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (addedProducts.length === 0) {
       errBox.textContent = 'أضف منتجاً واحداً على الأقل';
       errBox.style.display = 'block';
+      isSaving = false;
+      saveBtn.disabled = false;
       return;
     }
 
-    const { data: { user } } = await db.auth.getUser();
-    const { data: profile } = await db
-      .from('profiles')
-      .select('organization_id, full_name')
-      .eq('id', user.id)
-      .single();
-
-    if (!profile?.organization_id) {
-      errBox.textContent = 'لا يمكن تحديد المنظمة';
-      errBox.style.display = 'block';
-      return;
-    }
-
-    btn.disabled = true;
-    btn.querySelector('span').textContent = 'جارٍ الحفظ...';
-
-    const note = document.getElementById('note').value.trim() || null;
+    saveBtn.querySelector('span').textContent = 'جارٍ الحفظ...';
 
     try {
-      // 1. إنشاء stock_movements لكل منتج
+      const { data: { user } } = await db.auth.getUser();
+      const { data: profile } = await db
+        .from('profiles')
+        .select('organization_id, full_name')
+        .eq('id', user.id)
+        .single();
+
+      if (!profile?.organization_id) {
+        throw new Error('لا يمكن تحديد المنظمة');
+      }
+
+      // ✅ إدراج الحركات فقط — الـ Trigger يتولى qty
       const movements = addedProducts.map(p => ({
         organization_id: profile.organization_id,
         product_id: p.id,
         type: 'out',
         method: 'manual',
-        quantity: p.qty,
+        quantity: Number(p.qty),
         performed_by: user.id,
       }));
 
@@ -354,51 +413,45 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       if (moveError) throw new Error('فشل تسجيل الحركات: ' + moveError.message);
 
-      // 2. تحديث كميات المنتجات
-      for (const p of addedProducts) {
-        const newQty = p.available - p.qty;
-        const { error: updateError } = await db
-          .from('products')
-          .update({ qty: newQty })
-          .eq('id', p.id);
-
-        if (updateError) throw new Error(`فشل تحديث "${p.name}": ${updateError.message}`);
-      }
-
-      // 3. إشعار
+      // الإشعار
       if (typeof notifyOrganization === 'function') {
-        const count = addedProducts.length;
-        const title = count === 1 ? 'إخراج منتج' : `إخراج ${count} منتجات`;
-        const totalQty = addedProducts.reduce((s, p) => s + p.qty, 0);
-        const namesList = addedProducts.map(p => p.name).join('، ');
-        const message = `${profile.full_name || 'مستخدم'} أخرج ${totalQty} وحدة من: ${namesList}`;
+        try {
+          const count = addedProducts.length;
+          const totalQty = addedProducts.reduce((s, p) => s + Number(p.qty), 0);
+          const totalValue = addedProducts.reduce((s, p) => s + Number(p.qty) * Number(p.price), 0);
+          const namesList = addedProducts.map(p => p.name).join('، ');
 
-        await notifyOrganization({
-          orgId: profile.organization_id,
-          title,
-          message,
-          type: 'warning',
-          link: '/movements/list.html',
-          userName: profile.full_name || null,
-        });
+          await notifyOrganization({
+            orgId: profile.organization_id,
+            title: count === 1 ? 'إخراج منتج' : `إخراج ${count} منتجات`,
+            message: `${profile.full_name || 'مستخدم'} أخرج ${totalQty} وحدة (قيمة ${totalValue.toFixed(2)}) من: ${namesList}`,
+            type: 'warning',
+            link: '/movements/list.html',
+            userName: profile.full_name || null,
+          });
+        } catch (notifErr) {
+          console.error('❌ Notification error:', notifErr);
+        }
       }
 
-      successBox.textContent = `✅ تم إخراج ${addedProducts.length} منتج بنجاح!`;
-      successBox.style.display = 'block';
-
-      // إعادة تعيين
+      // نجاح — إعادة تعيين
       addedProducts.length = 0;
       renderAddedProducts();
       document.getElementById('note').value = '';
 
-      btn.disabled = false;
-      btn.querySelector('span').textContent = 'حفظ الكل';
+      successBox.textContent = '✅ تم حفظ الإخراج بنجاح!';
+      successBox.style.display = 'block';
 
-    } catch (err) {
-      errBox.textContent = err.message;
+      saveBtn.disabled = false;
+      saveBtn.querySelector('span').textContent = 'حفظ الإخراج';
+      isSaving = false;
+
+    } catch (error) {
+      errBox.textContent = error.message;
       errBox.style.display = 'block';
-      btn.disabled = false;
-      btn.querySelector('span').textContent = 'حفظ الكل';
+      saveBtn.disabled = false;
+      saveBtn.querySelector('span').textContent = 'حفظ الإخراج';
+      isSaving = false;
     }
   });
 

@@ -1,22 +1,48 @@
 /* ============================================
-   صفحة إخراج منتجات (متعددة)
+   صفحة إخراج منتجات — بنمط product-add
    ============================================ */
 
 .out-form {
-  background: white;
-  padding: 24px;
-  border-radius: 12px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
-  max-width: 700px;
+  max-width: 800px;
   margin: 0 auto;
-  width: 100%;
-  box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 16px;
 }
 
-/* ══════ اقتراحات المنتج ══════ */
+/* ══════ بطاقة إدخال المنتج ══════ */
+.product-input-card {
+  background: white;
+  border-radius: 10px;
+  padding: 16px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+.product-input-card .form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.product-input-card .form-group {
+  margin-bottom: 0;
+}
+
+.product-input-card .form-group:has(#available-qty) input {
+  background: #f5f5f5;
+  cursor: not-allowed;
+}
+
+.add-product-btn {
+  width: 100%;
+  justify-content: center;
+  margin-top: 12px;
+}
+
+/* ============================================
+   اقتراحات المنتج
+   ============================================ */
 .suggestions-box {
   position: absolute;
   top: 100%;
@@ -27,7 +53,7 @@
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   margin-top: 4px;
-  z-index: 100;
+  z-index: 9999;
   max-height: 320px;
   overflow-y: auto;
   display: none;
@@ -35,45 +61,47 @@
 
 .suggestion-card {
   display: flex;
-  flex-direction: row;
   align-items: center;
   gap: 10px;
-  padding: 8px 10px;
+  padding: 10px 12px;
   cursor: pointer;
   border-bottom: 1px solid #f5f5f5;
   transition: background 0.15s;
 }
 
-.suggestion-card:last-child { border-bottom: none; }
-.suggestion-card:hover { background: #f5f5f5; }
+.suggestion-card:last-child {
+  border-bottom: none;
+}
+
+.suggestion-card:hover {
+  background: #f5f5f5;
+}
 
 .suggestion-image {
-  width: 40px;
-  height: 40px;
-  min-width: 40px;
-  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
   border-radius: 6px;
-  background: #f5f5f5;
+  background: #f0f0f0;
+  color: #404040;
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
   overflow: hidden;
 }
 
 .suggestion-image img {
-  width: 40px;
-  height: 40px;
+  width: 100%;
+  height: 100%;
   object-fit: cover;
-  display: block;
 }
 
 .suggestion-image i {
-  color: #a3a3a3;
-  font-size: 16px;
+  font-size: 14px;
 }
 
 .suggestion-info {
-  flex: 1 1 auto;
+  flex: 1;
   min-width: 0;
   display: flex;
   flex-direction: column;
@@ -81,31 +109,24 @@
 }
 
 .suggestion-info strong {
-  font-size: 12px;
-  font-weight: 600;
+  font-size: 13px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  display: block;
 }
 
 .suggestion-sku {
-  font-size: 10px;
+  font-size: 11px;
   color: #737373;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  display: block;
 }
 
 .suggestion-stats {
   display: flex;
-  flex-direction: row;
   gap: 10px;
-  font-size: 10px;
-  flex-shrink: 0;
+  font-size: 11px;
   color: #737373;
   white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .suggestion-stats b {
@@ -124,40 +145,22 @@
   font-size: 13px;
 }
 
-/* ══════ بطاقة إدخال المنتج ══════ */
-.product-input-card {
-  background: #fafafa;
-  border: 1px solid #f0f0f0;
+/* ============================================
+   قسم المنتجات المضافة
+   ============================================ */
+.added-products-section {
+  background: white;
   border-radius: 10px;
   padding: 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.product-input-card .form-group {
-  margin: 0;
-}
-
-.add-product-btn {
-  width: 100%;
-  justify-content: center;
-  margin-top: 4px;
-}
-
-/* ══════ المنتجات المضافة ══════ */
-.added-products-section {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
 }
 
 .section-label {
-  font-size: 13px;
-  font-weight: 700;
-  color: #171717;
-  padding-bottom: 6px;
-  border-bottom: 1px solid #f0f0f0;
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: #404040;
+  margin-bottom: 12px;
 }
 
 .added-products {
@@ -167,81 +170,80 @@
 }
 
 .empty-added {
-  background: #fafafa;
-  border: 1px dashed #d4d4d4;
-  border-radius: 10px;
-  padding: 24px 16px;
+  padding: 32px 16px;
   text-align: center;
   color: #a3a3a3;
-  font-size: 13px;
 }
 
 .empty-added i {
-  font-size: 28px;
-  margin-bottom: 6px;
-  display: block;
+  font-size: 2rem;
+  margin-bottom: 8px;
   color: #d4d4d4;
+  display: block;
 }
 
 .empty-added p {
-  margin: 0;
+  font-size: 13px;
 }
 
-/* ══════ بطاقة منتج مضاف ══════ */
+/* ============================================
+   بطاقة المنتج المضاف
+   ============================================ */
 .added-product-card {
-  display: flex;
-  align-items: center;
+  display: grid;
+  grid-template-columns: 48px 1fr auto auto;
   gap: 12px;
-  padding: 10px 12px;
-  background: #ffffff;
-  border: 1px solid #e5e5e5;
+  align-items: center;
+  padding: 12px;
+  background: #fafafa;
   border-radius: 10px;
-  position: relative;
+  border: 1px solid #f0f0f0;
+  transition: background 0.15s;
+}
+
+.added-product-card:hover {
+  background: #f5f5f5;
 }
 
 .added-product-image {
-  width: 44px;
-  height: 44px;
+  width: 48px;
+  height: 48px;
   border-radius: 8px;
-  background: #f5f5f5;
+  background: white;
   display: flex;
   align-items: center;
   justify-content: center;
-  overflow: hidden;
   flex-shrink: 0;
-}
-
-.added-product-image img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+  border: 1px solid #e5e5e5;
 }
 
 .added-product-image i {
-  font-size: 18px;
   color: #a3a3a3;
+  font-size: 20px;
 }
 
 .added-product-info {
-  flex: 1;
-  min-width: 0;
   display: flex;
   flex-direction: column;
   gap: 2px;
+  min-width: 0;
 }
 
 .added-product-info strong {
-  font-size: 13px;
-  font-weight: 700;
+  font-size: 14px;
+  font-weight: 600;
   color: #171717;
+  white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 .added-product-info span {
   font-size: 11px;
   color: #737373;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .added-product-stats {
@@ -254,161 +256,217 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 4px 8px;
-  background: #fafafa;
+  padding: 6px 10px;
+  background: white;
   border-radius: 6px;
-  min-width: 50px;
+  min-width: 60px;
+  border: 1px solid #f0f0f0;
+}
+
+.stat-mini.highlight {
+  background: #171717;
+  border-color: #171717;
 }
 
 .stat-mini span {
-  font-size: 9px;
+  font-size: 10px;
   color: #737373;
-  font-weight: 500;
+  margin-bottom: 2px;
+}
+
+.stat-mini.highlight span {
+  color: #d4d4d4;
 }
 
 .stat-mini b {
   font-size: 12px;
-  color: #171717;
   font-weight: 700;
+  color: #171717;
 }
 
-.stat-mini b.low {
-  color: #dc2626;
+.stat-mini.highlight b {
+  color: white;
 }
 
 .added-product-delete {
-  width: 26px;
-  height: 26px;
-  border-radius: 50%;
+  background: none;
   border: none;
-  background: #fee2e2;
-  color: #dc2626;
+  color: #d4d4d4;
   cursor: pointer;
+  padding: 6px;
+  border-radius: 6px;
+  font-size: 14px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 12px;
   flex-shrink: 0;
-  transition: background 0.15s, transform 0.15s;
-  -webkit-tap-highlight-color: transparent;
+  transition: color 0.15s, background 0.15s;
 }
 
 .added-product-delete:hover {
-  background: #fecaca;
-  transform: scale(1.1);
+  color: #dc2626;
+  background: #fee2e2;
 }
 
-/* ══════ الإجماليات ══════ */
+/* ============================================
+   الملخص
+   ============================================ */
 .form-summary {
-  background: #fafafa;
-  border: 1px solid #f0f0f0;
+  background: white;
   border-radius: 10px;
-  padding: 14px 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+  padding: 16px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
 }
 
 .summary-row {
   display: flex;
-  justify-content: space-between;
-  font-size: 13px;
+  flex-direction: column;
+  gap: 4px;
+  text-align: center;
+  padding: 10px;
+  border-radius: 8px;
+  background: #fafafa;
+}
+
+.summary-row.highlight {
+  background: #171717;
+  color: white;
+}
+
+.summary-row.highlight span {
+  color: #d4d4d4;
+}
+
+.summary-row.highlight strong {
+  color: white;
+  font-size: 1.4rem;
 }
 
 .summary-row span {
+  font-size: 12px;
   color: #737373;
 }
 
 .summary-row strong {
-  color: #171717;
+  font-size: 1.1rem;
   font-weight: 700;
-}
-
-.summary-row.highlight {
-  padding-top: 8px;
-  border-top: 1px solid #e5e5e5;
-}
-
-.summary-row.highlight strong {
-  font-size: 16px;
   color: #171717;
 }
 
-/* ══════ الأزرار ══════ */
+/* ============================================
+   الأزرار
+   ============================================ */
 .form-actions {
   display: flex;
   gap: 10px;
-  flex-wrap: wrap;
 }
 
 .form-actions .btn-primary,
 .form-actions .btn-secondary {
   flex: 1;
   justify-content: center;
-  min-width: 140px;
 }
 
-/* ══════ Responsive ══════ */
+/* ============================================
+   الهاتف
+   ============================================ */
 @media (max-width: 768px) {
-  .out-form {
-    padding: 16px;
-    gap: 16px;
+  .product-input-card .form-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
   }
 
-  .product-input-card {
-    padding: 12px;
+  .product-input-card .form-group:nth-child(3) {
+    grid-column: 1 / -1;
   }
 
-  .suggestion-card {
-    padding: 6px 8px;
-    gap: 8px;
-  }
-
-  .suggestion-image {
-    width: 34px;
-    height: 34px;
-    min-width: 34px;
-  }
-
-  .suggestion-image img {
-    width: 34px;
-    height: 34px;
-  }
-
-  .suggestion-info strong {
-    font-size: 11px;
-  }
-
-  .suggestion-sku {
-    font-size: 9px;
-  }
-
-  .suggestion-stats {
-    font-size: 9px;
-    gap: 6px;
-  }
-
+  /* ═══════════════════════════════════════════
+     بطاقة المنتج المضاف — تصميم عمودي
+     ═══════════════════════════════════════════ */
   .added-product-card {
-    padding: 8px 10px;
-    gap: 8px;
+    display: grid;
+    grid-template-columns: 44px 1fr 32px;
+    grid-template-rows: auto auto;
+    gap: 10px 8px;
+    padding: 12px 10px;
+    align-items: center;
   }
 
   .added-product-image {
-    width: 38px;
-    height: 38px;
+    grid-column: 1;
+    grid-row: 1 / 3;
+    width: 44px;
+    height: 44px;
+    align-self: start;
+  }
+
+  .added-product-info {
+    grid-column: 2;
+    grid-row: 1;
+    min-width: 0;
+    text-align: right;
   }
 
   .added-product-info strong {
-    font-size: 12px;
+    font-size: 13px;
+  }
+
+  .added-product-info span {
+    font-size: 10px;
+  }
+
+  .added-product-delete {
+    grid-column: 3;
+    grid-row: 1;
+    align-self: start;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+  }
+
+  .added-product-stats {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 6px;
+    width: 100%;
+    margin-top: 4px;
   }
 
   .stat-mini {
-    padding: 3px 6px;
-    min-width: 44px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 6px 4px;
+    min-width: 0;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .stat-mini span {
+    font-size: 9px;
+    margin-bottom: 2px;
   }
 
   .stat-mini b {
     font-size: 11px;
+  }
+
+  .form-summary {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .summary-row {
+    flex-direction: row;
+    justify-content: space-between;
+    text-align: right;
+    padding: 8px 12px;
   }
 
   .form-actions {
@@ -418,24 +476,5 @@
   .form-actions .btn-primary,
   .form-actions .btn-secondary {
     width: 100%;
-  }
-}
-
-@media (max-width: 480px) {
-  .added-product-stats {
-    gap: 4px;
-  }
-
-  .stat-mini {
-    padding: 2px 5px;
-    min-width: 40px;
-  }
-
-  .stat-mini span {
-    font-size: 8px;
-  }
-
-  .stat-mini b {
-    font-size: 10px;
   }
 }
