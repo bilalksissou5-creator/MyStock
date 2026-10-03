@@ -28,28 +28,25 @@ body.receipt-page {
   color: #000;
   font-size: 12px;
   line-height: 1.5;
+  text-align: center;
 }
 
-/* ══════ الرأس: الشعار + اسم المنظمة ══════ */
-.rc-header {
+/* ══════ الشعار ══════ */
+.rc-logo-wrap {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  gap: 6px;
-  padding-bottom: 8px;
+  justify-content: center;
+  margin-bottom: 8px;
 }
 
 .rc-logo {
-  width: 60px;
-  height: 60px;
+  width: 50%;
+  aspect-ratio: 1 / 1;
   overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #f5f5f5;
-  border: 1px solid #e5e5e5;
-  transition: all 0.2s ease;
+  background: transparent;
+  border: none;
 }
 
 .rc-logo img {
@@ -64,55 +61,59 @@ body.receipt-page {
   justify-content: center;
   width: 100%;
   height: 100%;
-  color: #a3a3a3;
-  font-size: 22px;
+  color: #171717;
+  font-size: 40px;
 }
 
 /* ══════ أشكال الشعار ══════ */
-.rc-logo.shape-circle {
+.rc-logo.shape-circle img {
   border-radius: 50%;
+  object-fit: cover;
 }
 
-.rc-logo.shape-square {
-  border-radius: 8px;
-  aspect-ratio: 1 / 1;
+.rc-logo.shape-square img {
+  border-radius: 10px;
+  object-fit: cover;
 }
 
 .rc-logo.shape-rectangle {
-  border-radius: 8px;
-  width: 90px;
-  height: 55px;
+  width: 70%;
+  aspect-ratio: 16 / 10;
 }
 
+.rc-logo.shape-rectangle img {
+  border-radius: 10px;
+  object-fit: cover;
+}
+
+/* ══════ اسم المنظمة ══════ */
 .rc-org-name {
   font-size: 14px;
   font-weight: 700;
   color: #000;
   letter-spacing: 0.5px;
+  margin-bottom: 8px;
+  text-align: center;
 }
 
 /* ══════ الفواصل ══════ */
 .rc-divider {
   border-top: 1px solid #000;
-  margin: 6px 0;
+  margin: 8px 0;
 }
 
 .rc-divider-dashed {
   border-top: 1px dashed #999;
-  margin: 6px 0;
+  margin: 8px 0;
 }
 
-/* ══════ الصفوف العامة ══════ */
-.rc-row-center {
-  text-align: center;
-  font-size: 12px;
-  color: #000;
-}
-
+/* ══════ رقم الإيصال ══════ */
 .rc-receipt-num {
   font-size: 13px;
   font-weight: 600;
+  color: #000;
   padding: 4px 0;
+  text-align: center;
 }
 
 .rc-receipt-num strong {
@@ -124,8 +125,8 @@ body.receipt-page {
 .rc-table {
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  padding: 4px 0;
+  gap: 6px;
+  padding: 6px 0;
 }
 
 .rc-empty {
@@ -135,62 +136,57 @@ body.receipt-page {
   padding: 8px 0;
 }
 
+/* ══════ سطر منتج (4 أعمدة في الوسط) ══════ */
 .rc-line {
-  display: flex;
+  display: grid;
+  grid-template-columns: 30px 1fr 60px 60px;
+  gap: 4px;
   align-items: center;
-  justify-content: space-between;
-  gap: 8px;
   font-size: 12px;
-}
-
-.rc-line-left {
-  display: flex;
-  align-items: center;
-  gap: 3px;
-  flex-shrink: 0;
-  font-weight: 700;
-  color: #000;
+  text-align: center;
 }
 
 .rc-qty {
-  min-width: 18px;
-  text-align: left;
-}
-
-.rc-mult {
-  color: #666;
-  font-weight: 400;
-}
-
-.rc-price {
-  min-width: 45px;
-  text-align: left;
-}
-
-.rc-line-right {
-  flex: 1;
-  text-align: right;
-  font-weight: 500;
+  font-weight: 700;
   color: #000;
+  text-align: center;
+}
+
+.rc-name {
+  font-weight: 600;
+  color: #000;
+  text-align: center;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-/* ══════ المجموع ══════ */
+.rc-price {
+  font-weight: 500;
+  color: #333;
+  text-align: center;
+}
+
+.rc-total {
+  font-weight: 700;
+  color: #000;
+  text-align: center;
+}
+
+/* ══════ المجموع الكلي ══════ */
 .rc-total-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
   font-size: 14px;
   font-weight: 700;
-  padding: 4px 0;
+  color: #000;
+  padding: 6px 0;
+  text-align: center;
 }
 
 .rc-total-row strong {
   font-size: 16px;
   font-weight: 800;
   letter-spacing: 0.5px;
+  margin-right: 4px;
 }
 
 /* ══════ التاريخ والوقت ══════ */
@@ -199,23 +195,17 @@ body.receipt-page {
   font-size: 11px;
   color: #333;
   padding: 1px 0;
+  text-align: center;
 }
 
 /* ══════ شكر ══════ */
 .rc-thanks {
-  text-align: center;
   font-size: 13px;
   font-weight: 700;
   color: #000;
-  padding: 6px 0 2px;
-  letter-spacing: 0.5px;
-}
-
-.rc-cashier {
+  padding: 8px 0;
   text-align: center;
-  font-size: 11px;
-  color: #666;
-  padding-bottom: 4px;
+  letter-spacing: 0.5px;
 }
 
 /* ══════ الأزرار ══════ */
@@ -295,22 +285,13 @@ body.receipt-page {
     font-size: 13px;
   }
 
-  .rc-logo {
-    width: 50px;
-    height: 50px;
-  }
-
-  .rc-logo.shape-rectangle {
-    width: 75px;
-    height: 46px;
-  }
-
   .rc-receipt-num {
     font-size: 12px;
   }
 
   .rc-line {
     font-size: 11px;
+    grid-template-columns: 26px 1fr 55px 55px;
   }
 
   .rc-total-row {

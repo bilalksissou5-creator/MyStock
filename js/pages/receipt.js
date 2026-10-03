@@ -24,11 +24,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   if (error || !receipt) {
     document.getElementById('receipt-content').innerHTML = `
-      <div class="alert alert-error">
-        الإيصال غير موجود
-        <br>
-        <small style="font-size:10px; opacity:0.7;">${error?.message || 'no receipt'}</small>
-      </div>
+      <div class="alert alert-error">الإيصال غير موجود</div>
     `;
     return;
   }
@@ -40,25 +36,17 @@ document.addEventListener('DOMContentLoaded', async () => {
     .eq('id', receipt.organization_id)
     .single();
 
-  // 3. جلب الكاشير
-  const { data: cashier } = await db
-    .from('profiles')
-    .select('full_name')
-    .eq('id', receipt.created_by)
-    .single();
-
-  // 4. جلب عناصر الإيصال
+  // 3. جلب عناصر الإيصال
   const { data: items } = await db
     .from('receipt_items')
     .select('*')
     .eq('receipt_id', receiptId)
     .order('created_at', { ascending: true });
 
-  // 5. ربط البيانات
+  // 4. ربط
   receipt.organizations = org;
-  receipt.profiles = cashier;
 
-  // 6. عرض الإيصال
+  // 5. عرض
   renderReceipt({
     receipt,
     items: items ?? [],
@@ -72,7 +60,6 @@ function renderReceipt({ receipt, items }) {
   const container = document.getElementById('receipt-content');
 
   const org = receipt.organizations;
-  const cashier = receipt.profiles;
 
   const totalValue = Number(receipt.total_value ?? 0);
 
@@ -83,62 +70,56 @@ function renderReceipt({ receipt, items }) {
   const logoShape = org?.logo_shape || 'circle';
 
   container.innerHTML = `
-    <!-- ══════ الرأس ══════ -->
-    <div class="rc-header">
+    <!-- ══════ الشعار ══════ -->
+    <div class="rc-logo-wrap">
       <div class="rc-logo shape-${logoShape}">
         ${org?.logo_url
           ? `<img src="${org.logo_url}" alt="logo">`
           : `<div class="rc-logo-placeholder"><i class="fas fa-boxes-stacked"></i></div>`}
       </div>
-      <div class="rc-org-name">${org?.name ?? 'MyStock'}</div>
     </div>
+
+    <!-- ══════ اسم المنظمة ══════ -->
+    <div class="rc-org-name">${org?.name ?? 'MyStock'}</div>
 
     <div class="rc-divider"></div>
 
     <!-- ══════ رقم الإيصال ══════ -->
-    <div class="rc-row-center rc-receipt-num">
-      إيصال رقم: <strong>${receipt.receipt_number}</strong>
-    </div>
+    <div class="rc-receipt-num">إيصال رقم: <strong>${receipt.receipt_number}</strong></div>
 
     <div class="rc-divider-dashed"></div>
 
-    <!-- ══════ الجدول ══════ -->
+    <!-- ══════ جدول العناصر ══════ -->
     <div class="rc-table">
       ${items.length === 0 ? `
         <div class="rc-empty">لا توجد عناصر</div>
       ` : items.map(item => `
         <div class="rc-line">
-          <div class="rc-line-left">
-            <span class="rc-qty">${item.qty}</span>
-            <span class="rc-mult">×</span>
-            <span class="rc-price">${Number(item.price).toFixed(2)}</span>
-          </div>
-          <div class="rc-line-right">
-            ${item.product_name}
-          </div>
+          <span class="rc-qty">${item.qty}</span>
+          <span class="rc-name">${item.product_name}</span>
+          <span class="rc-price">${Number(item.price).toFixed(2)}</span>
+          <span class="rc-total">${Number(item.total).toFixed(2)}</span>
         </div>
       `).join('')}
     </div>
 
     <div class="rc-divider"></div>
 
-    <!-- ══════ المجموع ══════ -->
+    <!-- ══════ المجموع الكلي ══════ -->
     <div class="rc-total-row">
-      <span>المجموع الكلي</span>
-      <strong>${totalValue.toFixed(2)}</strong>
+      المجموع الكلي: <strong>${totalValue.toFixed(2)}</strong>
     </div>
 
     <div class="rc-divider"></div>
 
     <!-- ══════ التاريخ والوقت ══════ -->
-    <div class="rc-row-center rc-date">التاريخ: ${dateStr}</div>
-    <div class="rc-row-center rc-time">الوقت: ${timeStr}</div>
+    <div class="rc-date">التاريخ: ${dateStr}</div>
+    <div class="rc-time">الوقت: ${timeStr}</div>
 
     <div class="rc-divider-dashed"></div>
 
     <!-- ══════ شكر ══════ -->
     <div class="rc-thanks">شكراً لزيارتكم</div>
-    <div class="rc-cashier">${cashier?.full_name ?? ''}</div>
 
     <!-- ══════ الأزرار ══════ -->
     <div class="rc-actions no-print">
