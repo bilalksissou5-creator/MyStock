@@ -457,27 +457,27 @@
   color: #171717;
 }
 
-/* ══════ ✅ الفواتير + إخراج ══════ */
+/* ══════ الفواتير + إخراج ══════ */
 .records-left {
   display: flex;
   align-items: center;
-  gap: 10px;                    /* ← زيادة 10px */
+  gap: 10px;
 }
 
 .record-item[data-record="invoices"],
 .record-item[data-record="out"] {
   padding: 8px 8px;
   gap: 5px;
-  border-radius: 8px 8px 0 0;   /* ← حواف دائرية من فوق فقط */
-  transition: background 0.15s, color 0.15s, border-bottom 0.15s;
+  border-radius: 8px 8px 0 0;         /* حواف دائرية من فوق */
+  border-bottom: 2px solid transparent; /* ← مكان الخط محفوظ */
+  transition: background 0.15s, color 0.15s, border-bottom-color 0.1s;
 }
 
-/* ══════ عند الضغط (active) ══════ */
+/* ══════ عند الضغط والإبقاء ══════ */
 .record-item[data-record="invoices"]:active,
 .record-item[data-record="out"]:active {
-  background: #f0f0f0;                          /* خلفية خفيفة */
-  border-bottom: 2px solid #000;                /* خط أسود من تحت */
-  border-radius: 8px 8px 0 0;                   /* حواف دائرية من فوق */
+  background: #f0f0f0;                    /* خلفية خفيفة */
+  border-bottom-color: #000;              /* خط أسود يظهر */
   transform: none;
 }
 
@@ -604,7 +604,6 @@
     color: #171717;
   }
 
-  /* ✅ الفواتير + إخراج — gap 10px */
   .records-left {
     gap: 10px;
   }
