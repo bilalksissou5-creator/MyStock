@@ -34,9 +34,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   const deputies = others.filter(m => m.role === 'deputy');
   const workers = others.filter(m => m.role === 'worker');
 
-  // ═══════════════════════════════════════════
-  // بناء بطاقة عضو
-  // ═══════════════════════════════════════════
   function buildMemberCard(member, type) {
     const isOnline = typeof isUserOnline === 'function' && isUserOnline(member);
     const starClass = type === 'deputy' ? 'deputy-star' : 'worker-star';
@@ -211,7 +208,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         </div>
       </div>
 
-      <!-- ══════ سجل الفواتير (مخفي) ══════ -->
+      <!-- ══════ سجل الفواتير ══════ -->
       <div id="log-invoices" class="log-panel" style="display:none;">
         <div class="log-loading">
           <i class="fas fa-spinner fa-spin"></i>
@@ -219,7 +216,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         </div>
       </div>
 
-      <!-- ══════ سجل الإخراج (مخفي) ══════ -->
+      <!-- ══════ سجل الإخراج ══════ -->
       <div id="log-out" class="log-panel" style="display:none;">
         <div class="log-loading">
           <i class="fas fa-spinner fa-spin"></i>
@@ -258,12 +255,12 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
 
   // ═══════════════════════════════════════════
-  // السجلات — فواتير / إخراج
+  // السجلات
   // ═══════════════════════════════════════════
   const logInvoices = document.getElementById('log-invoices');
   const logOut = document.getElementById('log-out');
 
-  // ✅ سجل الفواتير
+  // ✅ سجل الفواتير (مع روابط)
   async function loadInvoices() {
     logInvoices.innerHTML = `
       <div class="log-loading">
@@ -274,7 +271,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const { data, error } = await db
       .from('invoices')
-      .select('invoice_number, total_qty, total_value, created_at')
+      .select('id, invoice_number, total_qty, total_value, created_at')
       .eq('created_by', user.id)
       .order('created_at', { ascending: false });
 
@@ -291,19 +288,19 @@ document.addEventListener('DOMContentLoaded', async () => {
     logInvoices.innerHTML = `
       <div class="log-list">
         ${data.map(inv => `
-          <div class="log-row">
+          <a href="/invoice.html?id=${encodeURIComponent(inv.invoice_number)}" class="log-row log-row-link">
             <div class="log-row-main">
               <strong>${inv.invoice_number}</strong>
               <span>${inv.total_qty ?? 0} قطعة • ${Number(inv.total_value ?? 0).toFixed(2)}</span>
             </div>
             <div class="log-row-date">${new Date(inv.created_at).toLocaleDateString('ar-MA')}</div>
-          </div>
+          </a>
         `).join('')}
       </div>
     `;
   }
 
-  // ✅ سجل الإخراج (مع روابط للإيصالات)
+  // ✅ سجل الإخراج (روابط للإيصالات)
   async function loadOut() {
     logOut.innerHTML = `
       <div class="log-loading">
@@ -383,7 +380,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   });
 
-  // ✅ الضغط خارج السجلات → إغلاق
   document.addEventListener('click', (e) => {
     if (e.target.closest('.record-item[data-record="invoices"]')) return;
     if (e.target.closest('.record-item[data-record="out"]')) return;
