@@ -425,6 +425,7 @@
   cursor: pointer;
   transition: background 0.15s, color 0.15s;
   -webkit-tap-highlight-color: transparent;
+  outline: none;
 }
 
 .record-item i {
@@ -442,9 +443,11 @@
 
 /* ══════ السجل (بدون تأثير) ══════ */
 .record-item[data-record="log"]:hover,
-.record-item[data-record="log"]:active {
+.record-item[data-record="log"]:active,
+.record-item[data-record="log"]:focus {
   background: transparent;
   transform: none;
+  outline: none;
 }
 
 .record-item[data-record="log"] i {
@@ -469,8 +472,8 @@
   padding: 8px 8px;
   gap: 5px;
   border-radius: 8px 8px 0 0;
-  border-bottom: 2px solid transparent;
-  transition: background 0.15s, color 0.15s, border-bottom-color 0.1s;
+  border-bottom: 2px solid transparent;    /* ← مكان الخط محفوظ */
+  transition: background 0.1s, border-bottom-color 0.1s;
 }
 
 .record-item[data-record="invoices"]:hover,
@@ -478,12 +481,19 @@
   background: #fafafa;
 }
 
-/* ══════ ✅ .pressed (يُضاف بواسطة JS) ══════ */
-.record-item[data-record="invoices"].pressed,
-.record-item[data-record="out"].pressed {
+/* ✅ عند الضغط: البطاقة + الخط يظهران معاً */
+.record-item[data-record="invoices"]:active,
+.record-item[data-record="out"]:active {
   background: #f0f0f0;
   border-bottom-color: #000;
   transform: none;
+  outline: none;
+}
+
+/* ✅ عند Focus (بعد رفع الإصبع) — نفس التنسيق */
+.record-item[data-record="invoices"]:focus,
+.record-item[data-record="out"]:focus {
+  outline: none;
 }
 
 .record-item[data-record="invoices"] i,
