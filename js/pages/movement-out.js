@@ -1,5 +1,6 @@
 // ============================================
 // صفحة إخراج منتجات (متعددة) + إيصال بيع
+// ✅ يدعم اللمس + الفأرة + القلم (pointerdown)
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   if (window.__movementOutLoaded) return;
@@ -12,14 +13,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   const main = document.getElementById('main-content');
 
-  // ✅ جلب المنتجات + تشخيص
+  // جلب المنتجات
   const { data: products, error: productsError } = await db
     .from('products')
     .select('*')
     .order('name');
-
-  console.log('🔍 [movement-out] Products:', products?.length);
-  console.log('🔍 [movement-out] Error:', productsError);
 
   if (productsError) {
     main.innerHTML = `
@@ -142,7 +140,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   let isSaving = false;
 
   // ============================================
-  // اقتراحات المنتج
+  // ✅ اقتراحات المنتج (تدعم اللمس + الفأرة)
   // ============================================
   function showSuggestions(filter) {
     const q = filter.trim().toLowerCase();
@@ -180,19 +178,21 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     suggestions.style.display = 'block';
 
+    // ✅ استخدام pointerdown (يعمل على اللمس والفأرة والقلم)
     suggestions.querySelectorAll('.suggestion-card').forEach(card => {
-      card.addEventListener('click', () => {
+      card.addEventListener('pointerdown', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+
         const id = card.dataset.id;
         const found = products.find(p => p.id === id);
-
-        console.log('🔍 [suggestion click] Product:', found);
 
         if (found) {
           selectedProduct = found;
           productInput.value = `${found.name} (${found.sku ?? '—'})`;
           hiddenId.value = found.id;
 
-          // ✅ تعبئة الحقول
+          // تعبئة الحقول
           quantityInput.value = '1';
           priceInput.value = Number(found.price ?? 0).toFixed(2);
           availableQtyInput.value = found.qty ?? 0;
@@ -210,7 +210,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     showSuggestions(productInput.value);
   });
 
-  document.addEventListener('click', (e) => {
+  // ✅ إغلاق الاقتراحات عند الضغط خارجها (pointerdown)
+  document.addEventListener('pointerdown', (e) => {
     if (!e.target.closest('#product-input') && !e.target.closest('#product-suggestions')) {
       suggestions.style.display = 'none';
     }
@@ -261,7 +262,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     `).join('');
 
     addedContainer.querySelectorAll('.added-product-delete').forEach(btn => {
-      btn.addEventListener('click', () => {
+      btn.addEventListener('pointerdown', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
         addedProducts.splice(Number(btn.dataset.index), 1);
         renderAddedProducts();
       });
@@ -374,7 +377,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
 
   // ============================================
-  // ✅ حفظ الإخراج + إنشاء إيصال
+  // حفظ الإخراج + إنشاء إيصال
   // ============================================
   saveBtn.addEventListener('click', async (e) => {
     e.preventDefault();
@@ -412,7 +415,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         throw new Error('لا يمكن تحديد المنظمة');
       }
 
-      // 1. رقم الإيصال التسلسلي
       const { data: lastReceipt } = await db
         .from('receipts')
         .select('receipt_number')
@@ -428,11 +430,9 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
       const receiptNumber = 'RCP-' + String(nextNumber).padStart(3, '0');
 
-      // 2. الإجماليات
       const totalQty = addedProducts.reduce((s, p) => s + Number(p.qty), 0);
       const totalValue = addedProducts.reduce((s, p) => s + Number(p.qty) * Number(p.price), 0);
 
-      // 3. إنشاء الإيصال
       const { data: newReceipt, error: receiptErr } = await db
         .from('receipts')
         .insert({
@@ -447,7 +447,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       if (receiptErr) throw new Error('فشل إنشاء الإيصال: ' + receiptErr.message);
 
-      // 4. عناصر الإيصال
       const receiptItems = addedProducts.map(p => ({
         receipt_id: newReceipt.id,
         product_id: p.id,
@@ -463,7 +462,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       if (itemsErr) throw new Error('فشل حفظ عناصر الإيصال: ' + itemsErr.message);
 
-      // 5. stock_movements
       const movements = addedProducts.map(p => ({
         organization_id: profile.organization_id,
         product_id: p.id,
@@ -479,7 +477,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       if (moveError) throw new Error('فشل تسجيل الحركات: ' + moveError.message);
 
-      // 6. إشعار
       if (typeof notifyOrganization === 'function') {
         try {
           const count = addedProducts.length;
@@ -498,7 +495,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
       }
 
-      // 7. نجاح
       successBox.textContent = `✅ تم إنشاء الإيصال ${receiptNumber}`;
       successBox.style.display = 'block';
 

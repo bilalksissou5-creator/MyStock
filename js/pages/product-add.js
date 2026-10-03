@@ -1,16 +1,8 @@
 // ============================================
 // صفحة إضافة منتجات
-// - "تم"    ← نقل الحقول إلى بطاقة المنتجات المضافة فقط
-// - "حفظ"   ← إدراج المنتجات + إنشاء فاتورة واحدة تلقائية
-// ============================================
-// ⚠️ قاعدة ذهبية:
-// - لا تُحدّث products.qty يدوياً أبداً
-// - استخدم stock_movements.insert() فقط
-// - الـ Trigger on_stock_movement_created سيتولى تحديث qty
-// - كل عملية حفظ = فاتورة واحدة موحّدة + إشعار لكل عضو
+// ✅ يدعم اللمس + الفأرة + القلم (pointerdown)
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
-  // ✅ حماية من التهيئة المزدوجة
   if (window.__productAddLoaded) return;
   window.__productAddLoaded = true;
 
@@ -129,7 +121,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   let isSaving = false;
 
   // ============================================
-  // اقتراحات المورد
+  // ✅ اقتراحات المورد (تدعم اللمس + الفأرة)
   // ============================================
   function showSuggestions(filter) {
     const q = filter.trim().toLowerCase();
@@ -176,8 +168,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     suggestions.innerHTML = html || '<div class="suggestion-empty">لا توجد نتائج</div>';
     suggestions.style.display = 'block';
 
+    // ✅ استخدام pointerdown (يعمل على اللمس والفأرة والقلم)
     suggestions.querySelectorAll('.suggestion-card').forEach(card => {
-      card.addEventListener('click', () => {
+      card.addEventListener('pointerdown', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+
         if (card.dataset.new === 'true') {
           selectedSupplier = null;
           supplierInput.value = card.dataset.name;
@@ -208,7 +204,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     showSuggestions(supplierInput.value);
   });
 
-  document.addEventListener('click', (e) => {
+  // ✅ إغلاق الاقتراحات (pointerdown)
+  document.addEventListener('pointerdown', (e) => {
     if (!e.target.closest('.supplier-group')) {
       suggestions.style.display = 'none';
     }
@@ -259,7 +256,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     `).join('');
 
     addedContainer.querySelectorAll('.added-product-delete').forEach(btn => {
-      btn.addEventListener('click', () => {
+      btn.addEventListener('pointerdown', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
         addedProducts.splice(Number(btn.dataset.index), 1);
         renderAddedProducts();
       });
@@ -281,7 +280,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   // ============================================
-  // زر "تم" — نقل فقط إلى بطاقة المنتجات المضافة
+  // زر "تم"
   // ============================================
   function addToCart() {
     if (isAddingProduct || doneBtn.disabled) return;
@@ -343,10 +342,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // ============================================
   // زر "حفظ"
-  // ✅ لا نُحدّث qty يدوياً — الـ Trigger يفعل ذلك
-  // ✅ الفاتورة واحدة لكل عملية حفظ
-  // ✅ كل منتج يُربط بـ invoice_id
-  // ✅ إشعارات لكل عضو في المنظمة
   // ============================================
   saveAllBtn.addEventListener('click', async (e) => {
     e.preventDefault();
@@ -373,19 +368,18 @@ document.addEventListener('DOMContentLoaded', async () => {
     saveAllBtn.querySelector('span').textContent = 'جارٍ الحفظ...';
 
     try {
-      // 1. جلب المستخدم
-      const { data: { user } } = await db.auth.getUser();
+      const { data: { user: authUser } } = await db.auth.getUser();
       const { data: profile } = await db
         .from('profiles')
         .select('organization_id, full_name')
-        .eq('id', user.id)
+        .eq('id', authUser.id)
         .single();
 
       if (!profile?.organization_id) {
         throw new Error('لا يمكن تحديد المنظمة');
       }
 
-      // 2. معالجة المورد
+      // معالجة المورد
       let finalSupplierId = supplierIdInput.value || null;
       const isNewSupplier = supplierInput.dataset.isNew === 'true';
       const newSupplierName = isNewSupplier
@@ -410,7 +404,7 @@ document.addEventListener('DOMContentLoaded', async () => {
               organization_id: profile.organization_id,
               name: newSupplierName,
               specialty: categoryInput.value.trim() || null,
-              created_by: user.id,
+              created_by: authUser.id,
             })
             .select()
             .single();
@@ -420,13 +414,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
       }
 
-      // 3. توليد رقم الفاتورة (نحتاجه لكل منتج)
       const invoiceNumber = 'INV-' + Date.now() + '-' + Math.floor(Math.random() * 1000);
 
-      // 4. لكل منتج: أنشئ + اربط بالفاتورة + سجّل الحركة
       let insertedCount = 0;
       let updatedCount = 0;
-
       const processedKeys = new Set();
 
       for (const p of addedProducts) {
@@ -434,7 +425,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (processedKeys.has(key)) continue;
         processedKeys.add(key);
 
-        // ابحث عن منتج مطابق
         let query = db
           .from('products')
           .select('id')
@@ -458,7 +448,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         let productId;
 
         if (matchedProduct) {
-          // ✅ موجود → اربطه بالفاتورة الجديدة (لا تلمس qty)
           productId = matchedProduct.id;
 
           const { error: linkErr } = await db
@@ -469,7 +458,6 @@ document.addEventListener('DOMContentLoaded', async () => {
           if (linkErr) throw new Error('فشل ربط المنتج بالفاتورة: ' + linkErr.message);
           updatedCount++;
         } else {
-          // ✅ جديد → أدرجه مع qty = 0 و invoice_id
           const { data: newProduct, error: insertError } = await db
             .from('products')
             .insert({
@@ -481,7 +469,7 @@ document.addEventListener('DOMContentLoaded', async () => {
               price: Number(p.price),
               category: p.category || null,
               invoice_id: invoiceNumber,
-              created_by: user.id,
+              created_by: authUser.id,
             })
             .select()
             .single();
@@ -491,18 +479,16 @@ document.addEventListener('DOMContentLoaded', async () => {
           insertedCount++;
         }
 
-        // ✅ سجّل الحركة — الـ Trigger سيضيف qty تلقائياً
         await db.from('stock_movements').insert({
           organization_id: profile.organization_id,
           product_id: productId,
           type: 'in',
           method: 'manual',
           quantity: Number(p.qty),
-          performed_by: user.id,
+          performed_by: authUser.id,
         });
       }
 
-      // 5. إنشاء الفاتورة (رأس)
       const totalQty = addedProducts.reduce((s, p) => s + Number(p.qty), 0);
       const totalValue = addedProducts.reduce((s, p) => s + Number(p.qty) * Number(p.price), 0);
 
@@ -512,7 +498,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           invoice_number: invoiceNumber,
           organization_id: profile.organization_id,
           supplier_id: finalSupplierId,
-          created_by: user.id,
+          created_by: authUser.id,
           total_qty: totalQty,
           total_value: totalValue,
         });
@@ -521,9 +507,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         throw new Error('فشل إنشاء الفاتورة: ' + invoiceErr.message);
       }
 
-      // ════════════════════════════════════════
-      // ✅ 6. الإشعارات — تُرسل لكل عضو في المنظمة
-      // ════════════════════════════════════════
       if (typeof notifyOrganization === 'function') {
         try {
           await notifyOrganization({
@@ -536,11 +519,9 @@ document.addEventListener('DOMContentLoaded', async () => {
           });
         } catch (notifErr) {
           console.error('❌ Notification error:', notifErr);
-          // لا نوقف العملية بسبب الإشعار
         }
       }
 
-      // 7. تنظيف شامل بعد النجاح
       addedProducts.length = 0;
       renderAddedProducts();
 
@@ -551,7 +532,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       successBox.textContent = `✅ جديد: ${insertedCount} | محدّث: ${updatedCount} | فاتورة: ${invoiceNumber}`;
       successBox.style.display = 'block';
 
-      // ✅ الانتقال لصفحة الفاتورة
       setTimeout(() => {
         window.location.replace(`/invoice.html?id=${encodeURIComponent(invoiceNumber)}`);
       }, 1500);

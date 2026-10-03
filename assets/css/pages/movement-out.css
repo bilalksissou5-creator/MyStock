@@ -67,13 +67,19 @@
   cursor: pointer;
   border-bottom: 1px solid #f5f5f5;
   transition: background 0.15s;
+  /* ✅ دعم اللمس */
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 .suggestion-card:last-child {
   border-bottom: none;
 }
 
-.suggestion-card:hover {
+.suggestion-card:hover,
+.suggestion-card:active {
   background: #f5f5f5;
 }
 
@@ -288,6 +294,7 @@
   color: white;
 }
 
+/* ✅ زر حذف المنتج المضاف — دعم اللمس */
 .added-product-delete {
   background: none;
   border: none;
@@ -301,9 +308,14 @@
   justify-content: center;
   flex-shrink: 0;
   transition: color 0.15s, background 0.15s;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
-.added-product-delete:hover {
+.added-product-delete:hover,
+.added-product-delete:active {
   color: #dc2626;
   background: #fee2e2;
 }
@@ -383,9 +395,6 @@
     grid-column: 1 / -1;
   }
 
-  /* ═══════════════════════════════════════════
-     بطاقة المنتج المضاف — تصميم عمودي
-     ═══════════════════════════════════════════ */
   .added-product-card {
     display: grid;
     grid-template-columns: 44px 1fr 32px;
