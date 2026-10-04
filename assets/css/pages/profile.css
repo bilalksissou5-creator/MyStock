@@ -76,17 +76,18 @@
   color: #a3a3a3;
 }
 
-/* ✅ النقطة على صورة المستخدم (15px) */
+/* ✅ النقطة على حافة الصورة (المركز على الحدود) */
 .profile-status-dot {
   position: absolute;
-  bottom: 2px;
-  right: 2px;
+  bottom: 0;
+  right: 0;
   width: 15px;
   height: 15px;
   border-radius: 50%;
   border: 3px solid #ffffff;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
   z-index: 10;
+  transform: translate(50%, 50%);
 }
 
 .profile-status-dot.online {
@@ -303,8 +304,8 @@
 
 .member-status-dot {
   position: absolute;
-  bottom: 8px;
-  right: 8px;
+  bottom: 2px;
+  right: 2px;
   width: 14px;
   height: 14px;
   border-radius: 50%;
@@ -692,12 +693,11 @@
     font-size: 40px;
   }
 
+  /* ✅ نفس موضع سطح المكتب (يعمل تلقائياً) */
   .profile-status-dot {
     width: 13px;
     height: 13px;
     border-width: 2.5px;
-    bottom: 2px;
-    right: 2px;
   }
 
   .profile-fb-info h3 {
