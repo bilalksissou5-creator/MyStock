@@ -79,10 +79,10 @@
 /* ✅ النقطة على حافة الدائرة تماماً (الزاوية 45° السفلية اليمنى) */
 .profile-status-dot {
   position: absolute;
-  bottom: 14px;
-  right: 14px;
-  width: 15px;
-  height: 15px;
+  bottom: 10px;
+  right: 10px;
+  width: 18px;
+  height: 18px;
   border-radius: 50%;
   border: 3px solid #ffffff;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
