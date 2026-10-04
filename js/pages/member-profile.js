@@ -1,5 +1,5 @@
 // ============================================
-// صفحة ملف عضو (بتنسيق profile.html)
+// صفحة ملف عضو آخر — بنفس تصميم profile.html
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   const user = await requireAuth();
@@ -9,6 +9,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   const main = document.getElementById('main-content');
 
+  // جلب بروفايل المستخدم الحالي
   const { data: myProfile } = await db
     .from('profiles')
     .select('*')
@@ -20,11 +21,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     return;
   }
 
+  const isAdmin = myProfile.role === 'admin';
+
+  // قراءة id العضو المُتصفَّح
   const params = new URLSearchParams(window.location.search);
   const memberId = params.get('id') || user.id;
   const isMe = memberId === user.id;
-  const isAdmin = myProfile.role === 'admin';
 
+  // جلب بيانات العضو
   const { data: member, error } = await db
     .from('profiles')
     .select('*')
@@ -36,87 +40,174 @@ document.addEventListener('DOMContentLoaded', async () => {
     return;
   }
 
+  // التحقق من نفس المنظمة
   if (!isMe && member.organization_id !== myProfile.organization_id) {
     main.innerHTML = `<div class="alert alert-error">هذا العضو ليس في منظمتك</div>`;
     return;
   }
 
   // ═══════════════════════════════════════════
-  // جلب السجل
+  // جلب أعضاء المنظمة
   // ═══════════════════════════════════════════
-  const [productsRes, movementsRes, invoicesRes, suppliersRes] = await Promise.all([
-    db.from('products').select('id', { count: 'exact', head: true }).eq('created_by', memberId),
-    db.from('stock_movements').select('id', { count: 'exact', head: true }).eq('performed_by', memberId),
-    db.from('invoices').select('id', { count: 'exact', head: true }).eq('created_by', memberId),
-    db.from('suppliers').select('id', { count: 'exact', head: true }).eq('created_by', memberId),
-  ]);
+  let members = [];
+  if (myProfile.organization_id) {
+    const { data } = await db
+      .from('profiles')
+      .select('*')
+      .eq('organization_id', myProfile.organization_id)
+      .order('created_at', { ascending: true });
+    members = data ?? [];
+  }
 
-  const stats = {
-    products: productsRes.count ?? 0,
-    movements: movementsRes.count ?? 0,
-    invoices: invoicesRes.count ?? 0,
-    suppliers: suppliersRes.count ?? 0,
-  };
+  const others = members.filter(m => m.id !== memberId);
+  const admin = others.find(m => m.role === 'admin');
+  const deputies = others.filter(m => m.role === 'deputy');
+  const workers = others.filter(m => m.role === 'worker');
 
-  const { data: lastMovement } = await db
-    .from('stock_movements')
-    .select('created_at')
-    .eq('performed_by', memberId)
-    .order('created_at', { ascending: false })
-    .limit(1)
-    .maybeSingle();
+  // ═══════════════════════════════════════════
+  // بناء بطاقة عضو
+  // ═══════════════════════════════════════════
+  function buildMemberCard(m, type) {
+    const isOnline = typeof isUserOnline === 'function' && isUserOnline(m);
+    const starClass = type === 'deputy' ? 'deputy-star' : 'worker-star';
+    const roleLabel = type === 'deputy' ? 'نائب' : 'عامل';
 
-  const { data: lastInvoice } = await db
-    .from('invoices')
-    .select('created_at')
-    .eq('created_by', memberId)
-    .order('created_at', { ascending: false })
-    .limit(1)
-    .maybeSingle();
+    return `
+      <a href="/member-profile.html?id=${m.id}" class="member-card member-card-link">
+        <div class="member-avatar-wrap">
+          <div class="member-avatar">
+            ${m.avatar_url
+              ? `<img src="${m.avatar_url}" alt="${m.full_name}">`
+              : `<i class="fas fa-user"></i>`}
+          </div>
+          <span class="member-status-dot ${isOnline ? 'online' : 'offline'}"
+                title="${isOnline ? 'متصل' : 'غير متصل'}"></span>
+        </div>
+
+        <div class="member-name-row">
+          <span class="member-name">${m.full_name ?? 'بدون اسم'}</span>
+          <i class="fas fa-star member-star-icon ${starClass}"></i>
+        </div>
+
+        <div class="member-role ${type}">${roleLabel}</div>
+      </a>
+    `;
+  }
+
+  function buildAdminCard(m) {
+    const isOnline = typeof isUserOnline === 'function' && isUserOnline(m);
+
+    return `
+      <a href="/member-profile.html?id=${m.id}" class="member-card member-card-admin member-card-link">
+        <div class="member-avatar-wrap">
+          <div class="member-avatar">
+            ${m.avatar_url
+              ? `<img src="${m.avatar_url}" alt="${m.full_name}">`
+              : `<i class="fas fa-user"></i>`}
+          </div>
+          <span class="member-status-dot ${isOnline ? 'online' : 'offline'}"
+                title="${isOnline ? 'متصل' : 'غير متصل'}"></span>
+        </div>
+
+        <div class="member-name-row">
+          <span class="member-name">${m.full_name ?? 'بدون اسم'}</span>
+          <i class="fas fa-crown member-star-icon crown-star"></i>
+        </div>
+
+        <div class="member-role admin">مدير</div>
+      </a>
+    `;
+  }
+
+  function buildTeamSection({ id, icon, iconColor, label, count, content }) {
+    return `
+      <div class="team-accordion" data-section="${id}">
+        <button type="button" class="team-accordion-header" data-toggle="${id}">
+          <div class="team-accordion-title">
+            <i class="fas ${icon}" ${iconColor ? `style="color:${iconColor};"` : ''}></i>
+            <span>${label}${count !== undefined ? ` (${count})` : ''}</span>
+          </div>
+          <i class="fas fa-chevron-left team-accordion-arrow"></i>
+        </button>
+
+        <div class="team-accordion-body" data-body="${id}" style="display:none;">
+          ${content}
+        </div>
+      </div>
+    `;
+  }
+
+  // ═══════════════════════════════════════════
+  // معلومات العضو المُتصفَّح
+  // ═══════════════════════════════════════════
+  const memberRole = member.role;
+  const roleIcon = memberRole === 'admin'
+    ? '<i class="fas fa-crown info-icon" style="color:#fbbf24;"></i>'
+    : memberRole === 'deputy'
+      ? '<i class="fas fa-star info-icon" style="color:#fbbf24;"></i>'
+      : '<i class="fas fa-users info-icon"></i>';
+
+  const roleLabel = memberRole === 'admin' ? 'مدير' : memberRole === 'deputy' ? 'نائب' : 'عامل';
+
+  const personalInfoContent = `
+    <div class="info-list">
+      <div class="info-row">
+        <i class="fas fa-user info-icon"></i>
+        <span class="info-text">${member.full_name ?? 'بدون اسم'}</span>
+      </div>
+
+      <div class="info-row">
+        <i class="fas fa-envelope info-icon"></i>
+        <span class="info-text" dir="ltr">محمي 🔒</span>
+      </div>
+
+      <div class="info-row">
+        <i class="fab fa-whatsapp info-icon" style="color:#25d366;"></i>
+        <span class="info-text" dir="ltr">${member.phone ?? '—'}</span>
+      </div>
+
+      <div class="info-row">
+        ${roleIcon}
+        <span class="info-text">${roleLabel}</span>
+      </div>
+    </div>
+  `;
 
   const isOnline = typeof isUserOnline === 'function' && isUserOnline(member);
-  const roleLabel = member.role === 'admin' ? 'مدير' : member.role === 'deputy' ? 'نائب' : 'عامل';
-  const starClass = member.role === 'deputy' ? 'deputy-star' : 'worker-star';
 
   main.innerHTML = `
     <div class="profile-fb-wrapper">
 
+      <!-- ══════ الغلاف ══════ -->
       <div class="profile-cover">
         ${member.cover_url
           ? `<img src="${member.cover_url}" alt="cover">`
           : `<div class="cover-placeholder"></div>`}
       </div>
 
-      <!-- ══════ الصورة الشخصية + النقطة ══════ -->
+      <!-- ══════ الصورة الشخصية ══════ -->
       <div class="profile-avatar-fb-wrap">
-        <div class="avatar-dot-wrap">
-          <div class="profile-avatar-fb">
-            ${member.avatar_url
-              ? `<img src="${member.avatar_url}" alt="avatar">`
-              : `<i class="fas fa-user"></i>`}
-          </div>
-          <span class="mp-status-dot-large ${isOnline ? 'online' : 'offline'}"
-                title="${isOnline ? 'متصل' : 'غير متصل'}"></span>
+        <div class="profile-avatar-fb">
+          ${member.avatar_url
+            ? `<img src="${member.avatar_url}" alt="avatar">`
+            : `<i class="fas fa-user"></i>`}
         </div>
       </div>
 
+      <!-- ══════ معلومات العضو ══════ -->
       <div class="profile-fb-info">
-        <h3>
-          ${member.full_name ?? 'بدون اسم'}
-          ${member.role !== 'admin' ? `<i class="fas fa-star member-star-icon ${starClass}"></i>` : ''}
-        </h3>
-        <p class="profile-fb-email">${isOnline ? '🟢 متصل الآن' : '⚪ غير متصل'}</p>
+        <h3>${member.full_name ?? 'بدون اسم'}</h3>
+        <p class="profile-fb-email">
+          ${isOnline ? '🟢 متصل الآن' : '⚪ غير متصل'}
+        </p>
         <div class="profile-fb-badges">
           <span class="badge-role">${roleLabel}</span>
         </div>
       </div>
 
+      <!-- ══════ شريط الأزرار (زر إدارة — للمدير فقط) ══════ -->
       ${isAdmin && !isMe ? `
         <div class="profile-actions-bar">
-          <a href="/profile-dashboard.html?id=${member.id}" class="btn-secondary">
-            <i class="fas fa-sliders"></i>
-            <span>لوحة المعلومات</span>
-          </a>
           <a href="/member-manage.html?id=${member.id}" class="btn-primary">
             <i class="fas fa-ellipsis-vertical"></i>
             <span>إدارة</span>
@@ -124,76 +215,242 @@ document.addEventListener('DOMContentLoaded', async () => {
         </div>
       ` : ''}
 
-      <div class="team-section">
-        <h3 class="team-title">
-          <i class="fas fa-chart-simple"></i>
-          السجل
-        </h3>
+      <!-- ══════ المعلومات الشخصية ══════ -->
+      ${buildTeamSection({
+        id: 'personal-info',
+        icon: 'fa-user',
+        label: 'المعلومات الشخصية',
+        count: undefined,
+        content: personalInfoContent,
+      })}
 
-        <div class="log-grid">
-          <div class="log-card">
-            <div class="log-icon"><i class="fas fa-box"></i></div>
-            <div class="log-value">${stats.products}</div>
-            <div class="log-label">منتج</div>
-          </div>
+      <!-- ══════ قسم المدير ══════ -->
+      ${admin ? buildTeamSection({
+        id: 'admin',
+        icon: 'fa-crown',
+        iconColor: '#fbbf24',
+        label: 'المدير',
+        count: undefined,
+        content: `<div class="team-grid">${buildAdminCard(admin)}</div>`,
+      }) : ''}
 
-          <div class="log-card">
-            <div class="log-icon"><i class="fas fa-right-left"></i></div>
-            <div class="log-value">${stats.movements}</div>
-            <div class="log-label">حركة</div>
-          </div>
+      <!-- ══════ قسم النواب ══════ -->
+      ${deputies.length > 0 ? buildTeamSection({
+        id: 'deputies',
+        icon: 'fa-star',
+        iconColor: '#fbbf24',
+        label: 'النواب',
+        count: deputies.length,
+        content: `<div class="team-grid">${deputies.map(w => buildMemberCard(w, 'deputy')).join('')}</div>`,
+      }) : ''}
 
-          <div class="log-card">
-            <div class="log-icon"><i class="fas fa-file-invoice"></i></div>
-            <div class="log-value">${stats.invoices}</div>
-            <div class="log-label">فاتورة</div>
-          </div>
+      <!-- ══════ قسم العمال ══════ -->
+      ${workers.length > 0 ? buildTeamSection({
+        id: 'workers',
+        icon: 'fa-users',
+        iconColor: '#171717',
+        label: 'العمال',
+        count: workers.length,
+        content: `<div class="team-grid">${workers.map(w => buildMemberCard(w, 'worker')).join('')}</div>`,
+      }) : ''}
 
-          <div class="log-card">
-            <div class="log-icon"><i class="fas fa-truck"></i></div>
-            <div class="log-value">${stats.suppliers}</div>
-            <div class="log-label">مورد</div>
-          </div>
+      <!-- ═══════════════════════════════════════
+           السجلات
+           ═══════════════════════════════════════ -->
+      <div class="records-row">
+        <a href="#" class="record-item" data-record="log">
+          <i class="fas fa-clipboard-list"></i>
+          <span>السجل</span>
+        </a>
+
+        <div class="records-left">
+          <a href="#" class="record-item" data-record="invoices">
+            <i class="fas fa-file-invoice"></i>
+            <span>الفواتير</span>
+          </a>
+
+          <a href="#" class="record-item" data-record="out">
+            <i class="fas fa-arrow-up-from-bracket"></i>
+            <span>إخراج</span>
+          </a>
         </div>
       </div>
 
-      <div class="team-section">
-        <h3 class="team-title">
-          <i class="fas fa-info-circle"></i>
-          معلومات
-        </h3>
+      <!-- ══════ سجل الفواتير ══════ -->
+      <div id="log-invoices" class="log-panel" style="display:none;">
+        <div class="log-loading">
+          <i class="fas fa-spinner fa-spin"></i>
+          <span>جارٍ التحميل...</span>
+        </div>
+      </div>
 
-        <div class="info-list">
-          <div class="info-row">
-            <i class="fas fa-phone"></i>
-            <span class="info-label">رقم الهاتف</span>
-            <span class="info-value" dir="ltr">${member.phone ?? 'غير متوفر'}</span>
-          </div>
-
-          <div class="info-row">
-            <i class="fas fa-calendar"></i>
-            <span class="info-label">عضو منذ</span>
-            <span class="info-value">${new Date(member.created_at).toLocaleDateString('ar')}</span>
-          </div>
-
-          ${lastMovement ? `
-            <div class="info-row">
-              <i class="fas fa-clock"></i>
-              <span class="info-label">آخر حركة</span>
-              <span class="info-value">${new Date(lastMovement.created_at).toLocaleDateString('ar')}</span>
-            </div>
-          ` : ''}
-
-          ${lastInvoice ? `
-            <div class="info-row">
-              <i class="fas fa-clock"></i>
-              <span class="info-label">آخر فاتورة</span>
-              <span class="info-value">${new Date(lastInvoice.created_at).toLocaleDateString('ar')}</span>
-            </div>
-          ` : ''}
+      <!-- ══════ سجل الإخراج ══════ -->
+      <div id="log-out" class="log-panel" style="display:none;">
+        <div class="log-loading">
+          <i class="fas fa-spinner fa-spin"></i>
+          <span>جارٍ التحميل...</span>
         </div>
       </div>
 
     </div>
   `;
+
+  // ═══════════════════════════════════════════
+  // Accordion
+  // ═══════════════════════════════════════════
+  document.querySelectorAll('[data-toggle]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const id = btn.dataset.toggle;
+      const body = document.querySelector(`[data-body="${id}"]`);
+      const accordion = btn.closest('.team-accordion');
+
+      if (!body) return;
+
+      const isOpen = body.style.display !== 'none';
+
+      document.querySelectorAll('.team-accordion-body').forEach(b => {
+        b.style.display = 'none';
+      });
+      document.querySelectorAll('.team-accordion').forEach(a => {
+        a.classList.remove('open');
+      });
+
+      if (!isOpen) {
+        body.style.display = 'block';
+        accordion.classList.add('open');
+      }
+    });
+  });
+
+  // ═══════════════════════════════════════════
+  // السجلات — مرتبطة بـ member.id
+  // ═══════════════════════════════════════════
+  const logInvoices = document.getElementById('log-invoices');
+  const logOut = document.getElementById('log-out');
+
+  async function loadInvoices() {
+    logInvoices.innerHTML = `
+      <div class="log-loading">
+        <i class="fas fa-spinner fa-spin"></i>
+        <span>جارٍ التحميل...</span>
+      </div>
+    `;
+
+    const { data, error } = await db
+      .from('invoices')
+      .select('id, invoice_number, total_qty, total_value, created_at')
+      .eq('created_by', memberId)
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      logInvoices.innerHTML = `<div class="log-empty">خطأ: ${error.message}</div>`;
+      return;
+    }
+
+    if (!data || data.length === 0) {
+      logInvoices.innerHTML = `<div class="log-empty">لا توجد فواتير بعد</div>`;
+      return;
+    }
+
+    logInvoices.innerHTML = `
+      <div class="log-list">
+        ${data.map(inv => `
+          <a href="/invoice.html?id=${encodeURIComponent(inv.invoice_number)}" class="log-row log-row-link">
+            <div class="log-row-main">
+              <strong>${inv.invoice_number}</strong>
+              <span>${inv.total_qty ?? 0} قطعة • ${Number(inv.total_value ?? 0).toFixed(2)}</span>
+            </div>
+            <div class="log-row-date">${new Date(inv.created_at).toLocaleDateString('ar-MA')}</div>
+          </a>
+        `).join('')}
+      </div>
+    `;
+  }
+
+  async function loadOut() {
+    logOut.innerHTML = `
+      <div class="log-loading">
+        <i class="fas fa-spinner fa-spin"></i>
+        <span>جارٍ التحميل...</span>
+      </div>
+    `;
+
+    const { data, error } = await db
+      .from('receipts')
+      .select('id, receipt_number, total_qty, total_value, created_at')
+      .eq('created_by', memberId)
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      logOut.innerHTML = `<div class="log-empty">خطأ: ${error.message}</div>`;
+      return;
+    }
+
+    if (!data || data.length === 0) {
+      logOut.innerHTML = `<div class="log-empty">لا توجد عمليات إخراج بعد</div>`;
+      return;
+    }
+
+    logOut.innerHTML = `
+      <div class="log-list">
+        ${data.map(r => `
+          <a href="/receipt.html?id=${r.id}" class="log-row log-row-link">
+            <div class="log-row-main">
+              <strong>${r.receipt_number}</strong>
+              <span>${r.total_qty ?? 0} قطعة • ${Number(r.total_value ?? 0).toFixed(2)}</span>
+            </div>
+            <div class="log-row-date">${new Date(r.created_at).toLocaleDateString('ar-MA')}</div>
+          </a>
+        `).join('')}
+      </div>
+    `;
+  }
+
+  const btnInvoices = document.querySelector('.record-item[data-record="invoices"]');
+  const btnOut = document.querySelector('.record-item[data-record="out"]');
+
+  btnInvoices.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    const isOpen = logInvoices.style.display !== 'none';
+
+    logInvoices.style.display = 'none';
+    logOut.style.display = 'none';
+    document.querySelectorAll('.record-item.active').forEach(x => x.classList.remove('active'));
+
+    if (!isOpen) {
+      logInvoices.style.display = 'block';
+      btnInvoices.classList.add('active');
+      loadInvoices();
+    }
+  });
+
+  btnOut.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    const isOpen = logOut.style.display !== 'none';
+
+    logInvoices.style.display = 'none';
+    logOut.style.display = 'none';
+    document.querySelectorAll('.record-item.active').forEach(x => x.classList.remove('active'));
+
+    if (!isOpen) {
+      logOut.style.display = 'block';
+      btnOut.classList.add('active');
+      loadOut();
+    }
+  });
+
+  document.addEventListener('click', (e) => {
+    if (e.target.closest('.record-item[data-record="invoices"]')) return;
+    if (e.target.closest('.record-item[data-record="out"]')) return;
+    if (e.target.closest('#log-invoices')) return;
+    if (e.target.closest('#log-out')) return;
+
+    logInvoices.style.display = 'none';
+    logOut.style.display = 'none';
+    document.querySelectorAll('.record-item.active').forEach(x => x.classList.remove('active'));
+  });
 });

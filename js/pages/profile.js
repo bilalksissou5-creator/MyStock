@@ -35,48 +35,40 @@ document.addEventListener('DOMContentLoaded', async () => {
   const workers = others.filter(m => m.role === 'worker');
 
   // ═══════════════════════════════════════════
-  // بناء بطاقة عضو
+  // بناء بطاقة عضو (قابلة للضغط للجميع)
   // ═══════════════════════════════════════════
   function buildMemberCard(member, type) {
     const isOnline = typeof isUserOnline === 'function' && isUserOnline(member);
     const starClass = type === 'deputy' ? 'deputy-star' : 'worker-star';
     const roleLabel = type === 'deputy' ? 'نائب' : 'عامل';
 
-    const inner = `
-      <div class="member-avatar-wrap">
-        <div class="member-avatar">
-          ${member.avatar_url
-            ? `<img src="${member.avatar_url}" alt="${member.full_name}">`
-            : `<i class="fas fa-user"></i>`}
+    return `
+      <a href="/member-profile.html?id=${member.id}" class="member-card member-card-link">
+        <div class="member-avatar-wrap">
+          <div class="member-avatar">
+            ${member.avatar_url
+              ? `<img src="${member.avatar_url}" alt="${member.full_name}">`
+              : `<i class="fas fa-user"></i>`}
+          </div>
+          <span class="member-status-dot ${isOnline ? 'online' : 'offline'}"
+                title="${isOnline ? 'متصل' : 'غير متصل'}"></span>
         </div>
-        <span class="member-status-dot ${isOnline ? 'online' : 'offline'}"
-              title="${isOnline ? 'متصل' : 'غير متصل'}"></span>
-      </div>
 
-      <div class="member-name-row">
-        <span class="member-name">${member.full_name ?? 'بدون اسم'}</span>
-        <i class="fas fa-star member-star-icon ${starClass}"></i>
-      </div>
+        <div class="member-name-row">
+          <span class="member-name">${member.full_name ?? 'بدون اسم'}</span>
+          <i class="fas fa-star member-star-icon ${starClass}"></i>
+        </div>
 
-      <div class="member-role ${type}">${roleLabel}</div>
+        <div class="member-role ${type}">${roleLabel}</div>
+      </a>
     `;
-
-    if (isAdmin) {
-      return `
-        <a href="/member-profile.html?id=${member.id}" class="member-card member-card-link">
-          ${inner}
-        </a>
-      `;
-    }
-
-    return `<div class="member-card">${inner}</div>`;
   }
 
   function buildAdminCard(member) {
     const isOnline = typeof isUserOnline === 'function' && isUserOnline(member);
 
     return `
-      <div class="member-card member-card-admin">
+      <a href="/member-profile.html?id=${member.id}" class="member-card member-card-admin member-card-link">
         <div class="member-avatar-wrap">
           <div class="member-avatar">
             ${member.avatar_url
@@ -93,7 +85,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         </div>
 
         <div class="member-role admin">مدير</div>
-      </div>
+      </a>
     `;
   }
 
@@ -192,9 +184,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         </a>
       </div>
 
-      <!-- ═══════════════════════════════════════
-           ✅ المعلومات الشخصية (Accordion)
-           ═══════════════════════════════════════ -->
+      <!-- ══════ المعلومات الشخصية ══════ -->
       ${buildTeamSection({
         id: 'personal-info',
         icon: 'fa-user',
@@ -275,7 +265,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   `;
 
   // ═══════════════════════════════════════════
-  // Accordion (فتح حصري)
+  // Accordion
   // ═══════════════════════════════════════════
   document.querySelectorAll('[data-toggle]').forEach(btn => {
     btn.addEventListener('click', () => {

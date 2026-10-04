@@ -1,24 +1,16 @@
 /* ============================================
-   صفحة ملف عضو — إضافات على profile.css
+   صفحة ملف عضو — تكملة profile.css
    ============================================ */
 
-/* ══════════════════════════════════════════
-   ✅ غلاف النقطة (بحجم الصورة بالضبط)
-   ══════════════════════════════════════════ */
-.avatar-dot-wrap {
-  position: relative;
-  display: inline-block;
-  line-height: 0;
-}
+/* ✅ معظم الأنماط موجودة في profile.css (تُحمَّل أولاً) */
 
 /* ══════════════════════════════════════════
-   ✅ النقطة على حافة الدائرة
-   (بنفس تنسيق بطاقات النواب لكن بقيم مضاعفة)
+   ✅ النقطة الكبيرة على الصورة (إن استُخدمت)
    ══════════════════════════════════════════ */
 .mp-status-dot-large {
   position: absolute;
-  margin-bottom: 10px;
-  right: 10px;
+  bottom: 8px;
+  right: calc(50% - 60px);
   width: 18px;
   height: 18px;
   border-radius: 50%;
@@ -36,182 +28,30 @@
 }
 
 /* ══════════════════════════════════════════
-   الاسم + النجمة
+   ✅ تعديل: بطاقة المدير قابلة للضغط أيضاً
    ══════════════════════════════════════════ */
-.profile-fb-info h3 {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-}
-
-.profile-fb-info h3 .member-star-icon {
-  font-size: 1rem;
-}
-
-.profile-fb-info h3 .member-star-icon.deputy-star {
-  color: #fbbf24;
-}
-
-.profile-fb-info h3 .member-star-icon.worker-star {
-  color: #a3a3a3;
+.member-card-admin.member-card-link:active {
+  transform: scale(0.98);
 }
 
 /* ══════════════════════════════════════════
-   شبكة السجل
+   ✅ تعديل: البريد الإلكتروني "محمي"
    ══════════════════════════════════════════ */
-.log-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 10px;
-}
-
-.log-card {
-  background: #fafafa;
-  border: 1px solid #f0f0f0;
-  border-radius: 12px;
-  padding: 16px 8px 12px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  gap: 6px;
-  transition: background 0.15s, transform 0.15s;
-}
-
-.log-card:hover {
-  background: #f5f5f5;
-  transform: translateY(-2px);
-}
-
-.log-icon {
-  width: 34px;
-  height: 34px;
-  border-radius: 10px;
-  background: #171717;
-  color: #ffffff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 14px;
-  flex-shrink: 0;
-}
-
-.log-value {
-  font-size: 1.4rem;
-  font-weight: 800;
-  color: #171717;
-  line-height: 1;
-}
-
-.log-label {
-  font-size: 11px;
-  color: #737373;
-  font-weight: 600;
-}
-
-/* ══════════════════════════════════════════
-   قائمة المعلومات
-   ══════════════════════════════════════════ */
-.info-list {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  background: #fafafa;
-  border: 1px solid #f0f0f0;
-  border-radius: 12px;
-  overflow: hidden;
-}
-
-.info-row {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 14px 16px;
-  font-size: 13px;
-  color: #404040;
-  border-bottom: 1px solid #f0f0f0;
-}
-
-.info-row:last-child {
-  border-bottom: none;
-}
-
-.info-row i {
-  width: 20px;
+.info-text.protected {
   color: #a3a3a3;
-  font-size: 15px;
-  text-align: center;
-  flex-shrink: 0;
-}
-
-.info-label {
-  flex: 1;
-  font-weight: 600;
-  color: #737373;
-}
-
-.info-value {
-  font-weight: 600;
-  color: #171717;
-  text-align: left;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  max-width: 55%;
+  font-weight: 500;
+  letter-spacing: 1px;
 }
 
 /* ══════════════════════════════════════════
    Responsive
    ══════════════════════════════════════════ */
 @media (max-width: 768px) {
-  .log-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 8px;
-  }
-
-  .log-card {
-    padding: 14px 6px 10px;
-  }
-
-  .log-icon {
-    width: 30px;
-    height: 30px;
-    font-size: 13px;
-  }
-
-  .log-value {
-    font-size: 1.2rem;
-  }
-
-  .log-label {
-    font-size: 10px;
-  }
-
-  .info-row {
-    padding: 12px 14px;
-    font-size: 12px;
-  }
-
   .mp-status-dot-large {
     width: 16px;
     height: 16px;
     border-width: 2.5px;
-    bottom: 3px;
-    right: 3px;
-  }
-}
-
-@media (max-width: 380px) {
-  .log-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  .mp-status-dot-large {
-    width: 14px;
-    height: 14px;
-    border-width: 2.5px;
-    bottom: 2px;
-    right: 2px;
+    right: calc(50% - 52px);
+    bottom: 6px;
   }
 }
