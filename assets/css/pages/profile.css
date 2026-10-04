@@ -694,8 +694,8 @@
 
   /* ✅ النقطة على الحافة (حسب الحجم الأصغر) */
   .profile-status-dot {
-    bottom: 12px;
-    right: 12px;
+    bottom: 6px;
+    right: 6px;
     width: 13px;
     height: 13px;
     border-width: 2.5px;
