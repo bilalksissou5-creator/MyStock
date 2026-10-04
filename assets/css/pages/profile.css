@@ -58,7 +58,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  overflow: hidden;
+  overflow: visible;
   position: relative;
   pointer-events: auto;
 }
@@ -68,11 +68,33 @@
   height: 100%;
   object-fit: cover;
   display: block;
+  border-radius: 50%;
 }
 
 .profile-avatar-fb i {
   font-size: 48px;
   color: #a3a3a3;
+}
+
+/* ✅ النقطة على صورة المستخدم (15px) */
+.profile-status-dot {
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  border: 3px solid #ffffff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  z-index: 10;
+}
+
+.profile-status-dot.online {
+  background: #22c55e;
+}
+
+.profile-status-dot.offline {
+  background: #d4d4d4;
 }
 
 /* ============================================
@@ -226,7 +248,7 @@
 }
 
 /* ============================================
-   ✅ المعلومات الشخصية (Info List)
+   المعلومات الشخصية (Info List)
    ============================================ */
 .info-list {
   display: flex;
@@ -271,7 +293,7 @@
 }
 
 /* ══════════════════════════════════════════
-   نقطة الاتصال على الصورة
+   نقطة الاتصال على صورة بطاقة العضو
    ══════════════════════════════════════════ */
 .member-avatar-wrap {
   position: relative;
@@ -668,6 +690,14 @@
 
   .profile-avatar-fb i {
     font-size: 40px;
+  }
+
+  .profile-status-dot {
+    width: 13px;
+    height: 13px;
+    border-width: 2.5px;
+    bottom: 2px;
+    right: 2px;
   }
 
   .profile-fb-info h3 {

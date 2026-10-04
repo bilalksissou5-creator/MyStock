@@ -173,6 +173,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     </div>
   `;
 
+  // ✅ حالة اتصال العضو المُتصفَّح
   const isOnline = typeof isUserOnline === 'function' && isUserOnline(member);
 
   main.innerHTML = `
@@ -185,12 +186,14 @@ document.addEventListener('DOMContentLoaded', async () => {
           : `<div class="cover-placeholder"></div>`}
       </div>
 
-      <!-- ══════ الصورة الشخصية ══════ -->
+      <!-- ══════ الصورة الشخصية + النقطة ══════ -->
       <div class="profile-avatar-fb-wrap">
         <div class="profile-avatar-fb">
           ${member.avatar_url
             ? `<img src="${member.avatar_url}" alt="avatar">`
             : `<i class="fas fa-user"></i>`}
+          <span class="profile-status-dot ${isOnline ? 'online' : 'offline'}"
+                title="${isOnline ? 'متصل' : 'غير متصل'}"></span>
         </div>
       </div>
 
@@ -323,7 +326,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
 
   // ═══════════════════════════════════════════
-  // السجلات — مرتبطة بـ member.id
+  // السجلات — مرتبطة بـ memberId
   // ═══════════════════════════════════════════
   const logInvoices = document.getElementById('log-invoices');
   const logOut = document.getElementById('log-out');

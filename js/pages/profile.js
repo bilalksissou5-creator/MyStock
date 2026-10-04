@@ -34,6 +34,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   const deputies = others.filter(m => m.role === 'deputy');
   const workers = others.filter(m => m.role === 'worker');
 
+  // ✅ حالة اتصال المستخدم نفسه
+  const isMeOnline = typeof isUserOnline === 'function' && isUserOnline(profile);
+
   // ═══════════════════════════════════════════
   // بناء بطاقة عضو (قابلة للضغط للجميع)
   // ═══════════════════════════════════════════
@@ -108,7 +111,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   // ═══════════════════════════════════════════
-  // بناء معلومات المستخدم الحالي
+  // معلومات المستخدم الحالي
   // ═══════════════════════════════════════════
   const roleIcon = currentRole === 'admin'
     ? '<i class="fas fa-crown info-icon" style="color:#fbbf24;"></i>'
@@ -152,12 +155,14 @@ document.addEventListener('DOMContentLoaded', async () => {
           : `<div class="cover-placeholder"></div>`}
       </div>
 
-      <!-- ══════ الصورة الشخصية ══════ -->
+      <!-- ══════ الصورة الشخصية + النقطة ══════ -->
       <div class="profile-avatar-fb-wrap">
         <div class="profile-avatar-fb">
           ${profile?.avatar_url
             ? `<img src="${profile.avatar_url}" alt="avatar">`
             : `<i class="fas fa-user"></i>`}
+          <span class="profile-status-dot ${isMeOnline ? 'online' : 'offline'}"
+                title="${isMeOnline ? 'متصل' : 'غير متصل'}"></span>
         </div>
       </div>
 
