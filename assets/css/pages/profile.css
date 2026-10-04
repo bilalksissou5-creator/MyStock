@@ -76,17 +76,18 @@
   color: #a3a3a3;
 }
 
-/* ✅ النقطة على حافة الدائرة تماماً (الزاوية 45° السفلية اليمنى) */
+/* ✅ النقطة على حافة الدائرة تماماً — تعمل على كل الشاشات */
 .profile-status-dot {
   position: absolute;
-  bottom: 6px;
-  right: 6px;
-  width: 18px;
-  height: 18px;
+  bottom: 14.64%;
+  right: 14.64%;
+  width: 15px;
+  height: 15px;
   border-radius: 50%;
   border: 3px solid #ffffff;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
   z-index: 10;
+  transform: translate(50%, 50%);
 }
 
 .profile-status-dot.online {
@@ -293,7 +294,7 @@
 }
 
 /* ══════════════════════════════════════════
-   نقطة الاتصال على بطاقة العضو (الحافة تماماً)
+   نقطة الاتصال على بطاقة العضو
    ══════════════════════════════════════════ */
 .member-avatar-wrap {
   position: relative;
@@ -301,10 +302,11 @@
   margin-bottom: 10px;
 }
 
+/* ✅ النقطة على حافة الدائرة تماماً — تعمل على كل الشاشات */
 .member-status-dot {
   position: absolute;
-  bottom: 7px;
-  right: 7px;
+  bottom: 14.64%;
+  right: 14.64%;
   width: 14px;
   height: 14px;
   border-radius: 50%;
@@ -312,6 +314,7 @@
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
   transition: background-color 0.2s;
   z-index: 2;
+  transform: translate(50%, 50%);
 }
 
 .member-status-dot.online {
@@ -692,14 +695,7 @@
     font-size: 40px;
   }
 
-  /* ✅ النقطة على الحافة (حسب الحجم الأصغر) */
-  .profile-status-dot {
-    bottom: 6px;
-    right: 6px;
-    width: 13px;
-    height: 13px;
-    border-width: 2.5px;
-  }
+  /* ✅ النقطة ترث من القاعدة الأساسية (لا تغيير) */
 
   .profile-fb-info h3 {
     font-size: 1.2rem;
@@ -761,14 +757,7 @@
     font-size: 22px;
   }
 
-  /* ✅ النقطة على الحافة (حسب الحجم الأصغر) */
-  .member-status-dot {
-    bottom: 6px;
-    right: 6px;
-    width: 12px;
-    height: 12px;
-    border-width: 2px;
-  }
+  /* ✅ النقطة ترث من القاعدة الأساسية (لا تغيير) */
 
   .member-name {
     font-size: 12px;
