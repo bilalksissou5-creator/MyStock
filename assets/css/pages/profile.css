@@ -79,10 +79,10 @@
 /* ✅ النقطة على صورة المستخدم (15px) */
 .profile-status-dot {
   position: absolute;
-  bottom: 10px;
-  right: 10px;
-  width: 17px;
-  height: 17px;
+  bottom: 7px;
+  right: 6px;
+  width: 18px;
+  height: 18px;
   border-radius: 50%;
   border: 3px solid #ffffff;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
