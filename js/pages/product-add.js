@@ -2,6 +2,7 @@
 // صفحة إضافة منتجات
 // ✅ يدعم اللمس + الفأرة + القلم (pointerdown)
 // ✅ ماسح باركود ذكي (نظامك → Open Food Facts)
+// ✅ يحفظ عناصر الفاتورة في invoice_items
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   if (window.__productAddLoaded) return;
@@ -308,7 +309,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       .maybeSingle();
 
     if (localProduct) {
-      // ✅ وُجد في نظامك
       nameInput.value = localProduct.name ?? '';
       priceInput.value = Number(localProduct.price ?? 0).toFixed(2);
       categoryInput.value = localProduct.category ?? '';
@@ -333,7 +333,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (json.status === 1 && json.product) {
         const p = json.product;
 
-        // اسم المنتج (عربي → إنجليزي → عام)
         const productName =
           p.product_name_ar ||
           p.product_name ||
@@ -344,7 +343,6 @@ document.addEventListener('DOMContentLoaded', async () => {
           nameInput.value = productName;
         }
 
-        // الفئة (أول فئة من categories)
         if (p.categories) {
           const firstCategory = p.categories.split(',')[0].trim();
           if (firstCategory) {
@@ -352,12 +350,10 @@ document.addEventListener('DOMContentLoaded', async () => {
           }
         }
 
-        // الصورة
         if (p.image_url) {
           scannedImageUrl = p.image_url;
         }
 
-        // الباركود
         skuInput.value = value;
         qtyInput.value = '1';
 
@@ -671,7 +667,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       const totalQty = addedProducts.reduce((s, p) => s + Number(p.qty), 0);
       const totalValue = addedProducts.reduce((s, p) => s + Number(p.qty) * Number(p.price), 0);
 
-      const { error: invoiceErr } = await db
+      // ✅ 1. إنشاء الفاتورة (مع جلب الـ id)
+      const { data: newInvoice, error: invoiceErr } = await db
         .from('invoices')
         .insert({
           invoice_number: invoiceNumber,
@@ -680,10 +677,30 @@ document.addEventListener('DOMContentLoaded', async () => {
           created_by: authUser.id,
           total_qty: totalQty,
           total_value: totalValue,
-        });
+        })
+        .select()
+        .single();
 
       if (invoiceErr) {
         throw new Error('فشل إنشاء الفاتورة: ' + invoiceErr.message);
+      }
+
+      // ✅ 2. إدراج عناصر الفاتورة في invoice_items
+      const invoiceItems = addedProducts.map(p => ({
+        invoice_id: newInvoice.id,
+        product_id: null,
+        product_name: p.name,
+        qty: Number(p.qty),
+        price: Number(p.price),
+        total: Number(p.qty) * Number(p.price),
+      }));
+
+      const { error: itemsErr } = await db
+        .from('invoice_items')
+        .insert(invoiceItems);
+
+      if (itemsErr) {
+        console.error('❌ invoice_items error:', itemsErr);
       }
 
       if (typeof notifyOrganization === 'function') {

@@ -1,20 +1,11 @@
 // ============================================
 // صفحة الفاتورة الواحدة
-// الدور: عرض فاتورة واحدة + طباعة + حذف
-// يجلب البيانات من invoices + products
+// الدور: عرض فاتورة واحدة + طباعة
+// ✅ يجلب العناصر من invoice_items (الكمية المُضافة)
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   const user = await requireAuth();
   if (!user) return;
-
-  // جلب بروفايل المستخدم (لصلاحيات الحذف)
-  const { data: myProfile } = await db
-    .from('profiles')
-    .select('role, full_name, organization_id')
-    .eq('id', user.id)
-    .single();
-
-  const canDelete = myProfile?.role === 'admin' || myProfile?.role === 'deputy';
 
   const params = new URLSearchParams(window.location.search);
   const invoiceId = params.get('id');
@@ -26,15 +17,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     return;
   }
 
-  // 1. جلب الفاتورة + المورد + المنظمة في استعلام واحد
+  // 1. جلب الفاتورة
   const { data: invoice, error: invoiceError } = await db
     .from('invoices')
-    .select(`
-      *,
-      suppliers (*),
-      organizations (*),
-      profiles:created_by (full_name)
-    `)
+    .select('*')
     .eq('invoice_number', invoiceId.trim())
     .single();
 
@@ -45,40 +31,61 @@ document.addEventListener('DOMContentLoaded', async () => {
     return;
   }
 
-  // 2. جلب المنتجات المرتبطة بهذه الفاتورة
-  const { data: products } = await db
-    .from('products')
+  // 2. جلب المورد
+  let supplier = null;
+  if (invoice.supplier_id) {
+    const { data: sup } = await db
+      .from('suppliers')
+      .select('*')
+      .eq('id', invoice.supplier_id)
+      .single();
+    supplier = sup;
+  }
+
+  // 3. جلب المنظمة
+  let org = null;
+  if (invoice.organization_id) {
+    const { data: o } = await db
+      .from('organizations')
+      .select('name, logo_url, logo_shape')
+      .eq('id', invoice.organization_id)
+      .single();
+    org = o;
+  }
+
+  // 4. جلب الموظف المسؤول
+  let createdBy = null;
+  if (invoice.created_by) {
+    const { data: prof } = await db
+      .from('profiles')
+      .select('full_name')
+      .eq('id', invoice.created_by)
+      .single();
+    createdBy = prof;
+  }
+
+  // 5. ✅ جلب عناصر الفاتورة من invoice_items
+  const { data: items } = await db
+    .from('invoice_items')
     .select('*')
-    .eq('invoice_id', invoiceId.trim())
+    .eq('invoice_id', invoice.id)
     .order('created_at', { ascending: true });
 
-  // 3. عرض الفاتورة
+  // 6. عرض الفاتورة
   renderInvoice({
     invoice,
-    products: products ?? [],
-    canDelete,
+    supplier,
+    org,
+    createdBy,
+    items: items ?? [],
   });
-
-  // 4. تفعيل زر الحذف بعد البناء
-  if (canDelete) {
-    const deleteBtn = document.getElementById('delete-invoice-btn');
-    if (deleteBtn) {
-      deleteBtn.addEventListener('click', () => {
-        handleDeleteInvoice(invoice);
-      });
-    }
-  }
 });
 
 // ============================================
 // عرض الفاتورة
 // ============================================
-function renderInvoice({ invoice, products, canDelete }) {
+function renderInvoice({ invoice, supplier, org, createdBy, items }) {
   const container = document.getElementById('invoice-content');
-
-  const supplier = invoice.suppliers;
-  const org = invoice.organizations;
-  const createdBy = invoice.profiles;
 
   const totalQty = invoice.total_qty ?? 0;
   const totalValue = Number(invoice.total_value ?? 0);
@@ -140,33 +147,31 @@ function renderInvoice({ invoice, products, canDelete }) {
         <tr>
           <th>#</th>
           <th>المنتج</th>
-          <th>SKU</th>
           <th>الكمية</th>
           <th>السعر</th>
           <th>المجموع</th>
         </tr>
       </thead>
       <tbody>
-        ${products.length === 0 ? `
+        ${items.length === 0 ? `
           <tr>
-            <td colspan="6" style="text-align:center; color:#737373; padding:20px;">
-              لا توجد منتجات في هذه الفاتورة
+            <td colspan="5" style="text-align:center; color:#737373; padding:20px;">
+              لا توجد عناصر في هذه الفاتورة
             </td>
           </tr>
-        ` : products.map((p, i) => `
+        ` : items.map((item, i) => `
           <tr>
             <td>${i + 1}</td>
-            <td>${p.name ?? '—'}</td>
-            <td>${p.sku ?? '—'}</td>
-            <td>${p.qty ?? 0}</td>
-            <td>${Number(p.price ?? 0).toFixed(2)}</td>
-            <td>${(Number(p.qty ?? 0) * Number(p.price ?? 0)).toFixed(2)}</td>
+            <td>${item.product_name ?? '—'}</td>
+            <td>${item.qty ?? 0}</td>
+            <td>${Number(item.price ?? 0).toFixed(2)}</td>
+            <td>${Number(item.total ?? 0).toFixed(2)}</td>
           </tr>
         `).join('')}
       </tbody>
       <tfoot>
         <tr>
-          <td colspan="3"><strong>الإجمالي</strong></td>
+          <td colspan="2"><strong>الإجمالي</strong></td>
           <td><strong>${totalQty}</strong></td>
           <td>—</td>
           <td><strong>${totalValue.toFixed(2)}</strong></td>
@@ -196,60 +201,6 @@ function renderInvoice({ invoice, products, canDelete }) {
         <i class="fas fa-file-invoice"></i>
         <span>الفواتير</span>
       </a>
-      ${canDelete ? `
-        <button class="btn-danger" id="delete-invoice-btn">
-          <i class="fas fa-trash"></i>
-          <span>حذف الفاتورة</span>
-        </button>
-      ` : ''}
     </div>
   `;
-}
-
-// ============================================
-// ✅ حذف الفاتورة + منتجاتها
-// ============================================
-async function handleDeleteInvoice(invoice) {
-  const confirmed = confirm(
-    `هل أنت متأكد من حذف الفاتورة "${invoice.invoice_number}"؟\n\n` +
-    `سيتم حذف الفاتورة وجميع المنتجات المرتبطة بها.\n` +
-    `لا يمكن التراجع بسهولة.`
-  );
-
-  if (!confirmed) return;
-
-  const btn = document.getElementById('delete-invoice-btn');
-  if (btn) {
-    btn.disabled = true;
-    btn.querySelector('span').textContent = 'جارٍ الحذف...';
-  }
-
-  try {
-    // 1. حذف المنتجات المرتبطة
-    const { error: productsError } = await db
-      .from('products')
-      .delete()
-      .eq('invoice_id', invoice.invoice_number);
-
-    if (productsError) throw new Error('فشل حذف المنتجات: ' + productsError.message);
-
-    // 2. حذف الفاتورة
-    const { error: invoiceError } = await db
-      .from('invoices')
-      .delete()
-      .eq('id', invoice.id);
-
-    if (invoiceError) throw new Error('فشل حذف الفاتورة: ' + invoiceError.message);
-
-    // 3. النجاح → العودة للقائمة
-    alert('✅ تم حذف الفاتورة بنجاح');
-    window.location.href = '/invoices/list.html';
-
-  } catch (err) {
-    alert('خطأ: ' + err.message);
-    if (btn) {
-      btn.disabled = false;
-      btn.querySelector('span').textContent = 'حذف الفاتورة';
-    }
-  }
 }
