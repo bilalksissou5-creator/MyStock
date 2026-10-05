@@ -3,6 +3,7 @@
 // ✅ يدعم اللمس + الفأرة + القلم (pointerdown)
 // ✅ ماسح باركود (html5-qrcode)
 // ✅ تعديل الكمية بعد المسح يُحدّث البطاقة
+// ✅ الكمية = عدد صحيح دائماً
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   if (window.__movementOutLoaded) return;
@@ -63,7 +64,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         <div class="form-grid">
           <div class="form-group">
             <label>الكمية *</label>
-            <input type="number" id="quantity" value="1" min="1">
+            <input type="number" id="quantity" value="1" min="1" step="1">
           </div>
           <div class="form-group">
             <label>السعر *</label>
@@ -230,14 +231,16 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
 
   // ============================================
-  // ✅ عند تغيير الكمية: يُحدّث البطاقة إذا كان المنتج مضافاً
+  // ✅ عند تغيير الكمية: يُحدّث البطاقة (عدد صحيح)
   // ============================================
   quantityInput.addEventListener('input', () => {
     if (!selectedProduct) return;
     const idx = addedProducts.findIndex(p => p.id === selectedProduct.id);
-    if (idx === -1) return; // غير مضاف
-    const newQty = Number(quantityInput.value) || 1;
+    if (idx === -1) return;
+
+    const newQty = Math.round(Number(quantityInput.value)) || 1;
     if (newQty <= 0) return;
+
     addedProducts[idx].qty = newQty;
     renderAddedProducts();
   });
@@ -289,7 +292,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     scannerModal.style.display = 'none';
   }
 
-  // ✅ عند مسح باركود → ابحث بـ sku → أضف للقائمة (أو حدّث الكمية)
   async function handleScan(barcode) {
     const value = String(barcode).trim();
     if (!value) return;
@@ -330,17 +332,14 @@ document.addEventListener('DOMContentLoaded', async () => {
       return;
     }
 
-    // ✅ إذا كان مضافاً مسبقاً → حدّد المنتج وحدّث الكمية (يظهر في الحقل)
     const existing = addedProducts.find(p => p.id === found.id);
 
     if (existing) {
-      // اختره ليعرض في الحقل — المستخدم يُعدّل الكمية
       selectProduct(found);
       quantityInput.value = existing.qty;
       return;
     }
 
-    // ✅ أضف جديد بكمية 1
     addedProducts.push({
       id: found.id,
       name: found.name,
@@ -423,7 +422,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     let totalQty = 0;
     let totalValue = 0;
     addedProducts.forEach(p => {
-      totalQty += Number(p.qty);
+      totalQty += Math.round(Number(p.qty));
       totalValue += Number(p.qty) * Number(p.price);
     });
     document.getElementById('sum-rows').textContent = addedProducts.length;
@@ -451,7 +450,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       return;
     }
 
-    const qty = Number(quantityInput.value);
+    // ✅ تحويل إلى عدد صحيح
+    const qty = Math.round(Number(quantityInput.value)) || 0;
     const price = Number(priceInput.value) || 0;
     const available = Number(selectedProduct.qty ?? 0);
 
@@ -473,7 +473,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       return;
     }
 
-    // ✅ إذا كان مضافاً مسبقاً → حدّث الكمية
     const existing = addedProducts.find(p => p.id === selectedProduct.id);
 
     if (existing) {
@@ -580,7 +579,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
       const receiptNumber = 'RCP-' + String(nextNumber).padStart(3, '0');
 
-      const totalQty = addedProducts.reduce((s, p) => s + Number(p.qty), 0);
+      // ✅ إجمالي الكمية كعدد صحيح
+      const totalQty = addedProducts.reduce((s, p) => s + Math.round(Number(p.qty)), 0);
       const totalValue = addedProducts.reduce((s, p) => s + Number(p.qty) * Number(p.price), 0);
 
       const { data: newReceipt, error: receiptErr } = await db
@@ -597,13 +597,14 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       if (receiptErr) throw new Error('فشل إنشاء الإيصال: ' + receiptErr.message);
 
+      // ✅ الكمية كعدد صحيح
       const receiptItems = addedProducts.map(p => ({
         receipt_id: newReceipt.id,
         product_id: p.id,
         product_name: p.name,
-        qty: Number(p.qty),
+        qty: Math.round(Number(p.qty)),
         price: Number(p.price),
-        total: Number(p.qty) * Number(p.price),
+        total: Math.round(Number(p.qty)) * Number(p.price),
       }));
 
       const { error: itemsErr } = await db
@@ -612,12 +613,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       if (itemsErr) throw new Error('فشل حفظ عناصر الإيصال: ' + itemsErr.message);
 
+      // ✅ الكمية كعدد صحيح
       const movements = addedProducts.map(p => ({
         organization_id: profile.organization_id,
         product_id: p.id,
         type: 'out',
         method: 'manual',
-        quantity: Number(p.qty),
+        quantity: Math.round(Number(p.qty)),
         performed_by: authUser.id,
       }));
 
