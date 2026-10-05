@@ -2,6 +2,7 @@
 // صفحة إخراج منتجات (متعددة) + إيصال بيع
 // ✅ يدعم اللمس + الفأرة + القلم (pointerdown)
 // ✅ ماسح باركود (html5-qrcode)
+// ✅ تعديل الكمية بعد المسح يُحدّث البطاقة
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   if (window.__movementOutLoaded) return;
@@ -14,7 +15,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   const main = document.getElementById('main-content');
 
-  // جلب المنتجات
   const { data: products, error: productsError } = await db
     .from('products')
     .select('*')
@@ -45,7 +45,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     <div class="out-form">
 
-      <!-- ══════ ملاحظة عامة ══════ -->
       <div class="product-input-card">
         <div class="form-group">
           <label>ملاحظة عامة (اختياري)</label>
@@ -53,7 +52,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         </div>
       </div>
 
-      <!-- ══════ إضافة منتج ══════ -->
       <div class="product-input-card">
         <div class="form-group" style="position:relative;margin-bottom:12px;">
           <label>المنتج *</label>
@@ -83,7 +81,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         </button>
       </div>
 
-      <!-- ══════ المنتجات المضافة ══════ -->
       <div class="added-products-section">
         <label class="section-label">المنتجات المُخرَجة</label>
         <div id="added-products" class="added-products">
@@ -94,7 +91,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         </div>
       </div>
 
-      <!-- ══════ الإجماليات ══════ -->
       <div class="form-summary">
         <div class="summary-row">
           <span>عدد المنتجات</span>
@@ -110,7 +106,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         </div>
       </div>
 
-      <!-- ══════ الأزرار ══════ -->
       <div class="form-actions">
         <button type="button" class="btn-primary" id="save-btn">
           <i class="fas fa-save"></i>
@@ -136,9 +131,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     </div>
   `;
 
-  // ============================================
-  // متغيرات
-  // ============================================
   const addedProducts = [];
   const productInput = document.getElementById('product-input');
   const hiddenId = document.getElementById('product_id');
@@ -238,7 +230,20 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
 
   // ============================================
-  // ✅ الماسح (html5-qrcode)
+  // ✅ عند تغيير الكمية: يُحدّث البطاقة إذا كان المنتج مضافاً
+  // ============================================
+  quantityInput.addEventListener('input', () => {
+    if (!selectedProduct) return;
+    const idx = addedProducts.findIndex(p => p.id === selectedProduct.id);
+    if (idx === -1) return; // غير مضاف
+    const newQty = Number(quantityInput.value) || 1;
+    if (newQty <= 0) return;
+    addedProducts[idx].qty = newQty;
+    renderAddedProducts();
+  });
+
+  // ============================================
+  // ✅ الماسح
   // ============================================
   async function startScanner() {
     if (typeof Html5Qrcode === 'undefined') {
@@ -284,15 +289,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     scannerModal.style.display = 'none';
   }
 
-  // ✅ عند مسح باركود → ابحث بـ sku → أضف للقائمة مباشرة
+  // ✅ عند مسح باركود → ابحث بـ sku → أضف للقائمة (أو حدّث الكمية)
   async function handleScan(barcode) {
     const value = String(barcode).trim();
     if (!value) return;
 
-    // ابحث في المنتجات المحمّلة محلياً أولاً
     let found = (products ?? []).find(p => p.sku === value);
 
-    // إذا لم يوجد → ابحث في DB
     if (!found) {
       const { data: profile } = await db
         .from('profiles')
@@ -320,7 +323,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       return;
     }
 
-    // ✅ موجود → أضف للقائمة مباشرة (كمية 1)
     const available = Number(found.qty ?? 0);
 
     if (available <= 0) {
@@ -328,12 +330,17 @@ document.addEventListener('DOMContentLoaded', async () => {
       return;
     }
 
-    // تحقق: هل مضاف مسبقاً؟
-    if (addedProducts.find(p => p.id === found.id)) {
-      alert(`المنتج "${found.name}" مضاف مسبقاً`);
+    // ✅ إذا كان مضافاً مسبقاً → حدّد المنتج وحدّث الكمية (يظهر في الحقل)
+    const existing = addedProducts.find(p => p.id === found.id);
+
+    if (existing) {
+      // اختره ليعرض في الحقل — المستخدم يُعدّل الكمية
+      selectProduct(found);
+      quantityInput.value = existing.qty;
       return;
     }
 
+    // ✅ أضف جديد بكمية 1
     addedProducts.push({
       id: found.id,
       name: found.name,
@@ -345,8 +352,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     renderAddedProducts();
-
-    // ✅ حدّث selectedProduct ليعرضه في الحقول (اختياري)
     selectProduct(found);
   }
 
@@ -468,9 +473,13 @@ document.addEventListener('DOMContentLoaded', async () => {
       return;
     }
 
-    if (addedProducts.find(p => p.id === selectedProduct.id)) {
-      errBox.textContent = 'هذا المنتج مضاف مسبقاً';
-      errBox.style.display = 'block';
+    // ✅ إذا كان مضافاً مسبقاً → حدّث الكمية
+    const existing = addedProducts.find(p => p.id === selectedProduct.id);
+
+    if (existing) {
+      existing.qty = qty;
+      existing.price = price;
+      renderAddedProducts();
       isAdding = false;
       addBtn.disabled = false;
       return;
