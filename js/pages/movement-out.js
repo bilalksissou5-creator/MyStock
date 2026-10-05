@@ -3,7 +3,7 @@
 // ✅ يدعم اللمس + الفأرة + القلم (pointerdown)
 // ✅ ماسح باركود (html5-qrcode)
 // ✅ تعديل الكمية بعد المسح يُحدّث البطاقة
-// ✅ الكمية = عدد صحيح دائماً
+// ✅ يدعم الكميات العشرية (0.5، 1.75...)
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   if (window.__movementOutLoaded) return;
@@ -64,7 +64,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         <div class="form-grid">
           <div class="form-group">
             <label>الكمية *</label>
-            <input type="number" id="quantity" value="1" min="1" step="1">
+            <input type="number" id="quantity" value="1" min="0.01" step="0.01">
           </div>
           <div class="form-group">
             <label>السعر *</label>
@@ -231,15 +231,15 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
 
   // ============================================
-  // ✅ عند تغيير الكمية: يُحدّث البطاقة (عدد صحيح)
+  // ✅ عند تغيير الكمية: يُحدّث البطاقة (يدعم العشرية)
   // ============================================
   quantityInput.addEventListener('input', () => {
     if (!selectedProduct) return;
     const idx = addedProducts.findIndex(p => p.id === selectedProduct.id);
     if (idx === -1) return;
 
-    const newQty = Math.round(Number(quantityInput.value)) || 1;
-    if (newQty <= 0) return;
+    const newQty = Number(quantityInput.value);
+    if (!newQty || newQty <= 0) return;
 
     addedProducts[idx].qty = newQty;
     renderAddedProducts();
@@ -422,7 +422,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     let totalQty = 0;
     let totalValue = 0;
     addedProducts.forEach(p => {
-      totalQty += Math.round(Number(p.qty));
+      totalQty += Number(p.qty);
       totalValue += Number(p.qty) * Number(p.price);
     });
     document.getElementById('sum-rows').textContent = addedProducts.length;
@@ -450,12 +450,12 @@ document.addEventListener('DOMContentLoaded', async () => {
       return;
     }
 
-    // ✅ تحويل إلى عدد صحيح
-    const qty = Math.round(Number(quantityInput.value)) || 0;
+    // ✅ يدعم العشرية
+    const qty = Number(quantityInput.value);
     const price = Number(priceInput.value) || 0;
     const available = Number(selectedProduct.qty ?? 0);
 
-    if (qty <= 0) {
+    if (!qty || qty <= 0) {
       errBox.textContent = 'الكمية يجب أن تكون أكبر من صفر';
       errBox.style.display = 'block';
       quantityInput.focus();
@@ -579,8 +579,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
       const receiptNumber = 'RCP-' + String(nextNumber).padStart(3, '0');
 
-      // ✅ إجمالي الكمية كعدد صحيح
-      const totalQty = addedProducts.reduce((s, p) => s + Math.round(Number(p.qty)), 0);
+      // ✅ يدعم العشرية
+      const totalQty = addedProducts.reduce((s, p) => s + Number(p.qty), 0);
       const totalValue = addedProducts.reduce((s, p) => s + Number(p.qty) * Number(p.price), 0);
 
       const { data: newReceipt, error: receiptErr } = await db
@@ -597,14 +597,14 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       if (receiptErr) throw new Error('فشل إنشاء الإيصال: ' + receiptErr.message);
 
-      // ✅ الكمية كعدد صحيح
+      // ✅ يدعم العشرية
       const receiptItems = addedProducts.map(p => ({
         receipt_id: newReceipt.id,
         product_id: p.id,
         product_name: p.name,
-        qty: Math.round(Number(p.qty)),
+        qty: Number(p.qty),
         price: Number(p.price),
-        total: Math.round(Number(p.qty)) * Number(p.price),
+        total: Number(p.qty) * Number(p.price),
       }));
 
       const { error: itemsErr } = await db
@@ -613,13 +613,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       if (itemsErr) throw new Error('فشل حفظ عناصر الإيصال: ' + itemsErr.message);
 
-      // ✅ الكمية كعدد صحيح
+      // ✅ يدعم العشرية
       const movements = addedProducts.map(p => ({
         organization_id: profile.organization_id,
         product_id: p.id,
         type: 'out',
         method: 'manual',
-        quantity: Math.round(Number(p.qty)),
+        quantity: Number(p.qty),
         performed_by: authUser.id,
       }));
 
