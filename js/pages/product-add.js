@@ -1,7 +1,7 @@
 // ============================================
 // صفحة إضافة منتجات
 // ✅ يدعم اللمس + الفأرة + القلم (pointerdown)
-// ✅ ماسح باركود (html5-qrcode)
+// ✅ ماسح باركود ذكي (نظامك → Open Food Facts)
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   if (window.__productAddLoaded) return;
@@ -119,7 +119,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           </button>
         </div>
         <div id="scanner-reader" class="scanner-reader"></div>
-        <p class="scanner-hint">وجّه الكاميرا نحو الباركود</p>
+        <p class="scanner-hint" id="scanner-hint">وجّه الكاميرا نحو الباركود</p>
       </div>
     </div>
   `;
@@ -140,11 +140,13 @@ document.addEventListener('DOMContentLoaded', async () => {
   const scannerModal = document.getElementById('scanner-modal');
   const scannerReader = document.getElementById('scanner-reader');
   const scannerClose = document.getElementById('scanner-close');
+  const scannerHint = document.getElementById('scanner-hint');
 
   let selectedSupplier = null;
   let isAddingProduct = false;
   let isSaving = false;
   let html5QrCode = null;
+  let scannedImageUrl = null;
 
   // ============================================
   // اقتراحات المورد
@@ -246,6 +248,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     scannerModal.style.display = 'flex';
     scannerReader.innerHTML = '';
+    scannerHint.textContent = 'وجّه الكاميرا نحو الباركود';
 
     try {
       html5QrCode = new Html5Qrcode("scanner-reader");
@@ -260,11 +263,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         { facingMode: "environment" },
         config,
         async (decodedText) => {
-          // ✅ تم المسح
           await handleScan(decodedText);
           await stopScanner();
         },
-        () => { /* تجاهل الأخطاء الفرعية */ }
+        () => { /* تجاهل */ }
       );
     } catch (err) {
       alert('تعذّر فتح الكاميرا: ' + err.message);
@@ -283,41 +285,97 @@ document.addEventListener('DOMContentLoaded', async () => {
     scannerModal.style.display = 'none';
   }
 
-  // ✅ عند مسح باركود
+  // ✅ معالج المسح الذكي (3 مراحل)
   async function handleScan(barcode) {
     const value = String(barcode).trim();
     if (!value) return;
 
-    // 🔍 ابحث في المنتجات بـ sku
-    const { data: found, error } = await db
+    // ═══════════════════════════════════════════
+    // 1️⃣ المرحلة الأولى: ابحث في products (نظامك)
+    // ═══════════════════════════════════════════
+    const { data: profile } = await db
+      .from('profiles')
+      .select('organization_id')
+      .eq('id', user.id)
+      .single();
+
+    const { data: localProduct } = await db
       .from('products')
       .select('*')
-      .eq('organization_id', (await db.from('profiles').select('organization_id').eq('id', user.id).single()).data?.organization_id)
+      .eq('organization_id', profile?.organization_id)
       .eq('sku', value)
       .limit(1)
       .maybeSingle();
 
-    if (error) {
-      alert('خطأ في البحث: ' + error.message);
+    if (localProduct) {
+      // ✅ وُجد في نظامك
+      nameInput.value = localProduct.name ?? '';
+      priceInput.value = Number(localProduct.price ?? 0).toFixed(2);
+      categoryInput.value = localProduct.category ?? '';
+      qtyInput.value = '1';
+      skuInput.value = localProduct.sku ?? value;
+      scannedImageUrl = localProduct.image_url || null;
+
+      nameInput.focus();
+      nameInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
       return;
     }
 
-    if (found) {
-      // ✅ وُجد → املأ الحقول
-      nameInput.value = found.name ?? '';
-      priceInput.value = Number(found.price ?? 0).toFixed(2);
-      categoryInput.value = found.category ?? '';
-      qtyInput.value = '1';
-      skuInput.value = found.sku ?? value;
+    // ═══════════════════════════════════════════
+    // 2️⃣ المرحلة الثانية: ابحث في Open Food Facts
+    // ═══════════════════════════════════════════
+    scannerHint.textContent = '🔍 جارٍ البحث في قاعدة البيانات العالمية...';
 
-      nameInput.focus();
-      nameInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    } else {
-      // ❌ لم يوجد → ضع الباركود في sku
-      skuInput.value = value;
-      nameInput.focus();
-      nameInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    try {
+      const res = await fetch(`https://world.openfoodfacts.org/api/v2/product/${encodeURIComponent(value)}.json`);
+      const json = await res.json();
+
+      if (json.status === 1 && json.product) {
+        const p = json.product;
+
+        // اسم المنتج (عربي → إنجليزي → عام)
+        const productName =
+          p.product_name_ar ||
+          p.product_name ||
+          p.product_name_en ||
+          '';
+
+        if (productName) {
+          nameInput.value = productName;
+        }
+
+        // الفئة (أول فئة من categories)
+        if (p.categories) {
+          const firstCategory = p.categories.split(',')[0].trim();
+          if (firstCategory) {
+            categoryInput.value = firstCategory;
+          }
+        }
+
+        // الصورة
+        if (p.image_url) {
+          scannedImageUrl = p.image_url;
+        }
+
+        // الباركود
+        skuInput.value = value;
+        qtyInput.value = '1';
+
+        nameInput.focus();
+        nameInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return;
+      }
+    } catch (err) {
+      console.warn('Open Food Facts error:', err);
     }
+
+    // ═══════════════════════════════════════════
+    // 3️⃣ المرحلة الثالثة: الباركود فقط
+    // ═══════════════════════════════════════════
+    skuInput.value = value;
+    scannedImageUrl = null;
+    nameInput.focus();
+    nameInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }
 
   scanBtn.addEventListener('click', startScanner);
@@ -437,13 +495,14 @@ document.addEventListener('DOMContentLoaded', async () => {
       price,
       category,
       sku,
-      image_url: null,
+      image_url: scannedImageUrl,
     });
 
     nameInput.value = '';
     qtyInput.value = '1';
     priceInput.value = '0';
     skuInput.value = '';
+    scannedImageUrl = null;
     nameInput.focus();
 
     renderAddedProducts();
@@ -587,6 +646,7 @@ document.addEventListener('DOMContentLoaded', async () => {
               qty: 0,
               price: Number(p.price),
               category: p.category || null,
+              image_url: p.image_url || null,
               invoice_id: invoiceNumber,
               created_by: authUser.id,
             })
