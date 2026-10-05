@@ -1,11 +1,20 @@
 // ============================================
 // صفحة الفاتورة الواحدة
-// الدور: عرض فاتورة واحدة + طباعة
+// الدور: عرض فاتورة واحدة + طباعة + حذف
 // ✅ يجلب العناصر من invoice_items (الكمية المُضافة)
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   const user = await requireAuth();
   if (!user) return;
+
+  // جلب بروفايل المستخدم (لصلاحيات الحذف)
+  const { data: myProfile } = await db
+    .from('profiles')
+    .select('role, full_name, organization_id')
+    .eq('id', user.id)
+    .single();
+
+  const canDelete = myProfile?.role === 'admin' || myProfile?.role === 'deputy';
 
   const params = new URLSearchParams(window.location.search);
   const invoiceId = params.get('id');
@@ -64,7 +73,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     createdBy = prof;
   }
 
-  // 5. ✅ جلب عناصر الفاتورة من invoice_items
+  // 5. جلب عناصر الفاتورة من invoice_items
   const { data: items } = await db
     .from('invoice_items')
     .select('*')
@@ -78,13 +87,24 @@ document.addEventListener('DOMContentLoaded', async () => {
     org,
     createdBy,
     items: items ?? [],
+    canDelete,
   });
+
+  // 7. تفعيل زر الحذف
+  if (canDelete) {
+    const deleteBtn = document.getElementById('delete-invoice-btn');
+    if (deleteBtn) {
+      deleteBtn.addEventListener('click', () => {
+        handleDeleteInvoice(invoice);
+      });
+    }
+  }
 });
 
 // ============================================
 // عرض الفاتورة
 // ============================================
-function renderInvoice({ invoice, supplier, org, createdBy, items }) {
+function renderInvoice({ invoice, supplier, org, createdBy, items, canDelete }) {
   const container = document.getElementById('invoice-content');
 
   const totalQty = invoice.total_qty ?? 0;
@@ -201,6 +221,68 @@ function renderInvoice({ invoice, supplier, org, createdBy, items }) {
         <i class="fas fa-file-invoice"></i>
         <span>الفواتير</span>
       </a>
+      ${canDelete ? `
+        <button class="btn-danger" id="delete-invoice-btn">
+          <i class="fas fa-trash"></i>
+          <span>حذف الفاتورة</span>
+        </button>
+      ` : ''}
     </div>
   `;
+}
+
+// ============================================
+// ✅ حذف الفاتورة + منتجاتها
+// ============================================
+async function handleDeleteInvoice(invoice) {
+  const confirmed = confirm(
+    `هل أنت متأكد من حذف الفاتورة "${invoice.invoice_number}"؟\n\n` +
+    `سيتم حذف الفاتورة وجميع المنتجات المرتبطة بها.\n` +
+    `لا يمكن التراجع بسهولة.`
+  );
+
+  if (!confirmed) return;
+
+  const btn = document.getElementById('delete-invoice-btn');
+  if (btn) {
+    btn.disabled = true;
+    btn.querySelector('span').textContent = 'جارٍ الحذف...';
+  }
+
+  try {
+    // 1. حذف عناصر الفاتورة من invoice_items
+    const { error: itemsErr } = await db
+      .from('invoice_items')
+      .delete()
+      .eq('invoice_id', invoice.id);
+
+    if (itemsErr) throw new Error('فشل حذف عناصر الفاتورة: ' + itemsErr.message);
+
+    // 2. حذف المنتجات المرتبطة بالفاتورة
+    const { error: productsErr } = await db
+      .from('products')
+      .delete()
+      .eq('invoice_id', invoice.invoice_number);
+
+    if (productsErr) throw new Error('فشل حذف المنتجات: ' + productsErr.message);
+
+    // 3. حذف الفاتورة
+    const { error: invoiceErr } = await db
+      .from('invoices')
+      .delete()
+      .eq('id', invoice.id);
+
+    if (invoiceErr) throw new Error('فشل حذف الفاتورة: ' + invoiceErr.message);
+
+    // 4. النجاح → العودة للقائمة
+    alert('✅ تم حذف الفاتورة بنجاح');
+    window.location.href = '/invoices/list.html';
+
+  } catch (err) {
+    alert('خطأ: ' + err.message);
+    if (btn) {
+      btn.disabled = false;
+      btn.querySelector('span').textContent = 'حذف الفاتورة';
+    }
+  }
 }
