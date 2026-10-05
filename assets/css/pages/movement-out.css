@@ -41,6 +41,15 @@
 }
 
 /* ============================================
+   زر المسح
+   ============================================ */
+.scan-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ============================================
    اقتراحات المنتج
    ============================================ */
 .suggestions-box {
@@ -67,7 +76,6 @@
   cursor: pointer;
   border-bottom: 1px solid #f5f5f5;
   transition: background 0.15s;
-  /* ✅ دعم اللمس */
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
   user-select: none;
@@ -221,6 +229,13 @@
   justify-content: center;
   flex-shrink: 0;
   border: 1px solid #e5e5e5;
+  overflow: hidden;
+}
+
+.added-product-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .added-product-image i {
@@ -294,7 +309,6 @@
   color: white;
 }
 
-/* ✅ زر حذف المنتج المضاف — دعم اللمس */
 .added-product-delete {
   background: none;
   border: none;
@@ -380,6 +394,89 @@
 .form-actions .btn-secondary {
   flex: 1;
   justify-content: center;
+}
+
+/* ============================================
+   ✅ Modal الماسح
+   ============================================ */
+.scanner-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.85);
+  z-index: 10000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.scanner-box {
+  background: #171717;
+  border-radius: 16px;
+  padding: 20px;
+  max-width: 500px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+
+.scanner-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: #ffffff;
+}
+
+.scanner-header h3 {
+  font-size: 16px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.scanner-close {
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  color: #ffffff;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  transition: background 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.scanner-close:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.scanner-reader {
+  width: 100%;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #000000;
+  min-height: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.scanner-reader video {
+  border-radius: 12px;
+  width: 100% !important;
+  height: auto !important;
+}
+
+.scanner-hint {
+  color: #a3a3a3;
+  font-size: 13px;
+  text-align: center;
+  margin: 0;
 }
 
 /* ============================================
@@ -485,5 +582,14 @@
   .form-actions .btn-primary,
   .form-actions .btn-secondary {
     width: 100%;
+  }
+
+  /* ✅ Modal الماسح */
+  .scanner-box {
+    padding: 16px;
+  }
+
+  .scanner-reader {
+    min-height: 250px;
   }
 }

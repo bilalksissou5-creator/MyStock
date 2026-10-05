@@ -1,6 +1,7 @@
 // ============================================
 // صفحة إخراج منتجات (متعددة) + إيصال بيع
 // ✅ يدعم اللمس + الفأرة + القلم (pointerdown)
+// ✅ ماسح باركود (html5-qrcode)
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   if (window.__movementOutLoaded) return;
@@ -33,10 +34,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   main.innerHTML = `
     <div class="page-header">
       <h2>إخراج منتجات</h2>
-      <a href="/movements/list.html" class="btn-secondary">
-        <i class="fas fa-arrow-right"></i>
-        <span>العودة</span>
-      </a>
+      <button type="button" class="btn-primary scan-btn" id="scan-btn">
+        <i class="fas fa-barcode"></i>
+        <span>مسح</span>
+      </button>
     </div>
 
     <div class="alert alert-error" id="form-error" style="display:none;"></div>
@@ -119,6 +120,20 @@ document.addEventListener('DOMContentLoaded', async () => {
       </div>
 
     </div>
+
+    <!-- ✅ Modal الماسح -->
+    <div class="scanner-modal" id="scanner-modal" style="display:none;">
+      <div class="scanner-box">
+        <div class="scanner-header">
+          <h3>امسح الباركود</h3>
+          <button type="button" class="scanner-close" id="scanner-close">
+            <i class="fas fa-xmark"></i>
+          </button>
+        </div>
+        <div id="scanner-reader" class="scanner-reader"></div>
+        <p class="scanner-hint">وجّه الكاميرا نحو الباركود</p>
+      </div>
+    </div>
   `;
 
   // ============================================
@@ -134,13 +149,18 @@ document.addEventListener('DOMContentLoaded', async () => {
   const addedContainer = document.getElementById('added-products');
   const addBtn = document.getElementById('add-product-btn');
   const saveBtn = document.getElementById('save-btn');
+  const scanBtn = document.getElementById('scan-btn');
+  const scannerModal = document.getElementById('scanner-modal');
+  const scannerReader = document.getElementById('scanner-reader');
+  const scannerClose = document.getElementById('scanner-close');
 
   let selectedProduct = null;
   let isAdding = false;
   let isSaving = false;
+  let html5QrCode = null;
 
   // ============================================
-  // ✅ اقتراحات المنتج (تدعم اللمس + الفأرة)
+  // اقتراحات المنتج
   // ============================================
   function showSuggestions(filter) {
     const q = filter.trim().toLowerCase();
@@ -178,7 +198,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     suggestions.style.display = 'block';
 
-    // ✅ استخدام pointerdown (يعمل على اللمس والفأرة والقلم)
     suggestions.querySelectorAll('.suggestion-card').forEach(card => {
       card.addEventListener('pointerdown', (e) => {
         e.preventDefault();
@@ -188,19 +207,21 @@ document.addEventListener('DOMContentLoaded', async () => {
         const found = products.find(p => p.id === id);
 
         if (found) {
-          selectedProduct = found;
-          productInput.value = `${found.name} (${found.sku ?? '—'})`;
-          hiddenId.value = found.id;
-
-          // تعبئة الحقول
-          quantityInput.value = '1';
-          priceInput.value = Number(found.price ?? 0).toFixed(2);
-          availableQtyInput.value = found.qty ?? 0;
-
+          selectProduct(found);
           suggestions.style.display = 'none';
         }
       });
     });
+  }
+
+  // ✅ دالة موحّدة: اختيار منتج
+  function selectProduct(found) {
+    selectedProduct = found;
+    productInput.value = `${found.name} (${found.sku ?? '—'})`;
+    hiddenId.value = found.id;
+    quantityInput.value = '1';
+    priceInput.value = Number(found.price ?? 0).toFixed(2);
+    availableQtyInput.value = found.qty ?? 0;
   }
 
   productInput.addEventListener('input', () => {
@@ -210,11 +231,129 @@ document.addEventListener('DOMContentLoaded', async () => {
     showSuggestions(productInput.value);
   });
 
-  // ✅ إغلاق الاقتراحات عند الضغط خارجها (pointerdown)
   document.addEventListener('pointerdown', (e) => {
     if (!e.target.closest('#product-input') && !e.target.closest('#product-suggestions')) {
       suggestions.style.display = 'none';
     }
+  });
+
+  // ============================================
+  // ✅ الماسح (html5-qrcode)
+  // ============================================
+  async function startScanner() {
+    if (typeof Html5Qrcode === 'undefined') {
+      alert('مكتبة الماسح غير محمّلة');
+      return;
+    }
+
+    scannerModal.style.display = 'flex';
+    scannerReader.innerHTML = '';
+
+    try {
+      html5QrCode = new Html5Qrcode("scanner-reader");
+
+      const config = {
+        fps: 10,
+        qrbox: { width: 250, height: 250 },
+        aspectRatio: 1.0,
+      };
+
+      await html5QrCode.start(
+        { facingMode: "environment" },
+        config,
+        async (decodedText) => {
+          await handleScan(decodedText);
+          await stopScanner();
+        },
+        () => { /* تجاهل */ }
+      );
+    } catch (err) {
+      alert('تعذّر فتح الكاميرا: ' + err.message);
+      scannerModal.style.display = 'none';
+    }
+  }
+
+  async function stopScanner() {
+    if (html5QrCode) {
+      try {
+        await html5QrCode.stop();
+        await html5QrCode.clear();
+      } catch (e) { /* تجاهل */ }
+      html5QrCode = null;
+    }
+    scannerModal.style.display = 'none';
+  }
+
+  // ✅ عند مسح باركود → ابحث بـ sku → أضف للقائمة مباشرة
+  async function handleScan(barcode) {
+    const value = String(barcode).trim();
+    if (!value) return;
+
+    // ابحث في المنتجات المحمّلة محلياً أولاً
+    let found = (products ?? []).find(p => p.sku === value);
+
+    // إذا لم يوجد → ابحث في DB
+    if (!found) {
+      const { data: profile } = await db
+        .from('profiles')
+        .select('organization_id')
+        .eq('id', user.id)
+        .single();
+
+      const { data: dbFound, error } = await db
+        .from('products')
+        .select('*')
+        .eq('organization_id', profile?.organization_id)
+        .eq('sku', value)
+        .limit(1)
+        .maybeSingle();
+
+      if (error) {
+        alert('خطأ في البحث: ' + error.message);
+        return;
+      }
+      found = dbFound;
+    }
+
+    if (!found) {
+      alert(`منتج غير موجود بهذا الباركود:\n${value}`);
+      return;
+    }
+
+    // ✅ موجود → أضف للقائمة مباشرة (كمية 1)
+    const available = Number(found.qty ?? 0);
+
+    if (available <= 0) {
+      alert(`المنتج "${found.name}" غير متوفر في المخزون`);
+      return;
+    }
+
+    // تحقق: هل مضاف مسبقاً؟
+    if (addedProducts.find(p => p.id === found.id)) {
+      alert(`المنتج "${found.name}" مضاف مسبقاً`);
+      return;
+    }
+
+    addedProducts.push({
+      id: found.id,
+      name: found.name,
+      sku: found.sku,
+      image_url: found.image_url,
+      qty: 1,
+      price: Number(found.price ?? 0),
+      available: available,
+    });
+
+    renderAddedProducts();
+
+    // ✅ حدّث selectedProduct ليعرضه في الحقول (اختياري)
+    selectProduct(found);
+  }
+
+  scanBtn.addEventListener('click', startScanner);
+  scannerClose.addEventListener('click', stopScanner);
+  scannerModal.addEventListener('click', (e) => {
+    if (e.target === scannerModal) stopScanner();
   });
 
   // ============================================
@@ -235,7 +374,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     addedContainer.innerHTML = addedProducts.map((p, index) => `
       <div class="added-product-card">
         <div class="added-product-image">
-          <i class="fas fa-box-open"></i>
+          ${p.image_url
+            ? `<img src="${p.image_url}" alt="${p.name}">`
+            : `<i class="fas fa-box-open"></i>`}
         </div>
         <div class="added-product-info">
           <strong>${p.name}</strong>
@@ -479,12 +620,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       if (typeof notifyOrganization === 'function') {
         try {
-          const count = addedProducts.length;
-          const namesList = addedProducts.map(p => p.name).join('، ');
-
           await notifyOrganization({
             orgId: profile.organization_id,
-            title: count === 1 ? 'إيصال بيع' : `إيصال بيع (${count} منتجات)`,
+            title: addedProducts.length === 1 ? 'إيصال بيع' : `إيصال بيع (${addedProducts.length} منتجات)`,
             message: `${profile.full_name || 'مستخدم'} أخرج ${totalQty} وحدة بقيمة ${totalValue.toFixed(2)} — ${receiptNumber}`,
             type: 'warning',
             link: `/receipt.html?id=${newReceipt.id}`,

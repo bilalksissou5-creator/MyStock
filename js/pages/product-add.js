@@ -1,6 +1,7 @@
 // ============================================
 // صفحة إضافة منتجات
 // ✅ يدعم اللمس + الفأرة + القلم (pointerdown)
+// ✅ ماسح باركود (html5-qrcode)
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   if (window.__productAddLoaded) return;
@@ -21,10 +22,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   main.innerHTML = `
     <div class="page-header">
       <h2>إضافة منتجات</h2>
-      <a href="/products/list.html" class="btn-secondary">
-        <i class="fas fa-arrow-right"></i>
-        <span>العودة</span>
-      </a>
+      <button type="button" class="btn-primary scan-btn" id="scan-btn">
+        <i class="fas fa-barcode"></i>
+        <span>مسح</span>
+      </button>
     </div>
 
     <div class="alert alert-error" id="form-error" style="display:none;"></div>
@@ -60,6 +61,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         <div class="form-group">
           <label>الفئة (تلقائياً من إختصاص المورد)</label>
           <input type="text" id="product-category" placeholder="الفئة...">
+        </div>
+
+        <div class="form-group">
+          <label>الباركود (SKU)</label>
+          <input type="text" id="product-sku" placeholder="امسح الباركود أو اكتبه..." dir="ltr">
         </div>
 
         <button type="button" class="btn-primary add-product-btn" id="done-btn">
@@ -102,6 +108,20 @@ document.addEventListener('DOMContentLoaded', async () => {
       </div>
 
     </div>
+
+    <!-- ✅ Modal الماسح -->
+    <div class="scanner-modal" id="scanner-modal" style="display:none;">
+      <div class="scanner-box">
+        <div class="scanner-header">
+          <h3>امسح الباركود</h3>
+          <button type="button" class="scanner-close" id="scanner-close">
+            <i class="fas fa-xmark"></i>
+          </button>
+        </div>
+        <div id="scanner-reader" class="scanner-reader"></div>
+        <p class="scanner-hint">وجّه الكاميرا نحو الباركود</p>
+      </div>
+    </div>
   `;
 
   const addedProducts = [];
@@ -113,15 +133,21 @@ document.addEventListener('DOMContentLoaded', async () => {
   const qtyInput = document.getElementById('product-qty');
   const priceInput = document.getElementById('product-price');
   const categoryInput = document.getElementById('product-category');
+  const skuInput = document.getElementById('product-sku');
   const doneBtn = document.getElementById('done-btn');
   const saveAllBtn = document.getElementById('save-all-btn');
+  const scanBtn = document.getElementById('scan-btn');
+  const scannerModal = document.getElementById('scanner-modal');
+  const scannerReader = document.getElementById('scanner-reader');
+  const scannerClose = document.getElementById('scanner-close');
 
   let selectedSupplier = null;
   let isAddingProduct = false;
   let isSaving = false;
+  let html5QrCode = null;
 
   // ============================================
-  // ✅ اقتراحات المورد (تدعم اللمس + الفأرة)
+  // اقتراحات المورد
   // ============================================
   function showSuggestions(filter) {
     const q = filter.trim().toLowerCase();
@@ -168,7 +194,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     suggestions.innerHTML = html || '<div class="suggestion-empty">لا توجد نتائج</div>';
     suggestions.style.display = 'block';
 
-    // ✅ استخدام pointerdown (يعمل على اللمس والفأرة والقلم)
     suggestions.querySelectorAll('.suggestion-card').forEach(card => {
       card.addEventListener('pointerdown', (e) => {
         e.preventDefault();
@@ -204,11 +229,101 @@ document.addEventListener('DOMContentLoaded', async () => {
     showSuggestions(supplierInput.value);
   });
 
-  // ✅ إغلاق الاقتراحات (pointerdown)
   document.addEventListener('pointerdown', (e) => {
     if (!e.target.closest('.supplier-group')) {
       suggestions.style.display = 'none';
     }
+  });
+
+  // ============================================
+  // ✅ الماسح (html5-qrcode)
+  // ============================================
+  async function startScanner() {
+    if (typeof Html5Qrcode === 'undefined') {
+      alert('مكتبة الماسح غير محمّلة');
+      return;
+    }
+
+    scannerModal.style.display = 'flex';
+    scannerReader.innerHTML = '';
+
+    try {
+      html5QrCode = new Html5Qrcode("scanner-reader");
+
+      const config = {
+        fps: 10,
+        qrbox: { width: 250, height: 250 },
+        aspectRatio: 1.0,
+      };
+
+      await html5QrCode.start(
+        { facingMode: "environment" },
+        config,
+        async (decodedText) => {
+          // ✅ تم المسح
+          await handleScan(decodedText);
+          await stopScanner();
+        },
+        () => { /* تجاهل الأخطاء الفرعية */ }
+      );
+    } catch (err) {
+      alert('تعذّر فتح الكاميرا: ' + err.message);
+      scannerModal.style.display = 'none';
+    }
+  }
+
+  async function stopScanner() {
+    if (html5QrCode) {
+      try {
+        await html5QrCode.stop();
+        await html5QrCode.clear();
+      } catch (e) { /* تجاهل */ }
+      html5QrCode = null;
+    }
+    scannerModal.style.display = 'none';
+  }
+
+  // ✅ عند مسح باركود
+  async function handleScan(barcode) {
+    const value = String(barcode).trim();
+    if (!value) return;
+
+    // 🔍 ابحث في المنتجات بـ sku
+    const { data: found, error } = await db
+      .from('products')
+      .select('*')
+      .eq('organization_id', (await db.from('profiles').select('organization_id').eq('id', user.id).single()).data?.organization_id)
+      .eq('sku', value)
+      .limit(1)
+      .maybeSingle();
+
+    if (error) {
+      alert('خطأ في البحث: ' + error.message);
+      return;
+    }
+
+    if (found) {
+      // ✅ وُجد → املأ الحقول
+      nameInput.value = found.name ?? '';
+      priceInput.value = Number(found.price ?? 0).toFixed(2);
+      categoryInput.value = found.category ?? '';
+      qtyInput.value = '1';
+      skuInput.value = found.sku ?? value;
+
+      nameInput.focus();
+      nameInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    } else {
+      // ❌ لم يوجد → ضع الباركود في sku
+      skuInput.value = value;
+      nameInput.focus();
+      nameInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  }
+
+  scanBtn.addEventListener('click', startScanner);
+  scannerClose.addEventListener('click', stopScanner);
+  scannerModal.addEventListener('click', (e) => {
+    if (e.target === scannerModal) stopScanner();
   });
 
   // ============================================
@@ -229,7 +344,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     addedContainer.innerHTML = addedProducts.map((p, index) => `
       <div class="added-product-card">
         <div class="added-product-image">
-          <i class="fas fa-box-open"></i>
+          ${p.image_url
+            ? `<img src="${p.image_url}" alt="${p.name}">`
+            : `<i class="fas fa-box-open"></i>`}
         </div>
         <div class="added-product-info">
           <strong>${p.name}</strong>
@@ -294,6 +411,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const qty = Number(qtyInput.value) || 0;
     const price = Number(priceInput.value) || 0;
     const category = categoryInput.value.trim();
+    const sku = skuInput.value.trim() || ('SKU-' + Date.now() + '-' + Math.floor(Math.random() * 10000));
 
     if (!name) {
       errBox.textContent = 'اسم المنتج مطلوب';
@@ -318,12 +436,14 @@ document.addEventListener('DOMContentLoaded', async () => {
       qty,
       price,
       category,
-      sku: 'SKU-' + Date.now() + '-' + Math.floor(Math.random() * 10000),
+      sku,
+      image_url: null,
     });
 
     nameInput.value = '';
     qtyInput.value = '1';
     priceInput.value = '0';
+    skuInput.value = '';
     nameInput.focus();
 
     renderAddedProducts();
@@ -379,7 +499,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         throw new Error('لا يمكن تحديد المنظمة');
       }
 
-      // معالجة المورد
       let finalSupplierId = supplierIdInput.value || null;
       const isNewSupplier = supplierInput.dataset.isNew === 'true';
       const newSupplierName = isNewSupplier
