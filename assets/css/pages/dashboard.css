@@ -3,13 +3,56 @@
    ============================================ */
 
 /* ============================================
-   قسم قيمة المخزون
+   ✅ قسم قيمة المخزون
    ============================================ */
 .stock-value-section {
   margin-bottom: 24px;
 }
 
-/* ✅ الصف العلوي: بطاقة كبيرة + 3 صغيرة */
+/* ══════════════════════════════════════════
+   ✅ العنوان + أيقونة (فوق البطاقة)
+   ══════════════════════════════════════════ */
+.stock-title-section {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+  padding: 0 4px;
+}
+
+.stock-title-text h3 {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: #171717;
+  margin: 0 0 4px;
+  letter-spacing: -0.3px;
+}
+
+.stock-title-text p {
+  font-size: 12px;
+  color: #737373;
+  margin: 0;
+}
+
+.stock-title-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  background: #ffffff;
+  border: 1px solid #f0f0f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #2563eb;
+  font-size: 18px;
+  flex-shrink: 0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+/* ══════════════════════════════════════════
+   ✅ الصف الأول: بطاقة كبيرة + 3 صغيرة
+   ══════════════════════════════════════════ */
 .stock-top-row {
   display: grid;
   grid-template-columns: 2fr 3fr;
@@ -17,9 +60,9 @@
   margin-bottom: 14px;
 }
 
-/* ============================================
-   البطاقة الرئيسية (السوداء)
-   ============================================ */
+/* ══════════════════════════════════════════
+   ✅ البطاقة الرئيسية
+   ══════════════════════════════════════════ */
 .stock-hero-card {
   position: relative;
   background: linear-gradient(135deg, #171717 0%, #2a2a2a 100%);
@@ -45,19 +88,21 @@
   pointer-events: none;
 }
 
+/* ✅ الأيقونة: دائرة داخل مربع (كما في الصورة) */
 .stock-hero-icon {
   width: 56px;
   height: 56px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.12);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 24px;
+  font-size: 22px;
   color: #ffffff;
   flex-shrink: 0;
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  border: 2px solid rgba(255, 255, 255, 0.15);
   z-index: 1;
+  position: relative;
 }
 
 .stock-hero-info {
@@ -75,7 +120,7 @@
 }
 
 .stock-hero-value {
-  font-size: 1.7rem;
+  font-size: 1.8rem;
   font-weight: 800;
   color: #ffffff;
   line-height: 1;
@@ -87,9 +132,9 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 3px 9px;
+  padding: 4px 10px;
   border-radius: 20px;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 700;
 }
 
@@ -104,12 +149,12 @@
 }
 
 .stock-hero-trend i {
-  font-size: 9px;
+  font-size: 10px;
 }
 
-/* ============================================
-   الإحصائيات (3 بطاقات)
-   ============================================ */
+/* ══════════════════════════════════════════
+   ✅ الإحصائيات (3 بطاقات صغيرة)
+   ══════════════════════════════════════════ */
 .stock-stats-row {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -120,7 +165,7 @@
   background: #ffffff;
   border: 1px solid #f0f0f0;
   border-radius: 14px;
-  padding: 14px 10px;
+  padding: 16px 12px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -142,15 +187,15 @@
 }
 
 .stat-mini-value {
-  font-size: 1.1rem;
+  font-size: 1.15rem;
   font-weight: 800;
   color: #171717;
   line-height: 1;
 }
 
 .stat-mini-icon {
-  width: 28px;
-  height: 28px;
+  width: 30px;
+  height: 30px;
   border-radius: 8px;
   display: flex;
   align-items: center;
@@ -173,14 +218,14 @@
   color: #2563eb;
 }
 
-/* ============================================
-   بطاقة المبيان (بعرض كامل)
-   ============================================ */
+/* ══════════════════════════════════════════
+   ✅ بطاقة المبيان (بعرض كامل)
+   ══════════════════════════════════════════ */
 .stock-chart-card {
   background: #ffffff;
   border: 1px solid #f0f0f0;
   border-radius: 16px;
-  padding: 20px 16px 16px;
+  padding: 20px 18px 16px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
 }
 
@@ -188,7 +233,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 12px;
+  margin-bottom: 14px;
   padding: 0 4px;
   gap: 8px;
 }
@@ -204,7 +249,7 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 5px 12px;
+  padding: 6px 12px;
   background: #f5f5f5;
   border-radius: 20px;
   font-size: 11px;
@@ -223,9 +268,9 @@
   min-height: 360px;
 }
 
-/* ============================================
-   أزرار الفلترة
-   ============================================ */
+/* ══════════════════════════════════════════
+   ✅ أزرار الفلترة + عرض التفاصيل
+   ══════════════════════════════════════════ */
 .stock-chart-filters {
   display: flex;
   align-items: center;
@@ -271,6 +316,7 @@
   transform: scale(0.97);
 }
 
+/* ✅ زر "عرض التفاصيل" */
 .filter-details-btn {
   display: inline-flex;
   align-items: center;
@@ -298,7 +344,7 @@
 }
 
 /* ============================================
-   البطاقات القديمة
+   البطاقات القديمة (كما هي)
    ============================================ */
 .stats-grid {
   display: grid;
@@ -335,6 +381,22 @@
     gap: 10px;
   }
 
+  /* ✅ العنوان */
+  .stock-title-text h3 {
+    font-size: 1.15rem;
+  }
+
+  .stock-title-text p {
+    font-size: 11px;
+  }
+
+  .stock-title-icon {
+    width: 40px;
+    height: 40px;
+    font-size: 16px;
+  }
+
+  /* ✅ البطاقة الرئيسية */
   .stock-hero-card {
     padding: 18px 16px;
     gap: 14px;
@@ -344,7 +406,7 @@
   .stock-hero-icon {
     width: 50px;
     height: 50px;
-    font-size: 22px;
+    font-size: 20px;
   }
 
   .stock-hero-value {
@@ -356,7 +418,7 @@
   }
 
   .stock-hero-trend {
-    font-size: 9px;
+    font-size: 10px;
     padding: 3px 8px;
   }
 
@@ -381,9 +443,9 @@
   }
 
   .stat-mini-icon {
-    width: 24px;
-    height: 24px;
-    font-size: 11px;
+    width: 26px;
+    height: 26px;
+    font-size: 12px;
   }
 
   /* ✅ المبيان */
@@ -398,7 +460,7 @@
 
   .stock-chart-badge {
     font-size: 10px;
-    padding: 4px 10px;
+    padding: 5px 10px;
   }
 
   #stock-chart {
