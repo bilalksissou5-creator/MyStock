@@ -1,902 +1,307 @@
 /* ============================================
-   صفحة الملف الشخصي — تصميم Facebook
+   صفحة الإيصال — نمط سوبر ماركت (80mm)
    ============================================ */
 
-.profile-fb-wrapper {
-  max-width: 800px;
+html, body {
+  height: auto !important;
+  min-height: 100vh;
+  overflow-x: hidden;
+  overflow-y: auto !important;
+}
+
+body.receipt-page {
+  background: #f5f5f5;
+  font-family: 'Courier New', 'Tahoma', monospace;
+  padding: 20px 10px 100px;
+  min-height: 100vh;
+}
+
+/* ══════ الحاوية (80mm) ══════ */
+.receipt-container {
+  background: #ffffff;
+  max-width: 320px;
   margin: 0 auto;
-  padding: 0 0 20px;
+  padding: 16px 14px;
+  border-radius: 6px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
   box-sizing: border-box;
-}
-
-/* ============================================
-   الغلاف (Cover)
-   ============================================ */
-.profile-cover {
-  position: relative;
-  width: 100%;
-  aspect-ratio: 16 / 6;
-  background: linear-gradient(135deg, #171717 0%, #404040 100%);
-  border-radius: 12px 12px 0 0;
-  overflow: hidden;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
-}
-
-.profile-cover img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-}
-
-.cover-placeholder {
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(135deg, #171717 0%, #404040 100%);
-}
-
-/* ============================================
-   الصورة الشخصية (Avatar)
-   ============================================ */
-.profile-avatar-fb-wrap {
-  position: relative;
-  display: flex;
-  justify-content: center;
-  margin-top: -60px;
-  margin-bottom: 12px;
-  z-index: 5;
-  pointer-events: none;
-}
-
-.profile-avatar-fb {
-  width: 120px;
-  height: 120px;
-  border-radius: 50%;
-  background: #f5f5f5;
-  border: 4px solid white;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: visible;
-  position: relative;
-  pointer-events: auto;
-}
-
-.profile-avatar-fb img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-  border-radius: 50%;
-}
-
-.profile-avatar-fb i {
-  font-size: 48px;
-  color: #a3a3a3;
-}
-
-/* ✅ النقطة على حافة الدائرة تماماً */
-.profile-status-dot {
-  position: absolute;
-  bottom: 14.64%;
-  right: 14.64%;
-  width: 15px;
-  height: 15px;
-  border-radius: 50%;
-  border: 3px solid #ffffff;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
-  z-index: 10;
-  transform: translate(50%, 50%);
-}
-
-.profile-status-dot.online {
-  background: #22c55e;
-}
-
-.profile-status-dot.offline {
-  background: #d4d4d4;
-}
-
-/* ============================================
-   معلومات المستخدم
-   ============================================ */
-.profile-fb-info {
+  color: #000;
+  font-size: 12px;
+  line-height: 1.5;
   text-align: center;
-  padding: 4px 16px 20px;
-  border-bottom: 1px solid #f0f0f0;
-  margin-bottom: 16px;
 }
 
-.profile-fb-info h3 {
-  font-size: 1.4rem;
-  font-weight: 700;
-  color: #171717;
-  margin: 0 0 4px;
-}
-
-.profile-fb-email {
-  font-size: 13px;
-  color: #a3a3a3;
-  margin: 0 0 12px;
-}
-
-.profile-fb-badges {
+/* ══════ الشعار ══════ */
+.rc-logo-wrap {
   display: flex;
-  gap: 8px;
   justify-content: center;
-  flex-wrap: wrap;
-}
-
-.badge-role {
-  display: inline-block;
-  padding: 4px 14px;
-  border-radius: 20px;
-  font-size: 11px;
-  font-weight: 600;
-  background: #171717;
-  color: white;
-}
-
-/* ============================================
-   شريط الأزرار
-   ============================================ */
-.profile-actions-bar {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 16px;
-  padding: 0 4px;
-}
-
-.profile-actions-bar .btn-primary,
-.profile-actions-bar .btn-secondary {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 12px 16px;
-  font-size: 14px;
-  font-weight: 600;
-  border-radius: 10px;
-  cursor: pointer;
-  transition: transform 0.15s, box-shadow 0.15s;
-  -webkit-tap-highlight-color: transparent;
-  text-decoration: none;
-}
-
-.profile-actions-bar .btn-primary {
-  background: #171717;
-  color: white;
-  border: none;
-}
-
-.profile-actions-bar .btn-secondary {
-  background: white;
-  color: #171717;
-  border: 1px solid #e5e5e5;
-}
-
-/* ============================================
-   Accordion (مسطّح — بدون بطاقة)
-   ============================================ */
-.team-accordion {
   margin-bottom: 8px;
-  border-bottom: 1px solid #f0f0f0;
 }
 
-.team-accordion-header {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 14px 4px;
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  font-family: inherit;
-  font-size: 15px;
-  font-weight: 700;
-  color: #171717;
-  text-align: right;
-  -webkit-tap-highlight-color: transparent;
-  transition: background 0.15s;
-}
-
-.team-accordion-header:hover {
-  background: #fafafa;
-}
-
-.team-accordion-title {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.team-accordion-title i {
-  font-size: 16px;
-  width: 20px;
-  text-align: center;
-}
-
-.team-accordion-arrow {
-  font-size: 14px;
-  color: #a3a3a3;
-  transition: transform 0.2s ease, color 0.15s;
-  flex-shrink: 0;
-  margin-left: 4px;
-}
-
-.team-accordion.open .team-accordion-arrow {
-  transform: rotate(-90deg);
-  color: #171717;
-}
-
-.team-accordion-body {
-  padding: 12px 0 16px;
-  animation: accordionOpen 0.2s ease;
-}
-
-@keyframes accordionOpen {
-  from {
-    opacity: 0;
-    transform: translateY(-4px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* ============================================
-   المعلومات الشخصية (Info List)
-   ============================================ */
-.info-list {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  padding: 4px 0;
-}
-
-.info-row {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-  padding: 8px 4px;
-}
-
-.info-icon {
-  font-size: 18px;
-  color: #171717;
-  width: 24px;
-  text-align: center;
-  flex-shrink: 0;
-}
-
-.info-text {
-  font-size: 14px;
-  font-weight: 600;
-  color: #171717;
+.rc-logo {
+  width: 50%;
+  aspect-ratio: 1 / 1;
   overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  flex: 1;
-  text-align: right;
-}
-
-/* ============================================
-   شبكة الفريق
-   ============================================ */
-.team-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-  gap: 12px;
-}
-
-/* ══════════════════════════════════════════
-   نقطة الاتصال على بطاقة العضو
-   ══════════════════════════════════════════ */
-.member-avatar-wrap {
-  position: relative;
-  display: inline-block;
-  margin-bottom: 10px;
-}
-
-.member-status-dot {
-  position: absolute;
-  bottom: 14.64%;
-  right: 14.64%;
-  width: 14px;
-  height: 14px;
-  border-radius: 50%;
-  border: 2.5px solid #ffffff;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
-  transition: background-color 0.2s;
-  z-index: 2;
-  transform: translate(50%, 50%);
-}
-
-.member-status-dot.online {
-  background: #22c55e;
-}
-
-.member-status-dot.offline {
-  background: #d4d4d4;
-}
-
-/* ══════════════════════════════════════════
-   بطاقة العضو
-   ══════════════════════════════════════════ */
-.member-card {
-  background: #fafafa;
-  border: 1px solid #f0f0f0;
-  border-radius: 12px;
-  padding: 16px 12px 14px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  transition: background 0.15s, transform 0.15s;
-  position: relative;
-}
-
-.member-card:hover {
-  background: #f5f5f5;
-  transform: translateY(-2px);
-}
-
-.member-avatar {
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  background: #e5e5e5;
   display: flex;
   align-items: center;
   justify-content: center;
-  overflow: hidden;
-  border: 2px solid white;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
-  flex-shrink: 0;
+  background: transparent;
+  border: none;
 }
 
-.member-avatar img {
+.rc-logo img {
   width: 100%;
   height: 100%;
+  object-fit: contain;
+}
+
+.rc-logo-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  color: #171717;
+  font-size: 40px;
+}
+
+/* ══════ أشكال الشعار ══════ */
+.rc-logo.shape-circle img {
+  border-radius: 50%;
   object-fit: cover;
 }
 
-.member-avatar i {
-  font-size: 24px;
-  color: #a3a3a3;
+.rc-logo.shape-square img {
+  border-radius: 10px;
+  object-fit: cover;
 }
 
-.member-name-row {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 5px;
-  margin-bottom: 6px;
-  width: 100%;
-  padding: 0 4px;
+.rc-logo.shape-rectangle {
+  width: 70%;
+  aspect-ratio: 16 / 10;
 }
 
-.member-name {
-  font-size: 13px;
-  font-weight: 600;
-  color: #171717;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: calc(100% - 22px);
+.rc-logo.shape-rectangle img {
+  border-radius: 10px;
+  object-fit: cover;
 }
 
-.member-star-icon {
-  font-size: 13px;
-  flex-shrink: 0;
-}
-
-.member-star-icon.deputy-star {
-  color: #fbbf24;
-}
-
-.member-star-icon.worker-star {
-  color: #a3a3a3;
-}
-
-.member-star-icon.crown-star {
-  color: #fbbf24;
-}
-
-.member-role {
-  font-size: 11px;
-  font-weight: 600;
-  padding: 2px 10px;
-  border-radius: 20px;
-  display: inline-block;
-  background: #f0f0f0;
-  color: #404040;
-}
-
-.member-role.admin {
-  background: #171717;
-  color: #ffffff;
-}
-
-.member-card-admin {
-  border-color: #fbbf24;
-  background: #fffbeb;
-}
-
-.member-card-admin:hover {
-  background: #fef3c7;
-}
-
-.member-card-link {
-  text-decoration: none;
-  color: inherit;
-  cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
-}
-
-.member-card-link:active {
-  transform: scale(0.98);
-}
-
-.member-card-link::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: 12px;
-  pointer-events: none;
-  transition: background 0.15s;
-}
-
-.member-card-link:active::after {
-  background: rgba(0, 0, 0, 0.03);
-}
-
-/* ============================================
-   السجلات
-   ============================================ */
-.records-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0;
-  margin-top: 20px;
-  padding: 0;
-  background: transparent;
-  border: none;
-  border-radius: 0;
-}
-
-.record-item {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 8px 6px;
-  background: transparent;
-  border: none;
-  border-radius: 8px;
-  text-decoration: none;
-  color: #404040;
-  cursor: pointer;
-  transition: background 0.15s, color 0.15s;
-  -webkit-tap-highlight-color: transparent;
-  outline: none;
-}
-
-.record-item i {
-  font-size: 18px;
-  color: #171717;
-  flex-shrink: 0;
-}
-
-.record-item span {
-  font-size: 13px;
-  font-weight: 700;
-  color: #404040;
-  white-space: nowrap;
-}
-
-/* ══════ السجل (بدون تأثير) ══════ */
-.record-item[data-record="log"]:hover,
-.record-item[data-record="log"]:active,
-.record-item[data-record="log"]:focus {
-  background: transparent;
-  transform: none;
-  outline: none;
-}
-
-.record-item[data-record="log"] i {
-  font-size: 16px;
-  color: #171717;
-}
-
-.record-item[data-record="log"] span {
-  font-size: 16px;
-  color: #171717;
-}
-
-/* ══════ الفواتير + إخراج ══════ */
-.records-left {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.record-item[data-record="invoices"],
-.record-item[data-record="out"] {
-  padding: 8px 8px;
-  gap: 5px;
-  border-radius: 8px 8px 0 0;
-  border-bottom: 2px solid transparent;
-  transition: background 0.15s, border-bottom-color 0.15s;
-}
-
-.record-item[data-record="invoices"]:hover,
-.record-item[data-record="out"]:hover {
-  background: #fafafa;
-}
-
-.record-item[data-record="invoices"].active,
-.record-item[data-record="out"].active {
-  background: #f0f0f0;
-  border-bottom-color: #000;
-  transform: none;
-}
-
-.record-item[data-record="invoices"] i,
-.record-item[data-record="out"] i {
+/* ══════ اسم المنظمة ══════ */
+.rc-org-name {
   font-size: 14px;
-}
-
-.record-item[data-record="invoices"] span,
-.record-item[data-record="out"] span {
-  font-size: 11px;
-  font-weight: 600;
-}
-
-/* ============================================
-   السجلات المنبثقة
-   ============================================ */
-.log-panel {
-  margin-top: 12px;
-  background: #fafafa;
-  border: 1px solid #f0f0f0;
-  border-radius: 12px;
-  padding: 8px;
-  animation: logOpen 0.2s ease;
-}
-
-@keyframes logOpen {
-  from {
-    opacity: 0;
-    transform: translateY(-4px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.log-loading {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 20px;
-  color: #737373;
-  font-size: 13px;
-}
-
-.log-loading i {
-  font-size: 16px;
-  color: #171717;
-}
-
-.log-empty {
+  font-weight: 700;
+  color: #000;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
   text-align: center;
-  padding: 20px;
-  color: #a3a3a3;
-  font-size: 13px;
 }
 
-.log-list {
+/* ══════ الفواصل ══════ */
+.rc-divider {
+  border-top: 1px solid #000;
+  margin: 8px 0;
+}
+
+.rc-divider-dashed {
+  border-top: 1px dashed #999;
+  margin: 8px 0;
+}
+
+/* ══════ رقم الإيصال ══════ */
+.rc-receipt-num {
+  font-size: 13px;
+  font-weight: 600;
+  color: #000;
+  padding: 4px 0;
+  text-align: center;
+}
+
+.rc-receipt-num strong {
+  font-weight: 800;
+  letter-spacing: 1px;
+}
+
+/* ══════ جدول العناصر ══════ */
+.rc-table {
   display: flex;
   flex-direction: column;
   gap: 6px;
+  padding: 6px 0;
 }
 
-.log-row {
-  display: flex;
+.rc-empty {
+  text-align: center;
+  font-size: 11px;
+  color: #999;
+  padding: 8px 0;
+}
+
+/* ══════ سطر منتج (توزيع متساوٍ) ══════ */
+.rc-line {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  gap: 4px;
   align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  padding: 10px 12px;
-  background: #ffffff;
-  border: 1px solid #f0f0f0;
-  border-radius: 8px;
+  font-size: 12px;
+  text-align: center;
 }
 
-.log-row-main {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  min-width: 0;
-  flex: 1;
-}
-
-.log-row-main strong {
-  font-size: 13px;
-  font-weight: 700;
-  color: #171717;
-  white-space: nowrap;
+.rc-name {
+  font-weight: 600;
+  color: #000;
+  text-align: center;
   overflow: hidden;
   text-overflow: ellipsis;
-}
-
-.log-row-main span {
-  font-size: 11px;
-  color: #737373;
-}
-
-.log-row-date {
-  font-size: 11px;
-  color: #737373;
-  flex-shrink: 0;
   white-space: nowrap;
-  display: flex;
-  align-items: center;
 }
 
-.log-row-link {
-  text-decoration: none;
-  color: inherit;
-  cursor: pointer;
-  transition: background 0.15s, border-color 0.15s;
+.rc-qty {
+  font-weight: 700;
+  color: #000;
+  text-align: center;
 }
 
-.log-row-link:hover {
-  background: #f5f5f5;
-  border-color: #d4d4d4;
+.rc-price {
+  font-weight: 500;
+  color: #333;
+  text-align: center;
 }
 
-.log-row-link:active {
-  background: #f0f0f0;
-  transform: scale(0.99);
+.rc-total {
+  font-weight: 700;
+  color: #000;
+  text-align: center;
 }
 
-/* ============================================
-   ✅ زر "طباعة الكل"
-   ============================================ */
-.print-all-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 12px 16px;
-  margin-bottom: 10px;
-  background: #171717;
-  color: #ffffff;
-  border-radius: 10px;
-  text-decoration: none;
+/* ══════ المجموع الكلي ══════ */
+.rc-total-row {
   font-size: 14px;
   font-weight: 700;
-  transition: background 0.15s, transform 0.15s;
-  -webkit-tap-highlight-color: transparent;
+  color: #000;
+  padding: 6px 0;
+  text-align: center;
 }
 
-.print-all-btn:hover {
-  background: #404040;
+.rc-total-row strong {
+  font-size: 16px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  margin-right: 4px;
 }
 
-.print-all-btn:active {
-  transform: scale(0.98);
+/* ══════ التاريخ والوقت ══════ */
+.rc-date,
+.rc-time {
+  font-size: 11px;
+  color: #333;
+  padding: 1px 0;
+  text-align: center;
 }
 
-.print-all-btn i {
-  font-size: 15px;
+/* ══════ شكر ══════ */
+.rc-thanks {
+  font-size: 13px;
+  font-weight: 700;
+  color: #000;
+  padding: 8px 0;
+  text-align: center;
+  letter-spacing: 0.5px;
 }
 
-/* ✅ معلومات "جميع الإيصالات مطبوعة" */
-.print-all-info {
+/* ══════ الأزرار ══════ */
+.rc-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px dashed #ccc;
+}
+
+.rc-actions .btn-primary,
+.rc-actions .btn-secondary {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  padding: 12px 16px;
-  margin-bottom: 10px;
-  background: #f0fdf4;
-  color: #16a34a;
-  border-radius: 10px;
+  padding: 10px 14px;
   font-size: 13px;
   font-weight: 600;
+  border-radius: 8px;
+  text-decoration: none;
+  cursor: pointer;
+  border: none;
+  font-family: system-ui, sans-serif;
 }
 
-.print-all-info i {
-  font-size: 15px;
+.rc-actions .btn-primary {
+  background: #171717;
+  color: #ffffff;
 }
 
-/* ============================================
-   الهاتف
-   ============================================ */
-@media (max-width: 768px) {
-  .profile-fb-wrapper {
-    padding: 0 8px 20px;
+.rc-actions .btn-secondary {
+  background: #f0f0f0;
+  color: #171717;
+}
+
+/* ══════ الطباعة ══════ */
+@media print {
+  @page {
+    size: 80mm auto;
+    margin: 0;
   }
 
-  .profile-cover {
-    aspect-ratio: 16 / 7;
-    border-radius: 10px 10px 0 0;
-  }
-
-  .profile-avatar-fb-wrap {
-    margin-top: -50px;
-  }
-
-  .profile-avatar-fb {
-    width: 100px;
-    height: 100px;
-    border-width: 3px;
-  }
-
-  .profile-avatar-fb i {
-    font-size: 40px;
-  }
-
-  .profile-fb-info h3 {
-    font-size: 1.2rem;
-  }
-
-  .profile-fb-email {
-    font-size: 12px;
-  }
-
-  .profile-actions-bar {
-    gap: 8px;
+  body.receipt-page {
+    background: #ffffff;
     padding: 0;
   }
 
-  .profile-actions-bar .btn-primary,
-  .profile-actions-bar .btn-secondary {
-    padding: 10px 12px;
-    font-size: 13px;
-    gap: 6px;
+  .receipt-container {
+    max-width: 100%;
+    box-shadow: none;
+    border-radius: 0;
+    padding: 8px 6px;
+    font-size: 11px;
   }
 
-  .team-accordion-header {
-    padding: 12px 4px;
-    font-size: 14px;
-  }
-
-  .team-accordion-body {
-    padding: 10px 0 14px;
-  }
-
-  .info-icon {
-    font-size: 16px;
-    width: 22px;
-  }
-
-  .info-text {
-    font-size: 13px;
-  }
-
-  .info-row {
-    gap: 15px;
-  }
-
-  .team-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
-  }
-
-  .member-card {
-    padding: 14px 8px 12px;
-  }
-
-  .member-avatar {
-    width: 52px;
-    height: 52px;
-  }
-
-  .member-avatar i {
-    font-size: 22px;
-  }
-
-  .member-name {
-    font-size: 12px;
-  }
-
-  .member-star-icon {
-    font-size: 12px;
-  }
-
-  .member-role {
-    font-size: 10px;
-  }
-
-  .record-item {
-    padding: 8px 4px;
-    gap: 6px;
-  }
-
-  .record-item[data-record="log"] i {
-    font-size: 16px;
-    color: #171717;
-  }
-
-  .record-item[data-record="log"] span {
-    font-size: 16px;
-    color: #171717;
-  }
-
-  .records-left {
-    gap: 10px;
-  }
-
-  .record-item[data-record="invoices"],
-  .record-item[data-record="out"] {
-    padding: 6px 6px;
-    gap: 4px;
-  }
-
-  .record-item[data-record="invoices"] i,
-  .record-item[data-record="out"] i {
-    font-size: 13px;
-  }
-
-  .record-item[data-record="invoices"] span,
-  .record-item[data-record="out"] span {
-    font-size: 10px;
-  }
-
-  .log-row {
-    padding: 8px 10px;
-  }
-
-  .log-row-main strong {
-    font-size: 12px;
-  }
-
-  .log-row-main span,
-  .log-row-date {
-    font-size: 10px;
-  }
-
-  .print-all-btn,
-  .print-all-info {
-    padding: 10px 14px;
-    font-size: 13px;
+  .no-print {
+    display: none !important;
   }
 }
 
-@media (max-width: 380px) {
-  .record-item {
-    padding: 6px 2px;
-    gap: 5px;
+/* ══════ الهاتف ══════ */
+@media (max-width: 480px) {
+  body.receipt-page {
+    padding: 10px 6px 80px;
   }
 
-  .record-item[data-record="log"] i,
-  .record-item[data-record="log"] span {
-    font-size: 15px;
-    color: #171717;
+  .receipt-container {
+    max-width: 100%;
+    padding: 12px 10px;
+    font-size: 11px;
   }
 
-  .records-left {
-    gap: 10px;
+  .rc-org-name {
+    font-size: 13px;
   }
 
-  .record-item[data-record="invoices"] i,
-  .record-item[data-record="out"] i {
+  .rc-receipt-num {
     font-size: 12px;
   }
 
-  .record-item[data-record="invoices"] span,
-  .record-item[data-record="out"] span {
-    font-size: 9px;
+  .rc-line {
+    font-size: 11px;
+  }
+
+  .rc-total-row {
+    font-size: 13px;
+  }
+
+  .rc-total-row strong {
+    font-size: 15px;
+  }
+
+  .rc-thanks {
+    font-size: 12px;
   }
 }
