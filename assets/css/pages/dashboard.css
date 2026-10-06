@@ -2,16 +2,12 @@
    صفحة لوحة التحكم
    ============================================ */
 
-/* ============================================
-   ✅ قسم قيمة المخزون
-   ============================================ */
+/* ✅ قسم قيمة المخزون */
 .stock-value-section {
   margin-bottom: 24px;
 }
 
-/* ══════════════════════════════════════════
-   ✅ العنوان + أيقونة (فوق البطاقة)
-   ══════════════════════════════════════════ */
+/* ✅ العنوان + أيقونة */
 .stock-title-section {
   display: flex;
   align-items: center;
@@ -50,9 +46,7 @@
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
 }
 
-/* ══════════════════════════════════════════
-   ✅ الصف الأول: بطاقة كبيرة + 3 صغيرة
-   ══════════════════════════════════════════ */
+/* ✅ الصف: بطاقة كبيرة + 3 صغيرة (دائماً) */
 .stock-top-row {
   display: grid;
   grid-template-columns: 2fr 3fr;
@@ -60,20 +54,19 @@
   margin-bottom: 14px;
 }
 
-/* ══════════════════════════════════════════
-   ✅ البطاقة الرئيسية
-   ══════════════════════════════════════════ */
+/* ✅ البطاقة الرئيسية */
 .stock-hero-card {
   position: relative;
   background: linear-gradient(135deg, #171717 0%, #2a2a2a 100%);
   color: #ffffff;
   border-radius: 16px;
-  padding: 20px 18px;
+  padding: 18px 14px;
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 12px;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
   overflow: hidden;
+  min-width: 0;
 }
 
 .stock-hero-card::before {
@@ -89,14 +82,14 @@
 }
 
 .stock-hero-icon {
-  width: 56px;
-  height: 56px;
+  width: 48px;
+  height: 48px;
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.12);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 22px;
+  font-size: 20px;
   color: #ffffff;
   flex-shrink: 0;
   border: 2px solid rgba(255, 255, 255, 0.15);
@@ -111,30 +104,31 @@
 }
 
 .stock-hero-label {
-  font-size: 11px;
+  font-size: 10px;
   color: rgba(255, 255, 255, 0.65);
-  margin-bottom: 6px;
+  margin-bottom: 4px;
   font-weight: 500;
   letter-spacing: 0.3px;
 }
 
 .stock-hero-value {
-  font-size: 1.8rem;
+  font-size: 1.4rem;
   font-weight: 800;
   color: #ffffff;
   line-height: 1;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
   letter-spacing: -0.5px;
 }
 
 .stock-hero-trend {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 4px 10px;
+  gap: 4px;
+  padding: 3px 8px;
   border-radius: 20px;
-  font-size: 11px;
+  font-size: 9px;
   font-weight: 700;
+  white-space: nowrap;
 }
 
 .stock-hero-trend.up {
@@ -148,29 +142,28 @@
 }
 
 .stock-hero-trend i {
-  font-size: 10px;
+  font-size: 8px;
 }
 
-/* ══════════════════════════════════════════
-   ✅ الإحصائيات (3 بطاقات صغيرة)
-   ══════════════════════════════════════════ */
+/* ✅ الإحصائيات (3 بطاقات صغيرة) */
 .stock-stats-row {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
+  gap: 8px;
 }
 
 .stock-stat-card {
   background: #ffffff;
   border: 1px solid #f0f0f0;
   border-radius: 14px;
-  padding: 16px 12px;
+  padding: 14px 6px;
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
-  gap: 8px;
+  gap: 6px;
   transition: transform 0.15s, box-shadow 0.15s;
+  min-width: 0;
 }
 
 .stock-stat-card:hover {
@@ -179,27 +172,34 @@
 }
 
 .stat-mini-label {
-  font-size: 10px;
+  font-size: 9px;
   color: #737373;
   font-weight: 600;
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
 }
 
 .stat-mini-value {
-  font-size: 1.15rem;
+  font-size: 0.95rem;
   font-weight: 800;
   color: #171717;
   line-height: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
 }
 
 .stat-mini-icon {
-  width: 30px;
-  height: 30px;
+  width: 26px;
+  height: 26px;
   border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 13px;
+  font-size: 11px;
 }
 
 .stat-mini-icon.down {
@@ -217,9 +217,7 @@
   color: #2563eb;
 }
 
-/* ══════════════════════════════════════════
-   ✅ بطاقة المبيان (بعرض كامل)
-   ══════════════════════════════════════════ */
+/* ✅ بطاقة المبيان */
 .stock-chart-card {
   background: #ffffff;
   border: 1px solid #f0f0f0;
@@ -266,9 +264,7 @@
   min-height: 360px;
 }
 
-/* ══════════════════════════════════════════
-   ✅ أزرار الفلترة + عرض التفاصيل
-   ══════════════════════════════════════════ */
+/* ✅ أزرار الفلترة */
 .stock-chart-filters {
   display: flex;
   align-items: center;
@@ -340,9 +336,7 @@
   font-size: 12px;
 }
 
-/* ============================================
-   البطاقات القديمة
-   ============================================ */
+/* ✅ البطاقات القديمة */
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
@@ -372,10 +366,7 @@
    الهاتف
    ============================================ */
 @media (max-width: 768px) {
-  .stock-top-row {
-    grid-template-columns: 1fr;
-    gap: 10px;
-  }
+  /* ✅ stock-top-row يبقى 2fr 3fr — لا تغيير */
 
   .stock-title-text h3 {
     font-size: 1.15rem;
@@ -386,61 +377,68 @@
   }
 
   .stock-title-icon {
+    width: 38px;
+    height: 38px;
+    font-size: 15px;
+  }
+
+  /* ✅ البطاقة الرئيسية — تصغير فقط */
+  .stock-hero-card {
+    padding: 14px 10px;
+    gap: 8px;
+    border-radius: 12px;
+  }
+
+  .stock-hero-icon {
     width: 40px;
     height: 40px;
     font-size: 16px;
   }
 
-  .stock-hero-card {
-    padding: 18px 16px;
-    gap: 14px;
-    border-radius: 14px;
-  }
-
-  .stock-hero-icon {
-    width: 50px;
-    height: 50px;
-    font-size: 20px;
-  }
-
   .stock-hero-value {
-    font-size: 1.5rem;
+    font-size: 1.1rem;
   }
 
   .stock-hero-label {
-    font-size: 10px;
+    font-size: 8px;
   }
 
   .stock-hero-trend {
-    font-size: 10px;
-    padding: 3px 8px;
+    font-size: 8px;
+    padding: 2px 6px;
+    gap: 3px;
   }
 
+  .stock-hero-trend i {
+    font-size: 7px;
+  }
+
+  /* ✅ 3 بطاقات صغيرة أصغر */
   .stock-stats-row {
-    grid-template-columns: repeat(3, 1fr);
-    gap: 8px;
+    gap: 5px;
   }
 
   .stock-stat-card {
-    padding: 12px 6px;
-    border-radius: 12px;
-    gap: 6px;
+    padding: 10px 4px;
+    border-radius: 10px;
+    gap: 4px;
   }
 
   .stat-mini-label {
-    font-size: 9px;
+    font-size: 8px;
   }
 
   .stat-mini-value {
-    font-size: 0.95rem;
+    font-size: 0.8rem;
   }
 
   .stat-mini-icon {
-    width: 26px;
-    height: 26px;
-    font-size: 12px;
+    width: 22px;
+    height: 22px;
+    font-size: 9px;
   }
 
+  /* ✅ المبيان */
   .stock-chart-card {
     padding: 16px 12px 12px;
     border-radius: 14px;
@@ -482,6 +480,7 @@
     padding: 10px;
   }
 
+  /* ✅ البطاقات القديمة */
   .stats-grid {
     grid-template-columns: repeat(2, 1fr);
   }
@@ -496,12 +495,22 @@
 }
 
 @media (max-width: 380px) {
+  .stock-hero-card {
+    padding: 12px 8px;
+  }
+
+  .stock-hero-icon {
+    width: 36px;
+    height: 36px;
+    font-size: 14px;
+  }
+
   .stock-hero-value {
-    font-size: 1.3rem;
+    font-size: 1rem;
   }
 
   .stat-mini-value {
-    font-size: 0.85rem;
+    font-size: 0.75rem;
   }
 
   .filter-btn {
