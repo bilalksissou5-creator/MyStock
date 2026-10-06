@@ -18,12 +18,12 @@
 }
 
 /* ============================================
-   ✅ الصف الأعلى (يتكيّف تلقائياً)
+   ✅ الصف الأعلى — تصغير العرض
    ============================================ */
 .stock-top-row {
   display: grid;
-  grid-template-columns: minmax(280px, 2fr) minmax(0, 3fr);
-  gap: 14px;
+  grid-template-columns: minmax(200px, 1fr) minmax(0, 2fr);
+  gap: 10px;
 }
 
 @media (max-width: 768px) {
@@ -38,7 +38,7 @@
 .stock-right-col {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
   min-width: 0;
 }
 
@@ -49,35 +49,35 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
-  padding: 0 4px;
+  gap: 10px;
+  padding: 0 2px;
 }
 
 .stock-title-text h3 {
-  font-size: 1.35rem;
+  font-size: 1.15rem;
   font-weight: 800;
   color: #171717;
-  margin: 0 0 4px;
+  margin: 0 0 2px;
   letter-spacing: -0.3px;
 }
 
 .stock-title-text p {
-  font-size: 12px;
+  font-size: 11px;
   color: #737373;
   margin: 0;
 }
 
 .stock-title-icon {
-  width: 44px;
-  height: 44px;
-  border-radius: 10px;
+  width: 38px;
+  height: 38px;
+  border-radius: 9px;
   background: #ffffff;
   border: 1px solid #f0f0f0;
   display: flex;
   align-items: center;
   justify-content: center;
   color: #2563eb;
-  font-size: 18px;
+  font-size: 15px;
   flex-shrink: 0;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
 }
@@ -89,11 +89,11 @@
   position: relative;
   background: linear-gradient(135deg, #171717 0%, #2a2a2a 100%);
   color: #ffffff;
-  border-radius: 14px;
-  padding: 8px 6px;
+  border-radius: 12px;
+  padding: 14px 12px;
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 10px;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   overflow: hidden;
   min-width: 0;
@@ -105,22 +105,22 @@
   position: absolute;
   top: -60%;
   left: -10%;
-  width: 80px;
-  height: 80px;
+  width: 180px;
+  height: 180px;
   border-radius: 50%;
   background: radial-gradient(circle, rgba(255,255,255,0.06) 0%, transparent 70%);
   pointer-events: none;
 }
 
 .stock-hero-icon {
-  width: 50px;
-  height: 50px;
+  width: 42px;
+  height: 42px;
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.12);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 20px;
+  font-size: 17px;
   color: #ffffff;
   flex-shrink: 0;
   border: 2px solid rgba(255, 255, 255, 0.15);
@@ -135,28 +135,28 @@
 }
 
 .stock-hero-label {
-  font-size: 10px;
+  font-size: 9px;
   color: rgba(255, 255, 255, 0.65);
-  margin-bottom: 4px;
+  margin-bottom: 3px;
   font-weight: 500;
 }
 
 .stock-hero-value {
-  font-size: 1.6rem;
+  font-size: 1.25rem;
   font-weight: 800;
   color: #ffffff;
   line-height: 1;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
   letter-spacing: -0.5px;
 }
 
 .stock-hero-trend {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
-  padding: 3px 9px;
+  gap: 4px;
+  padding: 2px 7px;
   border-radius: 20px;
-  font-size: 10px;
+  font-size: 9px;
   font-weight: 700;
   white-space: nowrap;
 }
@@ -172,7 +172,7 @@
 }
 
 .stock-hero-trend i {
-  font-size: 9px;
+  font-size: 8px;
 }
 
 /* ============================================
@@ -181,20 +181,20 @@
 .stock-stats-row {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
+  gap: 6px;
   flex: 1;
 }
 
 .stock-stat-card {
   background: #ffffff;
   border: 1px solid #f0f0f0;
-  border-radius: 12px;
-  padding: 12px 6px;
+  border-radius: 10px;
+  padding: 8px 4px;
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
-  gap: 6px;
+  gap: 4px;
   transition: transform 0.15s, box-shadow 0.15s;
   min-width: 0;
   justify-content: center;
@@ -206,7 +206,7 @@
 }
 
 .stat-mini-label {
-  font-size: 9px;
+  font-size: 8px;
   color: #737373;
   font-weight: 600;
   white-space: nowrap;
@@ -216,7 +216,7 @@
 }
 
 .stat-mini-value {
-  font-size: 0.95rem;
+  font-size: 0.8rem;
   font-weight: 800;
   color: #171717;
   line-height: 1;
@@ -227,13 +227,13 @@
 }
 
 .stat-mini-icon {
-  width: 24px;
-  height: 24px;
-  border-radius: 7px;
+  width: 20px;
+  height: 20px;
+  border-radius: 6px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 10px;
+  font-size: 9px;
 }
 
 .stat-mini-icon.down {
@@ -409,23 +409,22 @@
     gap: 14px;
   }
 
-  /* ✅ البطاقة السوداء أولاً، ثم العنوان + 3 بطاقات */
   .stock-hero-card {
     order: -1;
-    padding: 16px 14px;
-    gap: 12px;
+    padding: 14px 12px;
+    gap: 10px;
     border-radius: 12px;
     height: auto;
   }
 
   .stock-hero-icon {
-    width: 44px;
-    height: 44px;
-    font-size: 18px;
+    width: 40px;
+    height: 40px;
+    font-size: 16px;
   }
 
   .stock-hero-value {
-    font-size: 1.4rem;
+    font-size: 1.15rem;
   }
 
   .stock-hero-label {
@@ -442,23 +441,23 @@
   }
 
   .stock-title-text h3 {
-    font-size: 1.15rem;
+    font-size: 1.05rem;
   }
 
   .stock-title-text p {
-    font-size: 11px;
+    font-size: 10px;
   }
 
   .stock-title-icon {
-    width: 40px;
-    height: 40px;
-    font-size: 16px;
+    width: 36px;
+    height: 36px;
+    font-size: 14px;
   }
 
   .stock-stat-card {
-    padding: 10px 6px;
+    padding: 8px 4px;
     border-radius: 10px;
-    gap: 5px;
+    gap: 4px;
   }
 
   .stat-mini-label {
@@ -466,12 +465,12 @@
   }
 
   .stat-mini-value {
-    font-size: 0.85rem;
+    font-size: 0.8rem;
   }
 
   .stat-mini-icon {
-    width: 22px;
-    height: 22px;
+    width: 20px;
+    height: 20px;
     font-size: 9px;
   }
 
@@ -530,11 +529,11 @@
 
 @media (max-width: 380px) {
   .stock-hero-value {
-    font-size: 1.2rem;
+    font-size: 1.05rem;
   }
 
   .stat-mini-value {
-    font-size: 0.8rem;
+    font-size: 0.75rem;
   }
 
   .filter-btn {
