@@ -3,27 +3,27 @@
    ============================================ */
 
 /* ============================================
-   ✅ بطاقة قيمة المخزون (موحّدة)
+   ✅ بطاقة قيمة المخزون
    ============================================ */
 .stock-value-card {
   background: #ffffff;
   border: 1px solid #f0f0f0;
-  border-radius: 16px;
-  padding: 20px 18px;
+  border-radius: 14px;
+  padding: 14px 12px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
-  margin-bottom: 24px;
+  margin-bottom: 20px;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 12px;
 }
 
 /* ============================================
-   ✅ الصف الأعلى — تصغير العرض
+   ✅ الصف الأعلى — تصغير أكثر
    ============================================ */
 .stock-top-row {
   display: grid;
-  grid-template-columns: minmax(200px, 1fr) minmax(0, 2fr);
-  gap: 10px;
+  grid-template-columns: minmax(150px, 1fr) minmax(0, 2.5fr);
+  gap: 8px;
 }
 
 @media (max-width: 768px) {
@@ -33,12 +33,12 @@
 }
 
 /* ============================================
-   العمود اليمين: العنوان + 3 بطاقات
+   العمود اليمين
    ============================================ */
 .stock-right-col {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
   min-width: 0;
 }
 
@@ -49,12 +49,12 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 10px;
+  gap: 8px;
   padding: 0 2px;
 }
 
 .stock-title-text h3 {
-  font-size: 1.15rem;
+  font-size: 1rem;
   font-weight: 800;
   color: #171717;
   margin: 0 0 2px;
@@ -62,39 +62,39 @@
 }
 
 .stock-title-text p {
-  font-size: 11px;
+  font-size: 10px;
   color: #737373;
   margin: 0;
 }
 
 .stock-title-icon {
-  width: 38px;
-  height: 38px;
-  border-radius: 9px;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
   background: #ffffff;
   border: 1px solid #f0f0f0;
   display: flex;
   align-items: center;
   justify-content: center;
   color: #2563eb;
-  font-size: 15px;
+  font-size: 13px;
   flex-shrink: 0;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
 }
 
 /* ============================================
-   البطاقة الرئيسية (السوداء)
+   البطاقة السوداء — مصغّرة
    ============================================ */
 .stock-hero-card {
   position: relative;
   background: linear-gradient(135deg, #171717 0%, #2a2a2a 100%);
   color: #ffffff;
-  border-radius: 12px;
-  padding: 14px 12px;
+  border-radius: 10px;
+  padding: 10px 10px;
   display: flex;
   align-items: center;
-  gap: 10px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  gap: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   overflow: hidden;
   min-width: 0;
   height: 100%;
@@ -105,25 +105,25 @@
   position: absolute;
   top: -60%;
   left: -10%;
-  width: 180px;
-  height: 180px;
+  width: 150px;
+  height: 150px;
   border-radius: 50%;
   background: radial-gradient(circle, rgba(255,255,255,0.06) 0%, transparent 70%);
   pointer-events: none;
 }
 
 .stock-hero-icon {
-  width: 42px;
-  height: 42px;
+  width: 34px;
+  height: 34px;
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.12);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 17px;
+  font-size: 14px;
   color: #ffffff;
   flex-shrink: 0;
-  border: 2px solid rgba(255, 255, 255, 0.15);
+  border: 1.5px solid rgba(255, 255, 255, 0.15);
   z-index: 1;
   position: relative;
 }
@@ -135,28 +135,28 @@
 }
 
 .stock-hero-label {
-  font-size: 9px;
+  font-size: 8px;
   color: rgba(255, 255, 255, 0.65);
-  margin-bottom: 3px;
+  margin-bottom: 2px;
   font-weight: 500;
 }
 
 .stock-hero-value {
-  font-size: 1.25rem;
+  font-size: 1rem;
   font-weight: 800;
   color: #ffffff;
   line-height: 1;
-  margin-bottom: 6px;
+  margin-bottom: 4px;
   letter-spacing: -0.5px;
 }
 
 .stock-hero-trend {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  padding: 2px 7px;
+  gap: 3px;
+  padding: 2px 6px;
   border-radius: 20px;
-  font-size: 9px;
+  font-size: 8px;
   font-weight: 700;
   white-space: nowrap;
 }
@@ -172,7 +172,7 @@
 }
 
 .stock-hero-trend i {
-  font-size: 8px;
+  font-size: 7px;
 }
 
 /* ============================================
@@ -181,20 +181,20 @@
 .stock-stats-row {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 6px;
+  gap: 5px;
   flex: 1;
 }
 
 .stock-stat-card {
   background: #ffffff;
   border: 1px solid #f0f0f0;
-  border-radius: 10px;
-  padding: 8px 4px;
+  border-radius: 8px;
+  padding: 6px 3px;
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
-  gap: 4px;
+  gap: 3px;
   transition: transform 0.15s, box-shadow 0.15s;
   min-width: 0;
   justify-content: center;
@@ -206,7 +206,7 @@
 }
 
 .stat-mini-label {
-  font-size: 8px;
+  font-size: 7px;
   color: #737373;
   font-weight: 600;
   white-space: nowrap;
@@ -216,7 +216,7 @@
 }
 
 .stat-mini-value {
-  font-size: 0.8rem;
+  font-size: 0.7rem;
   font-weight: 800;
   color: #171717;
   line-height: 1;
@@ -227,13 +227,13 @@
 }
 
 .stat-mini-icon {
-  width: 20px;
-  height: 20px;
-  border-radius: 6px;
+  width: 16px;
+  height: 16px;
+  border-radius: 5px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 9px;
+  font-size: 7px;
 }
 
 .stat-mini-icon.down {
@@ -256,20 +256,20 @@
    ============================================ */
 .stock-chart-section {
   border-top: 1px solid #f5f5f5;
-  padding-top: 16px;
+  padding-top: 12px;
 }
 
 .stock-chart-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 14px;
-  padding: 0 4px;
+  margin-bottom: 12px;
+  padding: 0 2px;
   gap: 8px;
 }
 
 .stock-chart-header h3 {
-  font-size: 15px;
+  font-size: 13px;
   font-weight: 700;
   color: #171717;
   margin: 0;
@@ -278,23 +278,23 @@
 .stock-chart-badge {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 6px 12px;
+  gap: 5px;
+  padding: 4px 10px;
   background: #f5f5f5;
   border-radius: 20px;
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 700;
   color: #2563eb;
 }
 
 .stock-chart-badge i {
-  font-size: 7px;
+  font-size: 6px;
   color: #2563eb;
 }
 
 #stock-chart {
   width: 100%;
-  min-height: 360px;
+  min-height: 340px;
 }
 
 /* ============================================
@@ -304,25 +304,25 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 8px;
-  margin-top: 14px;
-  padding-top: 14px;
+  gap: 6px;
+  margin-top: 12px;
+  padding-top: 12px;
   border-top: 1px solid #f5f5f5;
   flex-wrap: wrap;
 }
 
 .filters-left {
   display: flex;
-  gap: 6px;
+  gap: 5px;
   flex-wrap: wrap;
 }
 
 .filter-btn {
-  padding: 8px 16px;
+  padding: 7px 14px;
   background: #f5f5f5;
   border: none;
-  border-radius: 8px;
-  font-size: 12px;
+  border-radius: 7px;
+  font-size: 11px;
   font-weight: 600;
   color: #737373;
   cursor: pointer;
@@ -348,12 +348,12 @@
 .filter-details-btn {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 8px 14px;
+  gap: 5px;
+  padding: 7px 12px;
   background: #ffffff;
   border: 1px solid #d4d4d4;
-  border-radius: 8px;
-  font-size: 12px;
+  border-radius: 7px;
+  font-size: 11px;
   font-weight: 600;
   color: #2563eb;
   cursor: pointer;
@@ -368,7 +368,7 @@
 }
 
 .filter-details-btn i {
-  font-size: 12px;
+  font-size: 11px;
 }
 
 /* ============================================
@@ -404,44 +404,44 @@
    ============================================ */
 @media (max-width: 768px) {
   .stock-value-card {
-    padding: 16px 14px;
-    border-radius: 14px;
-    gap: 14px;
+    padding: 12px 10px;
+    border-radius: 12px;
+    gap: 10px;
   }
 
   .stock-hero-card {
     order: -1;
-    padding: 14px 12px;
-    gap: 10px;
-    border-radius: 12px;
+    padding: 12px 10px;
+    gap: 8px;
+    border-radius: 10px;
     height: auto;
   }
 
   .stock-hero-icon {
-    width: 40px;
-    height: 40px;
-    font-size: 16px;
+    width: 32px;
+    height: 32px;
+    font-size: 14px;
   }
 
   .stock-hero-value {
-    font-size: 1.15rem;
+    font-size: 0.95rem;
   }
 
   .stock-hero-label {
-    font-size: 9px;
+    font-size: 8px;
   }
 
   .stock-hero-trend {
-    font-size: 9px;
-    padding: 3px 8px;
+    font-size: 8px;
+    padding: 2px 6px;
   }
 
   .stock-right-col {
-    gap: 10px;
+    gap: 8px;
   }
 
   .stock-title-text h3 {
-    font-size: 1.05rem;
+    font-size: 0.95rem;
   }
 
   .stock-title-text p {
@@ -449,52 +449,52 @@
   }
 
   .stock-title-icon {
-    width: 36px;
-    height: 36px;
-    font-size: 14px;
+    width: 30px;
+    height: 30px;
+    font-size: 12px;
   }
 
   .stock-stat-card {
-    padding: 8px 4px;
-    border-radius: 10px;
-    gap: 4px;
+    padding: 6px 3px;
+    border-radius: 8px;
+    gap: 3px;
   }
 
   .stat-mini-label {
-    font-size: 8px;
+    font-size: 7px;
   }
 
   .stat-mini-value {
-    font-size: 0.8rem;
+    font-size: 0.7rem;
   }
 
   .stat-mini-icon {
-    width: 20px;
-    height: 20px;
-    font-size: 9px;
+    width: 16px;
+    height: 16px;
+    font-size: 7px;
   }
 
   .stock-chart-section {
-    padding-top: 14px;
+    padding-top: 12px;
   }
 
   .stock-chart-header h3 {
-    font-size: 13px;
+    font-size: 12px;
   }
 
   .stock-chart-badge {
-    font-size: 10px;
-    padding: 5px 10px;
+    font-size: 9px;
+    padding: 4px 8px;
   }
 
   #stock-chart {
-    min-height: 300px;
+    min-height: 280px;
   }
 
   .stock-chart-filters {
     flex-direction: column;
     align-items: stretch;
-    gap: 10px;
+    gap: 8px;
   }
 
   .filters-left {
@@ -503,15 +503,16 @@
 
   .filter-btn {
     flex: 1;
-    padding: 8px 8px;
-    font-size: 11px;
+    padding: 7px 6px;
+    font-size: 10px;
     text-align: center;
   }
 
   .filter-details-btn {
     width: 100%;
     justify-content: center;
-    padding: 10px;
+    padding: 8px;
+    font-size: 10px;
   }
 
   .stats-grid {
@@ -529,15 +530,15 @@
 
 @media (max-width: 380px) {
   .stock-hero-value {
-    font-size: 1.05rem;
+    font-size: 0.9rem;
   }
 
   .stat-mini-value {
-    font-size: 0.75rem;
+    font-size: 0.65rem;
   }
 
   .filter-btn {
-    font-size: 10px;
-    padding: 7px 6px;
+    font-size: 9px;
+    padding: 6px 5px;
   }
 }
