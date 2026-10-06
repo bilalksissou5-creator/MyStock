@@ -30,7 +30,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         </div>
       </div>
 
-      <!-- ══════ البطاقة البيضاء الكبرى (تحتوي السوداء + 3 صغيرة) ══════ -->
+      <!-- ══════ البطاقة البيضاء الكبرى ══════ -->
       <div class="stock-top-card">
         <div class="stock-top-row">
 
@@ -79,7 +79,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         </div>
       </div>
 
-      <!-- ══════ بطاقة المبيان (بطاقة بيضاء منفصلة) ══════ -->
+      <!-- ══════ بطاقة المبيان ══════ -->
       <div class="stock-chart-card">
         <div class="stock-chart-header">
           <h3>تطور قيمة المخزون</h3>
@@ -90,7 +90,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         </div>
         <div id="stock-chart"></div>
 
-        <!-- ══════ أزرار الفلترة ══════ -->
         <div class="stock-chart-filters">
           <div class="filters-left">
             <button type="button" class="filter-btn" data-days="1">يوم</button>
@@ -279,7 +278,6 @@ async function loadStockChart(days) {
   document.getElementById('stat-avg-value').textContent = avgValue.toFixed(2);
   document.getElementById('stat-max-value').textContent = maxValue.toFixed(2);
 
-  // ✅ المبيان
   const options = {
     series: [{
       name: 'قيمة المخزون',
