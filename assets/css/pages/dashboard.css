@@ -1,7 +1,273 @@
 /* ============================================
-   صفحة لوحة التحكم - تنسيقات خاصة فقط
+   صفحة لوحة التحكم - تنسيقات
    ============================================ */
 
+/* ============================================
+   ✅ قسم قيمة المخزون (الجديد)
+   ============================================ */
+.stock-value-section {
+  margin-bottom: 24px;
+}
+
+/* ══════ البطاقة الرئيسية (سوداء) ══════ */
+.stock-hero-card {
+  position: relative;
+  background: linear-gradient(135deg, #171717 0%, #2a2a2a 100%);
+  color: #ffffff;
+  border-radius: 16px;
+  padding: 22px 20px;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  overflow: hidden;
+  margin-bottom: 14px;
+}
+
+/* ✅ تأثير زخرفي دائري */
+.stock-hero-card::before {
+  content: '';
+  position: absolute;
+  top: -60%;
+  left: -10%;
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,255,255,0.06) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.stock-hero-card::after {
+  content: '';
+  position: absolute;
+  bottom: -50%;
+  right: -10%;
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,255,255,0.04) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.stock-hero-icon {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26px;
+  color: #ffffff;
+  flex-shrink: 0;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  z-index: 1;
+}
+
+.stock-hero-info {
+  flex: 1;
+  min-width: 0;
+  z-index: 1;
+}
+
+.stock-hero-label {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.7);
+  margin-bottom: 6px;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+}
+
+.stock-hero-value {
+  font-size: 2rem;
+  font-weight: 800;
+  color: #ffffff;
+  line-height: 1;
+  margin-bottom: 8px;
+  letter-spacing: -0.5px;
+}
+
+.stock-hero-trend {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.stock-hero-trend.up {
+  background: rgba(34, 197, 94, 0.15);
+  color: #4ade80;
+}
+
+.stock-hero-trend.down {
+  background: rgba(239, 68, 68, 0.15);
+  color: #f87171;
+}
+
+.stock-hero-trend i {
+  font-size: 10px;
+}
+
+/* ══════ الإحصائيات (3 بطاقات) ══════ */
+.stock-stats-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.stock-stat-card {
+  background: #ffffff;
+  border: 1px solid #f0f0f0;
+  border-radius: 12px;
+  padding: 12px 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 6px;
+  position: relative;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.stock-stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+}
+
+.stat-mini-label {
+  font-size: 10px;
+  color: #737373;
+  font-weight: 600;
+}
+
+.stat-mini-value {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #171717;
+  line-height: 1;
+}
+
+.stat-mini-icon {
+  width: 26px;
+  height: 26px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  margin-top: 2px;
+}
+
+.stat-mini-icon.down {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.stat-mini-icon.up {
+  background: #dcfce7;
+  color: #16a34a;
+}
+
+.stat-mini-icon.chart {
+  background: #dbeafe;
+  color: #2563eb;
+}
+
+/* ══════ بطاقة المبيان ══════ */
+.stock-chart-card {
+  background: #ffffff;
+  border: 1px solid #f0f0f0;
+  border-radius: 16px;
+  padding: 18px 14px 14px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+}
+
+.stock-chart-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  padding: 0 4px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.stock-chart-header h3 {
+  font-size: 15px;
+  font-weight: 700;
+  color: #171717;
+  margin: 0;
+}
+
+.stock-chart-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  background: #f5f5f5;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #2563eb;
+}
+
+.stock-chart-badge i {
+  font-size: 8px;
+  color: #2563eb;
+}
+
+/* ✅ حاوية المبيان */
+#stock-chart {
+  width: 100%;
+  min-height: 300px;
+}
+
+/* ══════ أزرار الفلترة ══════ */
+.stock-chart-filters {
+  display: flex;
+  gap: 6px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid #f5f5f5;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.filter-btn {
+  padding: 7px 14px;
+  background: #f5f5f5;
+  border: none;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #737373;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.15s, color 0.15s, transform 0.1s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.filter-btn:hover {
+  background: #e5e5e5;
+  color: #171717;
+}
+
+.filter-btn.active {
+  background: #171717;
+  color: #ffffff;
+}
+
+.filter-btn:active {
+  transform: scale(0.97);
+}
+
+/* ============================================
+   البطاقات القديمة
+   ============================================ */
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
@@ -63,6 +329,9 @@
   margin-bottom: 14px;
 }
 
+/* ============================================
+   الهاتف
+   ============================================ */
 @media (max-width: 768px) {
   .dashboard-grid {
     grid-template-columns: 1fr;
@@ -78,5 +347,94 @@
 
   .stat-card .stat-value {
     font-size: 1.2rem;
+  }
+
+  /* ✅ البطاقة الرئيسية */
+  .stock-hero-card {
+    padding: 18px 16px;
+    gap: 14px;
+    border-radius: 14px;
+  }
+
+  .stock-hero-icon {
+    width: 50px;
+    height: 50px;
+    font-size: 22px;
+  }
+
+  .stock-hero-value {
+    font-size: 1.6rem;
+  }
+
+  .stock-hero-label {
+    font-size: 11px;
+  }
+
+  .stock-hero-trend {
+    font-size: 10px;
+    padding: 3px 8px;
+  }
+
+  /* ✅ الإحصائيات */
+  .stock-stats-row {
+    gap: 8px;
+  }
+
+  .stock-stat-card {
+    padding: 10px 6px;
+    border-radius: 10px;
+  }
+
+  .stat-mini-label {
+    font-size: 9px;
+  }
+
+  .stat-mini-value {
+    font-size: 0.95rem;
+  }
+
+  .stat-mini-icon {
+    width: 22px;
+    height: 22px;
+    font-size: 10px;
+  }
+
+  /* ✅ المبيان */
+  .stock-chart-card {
+    padding: 14px 10px 12px;
+    border-radius: 14px;
+  }
+
+  .stock-chart-header h3 {
+    font-size: 13px;
+  }
+
+  .stock-chart-badge {
+    font-size: 10px;
+    padding: 3px 8px;
+  }
+
+  #stock-chart {
+    min-height: 260px;
+  }
+
+  .filter-btn {
+    padding: 6px 12px;
+    font-size: 11px;
+  }
+}
+
+@media (max-width: 380px) {
+  .stock-hero-value {
+    font-size: 1.4rem;
+  }
+
+  .stat-mini-value {
+    font-size: 0.85rem;
+  }
+
+  .filter-btn {
+    padding: 5px 10px;
+    font-size: 10px;
   }
 }
