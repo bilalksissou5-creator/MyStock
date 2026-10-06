@@ -1,6 +1,7 @@
 // ============================================
 // صفحة لوحة التحكم
 // ✅ بطاقة قيمة المخزون + مبيان ApexCharts
+// ✅ استخدام UTC لتفادي فرق التوقيت
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   const user = await requireAuth();
@@ -14,7 +15,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     <h2>لوحة التحكم</h2>
 
     <!-- ══════════════════════════════════════
-         ✅ بطاقة قيمة المخزون (الجديدة)
+         بطاقة قيمة المخزون
          ══════════════════════════════════════ -->
     <div class="stock-value-section">
 
@@ -83,7 +84,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     </div>
 
     <!-- ══════════════════════════════════════
-         البطاقات القديمة (كما هي)
+         البطاقات القديمة
          ══════════════════════════════════════ -->
     <div class="stats-grid">
       <div class="stat-card">
@@ -138,10 +139,10 @@ async function loadStats() {
 }
 
 // ============================================
-// ✅ حساب قيمة المخزون التاريخية
+// ✅ حساب قيمة المخزون التاريخية (UTC)
 // ============================================
 async function computeStockValueHistory(days) {
-  // 1. جلب المنتجات الحالية
+  // 1. جلب المنتجات
   const { data: products } = await db
     .from('products')
     .select('id, qty, price');
@@ -150,28 +151,33 @@ async function computeStockValueHistory(days) {
     return { dates: [], values: [] };
   }
 
-  // خريطة: product_id → السعر الحالي
+  // ✅ خريطة السعر
   const priceMap = {};
   products.forEach(p => { priceMap[p.id] = Number(p.price ?? 0); });
 
-  // 2. جلب الحركات في الفترة
-  const startDate = new Date();
-  startDate.setDate(startDate.getDate() - days);
-  startDate.setHours(0, 0, 0, 0);
+  // ✅ startDate بـ UTC (بداية اليوم UTC قبل N يوم)
+  const now = new Date();
+  const startDate = new Date(Date.UTC(
+    now.getUTCFullYear(),
+    now.getUTCMonth(),
+    now.getUTCDate() - days,
+    0, 0, 0, 0
+  ));
 
+  // 2. جلب الحركات من startDate
   const { data: movements } = await db
     .from('stock_movements')
     .select('product_id, type, quantity, created_at')
     .gte('created_at', startDate.toISOString())
     .order('created_at', { ascending: true });
 
-  // 3. جلب الرصيد الافتتاحي (قبل startDate)
+  // 3. الرصيد الافتتاحي (قبل startDate)
   const { data: priorMovements } = await db
     .from('stock_movements')
     .select('product_id, type, quantity')
     .lt('created_at', startDate.toISOString());
 
-  // احسب رصيد البداية لكل منتج
+  // ✅ احسب رصيد البداية لكل منتج
   const balanceMap = {};
   (products ?? []).forEach(p => { balanceMap[p.id] = 0; });
 
@@ -181,14 +187,11 @@ async function computeStockValueHistory(days) {
     else if (m.type === 'out') balanceMap[m.product_id] -= Number(m.quantity ?? 0);
   });
 
-  // 4. بناء مصفوفة الأيام
+  // 4. بناء المصفوفات
   const dates = [];
   const values = [];
 
-  // رصيد كل يوم من 0 → days
-  let currentBalances = { ...balanceMap };
-
-  // نُجمّع الحركات حسب اليوم
+  // ✅ نُجمّع الحركات حسب اليوم (UTC)
   const movementsByDay = {};
   (movements ?? []).forEach(m => {
     const day = m.created_at.slice(0, 10);
@@ -196,9 +199,12 @@ async function computeStockValueHistory(days) {
     movementsByDay[day].push(m);
   });
 
+  // ✅ رصيد متحرك
+  let currentBalances = { ...balanceMap };
+
+  // ✅ حلقة الأيام (بـ UTC)
   for (let i = 0; i <= days; i++) {
-    const date = new Date(startDate);
-    date.setDate(date.getDate() + i);
+    const date = new Date(startDate.getTime() + i * 24 * 60 * 60 * 1000);
     const dayKey = date.toISOString().slice(0, 10);
 
     // طبّق حركات هذا اليوم
@@ -208,7 +214,7 @@ async function computeStockValueHistory(days) {
       else if (m.type === 'out') currentBalances[m.product_id] -= Number(m.quantity ?? 0);
     });
 
-    // احسب القيمة الإجمالية
+    // احسب القيمة
     let totalValue = 0;
     Object.keys(currentBalances).forEach(pid => {
       const qty = Math.max(0, currentBalances[pid]);
@@ -245,7 +251,7 @@ async function loadStockChart(days) {
   // ✅ البطاقة الرئيسية
   document.getElementById('hero-value').textContent = currentValue.toFixed(2);
 
-  // ✅ الفرق مع بداية الفترة
+  // ✅ الفرق
   const firstValue = values[0] ?? 0;
   const diff = currentValue - firstValue;
   const diffPct = firstValue > 0 ? ((diff / firstValue) * 100) : 0;
@@ -282,7 +288,7 @@ async function loadStockChart(days) {
         speed: 800,
       },
     },
-    colors: ['#2563eb'],       // ← أزرق (كما في الصورة)
+    colors: ['#2563eb'],
     dataLabels: { enabled: false },
     stroke: {
       curve: 'smooth',
@@ -317,7 +323,7 @@ async function loadStockChart(days) {
           fontSize: '11px',
           colors: '#a3a3a3',
         },
-        datetimeUTC: false,
+        datetimeUTC: true,
         format: days <= 30 ? 'dd MMM' : 'MMM yyyy',
       },
       axisBorder: { show: false },
@@ -352,7 +358,6 @@ async function loadStockChart(days) {
     },
   };
 
-  // ✅ إنشاء أو تحديث المبيان
   if (stockChart) {
     stockChart.updateOptions({
       series: [{ name: 'قيمة المخزون', data: values }],
