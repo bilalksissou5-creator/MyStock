@@ -1,7 +1,7 @@
 /* ============================================
    صفحة الفاتورة الواحدة
-   ✅ تقسيم تلقائي إلى صفحات A4 (كل صفحة فاتورة كاملة)
-   ✅ التوقيعات دائماً في أسفل الصفحة
+   ✅ تقسيم تلقائي إلى صفحات A4
+   ✅ التوقيعات دائماً في أسفل الصفحة (شاشة + طباعة)
    ============================================ */
 
 /* ============================================
@@ -56,7 +56,7 @@ main {
 }
 
 /* ============================================
-   ✅ صفحة الفاتورة — التوقيعات في الأسفل دائماً
+   ✅ صفحة الفاتورة — flex layout للتوقيعات في الأسفل
    ============================================ */
 #invoice-content .invoice-page {
   display: flex;
@@ -75,6 +75,11 @@ main {
 /* ✅ التوقيعات دائماً في الأسفل */
 #invoice-content .invoice-page .invoice-footer {
   margin-top: auto;
+}
+
+/* ✅ رقم الصفحة في الأسفل بعد التوقيعات */
+#invoice-content .invoice-page .page-number {
+  margin-top: 0;
 }
 
 /* ============================================
@@ -271,7 +276,7 @@ main {
 }
 
 /* ============================================
-   التوقيعات
+   ✅ التوقيعات — مثبتة في الأسفل
    ============================================ */
 .invoice-footer {
   display: grid;
@@ -280,6 +285,8 @@ main {
   margin-top: 14px;
   padding-top: 10px;
   border-top: 1px solid #e5e5e5;
+  page-break-inside: avoid;
+  break-inside: avoid;
 }
 
 .footer-signature {
@@ -474,6 +481,11 @@ main {
 
   .invoice-table thead {
     display: table-header-group;
+  }
+
+  .invoice-footer {
+    page-break-inside: avoid;
+    break-inside: avoid;
   }
 
   .page-number {
