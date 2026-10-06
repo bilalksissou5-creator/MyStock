@@ -19,49 +19,54 @@ document.addEventListener('DOMContentLoaded', async () => {
          ══════════════════════════════════════ -->
     <div class="stock-value-section">
 
-      <!-- ══════ البطاقة الرئيسية ══════ -->
-      <div class="stock-hero-card">
-        <div class="stock-hero-icon">
-          <i class="fas fa-database"></i>
-        </div>
-        <div class="stock-hero-info">
-          <div class="stock-hero-label">قيمة المخزون الحالية</div>
-          <div class="stock-hero-value">
-            <span id="hero-value">—</span>
+      <!-- ══════ الصف الأول: بطاقة كبيرة + 3 صغيرة ══════ -->
+      <div class="stock-top-row">
+
+        <!-- ══════ البطاقة الرئيسية ══════ -->
+        <div class="stock-hero-card">
+          <div class="stock-hero-icon">
+            <i class="fas fa-database"></i>
           </div>
-          <div class="stock-hero-trend" id="hero-trend">
-            <i class="fas fa-arrow-up"></i>
-            <span>—</span>
+          <div class="stock-hero-info">
+            <div class="stock-hero-label">القيمة الحالية للمخزون</div>
+            <div class="stock-hero-value">
+              <span id="hero-value">—</span>
+            </div>
+            <div class="stock-hero-trend" id="hero-trend">
+              <i class="fas fa-arrow-up"></i>
+              <span>—</span>
+            </div>
           </div>
         </div>
+
+        <!-- ══════ الإحصائيات (3 بطاقات صغيرة) ══════ -->
+        <div class="stock-stats-row">
+          <div class="stock-stat-card">
+            <div class="stat-mini-label">أدنى قيمة</div>
+            <div class="stat-mini-value" id="stat-min-value">—</div>
+            <div class="stat-mini-icon down">
+              <i class="fas fa-arrow-down"></i>
+            </div>
+          </div>
+          <div class="stock-stat-card">
+            <div class="stat-mini-label">متوسط القيمة</div>
+            <div class="stat-mini-value" id="stat-avg-value">—</div>
+            <div class="stat-mini-icon up">
+              <i class="fas fa-arrow-up"></i>
+            </div>
+          </div>
+          <div class="stock-stat-card">
+            <div class="stat-mini-label">أعلى قيمة</div>
+            <div class="stat-mini-value" id="stat-max-value">—</div>
+            <div class="stat-mini-icon chart">
+              <i class="fas fa-chart-line"></i>
+            </div>
+          </div>
+        </div>
+
       </div>
 
-      <!-- ══════ الإحصائيات (3 بطاقات صغيرة) ══════ -->
-      <div class="stock-stats-row">
-        <div class="stock-stat-card">
-          <div class="stat-mini-label">أدنى قيمة</div>
-          <div class="stat-mini-value" id="stat-min-value">—</div>
-          <div class="stat-mini-icon down">
-            <i class="fas fa-arrow-down"></i>
-          </div>
-        </div>
-        <div class="stock-stat-card">
-          <div class="stat-mini-label">متوسط القيمة</div>
-          <div class="stat-mini-value" id="stat-avg-value">—</div>
-          <div class="stat-mini-icon up">
-            <i class="fas fa-arrow-up"></i>
-          </div>
-        </div>
-        <div class="stock-stat-card">
-          <div class="stat-mini-label">أعلى قيمة</div>
-          <div class="stat-mini-value" id="stat-max-value">—</div>
-          <div class="stat-mini-icon chart">
-            <i class="fas fa-chart-line"></i>
-          </div>
-        </div>
-      </div>
-
-      <!-- ══════ المبيان ══════ -->
+      <!-- ══════ المبيان (بعرض كامل) ══════ -->
       <div class="stock-chart-card">
         <div class="stock-chart-header">
           <h3>تطور قيمة المخزون</h3>
@@ -74,10 +79,16 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         <!-- ══════ أزرار الفلترة ══════ -->
         <div class="stock-chart-filters">
-          <button type="button" class="filter-btn" data-days="1">يوم</button>
-          <button type="button" class="filter-btn active" data-days="30">30 يوم</button>
-          <button type="button" class="filter-btn" data-days="90">90 يوم</button>
-          <button type="button" class="filter-btn" data-days="365">سنة</button>
+          <div class="filters-left">
+            <button type="button" class="filter-btn" data-days="1">يوم</button>
+            <button type="button" class="filter-btn active" data-days="30">30 يوم</button>
+            <button type="button" class="filter-btn" data-days="90">90 يوم</button>
+            <button type="button" class="filter-btn" data-days="365">سنة</button>
+          </div>
+          <button type="button" class="filter-details-btn">
+            <i class="far fa-calendar-alt"></i>
+            <span>عرض التفاصيل</span>
+          </button>
         </div>
       </div>
 
@@ -142,7 +153,6 @@ async function loadStats() {
 // ✅ حساب قيمة المخزون التاريخية (UTC)
 // ============================================
 async function computeStockValueHistory(days) {
-  // 1. جلب المنتجات
   const { data: products } = await db
     .from('products')
     .select('id, qty, price');
@@ -151,11 +161,9 @@ async function computeStockValueHistory(days) {
     return { dates: [], values: [] };
   }
 
-  // ✅ خريطة السعر
   const priceMap = {};
   products.forEach(p => { priceMap[p.id] = Number(p.price ?? 0); });
 
-  // ✅ startDate بـ UTC (بداية اليوم UTC قبل N يوم)
   const now = new Date();
   const startDate = new Date(Date.UTC(
     now.getUTCFullYear(),
@@ -164,20 +172,17 @@ async function computeStockValueHistory(days) {
     0, 0, 0, 0
   ));
 
-  // 2. جلب الحركات من startDate
   const { data: movements } = await db
     .from('stock_movements')
     .select('product_id, type, quantity, created_at')
     .gte('created_at', startDate.toISOString())
     .order('created_at', { ascending: true });
 
-  // 3. الرصيد الافتتاحي (قبل startDate)
   const { data: priorMovements } = await db
     .from('stock_movements')
     .select('product_id, type, quantity')
     .lt('created_at', startDate.toISOString());
 
-  // ✅ احسب رصيد البداية لكل منتج
   const balanceMap = {};
   (products ?? []).forEach(p => { balanceMap[p.id] = 0; });
 
@@ -187,11 +192,9 @@ async function computeStockValueHistory(days) {
     else if (m.type === 'out') balanceMap[m.product_id] -= Number(m.quantity ?? 0);
   });
 
-  // 4. بناء المصفوفات
   const dates = [];
   const values = [];
 
-  // ✅ نُجمّع الحركات حسب اليوم (UTC)
   const movementsByDay = {};
   (movements ?? []).forEach(m => {
     const day = m.created_at.slice(0, 10);
@@ -199,22 +202,18 @@ async function computeStockValueHistory(days) {
     movementsByDay[day].push(m);
   });
 
-  // ✅ رصيد متحرك
   let currentBalances = { ...balanceMap };
 
-  // ✅ حلقة الأيام (بـ UTC)
   for (let i = 0; i <= days; i++) {
     const date = new Date(startDate.getTime() + i * 24 * 60 * 60 * 1000);
     const dayKey = date.toISOString().slice(0, 10);
 
-    // طبّق حركات هذا اليوم
     (movementsByDay[dayKey] ?? []).forEach(m => {
       if (currentBalances[m.product_id] === undefined) return;
       if (m.type === 'in') currentBalances[m.product_id] += Number(m.quantity ?? 0);
       else if (m.type === 'out') currentBalances[m.product_id] -= Number(m.quantity ?? 0);
     });
 
-    // احسب القيمة
     let totalValue = 0;
     Object.keys(currentBalances).forEach(pid => {
       const qty = Math.max(0, currentBalances[pid]);
@@ -248,10 +247,8 @@ async function loadStockChart(days) {
   const maxValue = Math.max(...values);
   const avgValue = values.reduce((s, v) => s + v, 0) / values.length;
 
-  // ✅ البطاقة الرئيسية
   document.getElementById('hero-value').textContent = currentValue.toFixed(2);
 
-  // ✅ الفرق
   const firstValue = values[0] ?? 0;
   const diff = currentValue - firstValue;
   const diffPct = firstValue > 0 ? ((diff / firstValue) * 100) : 0;
@@ -265,12 +262,11 @@ async function loadStockChart(days) {
     trendEl.innerHTML = `<i class="fas fa-arrow-down"></i> <span>${diffPct.toFixed(1)}% من الفترة السابقة</span>`;
   }
 
-  // ✅ الإحصائيات
   document.getElementById('stat-min-value').textContent = minValue.toFixed(2);
   document.getElementById('stat-avg-value').textContent = avgValue.toFixed(2);
   document.getElementById('stat-max-value').textContent = maxValue.toFixed(2);
 
-  // ✅ المبيان
+  // ✅ المبيان (بشكل الصورة)
   const options = {
     series: [{
       name: 'قيمة المخزون',
@@ -278,14 +274,14 @@ async function loadStockChart(days) {
     }],
     chart: {
       type: 'area',
-      height: 340,
+      height: 380,
       toolbar: { show: false },
       zoom: { enabled: false },
       fontFamily: 'system-ui, -apple-system, sans-serif',
       animations: {
         enabled: true,
         easing: 'easeinout',
-        speed: 800,
+        speed: 900,
       },
     },
     colors: ['#2563eb'],
@@ -299,12 +295,13 @@ async function loadStockChart(days) {
       type: 'gradient',
       gradient: {
         shadeIntensity: 1,
-        opacityFrom: 0.45,
-        opacityTo: 0.05,
-        stops: [0, 90, 100],
+        opacityFrom: 0.5,
+        opacityTo: 0.02,
+        stops: [0, 95, 100],
         colorStops: [
-          { offset: 0, color: '#2563eb', opacity: 0.45 },
-          { offset: 100, color: '#2563eb', opacity: 0.02 },
+          { offset: 0, color: '#2563eb', opacity: 0.5 },
+          { offset: 50, color: '#3b82f6', opacity: 0.15 },
+          { offset: 100, color: '#60a5fa', opacity: 0.02 },
         ],
       },
     },
@@ -313,7 +310,7 @@ async function loadStockChart(days) {
       colors: ['#2563eb'],
       strokeColors: '#ffffff',
       strokeWidth: 2,
-      hover: { size: 6 },
+      hover: { size: 7 },
     },
     xaxis: {
       type: 'datetime',
