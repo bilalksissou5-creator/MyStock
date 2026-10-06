@@ -1,7 +1,7 @@
 // ============================================
 // صفحة الاشتراك
 // ✅ تُعرض للمدير فقط (بعد التسجيل أو عند انتهاء الاشتراك)
-// ✅ تتيح حفظ طلب اشتراك (بحالة pending)
+// ✅ زر "طلب الاشتراك" → يُحوّل إلى payment.html
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   const user = await getCurrentUser();
@@ -48,7 +48,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   // ═══════════════════════════════════════════
   const status = subscription?.status ?? 'none';
 
-  // ✅ غير المدير → لا يفعل شيئاً هنا (يُوجَّه لاحقاً)
+  // ✅ غير المدير → انتظار
   if (!isAdmin) {
     container.innerHTML = `
       <div class="sub-box">
@@ -71,10 +71,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   // ═══════════════════════════════════════════
-  // 4. المدير: عرض حالات مختلفة
+  // 4. المدير
   // ═══════════════════════════════════════════
 
-  // ✅ الحالة: active → انتقل إلى dashboard
+  // ✅ الحالة: active → تحقق من الانتهاء
   if (status === 'active') {
     const expiresAt = subscription.expires_at
       ? new Date(subscription.expires_at)
@@ -89,7 +89,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // ✅ الحالة: pending (طلب مُرسل)
   if (status === 'pending' && subscription.started_at) {
-    // المستخدم أرسل الطلب بالفعل
     renderPending({ subscription });
     return;
   }
@@ -98,7 +97,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   renderPlan({ subscription, profile, user });
 
   // ═══════════════════════════════════════════
-  // 5. الدوال المساعدة
+  // 5. الدوال
   // ═══════════════════════════════════════════
 
   // ✅ عرض الخطة
@@ -133,13 +132,10 @@ document.addEventListener('DOMContentLoaded', async () => {
           </ul>
         </div>
 
-        <div class="alert alert-error" id="sub-error" style="display:none;"></div>
-        <div class="alert alert-success" id="sub-success" style="display:none;"></div>
-
-        <button class="btn-primary full-width" id="subscribe-btn">
-          <i class="fas fa-paper-plane"></i>
-          <span>طلب الاشتراك</span>
-        </button>
+        <a href="/payment.html" class="btn-primary full-width">
+          <i class="fas fa-credit-card"></i>
+          <span>الاشتراك الآن (150 DH)</span>
+        </a>
 
         <button class="btn-secondary full-width" onclick="logout()" style="margin-top:8px;">
           <i class="fas fa-right-from-bracket"></i>
@@ -147,57 +143,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         </button>
       </div>
     `;
-
-    const btn = document.getElementById('subscribe-btn');
-    const errBox = document.getElementById('sub-error');
-    const successBox = document.getElementById('sub-success');
-
-    btn.addEventListener('click', async () => {
-      errBox.style.display = 'none';
-      successBox.style.display = 'none';
-      btn.disabled = true;
-      btn.querySelector('span').textContent = 'جارٍ الإرسال...';
-
-      try {
-        if (subscription?.id) {
-          // تحديث الصف الموجود
-          const { error } = await db
-            .from('subscriptions')
-            .update({
-              status: 'pending',
-              started_at: new Date().toISOString(),
-            })
-            .eq('id', subscription.id);
-
-          if (error) throw error;
-        } else {
-          // إنشاء جديد
-          const { error } = await db
-            .from('subscriptions')
-            .insert({
-              organization_id: profile.organization_id,
-              owner_id: user.id,
-              plan: 'basic',
-              status: 'pending',
-              price: 150,
-              currency: 'MAD',
-              billing_cycle: 'monthly',
-              started_at: new Date().toISOString(),
-            });
-
-          if (error) throw error;
-        }
-
-        // إعادة التحميل
-        window.location.reload();
-
-      } catch (err) {
-        errBox.textContent = 'خطأ: ' + err.message;
-        errBox.style.display = 'block';
-        btn.disabled = false;
-        btn.querySelector('span').textContent = 'طلب الاشتراك';
-      }
-    });
   }
 
   // ✅ عرض "قيد الانتظار"
@@ -216,7 +161,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         <p class="sub-text">
           تم استلام طلب الاشتراك بنجاح.
           <br>
-          سيتم التواصل معك في أقرب وقت لتفعيل الحساب.
+          سيتم التواصل معك في أقرب وقت.
         </p>
 
         <div class="pending-details">
@@ -239,14 +184,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         </div>
 
         <div class="sub-actions">
-          <button class="btn-primary full-width" onclick="window.location.reload()">
-            <i class="fas fa-rotate"></i>
-            <span>تحديث الحالة</span>
-          </button>
-
-          <a href="https://wa.me/212651306537" target="_blank" class="btn-secondary full-width">
-            <i class="fab fa-whatsapp"></i>
-            <span>تواصل عبر واتساب</span>
+          <a href="/payment.html" class="btn-primary full-width">
+            <i class="fas fa-credit-card"></i>
+            <span>إتمام الدفع الآن</span>
           </a>
 
           <button class="btn-secondary full-width" onclick="logout()">
