@@ -43,13 +43,14 @@ main {
   flex-wrap: wrap;
 }
 
+/* ✅ إزالة الظل والحواف نهائياً */
 .invoice-container {
-  background: white;
+  background: transparent;
   max-width: 800px;
   margin: 0 auto;
   padding: 18px 22px;
-  border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border-radius: 0;
+  box-shadow: none;
   box-sizing: border-box;
 }
 
@@ -64,6 +65,8 @@ main {
   min-height: auto;
   overflow: visible;
   background: transparent;
+  box-shadow: none;
+  border-radius: 0;
 }
 
 /* ============================================
@@ -241,7 +244,7 @@ main {
 }
 
 /* ══════════════════════════════════════════
-   المجموع الكلي (عند وجود أكثر من صفحة)
+   المجموع الكلي
    ══════════════════════════════════════════ */
 .invoice-table tfoot .grand-total-row td {
   background: #171717;
@@ -407,9 +410,18 @@ main {
     margin: 0;
   }
 
+  .invoice-container {
+    background: transparent;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    max-width: 100%;
+  }
+
   #invoice-content .invoice-page {
     background: white;
-    box-shadow: none;
+    box-shadow: none !important;
     border-radius: 0;
     padding: 0;
     margin: 0;
@@ -467,7 +479,7 @@ main {
 @media (max-width: 768px) {
   .invoice-container {
     padding: 14px 12px;
-    border-radius: 10px;
+    border-radius: 0;
   }
 
   #invoice-content .invoice-page {
