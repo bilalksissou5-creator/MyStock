@@ -56,7 +56,7 @@ main {
 }
 
 /* ============================================
-   ✅ صفحة الفاتورة — flex للتوقيعات في الأسفل (شاشة)
+   ✅ صفحة الفاتورة — flex للتوقيعات في الأسفل
    ============================================ */
 #invoice-content .invoice-page {
   display: flex;
@@ -142,7 +142,7 @@ main {
 }
 
 /* ============================================
-   صف المعلومات
+   صف المعلومات: البطاقتان أفقيتان دائماً
    ============================================ */
 .invoice-info-row {
   display: grid;
@@ -403,7 +403,7 @@ main {
 }
 
 /* ============================================
-   ✅ الطباعة — استخدام display: table
+   الطباعة
    ============================================ */
 @media print {
   @page {
@@ -426,18 +426,17 @@ main {
     max-width: 100%;
   }
 
-  /* ✅ الطريقة الجديدة: table-footer-group */
   #invoice-content .invoice-page {
-    display: table !important;
-    width: 100% !important;
-    height: 273mm !important;   /* A4 - الهوامش */
-    border-collapse: collapse;
+    display: flex !important;
+    flex-direction: column !important;
     background: white;
     box-shadow: none !important;
     border-radius: 0;
     padding: 0;
     margin: 0;
     max-width: 100%;
+    height: 273mm !important;
+    overflow: hidden;
     page-break-after: always;
     break-after: page;
   }
@@ -447,41 +446,8 @@ main {
     break-after: auto;
   }
 
-  /* ✅ العناصر العادية → rows */
-  #invoice-content .invoice-page > .invoice-header {
-    display: table-row !important;
-  }
-
-  #invoice-content .invoice-page > .invoice-header > * {
-    display: table-cell !important;
-  }
-
-  #invoice-content .invoice-page > .invoice-info-row {
-    display: table-row !important;
-  }
-
-  #invoice-content .invoice-page > .invoice-info-row > * {
-    display: table-cell !important;
-  }
-
-  #invoice-content .invoice-page > .invoice-table {
-    display: table !important;
-    width: 100% !important;
-  }
-
-  /* ✅ التوقيعات → footer group (دائماً في الأسفل) */
   #invoice-content .invoice-page .invoice-footer {
-    display: table-footer-group !important;
-    margin: 0 !important;
-    padding: 0 !important;
-  }
-
-  #invoice-content .invoice-page .invoice-footer .footer-signature {
-    display: table-cell !important;
-    width: 50% !important;
-    padding: 10px !important;
-    text-align: center;
-    vertical-align: top;
+    margin-top: auto !important;
   }
 
   .no-print {
@@ -509,6 +475,14 @@ main {
   }
 
   .invoice-table tr {
+    page-break-inside: avoid;
+  }
+
+  .invoice-table thead {
+    display: table-header-group;
+  }
+
+  .invoice-footer {
     page-break-inside: avoid;
   }
 
