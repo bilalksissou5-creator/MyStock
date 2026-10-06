@@ -3,21 +3,28 @@
    ============================================ */
 
 /* ============================================
-   قسم قيمة المخزون
+   ✅ بطاقة قيمة المخزون (موحّدة)
    ============================================ */
-.stock-value-section {
+.stock-value-card {
+  background: #ffffff;
+  border: 1px solid #f0f0f0;
+  border-radius: 16px;
+  padding: 20px 18px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
   margin-bottom: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
 /* ============================================
-   ✅ العنوان + أيقونة (النص يمين، الأيقونة يسار)
+   العنوان + أيقونة
    ============================================ */
 .stock-title-section {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  margin-bottom: 14px;
   padding: 0 4px;
 }
 
@@ -51,18 +58,8 @@
 }
 
 /* ============================================
-   ✅ البطاقة البيضاء الكبرى
+   البطاقة السوداء + 3 صغيرة
    ============================================ */
-.stock-top-card {
-  background: #ffffff;
-  border: 1px solid #f0f0f0;
-  border-radius: 16px;
-  padding: 16px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
-  margin-bottom: 14px;
-}
-
-/* ✅ 3fr للبطاقة السوداء (60% — الأكبر) + 2fr للبطاقات الصغيرة */
 .stock-top-row {
   display: grid;
   grid-template-columns: 3fr 2fr;
@@ -236,14 +233,11 @@
 }
 
 /* ============================================
-   بطاقة المبيان
+   ✅ قسم المبيان (داخل نفس البطاقة)
    ============================================ */
-.stock-chart-card {
-  background: #ffffff;
-  border: 1px solid #f0f0f0;
-  border-radius: 16px;
-  padding: 20px 18px 16px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+.stock-chart-section {
+  border-top: 1px solid #f5f5f5;
+  padding-top: 16px;
 }
 
 .stock-chart-header {
@@ -390,6 +384,12 @@
    الهاتف
    ============================================ */
 @media (max-width: 768px) {
+  .stock-value-card {
+    padding: 16px 14px;
+    border-radius: 14px;
+    gap: 14px;
+  }
+
   .stock-title-text h3 {
     font-size: 1.15rem;
   }
@@ -402,11 +402,6 @@
     width: 40px;
     height: 40px;
     font-size: 16px;
-  }
-
-  .stock-top-card {
-    padding: 12px;
-    border-radius: 14px;
   }
 
   /* ✅ على الموبايل — عمودي */
@@ -460,9 +455,8 @@
     font-size: 9px;
   }
 
-  .stock-chart-card {
-    padding: 16px 12px 12px;
-    border-radius: 14px;
+  .stock-chart-section {
+    padding-top: 14px;
   }
 
   .stock-chart-header h3 {

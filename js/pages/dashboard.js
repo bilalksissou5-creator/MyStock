@@ -2,6 +2,7 @@
 // صفحة لوحة التحكم
 // ✅ بطاقة قيمة المخزون + مبيان ApexCharts
 // ✅ استخدام UTC لتفادي فرق التوقيت
+// ✅ كل العناصر داخل بطاقة واحدة
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   const user = await requireAuth();
@@ -15,9 +16,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     <h2>لوحة التحكم</h2>
 
     <!-- ══════════════════════════════════════
-         بطاقة قيمة المخزون
+         بطاقة قيمة المخزون (موحّدة)
          ══════════════════════════════════════ -->
-    <div class="stock-value-section">
+    <div class="stock-value-card">
 
       <!-- ✅ العنوان + أيقونة -->
       <div class="stock-title-section">
@@ -30,57 +31,53 @@ document.addEventListener('DOMContentLoaded', async () => {
         </div>
       </div>
 
-      <!-- ══════ البطاقة البيضاء الكبرى ══════ -->
-      <div class="stock-top-card">
-        <div class="stock-top-row">
+      <!-- ✅ البطاقة السوداء + 3 صغيرة -->
+      <div class="stock-top-row">
 
-          <!-- البطاقة الرئيسية -->
-          <div class="stock-hero-card">
-            <div class="stock-hero-icon">
-              <i class="fas fa-database"></i>
+        <div class="stock-hero-card">
+          <div class="stock-hero-icon">
+            <i class="fas fa-database"></i>
+          </div>
+          <div class="stock-hero-info">
+            <div class="stock-hero-label">القيمة الحالية للمخزون</div>
+            <div class="stock-hero-value">
+              <span id="hero-value">—</span>
             </div>
-            <div class="stock-hero-info">
-              <div class="stock-hero-label">القيمة الحالية للمخزون</div>
-              <div class="stock-hero-value">
-                <span id="hero-value">—</span>
-              </div>
-              <div class="stock-hero-trend" id="hero-trend">
-                <i class="fas fa-arrow-up"></i>
-                <span>—</span>
-              </div>
+            <div class="stock-hero-trend" id="hero-trend">
+              <i class="fas fa-arrow-up"></i>
+              <span>—</span>
             </div>
           </div>
-
-          <!-- الإحصائيات -->
-          <div class="stock-stats-row">
-            <div class="stock-stat-card">
-              <div class="stat-mini-label">أدنى قيمة</div>
-              <div class="stat-mini-value" id="stat-min-value">—</div>
-              <div class="stat-mini-icon down">
-                <i class="fas fa-arrow-down"></i>
-              </div>
-            </div>
-            <div class="stock-stat-card">
-              <div class="stat-mini-label">متوسط القيمة</div>
-              <div class="stat-mini-value" id="stat-avg-value">—</div>
-              <div class="stat-mini-icon up">
-                <i class="fas fa-arrow-up"></i>
-              </div>
-            </div>
-            <div class="stock-stat-card">
-              <div class="stat-mini-label">أعلى قيمة</div>
-              <div class="stat-mini-value" id="stat-max-value">—</div>
-              <div class="stat-mini-icon chart">
-                <i class="fas fa-chart-line"></i>
-              </div>
-            </div>
-          </div>
-
         </div>
+
+        <div class="stock-stats-row">
+          <div class="stock-stat-card">
+            <div class="stat-mini-label">أدنى قيمة</div>
+            <div class="stat-mini-value" id="stat-min-value">—</div>
+            <div class="stat-mini-icon down">
+              <i class="fas fa-arrow-down"></i>
+            </div>
+          </div>
+          <div class="stock-stat-card">
+            <div class="stat-mini-label">متوسط القيمة</div>
+            <div class="stat-mini-value" id="stat-avg-value">—</div>
+            <div class="stat-mini-icon up">
+              <i class="fas fa-arrow-up"></i>
+            </div>
+          </div>
+          <div class="stock-stat-card">
+            <div class="stat-mini-label">أعلى قيمة</div>
+            <div class="stat-mini-value" id="stat-max-value">—</div>
+            <div class="stat-mini-icon chart">
+              <i class="fas fa-chart-line"></i>
+            </div>
+          </div>
+        </div>
+
       </div>
 
-      <!-- ══════ بطاقة المبيان ══════ -->
-      <div class="stock-chart-card">
+      <!-- ✅ المبيان (نفس البطاقة) -->
+      <div class="stock-chart-section">
         <div class="stock-chart-header">
           <h3>تطور قيمة المخزون</h3>
           <span class="stock-chart-badge">
