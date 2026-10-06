@@ -1,5 +1,7 @@
 // ============================================
 // صفحة إنشاء حساب جديد
+// ✅ يُنشئ subscriptions بحالة pending
+// ✅ يُحوّل إلى subscription.html
 // ============================================
 document.addEventListener('DOMContentLoaded', () => {
 
@@ -110,11 +112,30 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    successBox.textContent = '✅ تم إنشاء الحساب بنجاح! جارٍ تحويلك...';
+    // ✅ 4. إنشاء اشتراك بحالة pending
+    const { error: subError } = await db
+      .from('subscriptions')
+      .insert({
+        organization_id: orgData.id,
+        owner_id: userId,
+        plan: 'basic',
+        status: 'pending',
+        price: 150,
+        currency: 'MAD',
+        billing_cycle: 'monthly',
+      });
+
+    if (subError) {
+      console.error('❌ Subscription error:', subError);
+      // لا نوقف العملية — يمكن إنشاؤه لاحقاً
+    }
+
+    successBox.textContent = '✅ تم إنشاء الحساب! جارٍ تحويلك للاشتراك...';
     successBox.style.display = 'block';
 
+    // ✅ 5. تحويل إلى صفحة الاشتراك
     setTimeout(() => {
-      window.location.href = '/dashboard.html';
+      window.location.href = '/subscription.html';
     }, 1500);
   });
 });

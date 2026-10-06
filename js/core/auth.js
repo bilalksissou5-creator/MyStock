@@ -1,6 +1,9 @@
 // ============================================
-// المصادقة + حالة الاتصال
-// الدور: تسجيل الدخول / الخروج + حماية الصفحات + online/offline
+// المصادقة + حالة الاتصال + فحص الاشتراك
+// ============================================
+// ⚠️ قاعدة: الاشتراك على مستوى المنظمة (organization_id)
+// - المدير هو المسؤول عن الدفع
+// - النواب والعمال يستفيدون من اشتراك المدير
 // ============================================
 
 // ============================================
@@ -36,7 +39,7 @@ async function getCurrentUser() {
 }
 
 // ============================================
-// حماية الصفحة — يجب تسجيل الدخول
+// حماية الصفحة — يجب تسجيل الدخول + اشتراك نشط
 // ============================================
 async function requireAuth() {
   const user = await getCurrentUser();
@@ -49,11 +52,76 @@ async function requireAuth() {
   await setOnline(user.id);
   startHeartbeat(user.id);
 
-  return user;
+  // ✅ فحص الاشتراك (استثناء صفحة الاشتراك نفسها)
+  const currentPage = window.location.pathname;
+  const isSubscriptionPage = currentPage.includes('subscription.html');
+  const isRegisterPage = currentPage.includes('register');
+  const isLoginPage = currentPage.includes('login');
+  const isInvoicePage = currentPage.includes('invoice.html');
+  const isReceiptPage = currentPage.includes('receipt');
+  const isReceiptsPrintPage = currentPage.includes('receipts-print');
+
+  // ✅ لا نُفحص في هذه الصفحات
+  if (isSubscriptionPage || isRegisterPage || isLoginPage) {
+    return user;
+  }
+
+  // ✅ جلب الاشتراك
+  const { data: subscription } = await db
+    .from('subscriptions')
+    .select('status, expires_at')
+    .eq('owner_id', user.id)
+    .maybeSingle();
+
+  // إذا كان المستخدم نائباً/عاملاً، نفحص اشتراك المدير
+  let sub = subscription;
+
+  if (!sub) {
+    // جلب منظمة المستخدم
+    const { data: profile } = await db
+      .from('profiles')
+      .select('organization_id, role')
+      .eq('id', user.id)
+      .single();
+
+    if (profile?.organization_id) {
+      const { data: orgSub } = await db
+        .from('subscriptions')
+        .select('status, expires_at')
+        .eq('organization_id', profile.organization_id)
+        .maybeSingle();
+      sub = orgSub;
+    }
+  }
+
+  // ✅ فحص الحالة
+  const status = sub?.status ?? 'none';
+  const expiresAt = sub?.expires_at ? new Date(sub.expires_at) : null;
+  const isExpired = expiresAt && expiresAt < new Date();
+
+  // ✅ الاشتراك النشط فقط
+  if (status === 'active' && !isExpired) {
+    return user;
+  }
+
+  // ✅ إذا كان في صفحة الاشتراك → اسمح
+  if (isSubscriptionPage) {
+    return user;
+  }
+
+  // ✅ إذا كان في صفحة الفاتورة/الإيصال → اسمح (مشاركة مع الآخرين)
+  if (isInvoicePage || isReceiptPage || isReceiptsPrintPage) {
+    return user;
+  }
+
+  // ⚠️ غير مشترك → حوّل إلى subscription.html
+  // (إذا كان المستخدم مديراً، يرى الخطة، وإذا كان عاملاً يرى انتظار)
+  window.location.href = '/subscription.html';
+  return null;
 }
 
 // ============================================
-// ✅ حالة الاتصال: online / offline
+// حالة الاتصال: online / offline
 // ============================================
 async function setOnline(userId) {
   if (!userId) return;
@@ -78,14 +146,13 @@ async function setOffline(userId) {
 }
 
 // ============================================
-// ✅ Heartbeat: تحديث last_active_at كل 30 ثانية
+// Heartbeat: تحديث last_active_at كل 30 ثانية
 // ============================================
 let heartbeatInterval = null;
 
 function startHeartbeat(userId) {
   if (!userId) return;
 
-  // نظّف أي heartbeat قديم
   if (heartbeatInterval) clearInterval(heartbeatInterval);
 
   heartbeatInterval = setInterval(async () => {
@@ -93,25 +160,14 @@ function startHeartbeat(userId) {
       .from('profiles')
       .update({ last_active_at: new Date().toISOString() })
       .eq('id', userId);
-  }, 30000); // كل 30 ثانية
+  }, 30000);
 
-  // عند إغلاق التبويب / المتصفح
   window.addEventListener('beforeunload', () => {
     if (heartbeatInterval) clearInterval(heartbeatInterval);
-    // محاولة أخيرة لتسجيل offline (قد لا تنجح دائماً)
-    navigator.sendBeacon?.(
-      `${SUPABASE_URL}/rest/v1/profiles?id=eq.${userId}`,
-      new Blob(
-        [JSON.stringify({ status: 'offline', last_active_at: new Date().toISOString() })],
-        { type: 'application/json' }
-      )
-    );
   });
 
-  // عند إخفاء الصفحة (التبويب في الخلفية)
   document.addEventListener('visibilitychange', async () => {
     if (document.visibilityState === 'visible') {
-      // عاد للصفحة → حدّث last_active_at
       await db
         .from('profiles')
         .update({ status: 'online', last_active_at: new Date().toISOString() })
@@ -121,8 +177,7 @@ function startHeartbeat(userId) {
 }
 
 // ============================================
-// ✅ فحص: هل مستخدم "متصل"؟
-// يُعتبر متصل إذا كان status='online' AND last_active_at خلال آخر 60 ثانية
+// فحص: هل مستخدم "متصل"؟
 // ============================================
 function isUserOnline(profile) {
   if (!profile) return false;
@@ -137,7 +192,7 @@ function isUserOnline(profile) {
 }
 
 // ============================================
-// نموذج تسجيل الدخول (لصفحة login.html)
+// نموذج تسجيل الدخول
 // ============================================
 document.addEventListener('DOMContentLoaded', () => {
   const form = document.getElementById('login-form');
@@ -167,7 +222,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // زر تسجيل الخروج
   document.querySelectorAll('.logout').forEach(b => {
     b.addEventListener('click', logout);
   });
