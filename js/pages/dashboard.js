@@ -2,7 +2,7 @@
 // صفحة لوحة التحكم
 // ✅ بطاقة قيمة المخزون + مبيان ApexCharts
 // ✅ استخدام UTC لتفادي فرق التوقيت
-// ✅ كل العناصر داخل بطاقة واحدة
+// ✅ البطاقة السوداء على اليسار + العنوان والبطاقات على اليمين
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   const user = await requireAuth();
@@ -20,20 +20,51 @@ document.addEventListener('DOMContentLoaded', async () => {
          ══════════════════════════════════════ -->
     <div class="stock-value-card">
 
-      <!-- ✅ العنوان + أيقونة -->
-      <div class="stock-title-section">
-        <div class="stock-title-text">
-          <h3>قيمة المخزون</h3>
-          <p>تطور قيمة المخزون خلال آخر 30 يوم</p>
-        </div>
-        <div class="stock-title-icon">
-          <i class="fas fa-chart-line"></i>
-        </div>
-      </div>
-
-      <!-- ✅ البطاقة السوداء + 3 صغيرة -->
+      <!-- ✅ الصف الأعلى: العنوان + 3 بطاقات (يمين) | البطاقة السوداء (يسار) -->
       <div class="stock-top-row">
 
+        <!-- ══════ العمود اليمين: العنوان + 3 بطاقات ══════ -->
+        <div class="stock-right-col">
+
+          <!-- العنوان + أيقونة -->
+          <div class="stock-title-section">
+            <div class="stock-title-text">
+              <h3>قيمة المخزون</h3>
+              <p>تطور قيمة المخزون خلال آخر 30 يوم</p>
+            </div>
+            <div class="stock-title-icon">
+              <i class="fas fa-chart-line"></i>
+            </div>
+          </div>
+
+          <!-- 3 بطاقات صغيرة -->
+          <div class="stock-stats-row">
+            <div class="stock-stat-card">
+              <div class="stat-mini-label">أدنى قيمة</div>
+              <div class="stat-mini-value" id="stat-min-value">—</div>
+              <div class="stat-mini-icon down">
+                <i class="fas fa-arrow-down"></i>
+              </div>
+            </div>
+            <div class="stock-stat-card">
+              <div class="stat-mini-label">متوسط القيمة</div>
+              <div class="stat-mini-value" id="stat-avg-value">—</div>
+              <div class="stat-mini-icon up">
+                <i class="fas fa-arrow-up"></i>
+              </div>
+            </div>
+            <div class="stock-stat-card">
+              <div class="stat-mini-label">أعلى قيمة</div>
+              <div class="stat-mini-value" id="stat-max-value">—</div>
+              <div class="stat-mini-icon chart">
+                <i class="fas fa-chart-line"></i>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- ══════ العمود اليسار: البطاقة السوداء ══════ -->
         <div class="stock-hero-card">
           <div class="stock-hero-icon">
             <i class="fas fa-database"></i>
@@ -50,33 +81,9 @@ document.addEventListener('DOMContentLoaded', async () => {
           </div>
         </div>
 
-        <div class="stock-stats-row">
-          <div class="stock-stat-card">
-            <div class="stat-mini-label">أدنى قيمة</div>
-            <div class="stat-mini-value" id="stat-min-value">—</div>
-            <div class="stat-mini-icon down">
-              <i class="fas fa-arrow-down"></i>
-            </div>
-          </div>
-          <div class="stock-stat-card">
-            <div class="stat-mini-label">متوسط القيمة</div>
-            <div class="stat-mini-value" id="stat-avg-value">—</div>
-            <div class="stat-mini-icon up">
-              <i class="fas fa-arrow-up"></i>
-            </div>
-          </div>
-          <div class="stock-stat-card">
-            <div class="stat-mini-label">أعلى قيمة</div>
-            <div class="stat-mini-value" id="stat-max-value">—</div>
-            <div class="stat-mini-icon chart">
-              <i class="fas fa-chart-line"></i>
-            </div>
-          </div>
-        </div>
-
       </div>
 
-      <!-- ✅ المبيان (نفس البطاقة) -->
+      <!-- ✅ المبيان (بعرض كامل) -->
       <div class="stock-chart-section">
         <div class="stock-chart-header">
           <h3>تطور قيمة المخزون</h3>

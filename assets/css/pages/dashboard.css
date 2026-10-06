@@ -18,6 +18,27 @@
 }
 
 /* ============================================
+   ✅ الصف الأعلى: (العنوان + 3 بطاقات) | البطاقة السوداء
+   في RTL:
+   - العنصر الأول (HTML) → يمين
+   - العنصر الثاني → يسار
+   ============================================ */
+.stock-top-row {
+  display: grid;
+  grid-template-columns: 3fr 2fr;
+  gap: 14px;
+  align-items: stretch;
+}
+
+/* ✅ العمود اليمين: العنوان + 3 بطاقات */
+.stock-right-col {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+}
+
+/* ============================================
    العنوان + أيقونة
    ============================================ */
 .stock-title-section {
@@ -29,7 +50,7 @@
 }
 
 .stock-title-text h3 {
-  font-size: 1.4rem;
+  font-size: 1.35rem;
   font-weight: 800;
   color: #171717;
   margin: 0 0 4px;
@@ -58,16 +79,7 @@
 }
 
 /* ============================================
-   البطاقة السوداء + 3 صغيرة
-   ============================================ */
-.stock-top-row {
-  display: grid;
-  grid-template-columns: 3fr 2fr;
-  gap: 12px;
-}
-
-/* ============================================
-   البطاقة الرئيسية (السوداء)
+   البطاقة الرئيسية (السوداء) — على اليسار
    ============================================ */
 .stock-hero-card {
   position: relative;
@@ -81,6 +93,7 @@
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   overflow: hidden;
   min-width: 0;
+  height: 100%;
 }
 
 .stock-hero-card::before {
@@ -159,12 +172,13 @@
 }
 
 /* ============================================
-   الإحصائيات (3 بطاقات صغيرة)
+   الإحصائيات (3 بطاقات صغيرة) — تحت العنوان
    ============================================ */
 .stock-stats-row {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 8px;
+  flex: 1;
 }
 
 .stock-stat-card {
@@ -179,6 +193,7 @@
   gap: 6px;
   transition: transform 0.15s, box-shadow 0.15s;
   min-width: 0;
+  justify-content: center;
 }
 
 .stock-stat-card:hover {
@@ -390,30 +405,19 @@
     gap: 14px;
   }
 
-  .stock-title-text h3 {
-    font-size: 1.15rem;
-  }
-
-  .stock-title-text p {
-    font-size: 11px;
-  }
-
-  .stock-title-icon {
-    width: 40px;
-    height: 40px;
-    font-size: 16px;
-  }
-
-  /* ✅ على الموبايل — عمودي */
+  /* ✅ على الموبايل: البطاقة السوداء أولاً، ثم العنوان + 3 بطاقات */
   .stock-top-row {
     grid-template-columns: 1fr;
-    gap: 10px;
+    gap: 12px;
   }
 
+  /* ✅ البطاقة السوداء أولاً (نُعيد ترتيبها بصرياً) */
   .stock-hero-card {
+    order: -1;
     padding: 16px 14px;
     gap: 12px;
     border-radius: 12px;
+    height: auto;
   }
 
   .stock-hero-icon {
@@ -433,6 +437,24 @@
   .stock-hero-trend {
     font-size: 9px;
     padding: 3px 8px;
+  }
+
+  .stock-right-col {
+    gap: 10px;
+  }
+
+  .stock-title-text h3 {
+    font-size: 1.15rem;
+  }
+
+  .stock-title-text p {
+    font-size: 11px;
+  }
+
+  .stock-title-icon {
+    width: 40px;
+    height: 40px;
+    font-size: 16px;
   }
 
   .stock-stat-card {
