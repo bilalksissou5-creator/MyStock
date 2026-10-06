@@ -1,6 +1,7 @@
 /* ============================================
    صفحة الفاتورة الواحدة
    ✅ تقسيم تلقائي إلى صفحات A4 (كل صفحة فاتورة كاملة)
+   ✅ التوقيعات دائماً في أسفل الصفحة
    ============================================ */
 
 /* ============================================
@@ -55,18 +56,25 @@ main {
 }
 
 /* ============================================
-   ✅ صفحة الفاتورة الواحدة (داخل الحاوية)
+   ✅ صفحة الفاتورة — التوقيعات في الأسفل دائماً
    ============================================ */
 #invoice-content .invoice-page {
+  display: flex;
+  flex-direction: column;
+  min-height: calc(297mm - 30mm);   /* A4 ناقص الهوامش */
   max-width: 800px;
   margin: 0 auto 20px;
   padding: 0;
   box-sizing: border-box;
-  min-height: auto;
   overflow: visible;
   background: transparent;
   box-shadow: none;
   border-radius: 0;
+}
+
+/* ✅ التوقيعات دائماً في الأسفل */
+#invoice-content .invoice-page .invoice-footer {
+  margin-top: auto;
 }
 
 /* ============================================
@@ -426,6 +434,7 @@ main {
     padding: 0;
     margin: 0;
     max-width: 100%;
+    min-height: calc(297mm - 24mm);
     page-break-after: always;
     break-after: page;
   }
@@ -483,6 +492,7 @@ main {
   }
 
   #invoice-content .invoice-page {
+    min-height: auto;
     padding: 0;
     margin-bottom: 12px;
   }
