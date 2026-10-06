@@ -51,36 +51,36 @@
 }
 
 /* ============================================
-   ✅ الصف — auto-fit (يتكيف مع كل الشاشات)
+   ✅ البطاقة البيضاء الكبرى (تحتوي السوداء + 3 صغيرة)
    ============================================ */
+.stock-top-card {
+  background: #ffffff;
+  border: 1px solid #f0f0f0;
+  border-radius: 16px;
+  padding: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+  margin-bottom: 14px;
+}
+
 .stock-top-row {
   display: grid;
   grid-template-columns: 2fr 3fr;
   gap: 12px;
-  margin-bottom: 14px;
-}
-
-/* على الشاشات الصغيرة — auto-fit */
-@media (max-width: 768px) {
-  .stock-top-row {
-    grid-template-columns: 1fr;
-    gap: 10px;
-  }
 }
 
 /* ============================================
-   البطاقة الرئيسية
+   البطاقة الرئيسية (السوداء)
    ============================================ */
 .stock-hero-card {
   position: relative;
   background: linear-gradient(135deg, #171717 0%, #2a2a2a 100%);
   color: #ffffff;
-  border-radius: 16px;
-  padding: 20px 18px;
+  border-radius: 14px;
+  padding: 18px 16px;
   display: flex;
   align-items: center;
-  gap: 16px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  gap: 14px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   overflow: hidden;
   min-width: 0;
 }
@@ -98,14 +98,14 @@
 }
 
 .stock-hero-icon {
-  width: 56px;
-  height: 56px;
+  width: 50px;
+  height: 50px;
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.12);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 22px;
+  font-size: 20px;
   color: #ffffff;
   flex-shrink: 0;
   border: 2px solid rgba(255, 255, 255, 0.15);
@@ -120,29 +120,28 @@
 }
 
 .stock-hero-label {
-  font-size: 11px;
+  font-size: 10px;
   color: rgba(255, 255, 255, 0.65);
-  margin-bottom: 6px;
+  margin-bottom: 4px;
   font-weight: 500;
-  letter-spacing: 0.3px;
 }
 
 .stock-hero-value {
-  font-size: 1.8rem;
+  font-size: 1.5rem;
   font-weight: 800;
   color: #ffffff;
   line-height: 1;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
   letter-spacing: -0.5px;
 }
 
 .stock-hero-trend {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 4px 10px;
+  gap: 5px;
+  padding: 3px 9px;
   border-radius: 20px;
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 700;
   white-space: nowrap;
 }
@@ -158,7 +157,7 @@
 }
 
 .stock-hero-trend i {
-  font-size: 10px;
+  font-size: 9px;
 }
 
 /* ============================================
@@ -167,19 +166,19 @@
 .stock-stats-row {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
+  gap: 8px;
 }
 
 .stock-stat-card {
   background: #ffffff;
   border: 1px solid #f0f0f0;
-  border-radius: 14px;
-  padding: 16px 12px;
+  border-radius: 12px;
+  padding: 12px 8px;
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
-  gap: 8px;
+  gap: 6px;
   transition: transform 0.15s, box-shadow 0.15s;
   min-width: 0;
 }
@@ -190,7 +189,7 @@
 }
 
 .stat-mini-label {
-  font-size: 10px;
+  font-size: 9px;
   color: #737373;
   font-weight: 600;
   white-space: nowrap;
@@ -200,7 +199,7 @@
 }
 
 .stat-mini-value {
-  font-size: 1.15rem;
+  font-size: 1rem;
   font-weight: 800;
   color: #171717;
   line-height: 1;
@@ -211,13 +210,13 @@
 }
 
 .stat-mini-icon {
-  width: 30px;
-  height: 30px;
-  border-radius: 8px;
+  width: 26px;
+  height: 26px;
+  border-radius: 7px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 13px;
+  font-size: 11px;
 }
 
 .stat-mini-icon.down {
@@ -236,7 +235,7 @@
 }
 
 /* ============================================
-   بطاقة المبيان
+   بطاقة المبيان (بطاقة بيضاء منفصلة)
    ============================================ */
 .stock-chart-card {
   background: #ffffff;
@@ -390,18 +389,6 @@
    الهاتف
    ============================================ */
 @media (max-width: 768px) {
-  /* ✅ البطاقة السوداء وحدها + 3 صغيرة تحتها */
-  .stock-top-row {
-    grid-template-columns: 1fr;
-    gap: 10px;
-  }
-
-  /* ✅ 3 بطاقات صغيرة تبقى في صف */
-  .stock-stats-row {
-    grid-template-columns: repeat(3, 1fr);
-    gap: 8px;
-  }
-
   .stock-title-text h3 {
     font-size: 1.15rem;
   }
@@ -416,49 +403,61 @@
     font-size: 16px;
   }
 
-  .stock-hero-card {
-    padding: 18px 16px;
-    gap: 14px;
+  /* ✅ البطاقة البيضاء الكبرى */
+  .stock-top-card {
+    padding: 12px;
     border-radius: 14px;
   }
 
+  /* ✅ على الموبايل — عمودي */
+  .stock-top-row {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .stock-hero-card {
+    padding: 16px 14px;
+    gap: 12px;
+    border-radius: 12px;
+  }
+
   .stock-hero-icon {
-    width: 50px;
-    height: 50px;
-    font-size: 20px;
+    width: 44px;
+    height: 44px;
+    font-size: 18px;
   }
 
   .stock-hero-value {
-    font-size: 1.5rem;
+    font-size: 1.35rem;
   }
 
   .stock-hero-label {
-    font-size: 10px;
+    font-size: 9px;
   }
 
   .stock-hero-trend {
-    font-size: 10px;
+    font-size: 9px;
     padding: 3px 8px;
   }
 
   .stock-stat-card {
-    padding: 12px 6px;
-    border-radius: 12px;
-    gap: 6px;
+    padding: 10px 6px;
+    border-radius: 10px;
+    gap: 5px;
   }
 
   .stat-mini-label {
-    font-size: 9px;
+    font-size: 8px;
   }
 
   .stat-mini-value {
-    font-size: 0.95rem;
+    font-size: 0.85rem;
   }
 
   .stat-mini-icon {
-    width: 26px;
-    height: 26px;
-    font-size: 12px;
+    width: 24px;
+    height: 24px;
+    font-size: 10px;
   }
 
   .stock-chart-card {
@@ -517,11 +516,11 @@
 
 @media (max-width: 380px) {
   .stock-hero-value {
-    font-size: 1.3rem;
+    font-size: 1.2rem;
   }
 
   .stat-mini-value {
-    font-size: 0.85rem;
+    font-size: 0.8rem;
   }
 
   .filter-btn {

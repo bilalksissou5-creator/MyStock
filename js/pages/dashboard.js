@@ -19,54 +19,67 @@ document.addEventListener('DOMContentLoaded', async () => {
          ══════════════════════════════════════ -->
     <div class="stock-value-section">
 
-      <!-- ══════ الصف الأول: بطاقة كبيرة + 3 صغيرة ══════ -->
-      <div class="stock-top-row">
-
-        <!-- ══════ البطاقة الرئيسية ══════ -->
-        <div class="stock-hero-card">
-          <div class="stock-hero-icon">
-            <i class="fas fa-database"></i>
-          </div>
-          <div class="stock-hero-info">
-            <div class="stock-hero-label">القيمة الحالية للمخزون</div>
-            <div class="stock-hero-value">
-              <span id="hero-value">—</span>
-            </div>
-            <div class="stock-hero-trend" id="hero-trend">
-              <i class="fas fa-arrow-up"></i>
-              <span>—</span>
-            </div>
-          </div>
+      <!-- ✅ العنوان + أيقونة -->
+      <div class="stock-title-section">
+        <div class="stock-title-text">
+          <h3>قيمة المخزون</h3>
+          <p>تطور قيمة المخزون خلال آخر 30 يوم</p>
         </div>
-
-        <!-- ══════ الإحصائيات (3 بطاقات صغيرة) ══════ -->
-        <div class="stock-stats-row">
-          <div class="stock-stat-card">
-            <div class="stat-mini-label">أدنى قيمة</div>
-            <div class="stat-mini-value" id="stat-min-value">—</div>
-            <div class="stat-mini-icon down">
-              <i class="fas fa-arrow-down"></i>
-            </div>
-          </div>
-          <div class="stock-stat-card">
-            <div class="stat-mini-label">متوسط القيمة</div>
-            <div class="stat-mini-value" id="stat-avg-value">—</div>
-            <div class="stat-mini-icon up">
-              <i class="fas fa-arrow-up"></i>
-            </div>
-          </div>
-          <div class="stock-stat-card">
-            <div class="stat-mini-label">أعلى قيمة</div>
-            <div class="stat-mini-value" id="stat-max-value">—</div>
-            <div class="stat-mini-icon chart">
-              <i class="fas fa-chart-line"></i>
-            </div>
-          </div>
+        <div class="stock-title-icon">
+          <i class="fas fa-chart-line"></i>
         </div>
-
       </div>
 
-      <!-- ══════ المبيان (بعرض كامل) ══════ -->
+      <!-- ══════ البطاقة البيضاء الكبرى (تحتوي السوداء + 3 صغيرة) ══════ -->
+      <div class="stock-top-card">
+        <div class="stock-top-row">
+
+          <!-- البطاقة الرئيسية -->
+          <div class="stock-hero-card">
+            <div class="stock-hero-icon">
+              <i class="fas fa-database"></i>
+            </div>
+            <div class="stock-hero-info">
+              <div class="stock-hero-label">القيمة الحالية للمخزون</div>
+              <div class="stock-hero-value">
+                <span id="hero-value">—</span>
+              </div>
+              <div class="stock-hero-trend" id="hero-trend">
+                <i class="fas fa-arrow-up"></i>
+                <span>—</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- الإحصائيات -->
+          <div class="stock-stats-row">
+            <div class="stock-stat-card">
+              <div class="stat-mini-label">أدنى قيمة</div>
+              <div class="stat-mini-value" id="stat-min-value">—</div>
+              <div class="stat-mini-icon down">
+                <i class="fas fa-arrow-down"></i>
+              </div>
+            </div>
+            <div class="stock-stat-card">
+              <div class="stat-mini-label">متوسط القيمة</div>
+              <div class="stat-mini-value" id="stat-avg-value">—</div>
+              <div class="stat-mini-icon up">
+                <i class="fas fa-arrow-up"></i>
+              </div>
+            </div>
+            <div class="stock-stat-card">
+              <div class="stat-mini-label">أعلى قيمة</div>
+              <div class="stat-mini-value" id="stat-max-value">—</div>
+              <div class="stat-mini-icon chart">
+                <i class="fas fa-chart-line"></i>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ══════ بطاقة المبيان (بطاقة بيضاء منفصلة) ══════ -->
       <div class="stock-chart-card">
         <div class="stock-chart-header">
           <h3>تطور قيمة المخزون</h3>
@@ -266,7 +279,7 @@ async function loadStockChart(days) {
   document.getElementById('stat-avg-value').textContent = avgValue.toFixed(2);
   document.getElementById('stat-max-value').textContent = maxValue.toFixed(2);
 
-  // ✅ المبيان (بشكل الصورة)
+  // ✅ المبيان
   const options = {
     series: [{
       name: 'قيمة المخزون',
@@ -306,11 +319,11 @@ async function loadStockChart(days) {
       },
     },
     markers: {
-      size: 0,
-      colors: ['#2563eb'],
-      strokeColors: '#ffffff',
-      strokeWidth: 2,
-      hover: { size: 7 },
+      size: 5,
+      colors: ['#ffffff'],
+      strokeColors: '#2563eb',
+      strokeWidth: 2.5,
+      hover: { size: 8 },
     },
     xaxis: {
       type: 'datetime',
