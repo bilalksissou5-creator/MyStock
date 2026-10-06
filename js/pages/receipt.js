@@ -95,8 +95,8 @@ function renderReceipt({ receipt, items }) {
         <div class="rc-empty">لا توجد عناصر</div>
       ` : items.map(item => `
         <div class="rc-line">
-          <span class="rc-qty">${item.qty}</span>
           <span class="rc-name">${item.product_name}</span>
+          <span class="rc-qty">${item.qty}</span>
           <span class="rc-price">${Number(item.price).toFixed(2)}</span>
           <span class="rc-total">${Number(item.total).toFixed(2)}</span>
         </div>
