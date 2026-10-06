@@ -349,9 +349,10 @@ document.addEventListener('DOMContentLoaded', async () => {
       </div>
     `;
 
+    // ✅ جلب الإيصالات (كل الإيصالات - مطبوعة وغير مطبوعة)
     const { data, error } = await db
       .from('receipts')
-      .select('id, receipt_number, total_qty, total_value, created_at')
+      .select('id, receipt_number, total_qty, total_value, created_at, printed_at')
       .eq('created_by', user.id)
       .order('created_at', { ascending: false });
 
@@ -365,7 +366,23 @@ document.addEventListener('DOMContentLoaded', async () => {
       return;
     }
 
+    // ✅ عدد الإيصالات غير المطبوعة
+    const unprintedCount = data.filter(r => !r.printed_at).length;
+
     logOut.innerHTML = `
+      <!-- ✅ زر طباعة الكل (فقط إذا وُجدت إيصالات جديدة) -->
+      ${unprintedCount > 0 ? `
+        <a href="/receipts-print.html" class="print-all-btn">
+          <i class="fas fa-print"></i>
+          <span>طباعة الكل (${unprintedCount} جديد)</span>
+        </a>
+      ` : `
+        <div class="print-all-info">
+          <i class="fas fa-check-circle"></i>
+          <span>جميع الإيصالات مطبوعة</span>
+        </div>
+      `}
+
       <div class="log-list">
         ${data.map(r => `
           <a href="/receipt.html?id=${r.id}" class="log-row log-row-link">
@@ -373,7 +390,10 @@ document.addEventListener('DOMContentLoaded', async () => {
               <strong>${r.receipt_number}</strong>
               <span>${r.total_qty ?? 0} قطعة • ${Number(r.total_value ?? 0).toFixed(2)}</span>
             </div>
-            <div class="log-row-date">${new Date(r.created_at).toLocaleDateString('ar-MA')}</div>
+            <div class="log-row-date">
+              ${new Date(r.created_at).toLocaleDateString('ar-MA')}
+              ${r.printed_at ? '<i class="fas fa-check" style="color:#22c55e; margin-right:4px;" title="مطبوع"></i>' : ''}
+            </div>
           </a>
         `).join('')}
       </div>

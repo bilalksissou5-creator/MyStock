@@ -1,0 +1,402 @@
+/* ============================================
+   صفحة طباعة الإيصالات المجمّعة (80mm)
+   ============================================ */
+
+html, body {
+  height: auto !important;
+  min-height: 100vh;
+  overflow-x: hidden;
+  overflow-y: auto !important;
+}
+
+body.receipts-print-page {
+  background: #f5f5f5;
+  font-family: 'Courier New', 'Tahoma', monospace;
+  padding: 20px 10px 100px;
+  min-height: 100vh;
+}
+
+/* ══════ الحاوية (80mm) ══════ */
+.print-container {
+  max-width: 320px;
+  margin: 0 auto;
+}
+
+/* ══════ الورقة ══════ */
+.rp-paper {
+  background: #ffffff;
+  padding: 16px 14px;
+  border-radius: 6px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  box-sizing: border-box;
+  color: #000;
+  font-size: 12px;
+  line-height: 1.5;
+  text-align: center;
+}
+
+/* ══════ الشعار ══════ */
+.rp-logo-wrap {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 8px;
+}
+
+.rp-logo {
+  width: 50%;
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+}
+
+.rp-logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.rp-logo-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  color: #171717;
+  font-size: 40px;
+}
+
+/* ══════ أشكال الشعار ══════ */
+.rp-logo.shape-circle img {
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.rp-logo.shape-square img {
+  border-radius: 10px;
+  object-fit: cover;
+}
+
+.rp-logo.shape-rectangle {
+  width: 70%;
+  aspect-ratio: 16 / 10;
+}
+
+.rp-logo.shape-rectangle img {
+  border-radius: 10px;
+  object-fit: cover;
+}
+
+/* ══════ اسم المنظمة ══════ */
+.rp-org-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: #000;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+  text-align: center;
+}
+
+/* ══════ الفواصل ══════ */
+.rp-divider-solid {
+  border-top: 1px solid #000;
+  margin: 8px 0;
+}
+
+.rp-divider-dashed {
+  border-top: 1px dashed #999;
+  margin: 8px 0;
+}
+
+/* ══════ الإيصال الواحد ══════ */
+.rp-receipt {
+  padding: 4px 0;
+}
+
+/* ══════ رقم الإيصال ══════ */
+.rp-receipt-num {
+  font-size: 13px;
+  font-weight: 600;
+  color: #000;
+  padding: 4px 0;
+  text-align: center;
+}
+
+.rp-receipt-num strong {
+  font-weight: 800;
+  letter-spacing: 1px;
+}
+
+/* ══════ جدول العناصر ══════ */
+.rp-table {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 6px 0;
+}
+
+.rp-empty {
+  text-align: center;
+  font-size: 11px;
+  color: #999;
+  padding: 8px 0;
+}
+
+/* ══════ سطر منتج (توزيع متساوٍ) ══════ */
+.rp-line {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  gap: 4px;
+  align-items: center;
+  font-size: 12px;
+  text-align: center;
+}
+
+.rp-name {
+  font-weight: 600;
+  color: #000;
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rp-qty {
+  font-weight: 700;
+  color: #000;
+  text-align: center;
+}
+
+.rp-price {
+  font-weight: 500;
+  color: #333;
+  text-align: center;
+}
+
+.rp-total {
+  font-weight: 700;
+  color: #000;
+  text-align: center;
+}
+
+/* ══════ المجموع الكلي للإيصال ══════ */
+.rp-total-row {
+  font-size: 14px;
+  font-weight: 700;
+  color: #000;
+  padding: 6px 0;
+  text-align: center;
+}
+
+.rp-total-row strong {
+  font-size: 16px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  margin-right: 4px;
+}
+
+/* ══════ التاريخ والوقت ══════ */
+.rp-date,
+.rp-time {
+  font-size: 11px;
+  color: #333;
+  padding: 1px 0;
+  text-align: center;
+}
+
+/* ══════ الفاصل الزمني بين الإيصالات ══════ */
+.rp-separator {
+  margin: 14px 0;
+  padding: 6px 0;
+}
+
+.rp-separator-line {
+  border-top: 2px solid #000;
+  margin: 6px 0;
+}
+
+.rp-separator-time {
+  font-size: 13px;
+  font-weight: 800;
+  color: #000;
+  text-align: center;
+  padding: 4px 0;
+  letter-spacing: 1px;
+}
+
+/* ══════ الملخص النهائي ══════ */
+.rp-separator-final {
+  margin: 14px 0;
+}
+
+.rp-separator-final .rp-separator-line {
+  border-top: 2px solid #000;
+  margin: 8px 0;
+}
+
+.rp-summary {
+  padding: 10px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.rp-summary-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  font-weight: 600;
+  color: #000;
+  padding: 2px 0;
+}
+
+.rp-summary-row strong {
+  font-size: 15px;
+  font-weight: 800;
+  color: #000;
+}
+
+/* ══════ حالة "لا توجد إيصالات" ══════ */
+.print-empty {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 40px 20px;
+  text-align: center;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  font-family: system-ui, sans-serif;
+  max-width: 320px;
+  margin: 40px auto;
+}
+
+/* ══════ الأزرار ══════ */
+.rp-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 16px;
+  padding: 12px 0;
+}
+
+.rp-actions .btn-primary,
+.rp-actions .btn-secondary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 16px;
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: 8px;
+  text-decoration: none;
+  cursor: pointer;
+  border: none;
+  font-family: system-ui, sans-serif;
+}
+
+.rp-actions .btn-primary {
+  background: #171717;
+  color: #ffffff;
+}
+
+.rp-actions .btn-secondary {
+  background: #f0f0f0;
+  color: #171717;
+}
+
+.full-width {
+  width: 100%;
+}
+
+/* ══════ الطباعة ══════ */
+@media print {
+  @page {
+    size: 80mm auto;
+    margin: 0;
+  }
+
+  body.receipts-print-page {
+    background: #ffffff;
+    padding: 0;
+  }
+
+  .print-container {
+    max-width: 100%;
+  }
+
+  .rp-paper {
+    box-shadow: none;
+    border-radius: 0;
+    padding: 8px 6px;
+    font-size: 11px;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+
+  /* ✅ منع قطع الإيصال الواحد */
+  .rp-receipt {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+
+  /* ✅ الملخص أيضاً */
+  .rp-summary {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+
+  /* ✅ الشعار واضح */
+  .rp-logo img {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}
+
+/* ══════ الهاتف ══════ */
+@media (max-width: 480px) {
+  body.receipts-print-page {
+    padding: 10px 6px 80px;
+  }
+
+  .rp-paper {
+    max-width: 100%;
+    padding: 12px 10px;
+    font-size: 11px;
+  }
+
+  .rp-org-name {
+    font-size: 13px;
+  }
+
+  .rp-receipt-num {
+    font-size: 12px;
+  }
+
+  .rp-line {
+    font-size: 11px;
+  }
+
+  .rp-total-row {
+    font-size: 13px;
+  }
+
+  .rp-total-row strong {
+    font-size: 15px;
+  }
+
+  .rp-separator-time {
+    font-size: 12px;
+  }
+
+  .rp-summary-row {
+    font-size: 12px;
+  }
+
+  .rp-summary-row strong {
+    font-size: 14px;
+  }
+}
