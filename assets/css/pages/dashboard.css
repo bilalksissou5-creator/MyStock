@@ -88,7 +88,6 @@
   pointer-events: none;
 }
 
-/* ✅ الأيقونة: دائرة داخل مربع (كما في الصورة) */
 .stock-hero-icon {
   width: 56px;
   height: 56px;
@@ -262,7 +261,6 @@
   color: #2563eb;
 }
 
-/* ✅ حاوية المبيان */
 #stock-chart {
   width: 100%;
   min-height: 360px;
@@ -316,7 +314,6 @@
   transform: scale(0.97);
 }
 
-/* ✅ زر "عرض التفاصيل" */
 .filter-details-btn {
   display: inline-flex;
   align-items: center;
@@ -344,7 +341,7 @@
 }
 
 /* ============================================
-   البطاقات القديمة (كما هي)
+   البطاقات القديمة
    ============================================ */
 .stats-grid {
   display: grid;
@@ -375,13 +372,11 @@
    الهاتف
    ============================================ */
 @media (max-width: 768px) {
-  /* ✅ البطاقة الكبيرة + 3 صغيرة → عمودي */
   .stock-top-row {
     grid-template-columns: 1fr;
     gap: 10px;
   }
 
-  /* ✅ العنوان */
   .stock-title-text h3 {
     font-size: 1.15rem;
   }
@@ -396,7 +391,6 @@
     font-size: 16px;
   }
 
-  /* ✅ البطاقة الرئيسية */
   .stock-hero-card {
     padding: 18px 16px;
     gap: 14px;
@@ -422,7 +416,6 @@
     padding: 3px 8px;
   }
 
-  /* ✅ 3 بطاقات صغيرة في صف واحد */
   .stock-stats-row {
     grid-template-columns: repeat(3, 1fr);
     gap: 8px;
@@ -448,7 +441,6 @@
     font-size: 12px;
   }
 
-  /* ✅ المبيان */
   .stock-chart-card {
     padding: 16px 12px 12px;
     border-radius: 14px;
@@ -490,7 +482,6 @@
     padding: 10px;
   }
 
-  /* ✅ البطاقات القديمة */
   .stats-grid {
     grid-template-columns: repeat(2, 1fr);
   }
