@@ -2,7 +2,11 @@
 // صفحة الفاتورة الواحدة
 // الدور: عرض فاتورة واحدة + طباعة + حذف
 // ✅ يجلب العناصر من invoice_items (الكمية المُضافة)
+// ✅ تقسيم تلقائي إلى صفحات A4 (13 صف لكل صفحة)
 // ============================================
+
+const ROWS_PER_PAGE = 13;
+
 document.addEventListener('DOMContentLoaded', async () => {
   const user = await requireAuth();
   if (!user) return;
@@ -80,7 +84,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     .eq('invoice_id', invoice.id)
     .order('created_at', { ascending: true });
 
-  // 6. عرض الفاتورة
+  // 6. عرض الفاتورة (مقسّمة على صفحات)
   renderInvoice({
     invoice,
     supplier,
@@ -102,116 +106,179 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 // ============================================
-// عرض الفاتورة
+// تقسيم المنتجات إلى صفحات
 // ============================================
-function renderInvoice({ invoice, supplier, org, createdBy, items, canDelete }) {
-  const container = document.getElementById('invoice-content');
+function splitIntoPages(items) {
+  const pages = [];
+  for (let i = 0; i < items.length; i += ROWS_PER_PAGE) {
+    pages.push(items.slice(i, i + ROWS_PER_PAGE));
+  }
+  if (pages.length === 0) pages.push([]);
+  return pages;
+}
 
-  const totalQty = invoice.total_qty ?? 0;
-  const totalValue = Number(invoice.total_value ?? 0);
-
+// ============================================
+// بناء صفحة واحدة (بنفس التصميم)
+// ============================================
+function buildPage({ pageNumber, totalPages, pageItems, invoice, supplier, org, createdBy, globalRowStart }) {
   const date = new Date(invoice.created_at);
   const dateStr = date.toLocaleDateString('ar-MA');
   const timeStr = date.toLocaleTimeString('ar-MA', { hour: '2-digit', minute: '2-digit' });
 
   const logoShape = org?.logo_shape || 'circle';
 
-  container.innerHTML = `
-    <div class="invoice-header">
-      <div class="invoice-logo shape-${logoShape}">
-        ${org?.logo_url
-          ? `<img src="${org.logo_url}" alt="logo">`
-          : `<div class="logo-placeholder"><i class="fas fa-boxes-stacked"></i></div>`}
-      </div>
-      <div class="invoice-org">
-        <h1>${org?.name ?? 'MyStock'}</h1>
-      </div>
-    </div>
+  // مجموع هذه الصفحة
+  const pageTotalQty = pageItems.reduce((s, it) => s + Number(it.qty ?? 0), 0);
+  const pageTotalValue = pageItems.reduce((s, it) => s + Number(it.total ?? 0), 0);
 
-    <div class="invoice-info-row">
-      <div class="info-box">
-        <h3>بيانات الفاتورة</h3>
-        <div class="info-row">
-          <strong>رقم الفاتورة:</strong>
-          <span>${invoice.invoice_number}</span>
+  // المجموع الكلي (من الفاتورة)
+  const grandTotalQty = invoice.total_qty ?? 0;
+  const grandTotalValue = Number(invoice.total_value ?? 0);
+
+  return `
+    <div class="invoice-page">
+
+      <!-- ══════ رأس الصفحة ══════ -->
+      <div class="invoice-header">
+        <div class="invoice-logo shape-${logoShape}">
+          ${org?.logo_url
+            ? `<img src="${org.logo_url}" alt="logo">`
+            : `<div class="logo-placeholder"><i class="fas fa-boxes-stacked"></i></div>`}
         </div>
-        <div class="info-row">
-          <strong>التاريخ:</strong>
-          <span>${dateStr}</span>
-        </div>
-        <div class="info-row">
-          <strong>الوقت:</strong>
-          <span>${timeStr}</span>
+        <div class="invoice-org">
+          <h1>${org?.name ?? 'MyStock'}</h1>
         </div>
       </div>
 
-      <div class="info-box">
-        <h3>بيانات المورد</h3>
-        <div class="info-row">
-          <strong>الاسم:</strong>
-          <span>${supplier?.name ?? '—'}</span>
+      <div class="invoice-info-row">
+        <div class="info-box">
+          <h3>بيانات الفاتورة</h3>
+          <div class="info-row">
+            <strong>رقم الفاتورة:</strong>
+            <span>${invoice.invoice_number}</span>
+          </div>
+          <div class="info-row">
+            <strong>التاريخ:</strong>
+            <span>${dateStr}</span>
+          </div>
+          <div class="info-row">
+            <strong>الوقت:</strong>
+            <span>${timeStr}</span>
+          </div>
         </div>
-        <div class="info-row">
-          <strong>الهاتف:</strong>
-          <span dir="ltr">${supplier?.phone ?? '—'}</span>
-        </div>
-        <div class="info-row">
-          <strong>الإختصاص:</strong>
-          <span>${supplier?.specialty ?? '—'}</span>
+
+        <div class="info-box">
+          <h3>بيانات المورد</h3>
+          <div class="info-row">
+            <strong>الاسم:</strong>
+            <span>${supplier?.name ?? '—'}</span>
+          </div>
+          <div class="info-row">
+            <strong>الهاتف:</strong>
+            <span dir="ltr">${supplier?.phone ?? '—'}</span>
+          </div>
+          <div class="info-row">
+            <strong>الإختصاص:</strong>
+            <span>${supplier?.specialty ?? '—'}</span>
+          </div>
         </div>
       </div>
-    </div>
 
-    <table class="invoice-table">
-      <thead>
-        <tr>
-          <th>#</th>
-          <th>المنتج</th>
-          <th>الكمية</th>
-          <th>السعر</th>
-          <th>المجموع</th>
-        </tr>
-      </thead>
-      <tbody>
-        ${items.length === 0 ? `
+      <!-- ══════ جدول المنتجات ══════ -->
+      <table class="invoice-table">
+        <thead>
           <tr>
-            <td colspan="5" style="text-align:center; color:#737373; padding:20px;">
-              لا توجد عناصر في هذه الفاتورة
-            </td>
+            <th>#</th>
+            <th>المنتج</th>
+            <th>الكمية</th>
+            <th>السعر</th>
+            <th>المجموع</th>
           </tr>
-        ` : items.map((item, i) => `
+        </thead>
+        <tbody>
+          ${pageItems.length === 0 ? `
+            <tr>
+              <td colspan="5" style="text-align:center; color:#737373; padding:20px;">
+                لا توجد عناصر
+              </td>
+            </tr>
+          ` : pageItems.map((item, i) => `
+            <tr>
+              <td>${globalRowStart + i + 1}</td>
+              <td>${item.product_name ?? '—'}</td>
+              <td>${item.qty ?? 0}</td>
+              <td>${Number(item.price ?? 0).toFixed(2)}</td>
+              <td>${Number(item.total ?? 0).toFixed(2)}</td>
+            </tr>
+          `).join('')}
+        </tbody>
+        <tfoot>
           <tr>
-            <td>${i + 1}</td>
-            <td>${item.product_name ?? '—'}</td>
-            <td>${item.qty ?? 0}</td>
-            <td>${Number(item.price ?? 0).toFixed(2)}</td>
-            <td>${Number(item.total ?? 0).toFixed(2)}</td>
+            <td colspan="2"><strong>مجموع الصفحة</strong></td>
+            <td><strong>${pageTotalQty}</strong></td>
+            <td>—</td>
+            <td><strong>${pageTotalValue.toFixed(2)}</strong></td>
           </tr>
-        `).join('')}
-      </tbody>
-      <tfoot>
-        <tr>
-          <td colspan="2"><strong>الإجمالي</strong></td>
-          <td><strong>${totalQty}</strong></td>
-          <td>—</td>
-          <td><strong>${totalValue.toFixed(2)}</strong></td>
-        </tr>
-      </tfoot>
-    </table>
+          ${totalPages > 1 ? `
+            <tr class="grand-total-row">
+              <td colspan="2"><strong>المجموع الكلي</strong></td>
+              <td><strong>${grandTotalQty}</strong></td>
+              <td>—</td>
+              <td><strong>${grandTotalValue.toFixed(2)}</strong></td>
+            </tr>
+          ` : ''}
+        </tfoot>
+      </table>
 
-    <div class="invoice-footer">
-      <div class="footer-signature">
-        <p><strong>الموظف المسؤول:</strong></p>
-        <p>${createdBy?.full_name ?? '—'}</p>
-        <div class="signature-line"></div>
+      <!-- ══════ التوقيعات ══════ -->
+      <div class="invoice-footer">
+        <div class="footer-signature">
+          <p><strong>الموظف المسؤول:</strong></p>
+          <p>${createdBy?.full_name ?? '—'}</p>
+          <div class="signature-line"></div>
+        </div>
+        <div class="footer-signature">
+          <p><strong>توقيع المورد:</strong></p>
+          <p class="supplier-name">${supplier?.name ?? '—'}</p>
+          <div class="signature-line"></div>
+        </div>
       </div>
-      <div class="footer-signature">
-        <p><strong>توقيع المورد:</strong></p>
-        <p class="supplier-name">${supplier?.name ?? '—'}</p>
-        <div class="signature-line"></div>
-      </div>
+
+      <!-- ══════ رقم الصفحة ══════ -->
+      ${totalPages > 1 ? `
+        <div class="page-number">الصفحة ${pageNumber} من ${totalPages}</div>
+      ` : ''}
+
     </div>
+  `;
+}
 
+// ============================================
+// عرض الفاتورة (مقسّمة على صفحات)
+// ============================================
+function renderInvoice({ invoice, supplier, org, createdBy, items, canDelete }) {
+  const container = document.getElementById('invoice-content');
+
+  const pages = splitIntoPages(items);
+  const totalPages = pages.length;
+
+  let html = '';
+
+  pages.forEach((pageItems, idx) => {
+    html += buildPage({
+      pageNumber: idx + 1,
+      totalPages,
+      pageItems,
+      invoice,
+      supplier,
+      org,
+      createdBy,
+      globalRowStart: idx * ROWS_PER_PAGE,
+    });
+  });
+
+  // ══════ الأزرار (مرة واحدة، في آخر الصفحة) ══════
+  html += `
     <div class="invoice-actions no-print">
       <button class="btn-primary" onclick="window.print()">
         <i class="fas fa-print"></i>
@@ -229,10 +296,12 @@ function renderInvoice({ invoice, supplier, org, createdBy, items, canDelete }) 
       ` : ''}
     </div>
   `;
+
+  container.innerHTML = html;
 }
 
 // ============================================
-// ✅ حذف الفاتورة + منتجاتها
+// حذف الفاتورة + منتجاتها
 // ============================================
 async function handleDeleteInvoice(invoice) {
   const confirmed = confirm(
@@ -250,7 +319,7 @@ async function handleDeleteInvoice(invoice) {
   }
 
   try {
-    // 1. حذف عناصر الفاتورة من invoice_items
+    // 1. حذف عناصر الفاتورة
     const { error: itemsErr } = await db
       .from('invoice_items')
       .delete()
@@ -258,7 +327,7 @@ async function handleDeleteInvoice(invoice) {
 
     if (itemsErr) throw new Error('فشل حذف عناصر الفاتورة: ' + itemsErr.message);
 
-    // 2. حذف المنتجات المرتبطة بالفاتورة
+    // 2. حذف المنتجات
     const { error: productsErr } = await db
       .from('products')
       .delete()
@@ -274,7 +343,6 @@ async function handleDeleteInvoice(invoice) {
 
     if (invoiceErr) throw new Error('فشل حذف الفاتورة: ' + invoiceErr.message);
 
-    // 4. النجاح → العودة للقائمة
     alert('✅ تم حذف الفاتورة بنجاح');
     window.location.href = '/invoices/list.html';
 

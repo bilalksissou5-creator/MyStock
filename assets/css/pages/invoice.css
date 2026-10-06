@@ -1,5 +1,6 @@
 /* ============================================
    صفحة الفاتورة الواحدة
+   ✅ تقسيم تلقائي إلى صفحات A4 (كل صفحة فاتورة كاملة)
    ============================================ */
 
 /* ============================================
@@ -59,6 +60,19 @@ main {
 }
 
 /* ============================================
+   ✅ صفحة الفاتورة الواحدة (داخل الحاوية)
+   ============================================ */
+.invoice-page-item,
+.invoice-page-content {
+  background: white;
+  border-radius: 12px;
+  padding: 18px 22px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  box-sizing: border-box;
+}
+
+/* ============================================
    الرأس: شعار + اسم المنظمة
    ============================================ */
 .invoice-header {
@@ -99,7 +113,7 @@ main {
 }
 
 /* ══════════════════════════════════════════
-   ✅ أشكال الشعار
+   أشكال الشعار
    ══════════════════════════════════════════ */
 .invoice-logo.shape-circle {
   border-radius: 50%;
@@ -124,7 +138,7 @@ main {
 }
 
 /* ============================================
-   ✅ صف المعلومات: البطاقتان أفقيتان دائماً
+   صف المعلومات: البطاقتان أفقيتان دائماً
    ============================================ */
 .invoice-info-row {
   display: grid;
@@ -232,8 +246,27 @@ main {
   font-size: 0.95rem;
 }
 
+/* ══════════════════════════════════════════
+   المجموع الكلي (عند وجود أكثر من صفحة)
+   ══════════════════════════════════════════ */
+.invoice-table tfoot .grand-total-row td {
+  background: #171717;
+  color: white;
+  font-weight: 800;
+  border-top: none;
+}
+
+.invoice-table tfoot .grand-total-row td:first-child {
+  color: #d4d4d4;
+}
+
+.invoice-table tfoot .grand-total-row td:last-child {
+  color: white;
+  font-size: 1.05rem;
+}
+
 /* ============================================
-   ✅ التوقيعات: أفقيتان دائماً
+   التوقيعات
    ============================================ */
 .invoice-footer {
   display: grid;
@@ -259,7 +292,6 @@ main {
   font-weight: 500;
 }
 
-/* ✅ اسم المورد تحت "توقيع المورد" */
 .footer-signature .supplier-name {
   font-size: 12px;
   font-weight: 700;
@@ -273,7 +305,19 @@ main {
 }
 
 /* ============================================
-   ✅ الأزرار (طباعة + الفواتير + حذف)
+   ✅ رقم الصفحة (عند وجود أكثر من صفحة)
+   ============================================ */
+.page-number {
+  text-align: center;
+  font-size: 10px;
+  color: #737373;
+  margin-top: 10px;
+  padding-top: 6px;
+  border-top: 1px dashed #e5e5e5;
+}
+
+/* ============================================
+   الأزرار
    ============================================ */
 .invoice-actions {
   display: flex;
@@ -342,30 +386,71 @@ main {
 }
 
 /* ============================================
+   ✅ فصل الصفحات (للعرض قبل الطباعة)
+   ============================================ */
+.invoice-page {
+  page-break-after: always;
+  break-after: page;
+}
+
+.invoice-page:last-child {
+  page-break-after: auto;
+  break-after: auto;
+}
+
+/* ============================================
+   ✅ إصلاح: الفاتورة داخل الحاوية
+   ============================================ */
+#invoice-content .invoice-page {
+  background: white;
+  max-width: 800px;
+  margin: 0 auto 20px;
+  padding: 18px 22px;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  box-sizing: border-box;
+  min-height: auto;
+  overflow: visible;
+}
+
+/* ============================================
    الطباعة
    ============================================ */
 @media print {
   @page {
     size: A4;
-    margin: 10mm;
+    margin: 12mm;
   }
 
-  .invoice-page {
+  body {
     background: white;
     padding: 0;
+    margin: 0;
   }
 
-  .invoice-container {
+  /* ✅ إزالة الخلفيات والظلال عند الطباعة */
+  #invoice-content .invoice-page {
+    background: white;
     box-shadow: none;
     border-radius: 0;
     padding: 0;
+    margin: 0;
     max-width: 100%;
+    page-break-after: always;
+    break-after: page;
   }
 
+  #invoice-content .invoice-page:last-child {
+    page-break-after: auto;
+    break-after: auto;
+  }
+
+  /* ✅ الأزرار مخفية */
   .no-print {
     display: none !important;
   }
 
+  /* ✅ ألوان دقيقة */
   .invoice-table thead {
     background: #000 !important;
     color: white !important;
@@ -378,10 +463,33 @@ main {
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
   }
+
+  .invoice-table tfoot .grand-total-row td {
+    background: #000 !important;
+    color: white !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* ✅ منع قطع الصفوف */
+  .invoice-table tr {
+    page-break-inside: avoid;
+  }
+
+  /* ✅ رأس الجدول يتكرر في كل صفحة */
+  .invoice-table thead {
+    display: table-header-group;
+  }
+
+  /* ✅ عدد الصفحات يظهر */
+  .page-number {
+    display: block !important;
+    color: #000;
+  }
 }
 
 /* ============================================
-   ✅ الهاتف
+   الهاتف
    ============================================ */
 @media (max-width: 768px) {
   .invoice-page {
@@ -391,6 +499,12 @@ main {
   .invoice-container {
     padding: 14px 12px;
     border-radius: 10px;
+  }
+
+  #invoice-content .invoice-page {
+    padding: 14px 12px;
+    border-radius: 10px;
+    margin-bottom: 12px;
   }
 
   .invoice-header {
@@ -449,7 +563,7 @@ main {
 }
 
 /* ============================================
-   ✅ تحسين للشاشات الضيقة جداً (< 480px)
+   تحسين للشاشات الضيقة جداً (< 480px)
    ============================================ */
 @media (max-width: 480px) {
   .info-box {
