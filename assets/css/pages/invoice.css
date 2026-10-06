@@ -62,14 +62,13 @@ main {
 /* ============================================
    ✅ صفحة الفاتورة الواحدة (داخل الحاوية)
    ============================================ */
-.invoice-page-item,
-.invoice-page-content {
-  background: white;
-  border-radius: 12px;
-  padding: 18px 22px;
-  margin-bottom: 20px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+#invoice-content .invoice-page {
+  max-width: 800px;
+  margin: 0 auto 20px;
+  padding: 0;
   box-sizing: border-box;
+  min-height: auto;
+  overflow: visible;
 }
 
 /* ============================================
@@ -399,21 +398,6 @@ main {
 }
 
 /* ============================================
-   ✅ إصلاح: الفاتورة داخل الحاوية
-   ============================================ */
-#invoice-content .invoice-page {
-  background: white;
-  max-width: 800px;
-  margin: 0 auto 20px;
-  padding: 18px 22px;
-  border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-  box-sizing: border-box;
-  min-height: auto;
-  overflow: visible;
-}
-
-/* ============================================
    الطباعة
    ============================================ */
 @media print {
@@ -428,7 +412,6 @@ main {
     margin: 0;
   }
 
-  /* ✅ إزالة الخلفيات والظلال عند الطباعة */
   #invoice-content .invoice-page {
     background: white;
     box-shadow: none;
@@ -445,12 +428,10 @@ main {
     break-after: auto;
   }
 
-  /* ✅ الأزرار مخفية */
   .no-print {
     display: none !important;
   }
 
-  /* ✅ ألوان دقيقة */
   .invoice-table thead {
     background: #000 !important;
     color: white !important;
@@ -471,17 +452,14 @@ main {
     print-color-adjust: exact;
   }
 
-  /* ✅ منع قطع الصفوف */
   .invoice-table tr {
     page-break-inside: avoid;
   }
 
-  /* ✅ رأس الجدول يتكرر في كل صفحة */
   .invoice-table thead {
     display: table-header-group;
   }
 
-  /* ✅ عدد الصفحات يظهر */
   .page-number {
     display: block !important;
     color: #000;
@@ -502,8 +480,7 @@ main {
   }
 
   #invoice-content .invoice-page {
-    padding: 14px 12px;
-    border-radius: 10px;
+    padding: 0;
     margin-bottom: 12px;
   }
 
@@ -526,13 +503,11 @@ main {
     font-size: 1rem;
   }
 
-  /* ✅ البطاقتان أفقيتان دائماً */
   .invoice-info-row {
     grid-template-columns: 1fr 1fr;
     gap: 8px;
   }
 
-  /* ✅ التوقيعات أفقية دائماً */
   .invoice-footer {
     grid-template-columns: 1fr 1fr;
     gap: 14px;
