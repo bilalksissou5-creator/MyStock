@@ -61,7 +61,7 @@ main {
 #invoice-content .invoice-page {
   display: flex;
   flex-direction: column;
-  min-height: calc(297mm - 30mm);   /* A4 ناقص الهوامش */
+  min-height: calc(297mm - 30mm);
   max-width: 800px;
   margin: 0 auto 20px;
   padding: 0;
@@ -75,11 +75,6 @@ main {
 /* ✅ التوقيعات دائماً في الأسفل */
 #invoice-content .invoice-page .invoice-footer {
   margin-top: auto;
-}
-
-/* ✅ رقم الصفحة في الأسفل بعد التوقيعات */
-#invoice-content .invoice-page .page-number {
-  margin-top: 0;
 }
 
 /* ============================================
@@ -276,7 +271,7 @@ main {
 }
 
 /* ============================================
-   ✅ التوقيعات — مثبتة في الأسفل
+   ✅ التوقيعات
    ============================================ */
 .invoice-footer {
   display: grid;
@@ -434,14 +429,18 @@ main {
     max-width: 100%;
   }
 
+  /* ✅ الصفحة الواحدة: position relative + height ثابت */
   #invoice-content .invoice-page {
+    position: relative;
+    display: block;
     background: white;
     box-shadow: none !important;
     border-radius: 0;
     padding: 0;
     margin: 0;
     max-width: 100%;
-    min-height: calc(297mm - 24mm);
+    height: 273mm;   /* A4 (297mm) - الهوامش (12+12) */
+    overflow: hidden;
     page-break-after: always;
     break-after: page;
   }
@@ -449,6 +448,24 @@ main {
   #invoice-content .invoice-page:last-child {
     page-break-after: auto;
     break-after: auto;
+  }
+
+  /* ✅ التوقيعات: مثبتة في أسفل الصفحة */
+  #invoice-content .invoice-page .invoice-footer {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: 0;
+    padding-top: 10px;
+    background: white;
+  }
+
+  #invoice-content .invoice-page .page-number {
+    position: absolute;
+    bottom: -20px;
+    left: 0;
+    right: 0;
   }
 
   .no-print {
@@ -481,11 +498,6 @@ main {
 
   .invoice-table thead {
     display: table-header-group;
-  }
-
-  .invoice-footer {
-    page-break-inside: avoid;
-    break-inside: avoid;
   }
 
   .page-number {
