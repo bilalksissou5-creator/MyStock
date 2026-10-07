@@ -18,18 +18,12 @@
 }
 
 /* ============================================
-   ✅ الصف الأعلى — تصغير أكثر
+   ✅ الصف الأعلى — يظهر في نفس الصف دائماً
    ============================================ */
 .stock-top-row {
   display: grid;
   grid-template-columns: minmax(150px, 1fr) minmax(0, 2.5fr);
   gap: 8px;
-}
-
-@media (max-width: 768px) {
-  .stock-top-row {
-    grid-template-columns: 1fr;
-  }
 }
 
 /* ============================================
@@ -83,7 +77,7 @@
 }
 
 /* ============================================
-   البطاقة السوداء — مصغّرة
+   البطاقة السوداء
    ============================================ */
 .stock-hero-card {
   position: relative;
@@ -400,101 +394,105 @@
 }
 
 /* ============================================
-   الهاتف
+   ✅ الهاتف — تصغير فقط (بدون تغيير التخطيط)
    ============================================ */
 @media (max-width: 768px) {
   .stock-value-card {
-    padding: 12px 10px;
+    padding: 10px 8px;
     border-radius: 12px;
-    gap: 10px;
+    gap: 8px;
   }
 
+  /* ✅ stock-top-row — لا تغيير (يبقى في صف) */
+
   .stock-hero-card {
-    order: -1;
-    padding: 12px 10px;
-    gap: 8px;
-    border-radius: 10px;
-    height: auto;
+    padding: 8px 8px;
+    gap: 6px;
+    border-radius: 8px;
   }
 
   .stock-hero-icon {
-    width: 32px;
-    height: 32px;
-    font-size: 14px;
+    width: 28px;
+    height: 28px;
+    font-size: 12px;
   }
 
   .stock-hero-value {
-    font-size: 0.95rem;
+    font-size: 0.85rem;
   }
 
   .stock-hero-label {
-    font-size: 8px;
+    font-size: 7px;
   }
 
   .stock-hero-trend {
-    font-size: 8px;
-    padding: 2px 6px;
+    font-size: 7px;
+    padding: 1px 5px;
+  }
+
+  .stock-hero-trend i {
+    font-size: 6px;
   }
 
   .stock-right-col {
-    gap: 8px;
+    gap: 6px;
   }
 
   .stock-title-text h3 {
-    font-size: 0.95rem;
+    font-size: 0.85rem;
   }
 
   .stock-title-text p {
-    font-size: 10px;
+    font-size: 9px;
   }
 
   .stock-title-icon {
-    width: 30px;
-    height: 30px;
-    font-size: 12px;
+    width: 26px;
+    height: 26px;
+    font-size: 11px;
   }
 
   .stock-stat-card {
-    padding: 6px 3px;
-    border-radius: 8px;
-    gap: 3px;
+    padding: 5px 2px;
+    border-radius: 7px;
+    gap: 2px;
   }
 
   .stat-mini-label {
-    font-size: 7px;
+    font-size: 6px;
   }
 
   .stat-mini-value {
-    font-size: 0.7rem;
+    font-size: 0.65rem;
   }
 
   .stat-mini-icon {
-    width: 16px;
-    height: 16px;
-    font-size: 7px;
+    width: 14px;
+    height: 14px;
+    font-size: 6px;
   }
 
   .stock-chart-section {
-    padding-top: 12px;
+    padding-top: 10px;
   }
 
   .stock-chart-header h3 {
-    font-size: 12px;
+    font-size: 11px;
   }
 
   .stock-chart-badge {
     font-size: 9px;
-    padding: 4px 8px;
+    padding: 3px 8px;
   }
 
   #stock-chart {
-    min-height: 280px;
+    min-height: 260px;
   }
 
   .stock-chart-filters {
     flex-direction: column;
     align-items: stretch;
-    gap: 8px;
+    gap: 6px;
   }
 
   .filters-left {
@@ -503,16 +501,16 @@
 
   .filter-btn {
     flex: 1;
-    padding: 7px 6px;
-    font-size: 10px;
+    padding: 6px 4px;
+    font-size: 9px;
     text-align: center;
   }
 
   .filter-details-btn {
     width: 100%;
     justify-content: center;
-    padding: 8px;
-    font-size: 10px;
+    padding: 7px;
+    font-size: 9px;
   }
 
   .stats-grid {
@@ -530,15 +528,23 @@
 
 @media (max-width: 380px) {
   .stock-hero-value {
-    font-size: 0.9rem;
+    font-size: 0.75rem;
+  }
+
+  .stock-hero-label {
+    font-size: 6px;
   }
 
   .stat-mini-value {
-    font-size: 0.65rem;
+    font-size: 0.6rem;
+  }
+
+  .stat-mini-label {
+    font-size: 5px;
   }
 
   .filter-btn {
-    font-size: 9px;
-    padding: 6px 5px;
+    font-size: 8px;
+    padding: 5px 4px;
   }
 }
