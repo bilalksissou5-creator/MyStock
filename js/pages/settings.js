@@ -31,7 +31,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       <!-- ══════ بطاقة 2: الاتصالات + الأجهزة ══════ -->
       <div class="settings-card">
 
-        <!-- الاتصالات -->
         <a href="/contacts.html" class="settings-item">
           <div class="settings-icon icon-green">
             <i class="fa-solid fa-wifi"></i>
@@ -42,7 +41,6 @@ document.addEventListener('DOMContentLoaded', async () => {
           <i class="fas fa-chevron-left settings-arrow"></i>
         </a>
 
-        <!-- الأجهزة -->
         <a href="/devices.html" class="settings-item">
           <div class="settings-icon icon-orange">
             <i class="fa-solid fa-laptop"></i>
@@ -53,6 +51,32 @@ document.addEventListener('DOMContentLoaded', async () => {
           <i class="fas fa-chevron-left settings-arrow"></i>
         </a>
 
+      </div>
+
+      <!-- ══════ بطاقة 3: الإدارة العامة ══════ -->
+      <div class="settings-card">
+        <div class="settings-item" id="admin-panel-item">
+          <div class="settings-icon icon-purple">
+            <i class="fas fa-sliders"></i>
+          </div>
+          <div class="settings-text">
+            <div class="settings-title">الإدارة العامة</div>
+          </div>
+          <i class="fas fa-chevron-left settings-arrow"></i>
+        </div>
+      </div>
+
+      <!-- ══════ بطاقة 4: الإشعارات ══════ -->
+      <div class="settings-card">
+        <div class="settings-item" id="notifications-item">
+          <div class="settings-icon icon-red">
+            <i class="fas fa-bell"></i>
+          </div>
+          <div class="settings-text">
+            <div class="settings-title">الإشعارات</div>
+          </div>
+          <i class="fas fa-chevron-left settings-arrow"></i>
+        </div>
       </div>
 
     </div>

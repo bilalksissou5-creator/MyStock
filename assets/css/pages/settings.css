@@ -74,6 +74,16 @@
   color: #ea8600;
 }
 
+.icon-purple {
+  background: #f3e8fd;
+  color: #8e24aa;
+}
+
+.icon-red {
+  background: #fce8e6;
+  color: #d93025;
+}
+
 /* ══════ النص ══════ */
 .settings-text {
   flex: 1;
