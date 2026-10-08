@@ -1,7 +1,8 @@
 // ============================================
 // صفحة إنشاء حساب جديد
 // ✅ يُنشئ subscriptions بحالة pending
-// ✅ يُحوّل إلى subscription.html
+// ✅ يُحوّل إلى subscription.html فقط عند الضغط على الزر
+// ✅ منع Enter/Go/Done من إرسال الفورم
 // ============================================
 document.addEventListener('DOMContentLoaded', () => {
 
@@ -21,6 +22,16 @@ document.addEventListener('DOMContentLoaded', () => {
   const form = document.getElementById('register-form');
   if (!form) return;
 
+  // ✅ منع Enter / Go / Done من إرسال الفورم
+  form.querySelectorAll('input').forEach(input => {
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+    });
+  });
+
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
 
@@ -37,6 +48,25 @@ document.addEventListener('DOMContentLoaded', () => {
     const email = document.getElementById('email').value.trim();
     const password = document.getElementById('password').value;
     const passwordConfirm = document.getElementById('password_confirm').value;
+
+    // ✅ التحقق من الحقول
+    if (!firstName || !lastName) {
+      errBox.textContent = 'الاسم مطلوب';
+      errBox.style.display = 'block';
+      return;
+    }
+
+    if (!orgName) {
+      errBox.textContent = 'اسم المنظمة مطلوب';
+      errBox.style.display = 'block';
+      return;
+    }
+
+    if (!email || !email.includes('@')) {
+      errBox.textContent = 'البريد الإلكتروني غير صحيح';
+      errBox.style.display = 'block';
+      return;
+    }
 
     if (password !== passwordConfirm) {
       errBox.textContent = 'كلمتا السر غير متطابقتين';
@@ -112,7 +142,7 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    // ✅ 4. إنشاء اشتراك بحالة pending
+    // 4. إنشاء اشتراك بحالة pending
     const { error: subError } = await db
       .from('subscriptions')
       .insert({
@@ -127,13 +157,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (subError) {
       console.error('❌ Subscription error:', subError);
-      // لا نوقف العملية — يمكن إنشاؤه لاحقاً
     }
 
-    successBox.textContent = '✅ تم إنشاء الحساب! جارٍ تحويلك للاشتراك...';
+    successBox.textContent = '✅ تم إنشاء الحساب! جارٍ تحويلك...';
     successBox.style.display = 'block';
 
-    // ✅ 5. تحويل إلى صفحة الاشتراك
+    // ✅ التحويل فقط بعد الضغط على الزر
     setTimeout(() => {
       window.location.href = '/subscription.html';
     }, 1500);
