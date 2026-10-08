@@ -1,57 +1,118 @@
 /* ============================================
-   صفحة الإعدادات - تنسيقات خاصة فقط
+   صفحة الإعدادات
    ============================================ */
 
-.settings-section {
-  background: white;
-  border-radius: 10px;
-  padding: 24px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
-  margin-bottom: 16px;
-  max-width: 600px;
-  margin-left: auto;
-  margin-right: auto;
-  box-sizing: border-box;
-}
-
-.settings-section h3 {
-  font-size: 1.1rem;
-  font-weight: 700;
-  margin-bottom: 16px;
-  padding-bottom: 12px;
-  border-bottom: 1px solid #f5f5f5;
-}
-
-.info-row {
+/* ============================================
+   قائمة البطاقات
+   ============================================ */
+.settings-cards-list {
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
+  gap: 10px;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* ============================================
+   البطاقة الواحدة
+   ============================================ */
+.settings-card {
+  display: flex;
   align-items: center;
-  padding: 10px 0;
-  font-size: 14px;
+  gap: 14px;
+  padding: 16px;
+  background: #ffffff;
+  border: 1px solid #e5e5e5;
+  border-radius: 14px;
+  text-decoration: none;
+  color: inherit;
+  transition: all 0.15s ease;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+  cursor: pointer;
 }
 
-.info-row span {
+.settings-card:hover {
+  border-color: #d4d4d4;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  transform: translateY(-1px);
+}
+
+.settings-card:active {
+  transform: translateY(0);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+}
+
+/* ══════ أيقونة البطاقة ══════ */
+.settings-card-icon {
+  width: 46px;
+  height: 46px;
+  border-radius: 12px;
+  background: #f5f5f5;
+  color: #171717;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+/* ══════ نص البطاقة ══════ */
+.settings-card-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.settings-card-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: #171717;
+  text-align: right;
+}
+
+.settings-card-subtitle {
+  font-size: 12px;
   color: #737373;
+  text-align: right;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-.info-row strong {
-  font-weight: 600;
+/* ══════ سهم البطاقة ══════ */
+.settings-card-arrow {
+  color: #d4d4d4;
+  font-size: 14px;
+  flex-shrink: 0;
+  transition: color 0.15s;
 }
 
-@media (max-width: 768px) {
-  .settings-section {
-    padding: 16px;
-    max-width: 100%;
+.settings-card:hover .settings-card-arrow {
+  color: #171717;
+}
+
+/* ============================================
+   Responsive
+   ============================================ */
+@media (max-width: 480px) {
+  .settings-card {
+    padding: 14px;
+    gap: 12px;
   }
 
-  .settings-section h3 {
-    font-size: 1rem;
-    margin-bottom: 12px;
-    padding-bottom: 10px;
+  .settings-card-icon {
+    width: 42px;
+    height: 42px;
+    font-size: 16px;
   }
 
-  .info-row {
-    padding: 8px 0;
-    font-size: 13px;
+  .settings-card-title {
+    font-size: 14px;
+  }
+
+  .settings-card-subtitle {
+    font-size: 11px;
   }
 }
