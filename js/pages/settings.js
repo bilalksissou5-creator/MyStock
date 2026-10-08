@@ -1,6 +1,6 @@
 // ============================================
 // صفحة الإعدادات
-// ✅ بطاقة الملف الشخصي
+// ✅ تصميم Samsung One UI
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   const user = await requireAuth();
@@ -13,20 +13,27 @@ document.addEventListener('DOMContentLoaded', async () => {
   main.innerHTML = `
     <h2>الإعدادات</h2>
 
-    <div class="settings-cards-list">
+    <div class="settings-list">
 
-      <!-- ✅ بطاقة الملف الشخصي -->
-      <a href="/profile-dashboard.html" class="settings-card">
-        <div class="settings-card-icon">
+      <a href="/profile-dashboard.html" class="settings-item">
+        <div class="settings-icon icon-blue">
           <i class="fas fa-user"></i>
         </div>
-        <div class="settings-card-body">
-          <div class="settings-card-title">الملف الشخصي</div>
-          <div class="settings-card-subtitle">تعديل معلوماتك الشخصية</div>
+        <div class="settings-text">
+          <div class="settings-title">الملف الشخصي</div>
+          <div class="settings-subtitle">تعديل معلوماتك الشخصية</div>
         </div>
-        <div class="settings-card-arrow">
-          <i class="fas fa-chevron-left"></i>
+        <i class="fas fa-chevron-left settings-arrow"></i>
+      </a>
+
+      <a href="/contacts-devices.html" class="settings-item">
+        <div class="settings-icon icon-green">
+          <i class="fas fa-phone"></i>
         </div>
+        <div class="settings-text">
+          <div class="settings-title">الاتصالات والأجهزة</div>
+        </div>
+        <i class="fas fa-chevron-left settings-arrow"></i>
       </a>
 
     </div>
