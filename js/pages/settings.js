@@ -79,6 +79,31 @@ document.addEventListener('DOMContentLoaded', async () => {
         </div>
       </div>
 
+      <!-- ══════ بطاقة 5: تحديث التطبيق + حول التطبيق ══════ -->
+      <div class="settings-card">
+
+        <div class="settings-item" id="update-app-item">
+          <div class="settings-icon icon-teal">
+            <i class="fas fa-download"></i>
+          </div>
+          <div class="settings-text">
+            <div class="settings-title">تحديث التطبيق</div>
+          </div>
+          <i class="fas fa-chevron-left settings-arrow"></i>
+        </div>
+
+        <div class="settings-item" id="about-app-item">
+          <div class="settings-icon icon-gray">
+            <i class="fas fa-info-circle"></i>
+          </div>
+          <div class="settings-text">
+            <div class="settings-title">حول التطبيق</div>
+          </div>
+          <i class="fas fa-chevron-left settings-arrow"></i>
+        </div>
+
+      </div>
+
     </div>
   `;
 });
