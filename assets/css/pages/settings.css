@@ -84,6 +84,16 @@
   color: #d93025;
 }
 
+.icon-teal {
+  background: #e0f2f1;
+  color: #00897b;
+}
+
+.icon-gray {
+  background: #f0f0f0;
+  color: #5f6368;
+}
+
 /* ══════ النص ══════ */
 .settings-text {
   flex: 1;
