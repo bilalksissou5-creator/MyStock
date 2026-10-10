@@ -1,6 +1,7 @@
 // ============================================
 // صفحة تعديل المنظمة (للمدير فقط)
 // ✅ إضافة قسم العملة (اختيار + رمز + إظهار)
+// ✅ إظهار اسم المنظمة ضمن قسم الاسم
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   const user = await requireAuth();
@@ -10,20 +11,17 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   const main = document.getElementById('main-content');
 
-  // جلب بروفايل المستخدم
   const { data: myProfile } = await db
     .from('profiles')
     .select('*')
     .eq('id', user.id)
     .single();
 
-  // فقط المدير
   if (myProfile?.role !== 'admin') {
     main.innerHTML = `<div class="alert alert-error">ليس لديك صلاحية تعديل المنظمة</div>`;
     return;
   }
 
-  // جلب بيانات المنظمة
   const { data: org, error } = await db
     .from('organizations')
     .select('*')
@@ -35,7 +33,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     return;
   }
 
-  // الحالة الحالية
   let currentShape = org.logo_shape || 'circle';
   let showOrgName = org.show_org_name !== false;
   let currencyCode = org.currency_code || 'MAD';
@@ -43,7 +40,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   let showCurrency = org.show_currency !== false;
   let pendingLogoFile = null;
 
-  // بناء قائمة العملات
   const currenciesList = Object.entries(CurrencyUtils.CURRENCIES)
     .map(([code, info]) => `<option value="${code}" data-symbol="${info.symbol}">${info.name} (${code})</option>`)
     .join('');
@@ -96,12 +92,24 @@ document.addEventListener('DOMContentLoaded', async () => {
         </button>
       </div>
 
-      <!-- ══════ اسم المنظمة ══════ -->
+      <!-- ══════ اسم المنظمة + إظهاره ══════ -->
       <div class="org-section">
         <h3>اسم المنظمة</h3>
         <div class="form-group">
           <label>الاسم</label>
           <input type="text" id="org-name" value="${org.name ?? ''}" placeholder="اسم المنظمة">
+        </div>
+
+        <div class="setting-toggle-item">
+          <div class="setting-toggle-info">
+            <strong>إظهار اسم المنظمة في الفواتير</strong>
+            <span>سيظهر الاسم في الفواتير والإيصالات المطبوعة</span>
+          </div>
+          <button type="button"
+                  class="setting-toggle ${showOrgName ? 'active' : ''}"
+                  id="show-org-name-toggle">
+            <span>${showOrgName ? 'مفعّل' : 'معطّل'}</span>
+          </button>
         </div>
       </div>
 
@@ -135,29 +143,11 @@ document.addEventListener('DOMContentLoaded', async () => {
           </button>
         </div>
 
-        <!-- معاينة -->
         <div class="currency-preview">
           <span class="preview-label">معاينة:</span>
           <span class="preview-value" id="currency-preview-value">
             ${CurrencyUtils.formatCurrency(1500, currencySymbol, showCurrency)}
           </span>
-        </div>
-      </div>
-
-      <!-- ══════ إعدادات الإيصال ══════ -->
-      <div class="org-section">
-        <h3>إعدادات الإيصال</h3>
-
-        <div class="setting-toggle-item">
-          <div class="setting-toggle-info">
-            <strong>إظهار اسم المنظمة في الإيصال</strong>
-            <span>سيظهر اسم المنظمة في الفواتير والإيصالات المطبوعة</span>
-          </div>
-          <button type="button"
-                  class="setting-toggle ${showOrgName ? 'active' : ''}"
-                  id="show-org-name-toggle">
-            <span>${showOrgName ? 'مفعّل' : 'معطّل'}</span>
-          </button>
         </div>
       </div>
 
@@ -183,7 +173,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   const showCurrencyToggle = document.getElementById('show-currency-toggle');
   const currencyPreviewValue = document.getElementById('currency-preview-value');
 
-  // تعيين القيم الحالية
   currencyCodeSelect.value = currencyCode;
 
   function showError(msg) {
@@ -200,9 +189,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     setTimeout(() => { successBox.style.display = 'none'; }, 3000);
   }
 
-  // ═══════════════════════════════════════════
-  // تطبيق الشكل على المعاينة
-  // ═══════════════════════════════════════════
   function applyShape(shape) {
     logoPreview.classList.remove('shape-circle', 'shape-square', 'shape-rectangle');
     logoPreview.classList.add('shape-' + shape);
@@ -220,24 +206,17 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   });
 
-  // ═══════════════════════════════════════════
-  // toggle إظهار اسم المنظمة
-  // ═══════════════════════════════════════════
   showOrgNameToggle.addEventListener('click', () => {
     showOrgName = !showOrgName;
     showOrgNameToggle.classList.toggle('active', showOrgName);
     showOrgNameToggle.querySelector('span').textContent = showOrgName ? 'مفعّل' : 'معطّل';
   });
 
-  // ═══════════════════════════════════════════
-  // تغيير العملة → تحديث الرمز تلقائياً
-  // ═══════════════════════════════════════════
   currencyCodeSelect.addEventListener('change', () => {
     currencyCode = currencyCodeSelect.value;
     const selectedOption = currencyCodeSelect.options[currencyCodeSelect.selectedIndex];
     const autoSymbol = selectedOption.dataset.symbol || '';
 
-    // إذا الرمز فارغ أو كان افتراضياً سابقاً → نُحدّثه
     if (!currencySymbolInput.value.trim() || currencySymbolInput.dataset.auto === 'true') {
       currencySymbolInput.value = autoSymbol;
       currencySymbolInput.dataset.auto = 'true';
@@ -247,18 +226,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     updateCurrencyPreview();
   });
 
-  // ═══════════════════════════════════════════
-  // تعديل الرمز يدوياً
-  // ═══════════════════════════════════════════
   currencySymbolInput.addEventListener('input', () => {
     currencySymbol = currencySymbolInput.value.trim() || CurrencyUtils.getCurrencySymbol(currencyCode);
     currencySymbolInput.dataset.auto = 'false';
     updateCurrencyPreview();
   });
 
-  // ═══════════════════════════════════════════
-  // toggle إظهار العملة
-  // ═══════════════════════════════════════════
   showCurrencyToggle.addEventListener('click', () => {
     showCurrency = !showCurrency;
     showCurrencyToggle.classList.toggle('active', showCurrency);
@@ -266,16 +239,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     updateCurrencyPreview();
   });
 
-  // ═══════════════════════════════════════════
-  // تحديث المعاينة
-  // ═══════════════════════════════════════════
   function updateCurrencyPreview() {
     currencyPreviewValue.textContent = CurrencyUtils.formatCurrency(1500, currencySymbol, showCurrency);
   }
 
-  // ═══════════════════════════════════════════
-  // اختيار صورة الشعار
-  // ═══════════════════════════════════════════
   document.getElementById('choose-logo-btn').addEventListener('click', () => {
     logoInput.click();
   });
@@ -300,9 +267,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     logoPreview.innerHTML = `<img src="${previewUrl}" alt="logo">`;
   });
 
-  // ═══════════════════════════════════════════
-  // رفع الصورة إلى Storage
-  // ═══════════════════════════════════════════
   async function uploadLogo(file) {
     const ext = (file.name.split('.').pop() || 'jpg').toLowerCase();
     const fileName = `${org.id}/logo-${Date.now()}.${ext}`;
@@ -321,9 +285,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     return urlData.publicUrl;
   }
 
-  // ═══════════════════════════════════════════
-  // الحفظ
-  // ═══════════════════════════════════════════
   document.getElementById('save-btn').addEventListener('click', async () => {
     const btn = document.getElementById('save-btn');
     const newName = nameInput.value.trim();
