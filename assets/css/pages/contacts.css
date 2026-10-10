@@ -74,41 +74,27 @@
   color: #737373;
 }
 
-/* ══════ زر التبديل ══════ */
-.contact-toggle {
-  padding: 9px 20px;
-  border-radius: 20px;
-  border: 1px solid #e5e5e5;
-  background: white;
-  color: #171717;
-  font-family: inherit;
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.15s;
-  white-space: nowrap;
+/* ══════ سهم الرابط ══════ */
+.contact-arrow {
+  color: #d4d4d4;
+  font-size: 14px;
   flex-shrink: 0;
-  -webkit-tap-highlight-color: transparent;
+  transition: color 0.15s;
 }
 
-.contact-toggle:hover:not(:disabled) {
-  border-color: #171717;
-  transform: translateY(-1px);
+.contact-item:hover .contact-arrow {
+  color: #171717;
 }
 
-.contact-toggle:active:not(:disabled) {
-  transform: translateY(0);
+/* ══════ رابط الاتصال ══════ */
+.contact-link {
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
 }
 
-.contact-toggle.active {
-  background: #171717;
-  color: white;
-  border-color: #171717;
-}
-
-.contact-toggle:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+.contact-link:active {
+  background: #f5f5f5;
 }
 
 /* ══════ Responsive ══════ */
@@ -130,10 +116,5 @@
 
   .contact-status {
     font-size: 11px;
-  }
-
-  .contact-toggle {
-    padding: 8px 16px;
-    font-size: 12px;
   }
 }
