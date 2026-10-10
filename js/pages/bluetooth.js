@@ -9,10 +9,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   const main = document.getElementById('main-content');
 
-  // ⚠️ تحقق من دعم المتصفح
   const isBluetoothSupported = 'bluetooth' in navigator;
 
-  // جلب البروفايل + الأجهزة
   const { data: profile } = await db
     .from('profiles')
     .select('bluetooth_enabled, organization_id')
@@ -20,7 +18,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     .single();
 
   let enabled = profile?.bluetooth_enabled ?? false;
-  let connectedDevice = null;
 
   const { data: devices } = await db
     .from('user_devices')
@@ -31,9 +28,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   let savedDevices = devices ?? [];
 
-  // ═══════════════════════════════════════════
-  // بناء الواجهة
-  // ═══════════════════════════════════════════
   function render() {
     main.innerHTML = `
       <div class="page-header">
@@ -68,23 +62,23 @@ document.addEventListener('DOMContentLoaded', async () => {
               <h3>حالة Bluetooth</h3>
               <p>${enabled ? 'مفعّل' : 'معطّل'}</p>
             </div>
-            ${enabled ? `
-              <button type="button" class="device-toggle active" id="bt-toggle">
-                <span>إغلاق</span>
-              </button>
-            ` : ''}
+            <button type="button"
+                    class="device-toggle ${enabled ? 'active' : ''}"
+                    id="bt-toggle">
+              <span>${enabled ? 'إغلاق' : 'تفعيل'}</span>
+            </button>
           </div>
         </div>
 
-        <!-- ══════ الاتصال بطابعة (الزر الرئيسي) ══════ -->
-        ${!enabled ? `
+        <!-- ══════ الاتصال بالطابعة ══════ -->
+        ${enabled ? `
           <div class="device-card">
             <div class="device-card-header">
               <div class="device-card-icon icon-blue">
                 <i class="fas fa-print"></i>
               </div>
               <div class="device-card-info">
-                <h3>الاتصال بطابعة Bluetooth</h3>
+                <h3>الاتصال بالطابعة</h3>
                 <p>اضغط للبحث عن الطابعات القريبة</p>
               </div>
             </div>
@@ -95,16 +89,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                 <span>البحث عن طابعة</span>
               </button>
             </div>
-
-            <div style="margin-top:12px; padding:12px; background:#f0f9ff; border-radius:10px; font-size:12px; color:#1e40af; line-height:1.6;">
-              ℹ️ <strong>ملاحظة:</strong> عند الضغط سيفتح Chrome نافذة الأجهزة. <br>
-              تأكد من تفعيل Bluetooth في إعدادات هاتفك أولاً.
-            </div>
           </div>
-        ` : ''}
 
-        <!-- ══════ اختبار الطباعة ══════ -->
-        ${enabled ? `
+          <!-- ══════ اختبار الطباعة ══════ -->
           <div class="device-card">
             <div class="device-card-header">
               <div class="device-card-icon icon-green">
@@ -167,9 +154,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       </div>
     `;
 
-    // ═══════════════════════════════════════════
-    // المراجع والأحداث
-    // ═══════════════════════════════════════════
     const errBox = document.getElementById('bt-error');
     const successBox = document.getElementById('bt-success');
 
@@ -187,22 +171,94 @@ document.addEventListener('DOMContentLoaded', async () => {
       setTimeout(() => { successBox.style.display = 'none'; }, 3000);
     }
 
-    // ══════ زر "البحث عن طابعة" ══════
-    document.getElementById('bt-connect-btn')?.addEventListener('click', async () => {
-      const btn = document.getElementById('bt-connect-btn');
+    // ══════ زر "تفعيل / إغلاق" ══════
+    document.getElementById('bt-toggle')?.addEventListener('click', async () => {
+      if (enabled) {
+        // ══ إغلاق ══
+        if (!confirm('إغلاق Bluetooth وقطع الاتصال؟')) return;
 
+        try {
+          if (Printer.isBluetoothConnected()) {
+            Printer.disconnectBluetooth();
+          }
+
+          await db
+            .from('profiles')
+            .update({ bluetooth_enabled: false })
+            .eq('id', user.id);
+
+          enabled = false;
+          render();
+        } catch (err) {
+          alert('خطأ: ' + err.message);
+        }
+      } else {
+        // ══ تفعيل → فتح قائمة الأجهزة ══
+        if (!isBluetoothSupported) {
+          showError('Bluetooth غير مدعوم في هذا المتصفح. استخدم Chrome على Android.');
+          return;
+        }
+
+        try {
+          const device = await Printer.connectBluetoothPrinter();
+
+          // حفظ في قاعدة البيانات
+          const { data: existing } = await db
+            .from('user_devices')
+            .select('*')
+            .eq('user_id', user.id)
+            .eq('device_type', 'bluetooth')
+            .eq('device_id', device.id)
+            .maybeSingle();
+
+          if (existing) {
+            await db
+              .from('user_devices')
+              .update({ last_used_at: new Date().toISOString() })
+              .eq('id', existing.id);
+          } else {
+            const isFirst = savedDevices.length === 0;
+            await db
+              .from('user_devices')
+              .insert({
+                user_id: user.id,
+                organization_id: profile.organization_id,
+                device_type: 'bluetooth',
+                device_name: device.name,
+                device_id: device.id,
+                is_default: isFirst,
+              });
+          }
+
+          // تفعيل bluetooth_enabled
+          await db
+            .from('profiles')
+            .update({ bluetooth_enabled: true })
+            .eq('id', user.id);
+
+          enabled = true;
+          showSuccess('✅ تم الاتصال بـ ' + device.name);
+          setTimeout(() => window.location.reload(), 1500);
+        } catch (err) {
+          showError(err.message);
+        }
+      }
+    });
+
+    // ══════ زر "البحث عن طابعة" (يظهر عند التفعيل) ══════
+    document.getElementById('bt-connect-btn')?.addEventListener('click', async () => {
       if (!isBluetoothSupported) {
-        showError('Bluetooth غير مدعوم في هذا المتصفح. استخدم Chrome على Android.');
+        showError('Bluetooth غير مدعوم في هذا المتصفح.');
         return;
       }
 
+      const btn = document.getElementById('bt-connect-btn');
       btn.disabled = true;
       btn.querySelector('span').textContent = 'جارٍ البحث...';
 
       try {
         const device = await Printer.connectBluetoothPrinter();
 
-        // حفظ في قاعدة البيانات
         const { data: existing } = await db
           .from('user_devices')
           .select('*')
@@ -230,16 +286,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             });
         }
 
-        // تفعيل bluetooth_enabled
-        await db
-          .from('profiles')
-          .update({ bluetooth_enabled: true })
-          .eq('id', user.id);
-
-        enabled = true;
-
         showSuccess('✅ تم الاتصال بـ ' + device.name);
-        setTimeout(() => window.location.reload(), 1500);
+        setTimeout(() => window.location.reload(), 1000);
       } catch (err) {
         showError(err.message);
         btn.disabled = false;
@@ -247,31 +295,9 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
     });
 
-    // ══════ زر الإغلاق ══════
-    document.getElementById('bt-toggle')?.addEventListener('click', async () => {
-      if (!confirm('إغلاق Bluetooth وقطع الاتصال؟')) return;
-
-      try {
-        if (Printer.isBluetoothConnected()) {
-          Printer.disconnectBluetooth();
-        }
-
-        await db
-          .from('profiles')
-          .update({ bluetooth_enabled: false })
-          .eq('id', user.id);
-
-        enabled = false;
-        render();
-      } catch (err) {
-        alert('خطأ: ' + err.message);
-      }
-    });
-
     // ══════ زر اختبار الطباعة ══════
     document.getElementById('bt-test-btn')?.addEventListener('click', async () => {
       if (!Printer.isBluetoothConnected()) {
-        // جرّب الاتصال بآخر جهاز محفوظ
         showError('يجب الاتصال بطابعة أولاً');
         return;
       }
