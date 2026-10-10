@@ -1,6 +1,6 @@
 // ============================================
 // صفحة الإيصال (نمط سوبر ماركت)
-// ✅ احترام إعداد show_org_name من المنظمة
+// ✅ احترام إعداد show_org_name + show_currency
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   const user = await requireAuth();
@@ -30,10 +30,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     return;
   }
 
-  // 2. جلب المنظمة (مع show_org_name)
+  // 2. جلب المنظمة (مع كل الإعدادات)
   const { data: org } = await db
     .from('organizations')
-    .select('name, logo_url, logo_shape, show_org_name')
+    .select('name, logo_url, logo_shape, show_org_name, currency_code, currency_symbol, show_currency')
     .eq('id', receipt.organization_id)
     .single();
 
@@ -71,6 +71,11 @@ function renderReceipt({ receipt, items }) {
   const logoShape = org?.logo_shape || 'circle';
   const showOrgName = org?.show_org_name !== false;
 
+  // إعدادات العملة
+  const currencySymbol = org?.currency_symbol || '';
+  const showCurrency = org?.show_currency !== false;
+  const fmtCurrency = (v) => CurrencyUtils.formatCurrency(v, currencySymbol, showCurrency);
+
   container.innerHTML = `
     <!-- ══════ الشعار ══════ -->
     <div class="rc-logo-wrap">
@@ -101,8 +106,8 @@ function renderReceipt({ receipt, items }) {
         <div class="rc-line">
           <span class="rc-name">${item.product_name}</span>
           <span class="rc-qty">${item.qty}</span>
-          <span class="rc-price">${Number(item.price).toFixed(2)}</span>
-          <span class="rc-total">${Number(item.total).toFixed(2)}</span>
+          <span class="rc-price">${fmtCurrency(item.price)}</span>
+          <span class="rc-total">${fmtCurrency(item.total)}</span>
         </div>
       `).join('')}
     </div>
@@ -111,7 +116,7 @@ function renderReceipt({ receipt, items }) {
 
     <!-- ══════ المجموع الكلي ══════ -->
     <div class="rc-total-row">
-      المجموع الكلي: <strong>${totalValue.toFixed(2)}</strong>
+      المجموع الكلي: <strong>${fmtCurrency(totalValue)}</strong>
     </div>
 
     <div class="rc-divider"></div>

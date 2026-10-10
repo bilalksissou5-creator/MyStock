@@ -3,7 +3,7 @@
 // الدور: عرض فاتورة واحدة + طباعة + حذف
 // ✅ يجلب العناصر من invoice_items (الكمية المُضافة)
 // ✅ تقسيم تلقائي إلى صفحات A4 (13 صف لكل صفحة)
-// ✅ احترام إعداد show_org_name من المنظمة
+// ✅ احترام إعداد show_org_name + show_currency
 // ============================================
 
 const ROWS_PER_PAGE = 13;
@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const user = await requireAuth();
   if (!user) return;
 
-  // جلب بروفايل المستخدم (لصلاحيات الحذف)
+  // جلب بروفايل المستخدم
   const { data: myProfile } = await db
     .from('profiles')
     .select('role, full_name, organization_id')
@@ -56,12 +56,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     supplier = sup;
   }
 
-  // 3. جلب المنظمة (مع show_org_name)
+  // 3. جلب المنظمة (مع كل الإعدادات)
   let org = null;
   if (invoice.organization_id) {
     const { data: o } = await db
       .from('organizations')
-      .select('name, logo_url, logo_shape, show_org_name')
+      .select('name, logo_url, logo_shape, show_org_name, currency_code, currency_symbol, show_currency')
       .eq('id', invoice.organization_id)
       .single();
     org = o;
@@ -78,14 +78,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     createdBy = prof;
   }
 
-  // 5. جلب عناصر الفاتورة من invoice_items
+  // 5. جلب عناصر الفاتورة
   const { data: items } = await db
     .from('invoice_items')
     .select('*')
     .eq('invoice_id', invoice.id)
     .order('created_at', { ascending: true });
 
-  // 6. عرض الفاتورة (مقسّمة على صفحات)
+  // 6. عرض الفاتورة
   renderInvoice({
     invoice,
     supplier,
@@ -128,6 +128,11 @@ function buildPage({ pageNumber, totalPages, pageItems, invoice, supplier, org, 
 
   const logoShape = org?.logo_shape || 'circle';
   const showOrgName = org?.show_org_name !== false;
+
+  // إعدادات العملة
+  const currencySymbol = org?.currency_symbol || '';
+  const showCurrency = org?.show_currency !== false;
+  const fmtCurrency = (v) => CurrencyUtils.formatCurrency(v, currencySymbol, showCurrency);
 
   // مجموع هذه الصفحة
   const pageTotalQty = pageItems.reduce((s, it) => s + Number(it.qty ?? 0), 0);
@@ -211,8 +216,8 @@ function buildPage({ pageNumber, totalPages, pageItems, invoice, supplier, org, 
               <td>${globalRowStart + i + 1}</td>
               <td>${item.product_name ?? '—'}</td>
               <td>${item.qty ?? 0}</td>
-              <td>${Number(item.price ?? 0).toFixed(2)}</td>
-              <td>${Number(item.total ?? 0).toFixed(2)}</td>
+              <td>${fmtCurrency(item.price)}</td>
+              <td>${fmtCurrency(item.total)}</td>
             </tr>
           `).join('')}
         </tbody>
@@ -221,14 +226,14 @@ function buildPage({ pageNumber, totalPages, pageItems, invoice, supplier, org, 
             <td colspan="2"><strong>مجموع الصفحة</strong></td>
             <td><strong>${pageTotalQty}</strong></td>
             <td>—</td>
-            <td><strong>${pageTotalValue.toFixed(2)}</strong></td>
+            <td><strong>${fmtCurrency(pageTotalValue)}</strong></td>
           </tr>
           ${totalPages > 1 ? `
             <tr class="grand-total-row">
               <td colspan="2"><strong>المجموع الكلي</strong></td>
               <td><strong>${grandTotalQty}</strong></td>
               <td>—</td>
-              <td><strong>${grandTotalValue.toFixed(2)}</strong></td>
+              <td><strong>${fmtCurrency(grandTotalValue)}</strong></td>
             </tr>
           ` : ''}
         </tfoot>
@@ -305,7 +310,7 @@ function renderInvoice({ invoice, supplier, org, createdBy, items, canDelete }) 
 }
 
 // ============================================
-// حذف الفاتورة + منتجاتها
+// حذف الفاتورة
 // ============================================
 async function handleDeleteInvoice(invoice) {
   const confirmed = confirm(
@@ -323,7 +328,6 @@ async function handleDeleteInvoice(invoice) {
   }
 
   try {
-    // 1. حذف عناصر الفاتورة
     const { error: itemsErr } = await db
       .from('invoice_items')
       .delete()
@@ -331,7 +335,6 @@ async function handleDeleteInvoice(invoice) {
 
     if (itemsErr) throw new Error('فشل حذف عناصر الفاتورة: ' + itemsErr.message);
 
-    // 2. حذف المنتجات
     const { error: productsErr } = await db
       .from('products')
       .delete()
@@ -339,7 +342,6 @@ async function handleDeleteInvoice(invoice) {
 
     if (productsErr) throw new Error('فشل حذف المنتجات: ' + productsErr.message);
 
-    // 3. حذف الفاتورة
     const { error: invoiceErr } = await db
       .from('invoices')
       .delete()
