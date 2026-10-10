@@ -87,7 +87,7 @@ main {
   align-items: center;
   justify-content: center;
   text-align: center;
-  min-height: 2.2cm;
+  min-height: 3.2cm;
   padding: 6px 0 10px;
   border-bottom: 2px solid #171717;
   margin-bottom: 10px;
@@ -95,8 +95,8 @@ main {
 
 /* ✅ الشعار بدون خلفية */
 .invoice-logo {
-  width: 55px;
-  height: 55px;
+  width: 100px;
+  height: 100px;
   border-radius: 8px;
   background: transparent;
   display: flex;
