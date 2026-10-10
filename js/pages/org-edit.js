@@ -2,7 +2,7 @@
 // صفحة تعديل المنظمة (للمدير فقط)
 // ✅ إضافة قسم العملة (اختيار + رمز + إظهار)
 // ✅ إظهار اسم المنظمة ضمن قسم الاسم
-// ✅ قسم نسبة الربح (0-50%)
+// ✅ قسم نسبة الربح (0-50%) — العناصر ظاهرة دائماً
 // ✅ Switchs احترافية بأزرق/رمادي
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
@@ -184,13 +184,15 @@ document.addEventListener('DOMContentLoaded', async () => {
           </label>
         </div>
 
-        <div class="form-group" id="profit-input-group" style="${profitEnabled ? '' : 'display:none;'}">
+        <!-- ✅ الحقل ظاهر دائماً -->
+        <div class="form-group" id="profit-input-group">
           <label>نسبة الربح (%)</label>
           <input type="number" id="profit-percentage" value="${profitPercentage}" min="0" max="50" step="0.5" dir="ltr">
           <small class="field-hint">القيمة بين 0 و 50%</small>
         </div>
 
-        <div class="currency-preview" id="profit-preview" style="${profitEnabled ? '' : 'display:none;'}">
+        <!-- ✅ المعاينة ظاهرة دائماً -->
+        <div class="currency-preview" id="profit-preview">
           <span class="preview-label">مثال:</span>
           <span class="preview-value" id="profit-preview-value">
             100 → ${(100 * (1 + profitPercentage / 100)).toFixed(2)}
@@ -223,9 +225,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const currencyPreviewValue = document.getElementById('currency-preview-value');
   const profitToggle = document.getElementById('profit-toggle');
   const profitStatus = document.getElementById('profit-status');
-  const profitInputGroup = document.getElementById('profit-input-group');
   const profitPercentageInput = document.getElementById('profit-percentage');
-  const profitPreview = document.getElementById('profit-preview');
   const profitPreviewValue = document.getElementById('profit-preview-value');
 
   currencyCodeSelect.value = currencyCode;
@@ -283,16 +283,13 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
 
   // ═══════════════════════════════════════════
-  // Switch: نسبة الربح
+  // Switch: نسبة الربح (بدون إخفاء العناصر)
   // ═══════════════════════════════════════════
   profitToggle.addEventListener('change', () => {
     profitEnabled = profitToggle.checked;
     profitStatus.textContent = profitEnabled ? 'مفعّل' : 'غير مفعّل';
     profitStatus.classList.toggle('on', profitEnabled);
     profitStatus.classList.toggle('off', !profitEnabled);
-
-    profitInputGroup.style.display = profitEnabled ? '' : 'none';
-    profitPreview.style.display = profitEnabled ? '' : 'none';
 
     updateProfitPreview();
   });
@@ -396,11 +393,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     let finalProfitPercentage = Number(profitPercentageInput.value) || 0;
-    if (profitEnabled) {
-      if (finalProfitPercentage < 0 || finalProfitPercentage > 50) {
-        showError('نسبة الربح يجب أن تكون بين 0 و 50%');
-        return;
-      }
+    if (finalProfitPercentage < 0 || finalProfitPercentage > 50) {
+      showError('نسبة الربح يجب أن تكون بين 0 و 50%');
+      return;
     }
 
     btn.disabled = true;
