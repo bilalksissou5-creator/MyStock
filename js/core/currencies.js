@@ -1,5 +1,6 @@
 // ============================================
 // قائمة العملات العالمية + أدوات التنسيق
+// ✅ العملة على اليسار: DH 100.00
 // ============================================
 
 const CURRENCIES = {
@@ -136,7 +137,8 @@ const CURRENCIES = {
 };
 
 // ═══════════════════════════════════════════
-// تنسيق القيمة المالية
+// ✅ تنسيق القيمة المالية — العملة على اليسار
+// مثال: DH 1,500.00
 // ═══════════════════════════════════════════
 function formatCurrency(value, symbol = '', showSymbol = true) {
   const num = Number(value || 0);
@@ -148,7 +150,9 @@ function formatCurrency(value, symbol = '', showSymbol = true) {
   });
 
   if (!showSymbol || !symbol) return formatted;
-  return `${formatted} ${symbol}`;
+
+  // ⚠️ الرمز أولاً (يسار) ثم القيمة
+  return `${symbol} ${formatted}`;
 }
 
 // ═══════════════════════════════════════════
