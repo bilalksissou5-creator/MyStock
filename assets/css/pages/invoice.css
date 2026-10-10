@@ -95,8 +95,8 @@ main {
 
 /* ✅ الشعار: مرن بدون حجم ثابت */
 .invoice-logo {
-  max-width: 160px;         /* ✅ حد أقصى فقط */
-  max-height: 160px;
+  max-width: 55px;         /* ✅ حد أقصى فقط */
+  max-height: 55px;
   width: auto;              /* ✅ مرن */
   height: auto;             /* ✅ مرن */
   border-radius: 8px;
