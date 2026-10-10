@@ -79,7 +79,7 @@
   text-overflow: ellipsis;
 }
 
-/* ══════ زر التبديل ══════ */
+/* ══════ زر التبديل (إغلاق) ══════ */
 .device-toggle {
   padding: 8px 18px;
   border-radius: 20px;
@@ -116,6 +116,85 @@
 .full-width {
   width: 100%;
   justify-content: center;
+}
+
+/* ══════ زر البحث عن طابعة ══════ */
+#bt-connect-btn,
+#usb-connect-btn {
+  background: #171717;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 14px 20px;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  transition: background 0.15s, transform 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+#bt-connect-btn:hover,
+#usb-connect-btn:hover {
+  background: #000;
+}
+
+#bt-connect-btn:active,
+#usb-connect-btn:active {
+  transform: scale(0.98);
+}
+
+#bt-connect-btn:disabled,
+#usb-connect-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+#bt-connect-btn i,
+#usb-connect-btn i {
+  font-size: 16px;
+}
+
+/* ══════ زر اختبار الطباعة ══════ */
+#bt-test-btn,
+#usb-test-btn {
+  background: #171717;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 14px 20px;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  transition: background 0.15s, transform 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+#bt-test-btn:hover,
+#usb-test-btn:hover {
+  background: #000;
+}
+
+#bt-test-btn:active,
+#usb-test-btn:active {
+  transform: scale(0.98);
+}
+
+#bt-test-btn:disabled,
+#usb-test-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 /* ══════ قائمة الأجهزة ══════ */
@@ -232,6 +311,21 @@
   margin: 0;
 }
 
+/* ══════ تنبيه معلوماتي ══════ */
+.device-note {
+  margin-top: 12px;
+  padding: 12px;
+  background: #f0f9ff;
+  border-radius: 10px;
+  font-size: 12px;
+  color: #1e40af;
+  line-height: 1.6;
+}
+
+.device-note strong {
+  font-weight: 700;
+}
+
 /* ══════ Responsive ══════ */
 @media (max-width: 480px) {
   .device-card {
@@ -262,5 +356,13 @@
     width: 36px;
     height: 36px;
     font-size: 14px;
+  }
+
+  #bt-connect-btn,
+  #usb-connect-btn,
+  #bt-test-btn,
+  #usb-test-btn {
+    padding: 12px 16px;
+    font-size: 13px;
   }
 }
