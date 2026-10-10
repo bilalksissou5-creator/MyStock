@@ -1,9 +1,13 @@
 /* ============================================
    صفحة الفاتورة الواحدة
    ✅ تقسيم تلقائي إلى صفحات A4
-   ✅ التوقيعات في أسفل الصفحة
-   ✅ العملة LTR على اليمين
-   ✅ الشعار 120px بدون حاوية
+   ✅ التوقيعات في أسفل الصفحة (شاشة + طباعة)
+   ✅ العملة على اليمين: 1.40 DH
+   ✅ شعار بدون خلفية رمادية
+   ============================================ */
+
+/* ============================================
+   ✅ إصلاح: السماح بالتمرير على الجوال
    ============================================ */
 
 html, body {
@@ -42,6 +46,7 @@ main {
   flex-wrap: wrap;
 }
 
+/* ✅ إزالة الظل والحواف نهائياً */
 .invoice-container {
   background: transparent;
   max-width: 800px;
@@ -52,6 +57,9 @@ main {
   box-sizing: border-box;
 }
 
+/* ============================================
+   ✅ صفحة الفاتورة — flex للتوقيعات في الأسفل
+   ============================================ */
 #invoice-content .invoice-page {
   display: flex;
   flex-direction: column;
@@ -79,50 +87,58 @@ main {
   align-items: center;
   justify-content: center;
   text-align: center;
-  padding: 18px 0 18px;
+  min-height: 2.2cm;
+  padding: 6px 0 10px;
   border-bottom: 2px solid #171717;
-  margin-bottom: 12px;
+  margin-bottom: 10px;
 }
 
-/* ✅ الشعار: صورة مباشرة بدون حاوية */
+/* ✅ الشعار بدون خلفية */
 .invoice-logo {
+  width: 55px;
+  height: 55px;
+  border-radius: 8px;
+  background: transparent;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: transparent;
-  margin-bottom: 18px;
-  overflow: visible;
+  overflow: hidden;
+  flex-shrink: 0;
+  margin-bottom: 5px;
+  transition: all 0.2s ease;
 }
 
 .invoice-logo img {
-  height: 120px;
-  width: auto;
-  max-width: 100%;
+  width: 100%;
+  height: 80%;
   object-fit: contain;
-  display: block;
-  border-radius: 8px;
 }
 
 .logo-placeholder {
-  font-size: 64px;
+  font-size: 24px;
   color: #171717;
+  background: transparent;
 }
 
 /* ══════════════════════════════════════════
-   أشكال الشعار (تُطبق على الصورة)
+   أشكال الشعار (بدون خلفية)
    ══════════════════════════════════════════ */
-.invoice-logo.shape-circle img {
+.invoice-logo.shape-circle {
   border-radius: 50%;
+  background: transparent;
 }
 
-.invoice-logo.shape-square img {
+.invoice-logo.shape-square {
   border-radius: 12px;
+  aspect-ratio: 1 / 1;
+  background: transparent;
 }
 
-.invoice-logo.shape-rectangle img {
+.invoice-logo.shape-rectangle {
   border-radius: 12px;
-  height: 120px;
-  max-width: 200px;
+  width: 90px;
+  height: 55px;
+  background: transparent;
 }
 
 .invoice-org h1 {
@@ -219,6 +235,7 @@ main {
   color: #737373;
 }
 
+/* ✅ الكمية والسعر والمجموع: LTR للعملة */
 .invoice-table td:nth-child(3),
 .invoice-table td:nth-child(4),
 .invoice-table td:nth-child(5) {
@@ -251,6 +268,9 @@ main {
   unicode-bidi: embed;
 }
 
+/* ══════════════════════════════════════════
+   المجموع الكلي
+   ══════════════════════════════════════════ */
 .invoice-table tfoot .grand-total-row td {
   background: #171717;
   color: white;
@@ -508,20 +528,18 @@ main {
   }
 
   .invoice-header {
-    padding: 18px 0 18px;
+    padding: 5px 0 8px;
+    min-height: 1.8cm;
   }
 
-  .invoice-logo img {
-    height: 100px;
+  .invoice-logo {
+    width: 48px;
+    height: 48px;
   }
 
-  .invoice-logo.shape-rectangle img {
-    height: 100px;
-    max-width: 160px;
-  }
-
-  .logo-placeholder {
-    font-size: 52px;
+  .invoice-logo.shape-rectangle {
+    width: 75px;
+    height: 48px;
   }
 
   .invoice-org h1 {
@@ -563,7 +581,7 @@ main {
 }
 
 /* ============================================
-   شاشات ضيقة جداً
+   تحسين للشاشات الضيقة جداً (< 480px)
    ============================================ */
 @media (max-width: 480px) {
   .info-box {
