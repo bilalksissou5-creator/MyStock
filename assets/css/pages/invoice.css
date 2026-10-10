@@ -3,7 +3,7 @@
    ✅ تقسيم تلقائي إلى صفحات A4
    ✅ التوقيعات في أسفل الصفحة (شاشة + طباعة)
    ✅ العملة على اليمين: 1.40 DH
-   ✅ شعار بدون خلفية رمادية
+   ✅ شعار بدون خلفية + كبير (110px)
    ============================================ */
 
 /* ============================================
@@ -87,16 +87,16 @@ main {
   align-items: center;
   justify-content: center;
   text-align: center;
-  min-height: 3.2cm;
+  min-height: 2.2cm;
   padding: 6px 0 10px;
   border-bottom: 2px solid #171717;
   margin-bottom: 10px;
 }
 
-/* ✅ الشعار بدون خلفية */
+/* ✅ الشعار بدون خلفية + كبير */
 .invoice-logo {
-  width: 100px;
-  height: 100px;
+  width: 110px;
+  height: 110px;
   border-radius: 8px;
   background: transparent;
   display: flex;
@@ -104,7 +104,7 @@ main {
   justify-content: center;
   overflow: hidden;
   flex-shrink: 0;
-  margin-bottom: 5px;
+  margin-bottom: 10px;
   transition: all 0.2s ease;
 }
 
@@ -115,7 +115,7 @@ main {
 }
 
 .logo-placeholder {
-  font-size: 24px;
+  font-size: 48px;
   color: #171717;
   background: transparent;
 }
@@ -136,8 +136,8 @@ main {
 
 .invoice-logo.shape-rectangle {
   border-radius: 12px;
-  width: 90px;
-  height: 55px;
+  width: 160px;
+  height: 110px;
   background: transparent;
 }
 
@@ -532,14 +532,19 @@ main {
     min-height: 1.8cm;
   }
 
+  /* ✅ الشعار على الهاتف: 80px */
   .invoice-logo {
-    width: 48px;
-    height: 48px;
+    width: 80px;
+    height: 80px;
   }
 
   .invoice-logo.shape-rectangle {
-    width: 75px;
-    height: 48px;
+    width: 120px;
+    height: 80px;
+  }
+
+  .logo-placeholder {
+    font-size: 36px;
   }
 
   .invoice-org h1 {
