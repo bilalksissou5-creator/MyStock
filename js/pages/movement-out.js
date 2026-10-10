@@ -4,8 +4,7 @@
 // ✅ ماسح باركود (html5-qrcode)
 // ✅ تعديل الكمية بعد المسح يُحدّث البطاقة
 // ✅ يدعم الكميات العشرية (0.5، 1.75...)
-// ✅ نسبة الربح من المنظمة تُطبَّق تلقائياً (0-50%)
-// ✅ تُحفظ النسبة في receipts.profit_percentage
+// ✅ سعر البيع الخاص بالمنتج (sell_price)
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   if (window.__movementOutLoaded) return;
@@ -19,7 +18,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const main = document.getElementById('main-content');
 
   // ═══════════════════════════════════════════
-  // جلب بيانات المنظمة (نسبة الربح)
+  // جلب بيانات المستخدم
   // ═══════════════════════════════════════════
   const { data: profile } = await db
     .from('profiles')
@@ -27,32 +26,20 @@ document.addEventListener('DOMContentLoaded', async () => {
     .eq('id', user.id)
     .single();
 
-  let profitEnabled = false;
-  let profitPercentage = 0;
+  // ═══════════════════════════════════════════
+  // ✅ حساب سعر البيع:
+  //    1. إذا sell_price_enabled && sell_price > 0 → sell_price
+  //    2. وإلا → price (سعر الشراء)
+  // ═══════════════════════════════════════════
+  function getSellingPrice(product) {
+    const sellPrice = Number(product.sell_price ?? 0);
+    const sellEnabled = product.sell_price_enabled === true;
+    const basePrice = Number(product.price ?? 0);
 
-  if (profile?.organization_id) {
-    const { data: org } = await db
-      .from('organizations')
-      .select('profit_enabled, profit_percentage')
-      .eq('id', profile.organization_id)
-      .single();
-
-    profitEnabled = org?.profit_enabled === true;
-    profitPercentage = Number(org?.profit_percentage) || 0;
-  }
-
-  // ✅ تطبيق نسبة الربح على السعر
-  function applyProfit(basePrice) {
-    const base = Number(basePrice) || 0;
-    if (!profitEnabled || profitPercentage <= 0) return base;
-
-    let finalPrice = base + (base * profitPercentage / 100);
-
-    // الحد الأقصى 50%
-    const maxPrice = base + (base * 50 / 100);
-    if (finalPrice > maxPrice) finalPrice = maxPrice;
-
-    return finalPrice;
+    if (sellEnabled && sellPrice > 0) {
+      return sellPrice;
+    }
+    return basePrice;
   }
 
   // ═══════════════════════════════════════════
@@ -82,12 +69,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         <span>مسح</span>
       </button>
     </div>
-
-    ${profitEnabled && profitPercentage > 0 ? `
-      <div class="alert alert-success" style="display:block; margin-bottom:12px;">
-        📈 نسبة الربح: <strong>${profitPercentage}%</strong>
-      </div>
-    ` : ''}
 
     <div class="alert alert-error" id="form-error" style="display:none;"></div>
     <div class="alert alert-success" id="form-success" style="display:none;"></div>
@@ -255,16 +236,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   }
 
-  // ✅ اختيار منتج + تطبيق الربح
+  // ✅ اختيار منتج + تطبيق سعر البيع
   function selectProduct(found) {
     selectedProduct = found;
     productInput.value = `${found.name} (${found.sku ?? '—'})`;
     hiddenId.value = found.id;
     quantityInput.value = '1';
 
-    const basePrice = Number(found.price ?? 0);
-    const finalPrice = applyProfit(basePrice);
-    priceInput.value = finalPrice.toFixed(2);
+    const sellingPrice = getSellingPrice(found);
+    priceInput.value = sellingPrice.toFixed(2);
 
     availableQtyInput.value = found.qty ?? 0;
   }
@@ -386,8 +366,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       return;
     }
 
-    const basePrice = Number(found.price ?? 0);
-    const finalPrice = applyProfit(basePrice);
+    const sellingPrice = getSellingPrice(found);
 
     addedProducts.push({
       id: found.id,
@@ -395,7 +374,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       sku: found.sku,
       image_url: found.image_url,
       qty: 1,
-      price: finalPrice,
+      price: sellingPrice,
       available: available,
     });
 
@@ -638,7 +617,6 @@ document.addEventListener('DOMContentLoaded', async () => {
           total_qty: totalQty,
           total_value: totalValue,
           created_by: authUser.id,
-          profit_percentage: profitEnabled ? profitPercentage : 0,
         })
         .select()
         .single();
