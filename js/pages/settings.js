@@ -28,32 +28,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         </a>
       </div>
 
-      <!-- ══════ بطاقة 2: الاتصالات + الأجهزة ══════ -->
-      <div class="settings-card">
-
-        <a href="/contacts.html" class="settings-item">
-          <div class="settings-icon icon-green">
-            <i class="fa-solid fa-wifi"></i>
-          </div>
-          <div class="settings-text">
-            <div class="settings-title">الاتصالات</div>
-          </div>
-          <i class="fas fa-chevron-left settings-arrow"></i>
-        </a>
-
-        <a href="/devices.html" class="settings-item">
-          <div class="settings-icon icon-orange">
-            <i class="fa-solid fa-laptop"></i>
-          </div>
-          <div class="settings-text">
-            <div class="settings-title">الأجهزة</div>
-          </div>
-          <i class="fas fa-chevron-left settings-arrow"></i>
-        </a>
-
-      </div>
-
-      <!-- ══════ بطاقة 3: الإدارة العامة ══════ -->
+      <!-- ══════ بطاقة 2: الإدارة العامة ══════ -->
       <div class="settings-card">
         <div class="settings-item" id="admin-panel-item">
           <div class="settings-icon icon-purple">
@@ -66,7 +41,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         </div>
       </div>
 
-      <!-- ══════ بطاقة 4: الإشعارات ══════ -->
+      <!-- ══════ بطاقة 3: الإشعارات ══════ -->
       <div class="settings-card">
         <div class="settings-item" id="notifications-item">
           <div class="settings-icon icon-red">
@@ -79,7 +54,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         </div>
       </div>
 
-      <!-- ══════ بطاقة 5: تحديث التطبيق + حول التطبيق ══════ -->
+      <!-- ══════ بطاقة 4: تحديث التطبيق + حول التطبيق ══════ -->
       <div class="settings-card">
 
         <div class="settings-item" id="update-app-item">
