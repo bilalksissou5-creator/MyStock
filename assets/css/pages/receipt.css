@@ -1,5 +1,6 @@
 /* ============================================
    صفحة الإيصال — نمط سوبر ماركت (80mm)
+   ✅ العملة على اليمين: 1.40 DH
    ============================================ */
 
 html, body {
@@ -136,7 +137,7 @@ body.receipt-page {
   padding: 8px 0;
 }
 
-/* ══════ سطر منتج (توزيع متساوٍ) ══════ */
+/* ══════ سطر منتج ══════ */
 .rc-line {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr 1fr;
@@ -161,16 +162,19 @@ body.receipt-page {
   text-align: center;
 }
 
-.rc-price {
+/* ✅ السعر والمجموع: LTR للعملة */
+.rc-price,
+.rc-total {
   font-weight: 500;
   color: #333;
   text-align: center;
+  direction: ltr;
+  unicode-bidi: embed;
 }
 
 .rc-total {
   font-weight: 700;
   color: #000;
-  text-align: center;
 }
 
 /* ══════ المجموع الكلي ══════ */
@@ -187,6 +191,9 @@ body.receipt-page {
   font-weight: 800;
   letter-spacing: 0.5px;
   margin-right: 4px;
+  direction: ltr;
+  unicode-bidi: embed;
+  display: inline-block;
 }
 
 /* ══════ التاريخ والوقت ══════ */
