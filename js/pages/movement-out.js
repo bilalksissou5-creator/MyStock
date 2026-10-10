@@ -4,6 +4,7 @@
 // ✅ ماسح باركود (html5-qrcode)
 // ✅ تعديل الكمية بعد المسح يُحدّث البطاقة
 // ✅ يدعم الكميات العشرية (0.5، 1.75...)
+// ✅ نسبة الربح: تُضاف تلقائياً على السعر (0-50%)
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   if (window.__movementOutLoaded) return;
@@ -16,6 +17,49 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   const main = document.getElementById('main-content');
 
+  // ═══════════════════════════════════════════
+  // جلب بيانات المنظمة (نسبة الربح)
+  // ═══════════════════════════════════════════
+  const { data: profile } = await db
+    .from('profiles')
+    .select('organization_id')
+    .eq('id', user.id)
+    .single();
+
+  let profitEnabled = false;
+  let profitPercentage = 0;
+  let currencySymbol = '';
+
+  if (profile?.organization_id) {
+    const { data: org } = await db
+      .from('organizations')
+      .select('profit_enabled, profit_percentage, currency_symbol')
+      .eq('id', profile.organization_id)
+      .single();
+
+    profitEnabled = org?.profit_enabled === true;
+    profitPercentage = Number(org?.profit_percentage) || 0;
+    currencySymbol = org?.currency_symbol || '';
+  }
+
+  // ✅ دالة حساب السعر مع الربح
+  function applyProfit(basePrice) {
+    const base = Number(basePrice) || 0;
+    if (!profitEnabled || profitPercentage <= 0) return base;
+
+    // تطبيق النسبة
+    let finalPrice = base + (base * profitPercentage / 100);
+
+    // الحد الأقصى 50%
+    const maxPrice = base + (base * 50 / 100);
+    if (finalPrice > maxPrice) finalPrice = maxPrice;
+
+    return finalPrice;
+  }
+
+  // ═══════════════════════════════════════════
+  // جلب المنتجات
+  // ═══════════════════════════════════════════
   const { data: products, error: productsError } = await db
     .from('products')
     .select('*')
@@ -40,6 +84,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         <span>مسح</span>
       </button>
     </div>
+
+    ${profitEnabled ? `
+      <div class="alert alert-success" style="display:block; margin-bottom:12px;">
+        📈 نسبة الربح مُفعّلة: <strong>${profitPercentage}%</strong>
+      </div>
+    ` : ''}
 
     <div class="alert alert-error" id="form-error" style="display:none;"></div>
     <div class="alert alert-success" id="form-success" style="display:none;"></div>
@@ -75,6 +125,13 @@ document.addEventListener('DOMContentLoaded', async () => {
             <input type="text" id="available-qty" value="—" disabled>
           </div>
         </div>
+
+        ${profitEnabled ? `
+          <p style="font-size:11px; color:#16a34a; text-align:center; margin:8px 0;">
+            <i class="fas fa-info-circle"></i>
+            السعر المُقترح يشمل نسبة الربح ${profitPercentage}%
+          </p>
+        ` : ''}
 
         <button type="button" class="btn-primary add-product-btn" id="add-product-btn">
           <i class="fas fa-plus"></i>
@@ -207,13 +264,18 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   }
 
-  // ✅ دالة موحّدة: اختيار منتج
+  // ✅ دالة موحّدة: اختيار منتج (مع تطبيق الربح)
   function selectProduct(found) {
     selectedProduct = found;
     productInput.value = `${found.name} (${found.sku ?? '—'})`;
     hiddenId.value = found.id;
     quantityInput.value = '1';
-    priceInput.value = Number(found.price ?? 0).toFixed(2);
+
+    // ✅ تطبيق نسبة الربح على السعر
+    const basePrice = Number(found.price ?? 0);
+    const finalPrice = applyProfit(basePrice);
+    priceInput.value = finalPrice.toFixed(2);
+
     availableQtyInput.value = found.qty ?? 0;
   }
 
@@ -231,7 +293,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
 
   // ============================================
-  // ✅ عند تغيير الكمية: يُحدّث البطاقة (يدعم العشرية)
+  // ✅ عند تغيير الكمية: يُحدّث البطاقة
   // ============================================
   quantityInput.addEventListener('input', () => {
     if (!selectedProduct) return;
@@ -299,12 +361,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     let found = (products ?? []).find(p => p.sku === value);
 
     if (!found) {
-      const { data: profile } = await db
-        .from('profiles')
-        .select('organization_id')
-        .eq('id', user.id)
-        .single();
-
       const { data: dbFound, error } = await db
         .from('products')
         .select('*')
@@ -340,13 +396,17 @@ document.addEventListener('DOMContentLoaded', async () => {
       return;
     }
 
+    // ✅ تطبيق الربح
+    const basePrice = Number(found.price ?? 0);
+    const finalPrice = applyProfit(basePrice);
+
     addedProducts.push({
       id: found.id,
       name: found.name,
       sku: found.sku,
       image_url: found.image_url,
       qty: 1,
-      price: Number(found.price ?? 0),
+      price: finalPrice,
       available: available,
     });
 
@@ -450,7 +510,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       return;
     }
 
-    // ✅ يدعم العشرية
     const qty = Number(quantityInput.value);
     const price = Number(priceInput.value) || 0;
     const available = Number(selectedProduct.qty ?? 0);
@@ -526,7 +585,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
 
   // ============================================
-  // حفظ الإخراج + إنشاء إيصال
+  // حفظ الإخراج
   // ============================================
   saveBtn.addEventListener('click', async (e) => {
     e.preventDefault();
@@ -554,20 +613,20 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     try {
       const { data: { user: authUser } } = await db.auth.getUser();
-      const { data: profile } = await db
+      const { data: prof } = await db
         .from('profiles')
         .select('organization_id, full_name')
         .eq('id', authUser.id)
         .single();
 
-      if (!profile?.organization_id) {
+      if (!prof?.organization_id) {
         throw new Error('لا يمكن تحديد المنظمة');
       }
 
       const { data: lastReceipt } = await db
         .from('receipts')
         .select('receipt_number')
-        .eq('organization_id', profile.organization_id)
+        .eq('organization_id', prof.organization_id)
         .order('created_at', { ascending: false })
         .limit(1)
         .maybeSingle();
@@ -579,7 +638,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
       const receiptNumber = 'RCP-' + String(nextNumber).padStart(3, '0');
 
-      // ✅ يدعم العشرية
       const totalQty = addedProducts.reduce((s, p) => s + Number(p.qty), 0);
       const totalValue = addedProducts.reduce((s, p) => s + Number(p.qty) * Number(p.price), 0);
 
@@ -587,7 +645,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         .from('receipts')
         .insert({
           receipt_number: receiptNumber,
-          organization_id: profile.organization_id,
+          organization_id: prof.organization_id,
           total_qty: totalQty,
           total_value: totalValue,
           created_by: authUser.id,
@@ -597,7 +655,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       if (receiptErr) throw new Error('فشل إنشاء الإيصال: ' + receiptErr.message);
 
-      // ✅ يدعم العشرية
       const receiptItems = addedProducts.map(p => ({
         receipt_id: newReceipt.id,
         product_id: p.id,
@@ -613,9 +670,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       if (itemsErr) throw new Error('فشل حفظ عناصر الإيصال: ' + itemsErr.message);
 
-      // ✅ يدعم العشرية
       const movements = addedProducts.map(p => ({
-        organization_id: profile.organization_id,
+        organization_id: prof.organization_id,
         product_id: p.id,
         type: 'out',
         method: 'manual',
@@ -632,12 +688,12 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (typeof notifyOrganization === 'function') {
         try {
           await notifyOrganization({
-            orgId: profile.organization_id,
+            orgId: prof.organization_id,
             title: addedProducts.length === 1 ? 'إيصال بيع' : `إيصال بيع (${addedProducts.length} منتجات)`,
-            message: `${profile.full_name || 'مستخدم'} أخرج ${totalQty} وحدة بقيمة ${totalValue.toFixed(2)} — ${receiptNumber}`,
+            message: `${prof.full_name || 'مستخدم'} أخرج ${totalQty} وحدة بقيمة ${totalValue.toFixed(2)} — ${receiptNumber}`,
             type: 'warning',
             link: `/receipt.html?id=${newReceipt.id}`,
-            userName: profile.full_name || null,
+            userName: prof.full_name || null,
           });
         } catch (notifErr) {
           console.error('❌ Notification error:', notifErr);
