@@ -1,5 +1,6 @@
 // ============================================
 // صفحة الإيصال (نمط سوبر ماركت)
+// ✅ احترام إعداد show_org_name من المنظمة
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   const user = await requireAuth();
@@ -29,10 +30,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     return;
   }
 
-  // 2. جلب المنظمة
+  // 2. جلب المنظمة (مع show_org_name)
   const { data: org } = await db
     .from('organizations')
-    .select('name, logo_url, logo_shape')
+    .select('name, logo_url, logo_shape, show_org_name')
     .eq('id', receipt.organization_id)
     .single();
 
@@ -68,6 +69,7 @@ function renderReceipt({ receipt, items }) {
   const timeStr = date.toLocaleTimeString('ar-MA', { hour: '2-digit', minute: '2-digit' });
 
   const logoShape = org?.logo_shape || 'circle';
+  const showOrgName = org?.show_org_name !== false;
 
   container.innerHTML = `
     <!-- ══════ الشعار ══════ -->
@@ -80,7 +82,9 @@ function renderReceipt({ receipt, items }) {
     </div>
 
     <!-- ══════ اسم المنظمة ══════ -->
-    <div class="rc-org-name">${org?.name ?? 'MyStock'}</div>
+    ${showOrgName ? `
+      <div class="rc-org-name">${org?.name ?? 'MyStock'}</div>
+    ` : ''}
 
     <div class="rc-divider"></div>
 

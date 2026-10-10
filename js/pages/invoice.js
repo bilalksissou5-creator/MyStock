@@ -3,6 +3,7 @@
 // الدور: عرض فاتورة واحدة + طباعة + حذف
 // ✅ يجلب العناصر من invoice_items (الكمية المُضافة)
 // ✅ تقسيم تلقائي إلى صفحات A4 (13 صف لكل صفحة)
+// ✅ احترام إعداد show_org_name من المنظمة
 // ============================================
 
 const ROWS_PER_PAGE = 13;
@@ -55,12 +56,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     supplier = sup;
   }
 
-  // 3. جلب المنظمة
+  // 3. جلب المنظمة (مع show_org_name)
   let org = null;
   if (invoice.organization_id) {
     const { data: o } = await db
       .from('organizations')
-      .select('name, logo_url, logo_shape')
+      .select('name, logo_url, logo_shape, show_org_name')
       .eq('id', invoice.organization_id)
       .single();
     org = o;
@@ -118,7 +119,7 @@ function splitIntoPages(items) {
 }
 
 // ============================================
-// بناء صفحة واحدة (بنفس التصميم)
+// بناء صفحة واحدة
 // ============================================
 function buildPage({ pageNumber, totalPages, pageItems, invoice, supplier, org, createdBy, globalRowStart }) {
   const date = new Date(invoice.created_at);
@@ -126,12 +127,13 @@ function buildPage({ pageNumber, totalPages, pageItems, invoice, supplier, org, 
   const timeStr = date.toLocaleTimeString('ar-MA', { hour: '2-digit', minute: '2-digit' });
 
   const logoShape = org?.logo_shape || 'circle';
+  const showOrgName = org?.show_org_name !== false;
 
   // مجموع هذه الصفحة
   const pageTotalQty = pageItems.reduce((s, it) => s + Number(it.qty ?? 0), 0);
   const pageTotalValue = pageItems.reduce((s, it) => s + Number(it.total ?? 0), 0);
 
-  // المجموع الكلي (من الفاتورة)
+  // المجموع الكلي
   const grandTotalQty = invoice.total_qty ?? 0;
   const grandTotalValue = Number(invoice.total_value ?? 0);
 
@@ -145,9 +147,11 @@ function buildPage({ pageNumber, totalPages, pageItems, invoice, supplier, org, 
             ? `<img src="${org.logo_url}" alt="logo">`
             : `<div class="logo-placeholder"><i class="fas fa-boxes-stacked"></i></div>`}
         </div>
-        <div class="invoice-org">
-          <h1>${org?.name ?? 'MyStock'}</h1>
-        </div>
+        ${showOrgName ? `
+          <div class="invoice-org">
+            <h1>${org?.name ?? 'MyStock'}</h1>
+          </div>
+        ` : ''}
       </div>
 
       <div class="invoice-info-row">
@@ -254,7 +258,7 @@ function buildPage({ pageNumber, totalPages, pageItems, invoice, supplier, org, 
 }
 
 // ============================================
-// عرض الفاتورة (مقسّمة على صفحات)
+// عرض الفاتورة
 // ============================================
 function renderInvoice({ invoice, supplier, org, createdBy, items, canDelete }) {
   const container = document.getElementById('invoice-content');
@@ -277,7 +281,7 @@ function renderInvoice({ invoice, supplier, org, createdBy, items, canDelete }) 
     });
   });
 
-  // ══════ الأزرار (مرة واحدة، في آخر الصفحة) ══════
+  // الأزرار
   html += `
     <div class="invoice-actions no-print">
       <button class="btn-primary" onclick="window.print()">
