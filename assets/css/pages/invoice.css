@@ -95,7 +95,7 @@ main {
 /* ✅ الشعار: الحاوية حجمها حسب الصورة */
 .invoice-logo {
   width: 160px;
-  height: 160px;
+  height: 100px;
   border-radius: 8px;
   background: transparent;
   display: flex;
