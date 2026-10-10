@@ -1,7 +1,7 @@
 /* ============================================
    صفحة تعديل المنظمة
    ✅ CSS Switch احترافي (أزرق/رمادي)
-   ✅ زر الحفظ ثابت في أسفل الشاشة
+   ✅ زر الحفظ ثابت في أسفل الشاشة بدون خلفية
    ============================================ */
 
 .org-edit-wrapper {
@@ -342,7 +342,7 @@
 }
 
 /* ══════════════════════════════════════════
-   ✅ زر الحفظ الثابت في أسفل الشاشة
+   ✅ زر الحفظ الثابت في أسفل الشاشة (بدون خلفية)
    ══════════════════════════════════════════ */
 .org-save-bar {
   position: fixed;
@@ -351,17 +351,16 @@
   right: 0;
   padding: 8px 16px;
   padding-bottom: calc(8px + env(safe-area-inset-bottom, 0px));
-  box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.06);
   z-index: 100;
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
   display: flex;
   justify-content: center;
+  pointer-events: none;
 }
 
 .org-save-bar .btn-primary {
   max-width: 800px;
   width: 100%;
+  pointer-events: auto;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
