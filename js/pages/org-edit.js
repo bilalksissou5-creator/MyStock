@@ -1,5 +1,6 @@
 // ============================================
 // صفحة تعديل المنظمة (للمدير فقط)
+// ✅ إضافة قسم العملة (اختيار + رمز + إظهار)
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   const user = await requireAuth();
@@ -36,8 +37,16 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // الحالة الحالية
   let currentShape = org.logo_shape || 'circle';
-  let showOrgName = org.show_org_name !== false; // default: true
+  let showOrgName = org.show_org_name !== false;
+  let currencyCode = org.currency_code || 'MAD';
+  let currencySymbol = org.currency_symbol || 'DH';
+  let showCurrency = org.show_currency !== false;
   let pendingLogoFile = null;
+
+  // بناء قائمة العملات
+  const currenciesList = Object.entries(CurrencyUtils.CURRENCIES)
+    .map(([code, info]) => `<option value="${code}" data-symbol="${info.symbol}">${info.name} (${code})</option>`)
+    .join('');
 
   main.innerHTML = `
     <div class="page-header">
@@ -58,7 +67,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         <h3>شعار المنظمة</h3>
         <p class="org-hint">اختر شكل الشعار ثم ارفع صورة</p>
 
-        <!-- اختيار الشكل -->
         <div class="shape-picker">
           <button type="button" class="shape-option" data-shape="circle">
             <div class="shape-preview shape-circle"></div>
@@ -74,7 +82,6 @@ document.addEventListener('DOMContentLoaded', async () => {
           </button>
         </div>
 
-        <!-- معاينة الشعار -->
         <div class="org-logo-preview" id="org-logo-preview">
           ${org.logo_url
             ? `<img src="${org.logo_url}" alt="logo" id="logo-img">`
@@ -95,6 +102,45 @@ document.addEventListener('DOMContentLoaded', async () => {
         <div class="form-group">
           <label>الاسم</label>
           <input type="text" id="org-name" value="${org.name ?? ''}" placeholder="اسم المنظمة">
+        </div>
+      </div>
+
+      <!-- ══════ العملة ══════ -->
+      <div class="org-section">
+        <h3>💰 العملة</h3>
+        <p class="org-hint">اختر العملة ورمزها المستخدم في الفواتير</p>
+
+        <div class="form-group">
+          <label>العملة</label>
+          <select id="currency-code" class="form-select">
+            ${currenciesList}
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>رمز العملة (قابل للتعديل)</label>
+          <input type="text" id="currency-symbol" value="${currencySymbol}" placeholder="DH" dir="ltr">
+          <small class="field-hint">مثال: DH، $، €، ر.س</small>
+        </div>
+
+        <div class="setting-toggle-item">
+          <div class="setting-toggle-info">
+            <strong>إظهار رمز العملة في الفواتير</strong>
+            <span>سيظهر الرمز بجانب السعر والمجموع (بدون الكمية)</span>
+          </div>
+          <button type="button"
+                  class="setting-toggle ${showCurrency ? 'active' : ''}"
+                  id="show-currency-toggle">
+            <span>${showCurrency ? 'مفعّل' : 'معطّل'}</span>
+          </button>
+        </div>
+
+        <!-- معاينة -->
+        <div class="currency-preview">
+          <span class="preview-label">معاينة:</span>
+          <span class="preview-value" id="currency-preview-value">
+            ${CurrencyUtils.formatCurrency(1500, currencySymbol, showCurrency)}
+          </span>
         </div>
       </div>
 
@@ -132,11 +178,19 @@ document.addEventListener('DOMContentLoaded', async () => {
   const logoPreview = document.getElementById('org-logo-preview');
   const nameInput = document.getElementById('org-name');
   const showOrgNameToggle = document.getElementById('show-org-name-toggle');
+  const currencyCodeSelect = document.getElementById('currency-code');
+  const currencySymbolInput = document.getElementById('currency-symbol');
+  const showCurrencyToggle = document.getElementById('show-currency-toggle');
+  const currencyPreviewValue = document.getElementById('currency-preview-value');
+
+  // تعيين القيم الحالية
+  currencyCodeSelect.value = currencyCode;
 
   function showError(msg) {
     successBox.style.display = 'none';
     errBox.textContent = msg;
     errBox.style.display = 'block';
+    setTimeout(() => { errBox.style.display = 'none'; }, 4000);
   }
 
   function showSuccess(msg) {
@@ -156,7 +210,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   applyShape(currentShape);
 
-  // تفعيل الشكل النشط
   document.querySelectorAll('.shape-option').forEach(btn => {
     if (btn.dataset.shape === currentShape) btn.classList.add('active');
     btn.addEventListener('click', () => {
@@ -175,6 +228,50 @@ document.addEventListener('DOMContentLoaded', async () => {
     showOrgNameToggle.classList.toggle('active', showOrgName);
     showOrgNameToggle.querySelector('span').textContent = showOrgName ? 'مفعّل' : 'معطّل';
   });
+
+  // ═══════════════════════════════════════════
+  // تغيير العملة → تحديث الرمز تلقائياً
+  // ═══════════════════════════════════════════
+  currencyCodeSelect.addEventListener('change', () => {
+    currencyCode = currencyCodeSelect.value;
+    const selectedOption = currencyCodeSelect.options[currencyCodeSelect.selectedIndex];
+    const autoSymbol = selectedOption.dataset.symbol || '';
+
+    // إذا الرمز فارغ أو كان افتراضياً سابقاً → نُحدّثه
+    if (!currencySymbolInput.value.trim() || currencySymbolInput.dataset.auto === 'true') {
+      currencySymbolInput.value = autoSymbol;
+      currencySymbolInput.dataset.auto = 'true';
+    }
+
+    currencySymbol = currencySymbolInput.value;
+    updateCurrencyPreview();
+  });
+
+  // ═══════════════════════════════════════════
+  // تعديل الرمز يدوياً
+  // ═══════════════════════════════════════════
+  currencySymbolInput.addEventListener('input', () => {
+    currencySymbol = currencySymbolInput.value.trim() || CurrencyUtils.getCurrencySymbol(currencyCode);
+    currencySymbolInput.dataset.auto = 'false';
+    updateCurrencyPreview();
+  });
+
+  // ═══════════════════════════════════════════
+  // toggle إظهار العملة
+  // ═══════════════════════════════════════════
+  showCurrencyToggle.addEventListener('click', () => {
+    showCurrency = !showCurrency;
+    showCurrencyToggle.classList.toggle('active', showCurrency);
+    showCurrencyToggle.querySelector('span').textContent = showCurrency ? 'مفعّل' : 'معطّل';
+    updateCurrencyPreview();
+  });
+
+  // ═══════════════════════════════════════════
+  // تحديث المعاينة
+  // ═══════════════════════════════════════════
+  function updateCurrencyPreview() {
+    currencyPreviewValue.textContent = CurrencyUtils.formatCurrency(1500, currencySymbol, showCurrency);
+  }
 
   // ═══════════════════════════════════════════
   // اختيار صورة الشعار
@@ -236,13 +333,17 @@ document.addEventListener('DOMContentLoaded', async () => {
       return;
     }
 
+    if (!currencySymbolInput.value.trim()) {
+      showError('رمز العملة مطلوب');
+      return;
+    }
+
     btn.disabled = true;
     btn.querySelector('span').textContent = 'جارٍ الحفظ...';
 
     try {
       let logoUrl = org.logo_url;
 
-      // رفع الشعار إن وُجد ملف جديد
       if (pendingLogoFile) {
         logoUrl = await uploadLogo(pendingLogoFile);
       }
@@ -252,6 +353,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         logo_url: logoUrl,
         logo_shape: currentShape,
         show_org_name: showOrgName,
+        currency_code: currencyCode,
+        currency_symbol: currencySymbolInput.value.trim(),
+        show_currency: showCurrency,
       };
 
       const { error: updateError } = await db

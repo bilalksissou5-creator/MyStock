@@ -146,11 +146,79 @@
 
 /* ══════ قسم الاسم ══════ */
 .org-section .form-group {
-  margin: 0;
+  margin: 0 0 14px;
+}
+
+.org-section .form-group:last-child {
+  margin-bottom: 0;
 }
 
 /* ══════════════════════════════════════════
-   ✅ عنصر Toggle في قسم إعدادات الإيصال
+   ✅ الحقول (select + hints)
+   ══════════════════════════════════════════ */
+.form-select {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid #e5e5e5;
+  border-radius: 10px;
+  font-family: inherit;
+  font-size: 14px;
+  background: white;
+  color: #171717;
+  cursor: pointer;
+  transition: border-color 0.15s;
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23737373' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: left 12px center;
+  background-size: 16px;
+  padding-left: 40px;
+  box-sizing: border-box;
+}
+
+.form-select:focus {
+  outline: none;
+  border-color: #171717;
+}
+
+.field-hint {
+  display: block;
+  font-size: 11px;
+  color: #a3a3a3;
+  margin-top: 6px;
+}
+
+/* ══════════════════════════════════════════
+   ✅ معاينة العملة
+   ══════════════════════════════════════════ */
+.currency-preview {
+  margin-top: 14px;
+  padding: 14px 16px;
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.preview-label {
+  font-size: 12px;
+  color: #166534;
+  font-weight: 600;
+}
+
+.preview-value {
+  font-size: 16px;
+  font-weight: 700;
+  color: #15803d;
+  font-family: 'Courier New', monospace;
+  direction: ltr;
+}
+
+/* ══════════════════════════════════════════
+   ✅ عنصر Toggle
    ══════════════════════════════════════════ */
 .setting-toggle-item {
   display: flex;
@@ -295,5 +363,16 @@
   .setting-toggle {
     padding: 7px 14px;
     font-size: 12px;
+  }
+
+  .currency-preview {
+    padding: 12px 14px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+
+  .preview-value {
+    font-size: 15px;
   }
 }
