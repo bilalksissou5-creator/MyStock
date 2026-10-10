@@ -27,12 +27,9 @@ const CMD = {
 };
 
 // ═══════════════════════════════════════════
-// ترميز النص العربي (Windows-1256)
+// ترميز النص
 // ═══════════════════════════════════════════
-// ملاحظة: معظم الطابعات الحرارية لا تدعم العربية
-// تحتاج طابعة تدعم CP1256 أو UTF-8
 function encodeText(text) {
-  // تحويل النص إلى bytes
   const encoder = new TextEncoder();
   return Array.from(encoder.encode(text));
 }
@@ -43,9 +40,7 @@ function encodeText(text) {
 class ReceiptBuilder {
   constructor(paperWidth = 58) {
     this.chunks = [];
-    this.paperWidth = paperWidth; // 58 أو 80
-    // 58mm = 32 حرف تقريباً
-    // 80mm = 48 حرف
+    this.paperWidth = paperWidth;
     this.charsPerLine = paperWidth === 80 ? 48 : 32;
     this.add(CMD.INIT);
   }
@@ -79,12 +74,10 @@ class ReceiptBuilder {
     return this;
   }
 
-  // خط فاصل
   separator(char = '-') {
     return this.line(char.repeat(this.charsPerLine));
   }
 
-  // صف بعمودين (يسار + يمين)
   row(left, right) {
     const leftStr = String(left);
     const rightStr = String(right);
@@ -109,85 +102,96 @@ class ReceiptBuilder {
 }
 
 // ═══════════════════════════════════════════
-// طباعة Bluetooth
+// Bluetooth
 // ═══════════════════════════════════════════
 let bluetoothDevice = null;
 let bluetoothCharacteristic = null;
 
-// خدمات Bluetooth للطابعات الحرارية
+// خدمات الطابعات الحرارية الشائعة (UUIDs كاملة)
 const PRINTER_SERVICES = [
-  0xFF00, // Common for thermal printers
-  0x18F0, // Common
-  0xFFE0, // Common
-  0xFF80,
-  0x49535343, // ISSC
-];
-
-const PRINTER_CHARACTERISTICS = [
-  0xFF02,
-  0xFF01,
-  0xFFE1,
-  0x2AF1,
-  0x49535343,
+  '000018f0-0000-1000-8000-00805f9b34fb',
+  '0000ff00-0000-1000-8000-00805f9b34fb',
+  '0000ffe0-0000-1000-8000-00805f9b34fb',
+  '0000ff80-0000-1000-8000-00805f9b34fb',
+  '0000ff10-0000-1000-8000-00805f9b34fb',
+  '0000ff01-0000-1000-8000-00805f9b34fb',
+  '49535343-fe7d-4ae5-8fa9-9fafd205e455',
+  'e7810a71-73ae-499d-8c15-faa9aef0c3f2',
 ];
 
 async function connectBluetoothPrinter() {
   if (!navigator.bluetooth) {
-    throw new Error('Bluetooth غير مدعوم في هذا المتصفح');
+    throw new Error('Bluetooth غير مدعوم في هذا المتصفح. استخدم Chrome على Android.');
   }
 
+  // ✅ محاولة واحدة: كل الأجهزة
+  const device = await navigator.bluetooth.requestDevice({
+    acceptAllDevices: true,
+    optionalServices: PRINTER_SERVICES,
+  });
+
+  if (!device) {
+    throw new Error('لم يتم اختيار أي جهاز');
+  }
+
+  // الاتصال
+  let server;
   try {
-    const device = await navigator.bluetooth.requestDevice({
-      acceptAllDevices: true,
-      optionalServices: PRINTER_SERVICES,
-    });
+    server = await device.gatt.connect();
+  } catch (e) {
+    throw new Error('فشل الاتصال بالجهاز: ' + e.message);
+  }
 
-    const server = await device.gatt.connect();
+  // البحث عن خدمة الكتابة
+  let characteristic = null;
 
-    // البحث عن خدمة الطباعة
-    let characteristic = null;
-    for (const serviceUuid of PRINTER_SERVICES) {
-      try {
-        const service = await server.getPrimaryService(serviceUuid);
-        for (const charUuid of PRINTER_CHARACTERISTICS) {
-          try {
-            characteristic = await service.getCharacteristic(charUuid);
-            if (characteristic) break;
-          } catch (e) { /* تجاهل */ }
+  // 1. جرّب خدمات الطابعات المعروفة
+  for (const serviceUuid of PRINTER_SERVICES) {
+    try {
+      const service = await server.getPrimaryService(serviceUuid);
+      const chars = await service.getCharacteristics();
+      for (const char of chars) {
+        if (char.properties.write || char.properties.writeWithoutResponse) {
+          characteristic = char;
+          break;
         }
-        if (characteristic) break;
-      } catch (e) { /* تجاهل */ }
-    }
+      }
+      if (characteristic) break;
+    } catch (e) { /* تجاهل */ }
+  }
 
-    // إذا لم نجد، ابحث في كل الخدمات
-    if (!characteristic) {
+  // 2. إذا لم نجد، ابحث في كل الخدمات
+  if (!characteristic) {
+    try {
       const services = await server.getPrimaryServices();
       for (const service of services) {
-        const chars = await service.getCharacteristics();
-        for (const char of chars) {
-          if (char.properties.write || char.properties.writeWithoutResponse) {
-            characteristic = char;
-            break;
+        try {
+          const chars = await service.getCharacteristics();
+          for (const char of chars) {
+            if (char.properties.write || char.properties.writeWithoutResponse) {
+              characteristic = char;
+              break;
+            }
           }
-        }
-        if (characteristic) break;
+          if (characteristic) break;
+        } catch (e) { /* تجاهل */ }
       }
-    }
-
-    if (!characteristic) {
-      throw new Error('لم يتم العثور على خدمة الطباعة');
-    }
-
-    bluetoothDevice = device;
-    bluetoothCharacteristic = characteristic;
-
-    return {
-      id: device.id,
-      name: device.name || 'طابعة Bluetooth',
-    };
-  } catch (err) {
-    throw new Error('فشل الاتصال: ' + err.message);
+    } catch (e) { /* تجاهل */ }
   }
+
+  if (!characteristic) {
+    // اقطع الاتصال لأننا لا نستطيع الطباعة
+    if (device.gatt.connected) device.gatt.disconnect();
+    throw new Error('الجهاز لا يدعم الطباعة (لا يوجد منفذ كتابة). اختر طابعة حرارية.');
+  }
+
+  bluetoothDevice = device;
+  bluetoothCharacteristic = characteristic;
+
+  return {
+    id: device.id,
+    name: device.name || 'طابعة Bluetooth',
+  };
 }
 
 async function printBluetooth(data) {
@@ -195,11 +199,12 @@ async function printBluetooth(data) {
     throw new Error('لا يوجد اتصال بطابعة Bluetooth');
   }
 
-  // الكتابة على شكل chunks (204 bytes)
-  const chunkSize = 204;
+  const chunkSize = 200;
   for (let i = 0; i < data.length; i += chunkSize) {
     const chunk = data.slice(i, i + chunkSize);
     await bluetoothCharacteristic.writeValue(chunk);
+    // تأخير بسيط بين الحزم لتفادي فقدان البيانات
+    await new Promise(r => setTimeout(r, 20));
   }
 }
 
@@ -216,60 +221,52 @@ function isBluetoothConnected() {
 }
 
 // ═══════════════════════════════════════════
-// طباعة USB
+// USB
 // ═══════════════════════════════════════════
 let usbDevice = null;
 let usbEndpoint = null;
 
 async function connectUsbPrinter() {
   if (!navigator.usb) {
-    throw new Error('USB غير مدعوم في هذا المتصفح');
+    throw new Error('USB غير مدعوم في هذا المتصفح. استخدم Chrome على حاسوب.');
   }
 
-  try {
-    const device = await navigator.usb.requestDevice({
-      filters: [], // كل الأجهزة
-    });
+  const device = await navigator.usb.requestDevice({ filters: [] });
 
-    await device.open();
+  await device.open();
 
-    // اختيار الإعدادات
-    if (device.configuration === null) {
-      await device.selectConfiguration(1);
-    }
+  if (device.configuration === null) {
+    await device.selectConfiguration(1);
+  }
 
-    // البحث عن واجهة الطباعة
-    let foundEndpoint = null;
-    for (const iface of device.configuration.interfaces) {
-      for (const alt of iface.alternates) {
-        for (const ep of alt.endpoints) {
-          if (ep.direction === 'out') {
-            try {
-              await device.claimInterface(iface.interfaceNumber);
-              foundEndpoint = { interface: iface.interfaceNumber, endpoint: ep.endpointNumber };
-              break;
-            } catch (e) { /* حاول مع الآخر */ }
-          }
+  let foundEndpoint = null;
+  for (const iface of device.configuration.interfaces) {
+    for (const alt of iface.alternates) {
+      for (const ep of alt.endpoints) {
+        if (ep.direction === 'out') {
+          try {
+            await device.claimInterface(iface.interfaceNumber);
+            foundEndpoint = { interface: iface.interfaceNumber, endpoint: ep.endpointNumber };
+            break;
+          } catch (e) { /* حاول مع الآخر */ }
         }
-        if (foundEndpoint) break;
       }
       if (foundEndpoint) break;
     }
-
-    if (!foundEndpoint) {
-      throw new Error('لم يتم العثور على منفذ الطباعة');
-    }
-
-    usbDevice = device;
-    usbEndpoint = foundEndpoint;
-
-    return {
-      id: `${device.vendorId}-${device.productId}`,
-      name: device.productName || 'طابعة USB',
-    };
-  } catch (err) {
-    throw new Error('فشل الاتصال: ' + err.message);
+    if (foundEndpoint) break;
   }
+
+  if (!foundEndpoint) {
+    throw new Error('لم يتم العثور على منفذ الطباعة');
+  }
+
+  usbDevice = device;
+  usbEndpoint = foundEndpoint;
+
+  return {
+    id: `${device.vendorId}-${device.productId}`,
+    name: device.productName || 'طابعة USB',
+  };
 }
 
 async function printUsb(data) {
@@ -291,8 +288,6 @@ function isUsbConnected() {
 // ═══════════════════════════════════════════
 // دوال مساعدة
 // ═══════════════════════════════════════════
-
-// الاتصال بالطابعة الافتراضية
 async function printReceipt(receiptData, connectionType) {
   const builder = new ReceiptBuilder(receiptData.paperWidth || 58);
   buildReceiptContent(builder, receiptData);
@@ -307,7 +302,6 @@ async function printReceipt(receiptData, connectionType) {
   }
 }
 
-// بناء محتوى الفاتورة
 function buildReceiptContent(builder, data) {
   builder.alignCenter();
   builder.doubleBoth();
