@@ -34,15 +34,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     return;
   }
 
-  // الحالة الحالية للشكل
+  // الحالة الحالية
   let currentShape = org.logo_shape || 'circle';
+  let showOrgName = org.show_org_name !== false; // default: true
   let pendingLogoFile = null;
-
-  const shapeLabels = {
-    circle: 'دائري',
-    square: 'مربع',
-    rectangle: 'مستطيل',
-  };
 
   main.innerHTML = `
     <div class="page-header">
@@ -103,6 +98,23 @@ document.addEventListener('DOMContentLoaded', async () => {
         </div>
       </div>
 
+      <!-- ══════ إعدادات الإيصال ══════ -->
+      <div class="org-section">
+        <h3>إعدادات الإيصال</h3>
+
+        <div class="setting-toggle-item">
+          <div class="setting-toggle-info">
+            <strong>إظهار اسم المنظمة في الإيصال</strong>
+            <span>سيظهر اسم المنظمة في الفواتير والإيصالات المطبوعة</span>
+          </div>
+          <button type="button"
+                  class="setting-toggle ${showOrgName ? 'active' : ''}"
+                  id="show-org-name-toggle">
+            <span>${showOrgName ? 'مفعّل' : 'معطّل'}</span>
+          </button>
+        </div>
+      </div>
+
     </div>
 
     <!-- ══════ زر الحفظ ══════ -->
@@ -119,6 +131,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const logoInput = document.getElementById('logo-input');
   const logoPreview = document.getElementById('org-logo-preview');
   const nameInput = document.getElementById('org-name');
+  const showOrgNameToggle = document.getElementById('show-org-name-toggle');
 
   function showError(msg) {
     successBox.style.display = 'none';
@@ -152,6 +165,15 @@ document.addEventListener('DOMContentLoaded', async () => {
       btn.classList.add('active');
       applyShape(currentShape);
     });
+  });
+
+  // ═══════════════════════════════════════════
+  // toggle إظهار اسم المنظمة
+  // ═══════════════════════════════════════════
+  showOrgNameToggle.addEventListener('click', () => {
+    showOrgName = !showOrgName;
+    showOrgNameToggle.classList.toggle('active', showOrgName);
+    showOrgNameToggle.querySelector('span').textContent = showOrgName ? 'مفعّل' : 'معطّل';
   });
 
   // ═══════════════════════════════════════════
@@ -229,6 +251,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         name: newName,
         logo_url: logoUrl,
         logo_shape: currentShape,
+        show_org_name: showOrgName,
       };
 
       const { error: updateError } = await db
