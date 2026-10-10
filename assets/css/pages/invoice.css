@@ -3,7 +3,7 @@
    ✅ تقسيم تلقائي إلى صفحات A4
    ✅ التوقيعات في أسفل الصفحة (شاشة + طباعة)
    ✅ العملة على اليمين: 1.40 DH
-   ✅ شعار كبير + بدون خلفية
+   ✅ شعار كبير بدون خلفية + الصورة تملأ الحاوية
    ============================================ */
 
 /* ============================================
@@ -87,13 +87,12 @@ main {
   align-items: center;
   justify-content: center;
   text-align: center;
-  min-height: 2.2cm;
   padding: 8px 0 12px;
   border-bottom: 2px solid #171717;
   margin-bottom: 12px;
 }
 
-/* ✅ الشعار كبير + بدون خلفية */
+/* ✅ الشعار: الحاوية حجمها حسب الصورة */
 .invoice-logo {
   width: 160px;
   height: 160px;
@@ -104,15 +103,16 @@ main {
   justify-content: center;
   overflow: hidden;
   flex-shrink: 0;
-  margin-bottom: 12px;
+  margin-bottom: 10px;
   transition: all 0.2s ease;
 }
 
+/* ✅ الصورة تملأ الحاوية */
 .invoice-logo img {
   width: 100%;
   height: 100%;
-  object-fit: contain;
-  transform: scale(1.15);
+  object-fit: cover;
+  display: block;
 }
 
 .logo-placeholder {
@@ -530,7 +530,6 @@ main {
 
   .invoice-header {
     padding: 6px 0 10px;
-    min-height: 1.8cm;
   }
 
   /* ✅ الشعار على الهاتف: 130px */
