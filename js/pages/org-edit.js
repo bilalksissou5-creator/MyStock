@@ -3,6 +3,7 @@
 // ✅ إضافة قسم العملة (اختيار + رمز + إظهار)
 // ✅ إظهار اسم المنظمة ضمن قسم الاسم
 // ✅ قسم نسبة الربح (0-50%)
+// ✅ Switchs احترافية بأزرق/رمادي
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   const user = await requireAuth();
@@ -103,16 +104,20 @@ document.addEventListener('DOMContentLoaded', async () => {
           <input type="text" id="org-name" value="${org.name ?? ''}" placeholder="اسم المنظمة">
         </div>
 
-        <div class="setting-toggle-item">
-          <div class="setting-toggle-info">
-            <strong>إظهار اسم المنظمة في الفواتير</strong>
-            <span>سيظهر الاسم في الفواتير والإيصالات المطبوعة</span>
+        <div class="switch-item">
+          <div class="switch-content">
+            <div class="switch-header">
+              <strong class="switch-title">إظهار اسم المنظمة في الفواتير</strong>
+              <span class="switch-status ${showOrgName ? 'on' : 'off'}" id="show-org-name-status">
+                ${showOrgName ? 'مفعّل' : 'غير مفعّل'}
+              </span>
+            </div>
+            <p class="switch-desc">سيظهر الاسم في الفواتير والإيصالات المطبوعة</p>
           </div>
-          <button type="button"
-                  class="setting-toggle ${showOrgName ? 'active' : ''}"
-                  id="show-org-name-toggle">
-            <span>${showOrgName ? 'مفعّل' : 'معطّل'}</span>
-          </button>
+          <label class="switch">
+            <input type="checkbox" id="show-org-name-toggle" ${showOrgName ? 'checked' : ''}>
+            <span class="switch-slider"></span>
+          </label>
         </div>
       </div>
 
@@ -134,16 +139,20 @@ document.addEventListener('DOMContentLoaded', async () => {
           <small class="field-hint">مثال: DH، $، €، ر.س</small>
         </div>
 
-        <div class="setting-toggle-item">
-          <div class="setting-toggle-info">
-            <strong>إظهار رمز العملة في الفواتير</strong>
-            <span>سيظهر الرمز بجانب السعر والمجموع (بدون الكمية)</span>
+        <div class="switch-item">
+          <div class="switch-content">
+            <div class="switch-header">
+              <strong class="switch-title">إظهار رمز العملة في الفواتير</strong>
+              <span class="switch-status ${showCurrency ? 'on' : 'off'}" id="show-currency-status">
+                ${showCurrency ? 'مفعّل' : 'غير مفعّل'}
+              </span>
+            </div>
+            <p class="switch-desc">سيظهر الرمز بجانب السعر والمجموع (بدون الكمية)</p>
           </div>
-          <button type="button"
-                  class="setting-toggle ${showCurrency ? 'active' : ''}"
-                  id="show-currency-toggle">
-            <span>${showCurrency ? 'مفعّل' : 'معطّل'}</span>
-          </button>
+          <label class="switch">
+            <input type="checkbox" id="show-currency-toggle" ${showCurrency ? 'checked' : ''}>
+            <span class="switch-slider"></span>
+          </label>
         </div>
 
         <div class="currency-preview">
@@ -159,16 +168,20 @@ document.addEventListener('DOMContentLoaded', async () => {
         <h3>📈 نسبة الربح</h3>
         <p class="org-hint">تُضاف تلقائياً على سعر البيع عند إنشاء إيصال</p>
 
-        <div class="setting-toggle-item">
-          <div class="setting-toggle-info">
-            <strong>تفعيل نسبة الربح</strong>
-            <span>عند التفعيل تُضاف النسبة على سعر كل منتج في إيصال البيع</span>
+        <div class="switch-item">
+          <div class="switch-content">
+            <div class="switch-header">
+              <strong class="switch-title">تفعيل نسبة الربح</strong>
+              <span class="switch-status ${profitEnabled ? 'on' : 'off'}" id="profit-status">
+                ${profitEnabled ? 'مفعّل' : 'غير مفعّل'}
+              </span>
+            </div>
+            <p class="switch-desc">عند التفعيل تُضاف النسبة على سعر كل منتج في إيصال البيع</p>
           </div>
-          <button type="button"
-                  class="setting-toggle ${profitEnabled ? 'active' : ''}"
-                  id="profit-toggle">
-            <span>${profitEnabled ? 'مفعّل' : 'معطّل'}</span>
-          </button>
+          <label class="switch">
+            <input type="checkbox" id="profit-toggle" ${profitEnabled ? 'checked' : ''}>
+            <span class="switch-slider"></span>
+          </label>
         </div>
 
         <div class="form-group" id="profit-input-group" style="${profitEnabled ? '' : 'display:none;'}">
@@ -202,11 +215,14 @@ document.addEventListener('DOMContentLoaded', async () => {
   const logoPreview = document.getElementById('org-logo-preview');
   const nameInput = document.getElementById('org-name');
   const showOrgNameToggle = document.getElementById('show-org-name-toggle');
+  const showOrgNameStatus = document.getElementById('show-org-name-status');
   const currencyCodeSelect = document.getElementById('currency-code');
   const currencySymbolInput = document.getElementById('currency-symbol');
   const showCurrencyToggle = document.getElementById('show-currency-toggle');
+  const showCurrencyStatus = document.getElementById('show-currency-status');
   const currencyPreviewValue = document.getElementById('currency-preview-value');
   const profitToggle = document.getElementById('profit-toggle');
+  const profitStatus = document.getElementById('profit-status');
   const profitInputGroup = document.getElementById('profit-input-group');
   const profitPercentageInput = document.getElementById('profit-percentage');
   const profitPreview = document.getElementById('profit-preview');
@@ -245,12 +261,45 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   });
 
-  showOrgNameToggle.addEventListener('click', () => {
-    showOrgName = !showOrgName;
-    showOrgNameToggle.classList.toggle('active', showOrgName);
-    showOrgNameToggle.querySelector('span').textContent = showOrgName ? 'مفعّل' : 'معطّل';
+  // ═══════════════════════════════════════════
+  // Switch: إظهار اسم المنظمة
+  // ═══════════════════════════════════════════
+  showOrgNameToggle.addEventListener('change', () => {
+    showOrgName = showOrgNameToggle.checked;
+    showOrgNameStatus.textContent = showOrgName ? 'مفعّل' : 'غير مفعّل';
+    showOrgNameStatus.classList.toggle('on', showOrgName);
+    showOrgNameStatus.classList.toggle('off', !showOrgName);
   });
 
+  // ═══════════════════════════════════════════
+  // Switch: إظهار العملة
+  // ═══════════════════════════════════════════
+  showCurrencyToggle.addEventListener('change', () => {
+    showCurrency = showCurrencyToggle.checked;
+    showCurrencyStatus.textContent = showCurrency ? 'مفعّل' : 'غير مفعّل';
+    showCurrencyStatus.classList.toggle('on', showCurrency);
+    showCurrencyStatus.classList.toggle('off', !showCurrency);
+    updateCurrencyPreview();
+  });
+
+  // ═══════════════════════════════════════════
+  // Switch: نسبة الربح
+  // ═══════════════════════════════════════════
+  profitToggle.addEventListener('change', () => {
+    profitEnabled = profitToggle.checked;
+    profitStatus.textContent = profitEnabled ? 'مفعّل' : 'غير مفعّل';
+    profitStatus.classList.toggle('on', profitEnabled);
+    profitStatus.classList.toggle('off', !profitEnabled);
+
+    profitInputGroup.style.display = profitEnabled ? '' : 'none';
+    profitPreview.style.display = profitEnabled ? '' : 'none';
+
+    updateProfitPreview();
+  });
+
+  // ═══════════════════════════════════════════
+  // العملة
+  // ═══════════════════════════════════════════
   currencyCodeSelect.addEventListener('change', () => {
     currencyCode = currencyCodeSelect.value;
     const selectedOption = currencyCodeSelect.options[currencyCodeSelect.selectedIndex];
@@ -271,30 +320,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     updateCurrencyPreview();
   });
 
-  showCurrencyToggle.addEventListener('click', () => {
-    showCurrency = !showCurrency;
-    showCurrencyToggle.classList.toggle('active', showCurrency);
-    showCurrencyToggle.querySelector('span').textContent = showCurrency ? 'مفعّل' : 'معطّل';
-    updateCurrencyPreview();
-  });
-
   function updateCurrencyPreview() {
     currencyPreviewValue.textContent = CurrencyUtils.formatCurrency(1500, currencySymbol, showCurrency);
   }
-
-  // ═══════════════════════════════════════════
-  // نسبة الربح
-  // ═══════════════════════════════════════════
-  profitToggle.addEventListener('click', () => {
-    profitEnabled = !profitEnabled;
-    profitToggle.classList.toggle('active', profitEnabled);
-    profitToggle.querySelector('span').textContent = profitEnabled ? 'مفعّل' : 'معطّل';
-
-    profitInputGroup.style.display = profitEnabled ? '' : 'none';
-    profitPreview.style.display = profitEnabled ? '' : 'none';
-
-    updateProfitPreview();
-  });
 
   profitPercentageInput.addEventListener('input', () => {
     let value = Number(profitPercentageInput.value);
@@ -367,7 +395,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       return;
     }
 
-    // التحقق من نسبة الربح
     let finalProfitPercentage = Number(profitPercentageInput.value) || 0;
     if (profitEnabled) {
       if (finalProfitPercentage < 0 || finalProfitPercentage > 50) {
