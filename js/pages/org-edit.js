@@ -1,9 +1,8 @@
 // ============================================
 // صفحة تعديل المنظمة (للمدير فقط)
-// ✅ إضافة قسم العملة (اختيار + رمز + إظهار)
-// ✅ إظهار اسم المنظمة ضمن قسم الاسم
-// ✅ قسم نسبة الربح (0-50%) — العناصر ظاهرة دائماً
-// ✅ Switchs احترافية بأزرق/رمادي
+// ✅ قسم العملة + نسبة الربح
+// ✅ الأشكال الصغيرة تحت الصورة
+// ✅ زر الحفظ ثابت بأسفل الشاشة
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   const user = await requireAuth();
@@ -65,27 +64,25 @@ document.addEventListener('DOMContentLoaded', async () => {
       <!-- ══════ الشعار ══════ -->
       <div class="org-section">
         <h3>شعار المنظمة</h3>
-        <p class="org-hint">اختر شكل الشعار ثم ارفع صورة</p>
 
-        <div class="shape-picker">
-          <button type="button" class="shape-option" data-shape="circle">
-            <div class="shape-preview shape-circle"></div>
-            <span>دائري</span>
-          </button>
-          <button type="button" class="shape-option" data-shape="square">
-            <div class="shape-preview shape-square"></div>
-            <span>مربع</span>
-          </button>
-          <button type="button" class="shape-option" data-shape="rectangle">
-            <div class="shape-preview shape-rectangle"></div>
-            <span>مستطيل</span>
-          </button>
-        </div>
-
+        <!-- ✅ الصورة أولاً -->
         <div class="org-logo-preview" id="org-logo-preview">
           ${org.logo_url
             ? `<img src="${org.logo_url}" alt="logo" id="logo-img">`
             : `<i class="fas fa-building" id="logo-placeholder"></i>`}
+        </div>
+
+        <!-- ✅ الأشكال الصغيرة تحتها -->
+        <div class="shape-picker">
+          <button type="button" class="shape-option" data-shape="circle" title="دائري">
+            <div class="shape-preview shape-circle"></div>
+          </button>
+          <button type="button" class="shape-option" data-shape="square" title="مربع">
+            <div class="shape-preview shape-square"></div>
+          </button>
+          <button type="button" class="shape-option" data-shape="rectangle" title="مستطيل">
+            <div class="shape-preview shape-rectangle"></div>
+          </button>
         </div>
 
         <input type="file" id="logo-input" accept="image/*" style="display:none;">
@@ -184,14 +181,12 @@ document.addEventListener('DOMContentLoaded', async () => {
           </label>
         </div>
 
-        <!-- ✅ الحقل ظاهر دائماً -->
         <div class="form-group" id="profit-input-group">
           <label>نسبة الربح (%)</label>
           <input type="number" id="profit-percentage" value="${profitPercentage}" min="0" max="50" step="0.5" dir="ltr">
           <small class="field-hint">القيمة بين 0 و 50%</small>
         </div>
 
-        <!-- ✅ المعاينة ظاهرة دائماً -->
         <div class="currency-preview" id="profit-preview">
           <span class="preview-label">مثال:</span>
           <span class="preview-value" id="profit-preview-value">
@@ -261,9 +256,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   });
 
-  // ═══════════════════════════════════════════
-  // Switch: إظهار اسم المنظمة
-  // ═══════════════════════════════════════════
   showOrgNameToggle.addEventListener('change', () => {
     showOrgName = showOrgNameToggle.checked;
     showOrgNameStatus.textContent = showOrgName ? 'مفعّل' : 'غير مفعّل';
@@ -271,9 +263,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     showOrgNameStatus.classList.toggle('off', !showOrgName);
   });
 
-  // ═══════════════════════════════════════════
-  // Switch: إظهار العملة
-  // ═══════════════════════════════════════════
   showCurrencyToggle.addEventListener('change', () => {
     showCurrency = showCurrencyToggle.checked;
     showCurrencyStatus.textContent = showCurrency ? 'مفعّل' : 'غير مفعّل';
@@ -282,21 +271,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     updateCurrencyPreview();
   });
 
-  // ═══════════════════════════════════════════
-  // Switch: نسبة الربح (بدون إخفاء العناصر)
-  // ═══════════════════════════════════════════
   profitToggle.addEventListener('change', () => {
     profitEnabled = profitToggle.checked;
     profitStatus.textContent = profitEnabled ? 'مفعّل' : 'غير مفعّل';
     profitStatus.classList.toggle('on', profitEnabled);
     profitStatus.classList.toggle('off', !profitEnabled);
-
     updateProfitPreview();
   });
 
-  // ═══════════════════════════════════════════
-  // العملة
-  // ═══════════════════════════════════════════
   currencyCodeSelect.addEventListener('change', () => {
     currencyCode = currencyCodeSelect.value;
     const selectedOption = currencyCodeSelect.options[currencyCodeSelect.selectedIndex];
