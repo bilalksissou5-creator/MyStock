@@ -1,12 +1,13 @@
 /* ============================================
    صفحة تعديل المنظمة
    ✅ CSS Switch احترافي (أزرق/رمادي)
+   ✅ زر الحفظ ثابت في أسفل الشاشة
    ============================================ */
 
 .org-edit-wrapper {
   max-width: 800px;
   margin: 0 auto;
-  padding: 0 4px 20px;
+  padding: 0 4px 90px; /* ✅ مساحة للزر الثابت */
   display: flex;
   flex-direction: column;
   gap: 20px;
@@ -222,7 +223,6 @@
    ✅ Switch Component (احترافي)
    ══════════════════════════════════════════ */
 
-/* الحاوية العامة */
 .switch-item {
   display: flex;
   align-items: flex-start;
@@ -236,7 +236,6 @@
   padding-bottom: 0;
 }
 
-/* الجانب النصي */
 .switch-content {
   flex: 1;
   min-width: 0;
@@ -259,7 +258,6 @@
   text-align: right;
 }
 
-/* شارة الحالة */
 .switch-status {
   display: inline-block;
   padding: 2px 10px;
@@ -326,7 +324,6 @@
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
 }
 
-/* عند التفعيل */
 .switch input:checked + .switch-slider {
   background-color: #2563eb;
 }
@@ -335,30 +332,39 @@
   transform: translateX(22px);
 }
 
-/* عند focus */
 .switch input:focus + .switch-slider {
   box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
 }
 
-/* تعطيل */
 .switch input:disabled + .switch-slider {
   opacity: 0.5;
   cursor: not-allowed;
 }
 
 /* ══════════════════════════════════════════
-   زر الحفظ
+   ✅ زر الحفظ الثابت في أسفل الشاشة
    ══════════════════════════════════════════ */
 .org-save-bar {
-  position: sticky;
-  bottom: 16px;
-  max-width: 800px;
-  margin: 0 auto;
-  z-index: 10;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 8px 16px;
+  padding-bottom: calc(8px + env(safe-area-inset-bottom, 0px));
+  background: rgba(255, 255, 255, 0.98);
+  border-top: 1px solid #e5e5e5;
+  box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.06);
+  z-index: 100;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  justify-content: center;
 }
 
 .org-save-bar .btn-primary {
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+  max-width: 800px;
+  width: 100%;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .full-width {
@@ -383,6 +389,10 @@
 
 /* ══════ Responsive ══════ */
 @media (max-width: 480px) {
+  .org-edit-wrapper {
+    padding: 0 4px 80px;
+  }
+
   .org-section {
     padding: 16px 14px;
   }
@@ -457,5 +467,15 @@
 
   .preview-value {
     font-size: 15px;
+  }
+
+  .org-save-bar {
+    padding: 6px 12px;
+    padding-bottom: calc(6px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .org-save-bar .btn-primary {
+    padding: 10px 14px;
+    font-size: 13px;
   }
 }
