@@ -4,7 +4,8 @@
 // ✅ ماسح باركود (html5-qrcode)
 // ✅ تعديل الكمية بعد المسح يُحدّث البطاقة
 // ✅ يدعم الكميات العشرية (0.5، 1.75...)
-// ✅ نسبة الربح: تُضاف تلقائياً على السعر (0-50%)
+// ✅ نسبة الربح: قابلة للتعديل من الصفحة (0-50%)
+// ✅ تُحفظ في receipts.profit_percentage
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   if (window.__movementOutLoaded) return;
@@ -27,7 +28,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     .single();
 
   let profitEnabled = false;
-  let profitPercentage = 0;
+  let orgProfitPercentage = 0;
+  let currentProfitPercentage = 0;  // النسبة الفعلية المستخدمة الآن
   let currencySymbol = '';
 
   if (profile?.organization_id) {
@@ -38,17 +40,17 @@ document.addEventListener('DOMContentLoaded', async () => {
       .single();
 
     profitEnabled = org?.profit_enabled === true;
-    profitPercentage = Number(org?.profit_percentage) || 0;
+    orgProfitPercentage = Number(org?.profit_percentage) || 0;
+    currentProfitPercentage = orgProfitPercentage;
     currencySymbol = org?.currency_symbol || '';
   }
 
   // ✅ دالة حساب السعر مع الربح
   function applyProfit(basePrice) {
     const base = Number(basePrice) || 0;
-    if (!profitEnabled || profitPercentage <= 0) return base;
+    if (!profitEnabled || currentProfitPercentage <= 0) return base;
 
-    // تطبيق النسبة
-    let finalPrice = base + (base * profitPercentage / 100);
+    let finalPrice = base + (base * currentProfitPercentage / 100);
 
     // الحد الأقصى 50%
     const maxPrice = base + (base * 50 / 100);
@@ -85,16 +87,34 @@ document.addEventListener('DOMContentLoaded', async () => {
       </button>
     </div>
 
-    ${profitEnabled ? `
-      <div class="alert alert-success" style="display:block; margin-bottom:12px;">
-        📈 نسبة الربح مُفعّلة: <strong>${profitPercentage}%</strong>
-      </div>
-    ` : ''}
-
     <div class="alert alert-error" id="form-error" style="display:none;"></div>
     <div class="alert alert-success" id="form-success" style="display:none;"></div>
 
     <div class="out-form">
+
+      ${profitEnabled ? `
+        <div class="product-input-card">
+          <h3 style="font-size:14px; font-weight:700; margin:0 0 12px; color:#171717;">
+            📈 نسبة الربح
+          </h3>
+          <div class="form-grid" style="grid-template-columns: 1fr 2fr;">
+            <div class="form-group">
+              <label>النسبة (%)</label>
+              <input type="number" id="profit-percentage-input"
+                     value="${currentProfitPercentage}"
+                     min="0" max="50" step="0.5" dir="ltr">
+            </div>
+            <div class="form-group">
+              <label>معاينة على 100</label>
+              <input type="text" id="profit-preview-input" value="" disabled>
+            </div>
+          </div>
+          <p style="font-size:11px; color:#16a34a; text-align:center; margin:8px 0 0;">
+            <i class="fas fa-info-circle"></i>
+            النسبة الافتراضية ${orgProfitPercentage}% — الحد الأقصى 50%
+          </p>
+        </div>
+      ` : ''}
 
       <div class="product-input-card">
         <div class="form-group">
@@ -125,13 +145,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             <input type="text" id="available-qty" value="—" disabled>
           </div>
         </div>
-
-        ${profitEnabled ? `
-          <p style="font-size:11px; color:#16a34a; text-align:center; margin:8px 0;">
-            <i class="fas fa-info-circle"></i>
-            السعر المُقترح يشمل نسبة الربح ${profitPercentage}%
-          </p>
-        ` : ''}
 
         <button type="button" class="btn-primary add-product-btn" id="add-product-btn">
           <i class="fas fa-plus"></i>
@@ -203,11 +216,62 @@ document.addEventListener('DOMContentLoaded', async () => {
   const scannerModal = document.getElementById('scanner-modal');
   const scannerReader = document.getElementById('scanner-reader');
   const scannerClose = document.getElementById('scanner-close');
+  const profitPercentageInput = document.getElementById('profit-percentage-input');
+  const profitPreviewInput = document.getElementById('profit-preview-input');
 
   let selectedProduct = null;
   let isAdding = false;
   let isSaving = false;
   let html5QrCode = null;
+
+  // ═══════════════════════════════════════════
+  // ✅ نسبة الربح — التفاعل
+  // ═══════════════════════════════════════════
+  function updateProfitPreview() {
+    if (!profitPreviewInput) return;
+    const result = 100 * (1 + currentProfitPercentage / 100);
+    profitPreviewInput.value = `100 → ${result.toFixed(2)} ${currencySymbol}`;
+  }
+
+  function refreshAllPrices() {
+    // تحديث سعر المنتج المحدد حالياً
+    if (selectedProduct) {
+      const basePrice = Number(selectedProduct.price ?? 0);
+      const finalPrice = applyProfit(basePrice);
+      priceInput.value = finalPrice.toFixed(2);
+    }
+
+    // تحديث أسعار المنتجات المضافة
+    addedProducts.forEach(p => {
+      // نحفظ السعر الأصلي في خاصية داخلية
+      if (p.basePrice === undefined) {
+        p.basePrice = Number(p.price) || 0;
+      }
+      const finalPrice = applyProfit(p.basePrice);
+      p.price = finalPrice;
+    });
+
+    renderAddedProducts();
+  }
+
+  if (profitPercentageInput) {
+    profitPercentageInput.addEventListener('input', () => {
+      let value = Number(profitPercentageInput.value);
+
+      if (value < 0) value = 0;
+      if (value > 50) {
+        value = 50;
+        profitPercentageInput.value = 50;
+      }
+
+      currentProfitPercentage = value;
+      updateProfitPreview();
+      refreshAllPrices();
+    });
+
+    // تهيئة المعاينة
+    updateProfitPreview();
+  }
 
   // ============================================
   // اقتراحات المنتج
@@ -264,14 +328,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   }
 
-  // ✅ دالة موحّدة: اختيار منتج (مع تطبيق الربح)
+  // ✅ دالة موحّدة: اختيار منتج
   function selectProduct(found) {
     selectedProduct = found;
     productInput.value = `${found.name} (${found.sku ?? '—'})`;
     hiddenId.value = found.id;
     quantityInput.value = '1';
 
-    // ✅ تطبيق نسبة الربح على السعر
     const basePrice = Number(found.price ?? 0);
     const finalPrice = applyProfit(basePrice);
     priceInput.value = finalPrice.toFixed(2);
@@ -293,7 +356,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
 
   // ============================================
-  // ✅ عند تغيير الكمية: يُحدّث البطاقة
+  // ✅ عند تغيير الكمية
   // ============================================
   quantityInput.addEventListener('input', () => {
     if (!selectedProduct) return;
@@ -396,7 +459,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       return;
     }
 
-    // ✅ تطبيق الربح
     const basePrice = Number(found.price ?? 0);
     const finalPrice = applyProfit(basePrice);
 
@@ -407,6 +469,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       image_url: found.image_url,
       qty: 1,
       price: finalPrice,
+      basePrice: basePrice,
       available: available,
     });
 
@@ -537,6 +600,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (existing) {
       existing.qty = qty;
       existing.price = price;
+      if (existing.basePrice === undefined) {
+        existing.basePrice = Number(selectedProduct.price) || 0;
+      }
       renderAddedProducts();
       isAdding = false;
       addBtn.disabled = false;
@@ -550,6 +616,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       image_url: selectedProduct.image_url,
       qty: qty,
       price: price,
+      basePrice: Number(selectedProduct.price) || 0,
       available: available,
     });
 
@@ -649,6 +716,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           total_qty: totalQty,
           total_value: totalValue,
           created_by: authUser.id,
+          profit_percentage: profitEnabled ? currentProfitPercentage : 0,
         })
         .select()
         .single();
