@@ -3,6 +3,7 @@
    ✅ تقسيم تلقائي إلى صفحات A4
    ✅ التوقيعات في أسفل الصفحة (شاشة + طباعة)
    ✅ العملة على اليمين: 1.40 DH
+   ✅ شعار بدون خلفية رمادية
    ============================================ */
 
 /* ============================================
@@ -92,11 +93,12 @@ main {
   margin-bottom: 10px;
 }
 
+/* ✅ الشعار بدون خلفية */
 .invoice-logo {
   width: 55px;
   height: 55px;
   border-radius: 8px;
-  background: #f5f5f5;
+  background: transparent;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -115,24 +117,28 @@ main {
 .logo-placeholder {
   font-size: 24px;
   color: #171717;
+  background: transparent;
 }
 
 /* ══════════════════════════════════════════
-   أشكال الشعار
+   أشكال الشعار (بدون خلفية)
    ══════════════════════════════════════════ */
 .invoice-logo.shape-circle {
   border-radius: 50%;
+  background: transparent;
 }
 
 .invoice-logo.shape-square {
   border-radius: 12px;
   aspect-ratio: 1 / 1;
+  background: transparent;
 }
 
 .invoice-logo.shape-rectangle {
   border-radius: 12px;
   width: 90px;
   height: 55px;
+  background: transparent;
 }
 
 .invoice-org h1 {
