@@ -1,6 +1,7 @@
 // ============================================
 // صفحة تعديل المنظمة (للمدير فقط)
-// ✅ قسم العملة + نسبة الربح
+// ✅ قسم العملة (اختيار + رمز + إظهار)
+// ✅ إظهار اسم المنظمة
 // ✅ الأشكال الصغيرة تحت الصورة
 // ✅ زر الحفظ ثابت بأسفل الشاشة
 // ============================================
@@ -39,8 +40,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   let currencyCode = org.currency_code || 'MAD';
   let currencySymbol = org.currency_symbol || 'DH';
   let showCurrency = org.show_currency !== false;
-  let profitEnabled = org.profit_enabled === true;
-  let profitPercentage = Number(org.profit_percentage) || 0;
   let pendingLogoFile = null;
 
   const currenciesList = Object.entries(CurrencyUtils.CURRENCIES)
@@ -160,41 +159,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         </div>
       </div>
 
-      <!-- ══════ نسبة الربح ══════ -->
-      <div class="org-section">
-        <h3>📈 نسبة الربح</h3>
-        <p class="org-hint">تُضاف تلقائياً على سعر البيع عند إنشاء إيصال</p>
-
-        <div class="switch-item">
-          <div class="switch-content">
-            <div class="switch-header">
-              <strong class="switch-title">تفعيل نسبة الربح</strong>
-              <span class="switch-status ${profitEnabled ? 'on' : 'off'}" id="profit-status">
-                ${profitEnabled ? 'مفعّل' : 'غير مفعّل'}
-              </span>
-            </div>
-            <p class="switch-desc">عند التفعيل تُضاف النسبة على سعر كل منتج في إيصال البيع</p>
-          </div>
-          <label class="switch">
-            <input type="checkbox" id="profit-toggle" ${profitEnabled ? 'checked' : ''}>
-            <span class="switch-slider"></span>
-          </label>
-        </div>
-
-        <div class="form-group" id="profit-input-group">
-          <label>نسبة الربح (%)</label>
-          <input type="number" id="profit-percentage" value="${profitPercentage}" min="0" max="50" step="0.5" dir="ltr">
-          <small class="field-hint">القيمة بين 0 و 50%</small>
-        </div>
-
-        <div class="currency-preview" id="profit-preview">
-          <span class="preview-label">مثال:</span>
-          <span class="preview-value" id="profit-preview-value">
-            100 → ${(100 * (1 + profitPercentage / 100)).toFixed(2)}
-          </span>
-        </div>
-      </div>
-
     </div>
 
     <!-- ══════ زر الحفظ ══════ -->
@@ -218,10 +182,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   const showCurrencyToggle = document.getElementById('show-currency-toggle');
   const showCurrencyStatus = document.getElementById('show-currency-status');
   const currencyPreviewValue = document.getElementById('currency-preview-value');
-  const profitToggle = document.getElementById('profit-toggle');
-  const profitStatus = document.getElementById('profit-status');
-  const profitPercentageInput = document.getElementById('profit-percentage');
-  const profitPreviewValue = document.getElementById('profit-preview-value');
 
   currencyCodeSelect.value = currencyCode;
 
@@ -271,14 +231,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     updateCurrencyPreview();
   });
 
-  profitToggle.addEventListener('change', () => {
-    profitEnabled = profitToggle.checked;
-    profitStatus.textContent = profitEnabled ? 'مفعّل' : 'غير مفعّل';
-    profitStatus.classList.toggle('on', profitEnabled);
-    profitStatus.classList.toggle('off', !profitEnabled);
-    updateProfitPreview();
-  });
-
   currencyCodeSelect.addEventListener('change', () => {
     currencyCode = currencyCodeSelect.value;
     const selectedOption = currencyCodeSelect.options[currencyCodeSelect.selectedIndex];
@@ -301,21 +253,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   function updateCurrencyPreview() {
     currencyPreviewValue.textContent = CurrencyUtils.formatCurrency(1500, currencySymbol, showCurrency);
-  }
-
-  profitPercentageInput.addEventListener('input', () => {
-    let value = Number(profitPercentageInput.value);
-
-    if (value < 0) value = 0;
-    if (value > 50) value = 50;
-
-    profitPercentage = value;
-    updateProfitPreview();
-  });
-
-  function updateProfitPreview() {
-    const result = 100 * (1 + profitPercentage / 100);
-    profitPreviewValue.textContent = `100 → ${result.toFixed(2)} ${currencySymbol}`;
   }
 
   document.getElementById('choose-logo-btn').addEventListener('click', () => {
@@ -374,12 +311,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       return;
     }
 
-    let finalProfitPercentage = Number(profitPercentageInput.value) || 0;
-    if (finalProfitPercentage < 0 || finalProfitPercentage > 50) {
-      showError('نسبة الربح يجب أن تكون بين 0 و 50%');
-      return;
-    }
-
     btn.disabled = true;
     btn.querySelector('span').textContent = 'جارٍ الحفظ...';
 
@@ -398,8 +329,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         currency_code: currencyCode,
         currency_symbol: currencySymbolInput.value.trim(),
         show_currency: showCurrency,
-        profit_enabled: profitEnabled,
-        profit_percentage: finalProfitPercentage,
       };
 
       const { error: updateError } = await db
