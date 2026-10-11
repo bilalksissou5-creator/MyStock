@@ -1,9 +1,9 @@
 // ============================================
 // صفحة إنشاء حساب جديد
+// ✅ يقرأ البلد من localStorage (المُختار في welcome.html)
 // ✅ يُنشئ subscriptions بحالة pending
-// ✅ يُحوّل إلى subscription.html فقط عند الضغط على الزر
+// ✅ يُحوّل إلى subscription.html بعد التسجيل
 // ✅ منع Enter/Go/Done من إرسال الفورم
-// ✅ حفظ البلد في profiles.country و organizations.country
 // ============================================
 document.addEventListener('DOMContentLoaded', () => {
 
@@ -22,6 +22,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const form = document.getElementById('register-form');
   if (!form) return;
+
+  // ✅ إذا لم يُختر البلد، أعد المستخدم إلى welcome.html
+  const country = localStorage.getItem('app_country');
+  if (!country) {
+    window.location.href = '/welcome.html';
+    return;
+  }
 
   // ✅ منع Enter / Go / Done من إرسال الفورم
   form.querySelectorAll('input').forEach(input => {
@@ -46,7 +53,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const firstName = document.getElementById('first_name').value.trim();
     const lastName = document.getElementById('last_name').value.trim();
     const orgName = document.getElementById('org_name').value.trim();
-    const country = document.getElementById('country').value;
     const email = document.getElementById('email').value.trim();
     const password = document.getElementById('password').value;
     const passwordConfirm = document.getElementById('password_confirm').value;
@@ -60,12 +66,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (!orgName) {
       errBox.textContent = 'اسم المنظمة مطلوب';
-      errBox.style.display = 'block';
-      return;
-    }
-
-    if (!country) {
-      errBox.textContent = 'الرجاء اختيار البلد';
       errBox.style.display = 'block';
       return;
     }
@@ -172,7 +172,7 @@ document.addEventListener('DOMContentLoaded', () => {
     successBox.textContent = '✅ تم إنشاء الحساب! جارٍ تحويلك...';
     successBox.style.display = 'block';
 
-    // ✅ التحويل فقط بعد الضغط على الزر
+    // ✅ التحويل إلى صفحة الاشتراك
     setTimeout(() => {
       window.location.href = '/subscription.html';
     }, 1500);

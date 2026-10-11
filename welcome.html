@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>مرحباً - MyStock</title>
+  <link rel="stylesheet" href="/assets/css/common.css">
+  <link rel="stylesheet" href="/assets/css/pages/welcome.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body class="welcome-page">
+  <div class="welcome-box">
+    <div class="welcome-logo">MyStock</div>
+    <div class="welcome-subtitle">نظام إدارة المخزون</div>
+
+    <!-- اختيار اللغة -->
+    <div class="welcome-section">
+      <label class="welcome-label">اللغة</label>
+      <div class="lang-buttons">
+        <button type="button" class="lang-btn active" data-lang="ar">العربية</button>
+        <button type="button" class="lang-btn" data-lang="fr">Français</button>
+        <button type="button" class="lang-btn" data-lang="en">English</button>
+      </div>
+    </div>
+
+    <!-- اختيار البلد -->
+    <div class="welcome-section">
+      <label class="welcome-label">البلد</label>
+      <select id="country" class="welcome-select" required>
+        <option value="">-- اختر البلد --</option>
+        <option value="MA">المغرب 🇲🇦</option>
+        <option value="DZ">الجزائر 🇩🇿</option>
+        <option value="TN">تونس 🇹🇳</option>
+        <option value="LY">ليبيا 🇱🇾</option>
+        <option value="EG">مصر 🇪🇬</option>
+        <option value="MR">موريتانيا 🇲🇷</option>
+        <option value="SA">السعودية 🇸🇦</option>
+        <option value="AE">الإمارات 🇦🇪</option>
+        <option value="QA">قطر 🇶🇦</option>
+        <option value="KW">الكويت 🇰🇼</option>
+        <option value="BH">البحرين 🇧🇭</option>
+        <option value="OM">عمان 🇴🇲</option>
+        <option value="JO">الأردن 🇯🇴</option>
+        <option value="LB">لبنان 🇱🇧</option>
+        <option value="SY">سوريا 🇸🇾</option>
+        <option value="IQ">العراق 🇮🇶</option>
+        <option value="PS">فلسطين 🇵🇸</option>
+        <option value="YE">اليمن 🇾🇪</option>
+        <option value="SD">السودان 🇸🇩</option>
+        <option value="SO">الصومال 🇸🇴</option>
+        <option value="TR">تركيا 🇹🇷</option>
+        <option value="FR">فرنسا 🇫🇷</option>
+        <option value="ES">إسبانيا 🇪🇸</option>
+        <option value="US">أمريكا 🇺🇸</option>
+        <option value="CA">كندا 🇨🇦</option>
+        <option value="GB">بريطانيا 🇬🇧</option>
+        <option value="DE">ألمانيا 🇩🇪</option>
+        <option value="OTHER">أخرى</option>
+      </select>
+    </div>
+
+    <button type="button" class="welcome-btn" id="continue-btn" disabled>
+      <span>متابعة</span>
+      <i class="fas fa-arrow-left"></i>
+    </button>
+  </div>
+
+  <script src="/js/core/welcome.js"></script>
+</body>
+</html>
