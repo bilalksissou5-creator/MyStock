@@ -2,6 +2,7 @@
 // صفحة الاشتراك
 // ✅ تُعرض للمدير فقط (بعد التسجيل أو عند انتهاء الاشتراك)
 // ✅ زر "طلب الاشتراك" → يُحوّل إلى payment.html
+// ✅ يدعم الترجمة (عربية / فرنسية / إنجليزية)
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   const user = await getCurrentUser();
@@ -11,7 +12,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     return;
   }
 
+  // ✅ تطبيق اللغة
+  if (window.applyLanguage) window.applyLanguage();
+
   const container = document.getElementById('subscription-content');
+  const tr = (key) => (window.t ? window.t(key) : key);
 
   // 1. جلب بروفايل المستخدم
   const { data: profile } = await db
@@ -23,10 +28,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (!profile?.organization_id) {
     container.innerHTML = `
       <div class="sub-box">
-        <div class="alert alert-error">لا يمكن تحديد المنظمة</div>
+        <div class="alert alert-error">${tr('sub_no_org')}</div>
         <button class="btn-secondary full-width" onclick="logout()">
           <i class="fas fa-right-from-bracket"></i>
-          <span>تسجيل الخروج</span>
+          <span>${tr('sub_logout')}</span>
         </button>
       </div>
     `;
@@ -55,15 +60,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         <div class="sub-icon waiting">
           <i class="fas fa-clock"></i>
         </div>
-        <h2>بانتظار تفعيل الاشتراك</h2>
+        <h2>${tr('sub_wait_title')}</h2>
         <p class="sub-text">
-          مدير المنظمة لم يُفعّل الاشتراك بعد.
-          <br>
-          يرجى التواصل معه.
+          ${tr('sub_wait_text')}
         </p>
         <button class="btn-secondary full-width" onclick="logout()">
           <i class="fas fa-right-from-bracket"></i>
-          <span>تسجيل الخروج</span>
+          <span>${tr('sub_logout')}</span>
         </button>
       </div>
     `;
@@ -108,38 +111,36 @@ document.addEventListener('DOMContentLoaded', async () => {
           <i class="fas fa-crown" style="color:#fbbf24;"></i>
         </div>
 
-        <h2>اشترك في MyStock</h2>
-        <p class="sub-text">
-          للاستفادة من جميع الميزات، يرجى تفعيل الاشتراك الشهري.
-        </p>
+        <h2>${tr('sub_plan_title')}</h2>
+        <p class="sub-text">${tr('sub_plan_text')}</p>
 
         <div class="plan-card">
           <div class="plan-header">
-            <h3>الخطة الأساسية</h3>
+            <h3>${tr('sub_plan_name')}</h3>
             <div class="plan-price">
               <span class="price-value">150</span>
-              <span class="price-currency">DH / شهرياً</span>
+              <span class="price-currency">${tr('sub_plan_price')}</span>
             </div>
           </div>
 
           <ul class="plan-features">
-            <li><i class="fas fa-check"></i> عدد غير محدود من العمال</li>
-            <li><i class="fas fa-check"></i> عدد غير محدود من المنتجات</li>
-            <li><i class="fas fa-check"></i> إيصالات بيع غير محدودة</li>
-            <li><i class="fas fa-check"></i> إدارة الموردين والفواتير</li>
-            <li><i class="fas fa-check"></i> إشعارات فورية</li>
-            <li><i class="fas fa-check"></i> دعم فني</li>
+            <li><i class="fas fa-check"></i> ${tr('sub_feature_1')}</li>
+            <li><i class="fas fa-check"></i> ${tr('sub_feature_2')}</li>
+            <li><i class="fas fa-check"></i> ${tr('sub_feature_3')}</li>
+            <li><i class="fas fa-check"></i> ${tr('sub_feature_4')}</li>
+            <li><i class="fas fa-check"></i> ${tr('sub_feature_5')}</li>
+            <li><i class="fas fa-check"></i> ${tr('sub_feature_6')}</li>
           </ul>
         </div>
 
         <a href="/payment.html" class="btn-primary full-width">
           <i class="fas fa-credit-card"></i>
-          <span>الاشتراك الآن (150 DH)</span>
+          <span>${tr('sub_subscribe_now')}</span>
         </a>
 
         <button class="btn-secondary full-width" onclick="logout()" style="margin-top:8px;">
           <i class="fas fa-right-from-bracket"></i>
-          <span>تسجيل الخروج</span>
+          <span>${tr('sub_logout')}</span>
         </button>
       </div>
     `;
@@ -148,7 +149,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   // ✅ عرض "قيد الانتظار"
   function renderPending({ subscription }) {
     const sentAt = subscription.started_at
-      ? new Date(subscription.started_at).toLocaleString('ar-MA')
+      ? new Date(subscription.started_at).toLocaleString()
       : '—';
 
     container.innerHTML = `
@@ -157,28 +158,24 @@ document.addEventListener('DOMContentLoaded', async () => {
           <i class="fas fa-hourglass-half"></i>
         </div>
 
-        <h2>طلبك قيد المراجعة</h2>
-        <p class="sub-text">
-          تم استلام طلب الاشتراك بنجاح.
-          <br>
-          سيتم التواصل معك في أقرب وقت.
-        </p>
+        <h2>${tr('sub_pending_title')}</h2>
+        <p class="sub-text">${tr('sub_pending_text')}</p>
 
         <div class="pending-details">
           <div class="pending-row">
-            <span>رقم الطلب:</span>
+            <span>${tr('sub_pending_order')}</span>
             <strong>${subscription.id.slice(0, 8).toUpperCase()}</strong>
           </div>
           <div class="pending-row">
-            <span>الخطة:</span>
-            <strong>الخطة الأساسية</strong>
+            <span>${tr('sub_pending_plan')}</span>
+            <strong>${tr('sub_plan_name')}</strong>
           </div>
           <div class="pending-row">
-            <span>المبلغ:</span>
-            <strong>150 DH / شهرياً</strong>
+            <span>${tr('sub_pending_amount')}</span>
+            <strong>150 DH</strong>
           </div>
           <div class="pending-row">
-            <span>تاريخ الطلب:</span>
+            <span>${tr('sub_pending_date')}</span>
             <strong>${sentAt}</strong>
           </div>
         </div>
@@ -186,12 +183,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         <div class="sub-actions">
           <a href="/payment.html" class="btn-primary full-width">
             <i class="fas fa-credit-card"></i>
-            <span>إتمام الدفع الآن</span>
+            <span>${tr('sub_pay_now')}</span>
           </a>
 
           <button class="btn-secondary full-width" onclick="logout()">
             <i class="fas fa-right-from-bracket"></i>
-            <span>تسجيل الخروج</span>
+            <span>${tr('sub_logout')}</span>
           </button>
         </div>
       </div>
