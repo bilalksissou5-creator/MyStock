@@ -1,5 +1,6 @@
 // ============================================
 // صفحة المنتجات
+// ✅ دعم كامل للترجمة
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   const user = await requireAuth();
@@ -7,22 +8,28 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   renderLayout('products/list.html');
 
+  if (window.applyLanguage) window.applyLanguage();
+  const tr = (key) => (window.t ? window.t(key) : key);
+
+  // ✅ تحديث عنوان الصفحة
+  document.title = tr('products_title_full');
+
   const main = document.getElementById('main-content');
   main.innerHTML = `
     <div class="page-header">
-      <h2>المنتجات</h2>
+      <h2>${tr('products_title')}</h2>
       <a href="add.html" class="btn-primary">
         <i class="fas fa-plus"></i>
-        <span>إضافة منتج</span>
+        <span>${tr('products_add')}</span>
       </a>
     </div>
 
     <div class="search-bar">
       <i class="fas fa-search"></i>
-      <input type="text" id="search-products" placeholder="بحث بالاسم أو SKU...">
+      <input type="text" id="search-products" placeholder="${tr('products_search_ph')}">
     </div>
 
-    <div id="products" class="products">جارٍ التحميل...</div>
+    <div id="products" class="products">${tr('loading')}</div>
   `;
 
   await loadProducts();
@@ -40,6 +47,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 // جلب المنتجات وتجميعها
 // ============================================
 async function loadProducts() {
+  const tr = (key) => (window.t ? window.t(key) : key);
+
   const { data, error } = await db
     .from('products')
     .select('*, suppliers(name)')
@@ -49,7 +58,7 @@ async function loadProducts() {
   if (!container) return;
 
   if (error) {
-    container.innerHTML = `<div class="alert alert-error">خطأ: ${error.message}</div>`;
+    container.innerHTML = `<div class="alert alert-error">${tr('products_error')} ${error.message}</div>`;
     return;
   }
 
@@ -57,7 +66,7 @@ async function loadProducts() {
     container.innerHTML = `
       <div class="empty-state">
         <i class="fas fa-box-open"></i>
-        <p>لا توجد منتجات بعد</p>
+        <p>${tr('products_empty')}</p>
       </div>
     `;
     return;
@@ -92,19 +101,19 @@ async function loadProducts() {
             ? `<img src="${p.image_url}" alt="${p.name}">`
             : `<i class="fas fa-box-open"></i>`}
         </div>
-        <h3>${p.name ?? 'بدون اسم'}</h3>
+        <h3>${p.name ?? tr('products_no_name')}</h3>
         <p class="sku">${p.sku ?? '—'}</p>
         <div class="product-stats">
           <div class="stat">
-            <div class="stat-label">الكمية</div>
+            <div class="stat-label">${tr('products_qty')}</div>
             <div class="stat-value ${lowClass}">${p.qty ?? 0}</div>
           </div>
           <div class="stat">
-            <div class="stat-label">الثمن</div>
+            <div class="stat-label">${tr('products_price')}</div>
             <div class="stat-value">${p.price ?? 0}</div>
           </div>
           <div class="stat">
-            <div class="stat-label">المجموع</div>
+            <div class="stat-label">${tr('products_total')}</div>
             <div class="stat-value">${total}</div>
           </div>
         </div>

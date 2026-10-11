@@ -1,8 +1,5 @@
 // ============================================
 // نظام الترجمة (i18n)
-// ✅ 3 لغات: العربية، الفرنسية، الإنجليزية
-// ✅ 28 بلداً بأسماء مترجمة
-// ✅ يغيّر ترتيب الصفحة تلقائياً (RTL/LTR)
 // ============================================
 
 const translations = {
@@ -145,6 +142,18 @@ const translations = {
     dash_prof_sub_7: 'آخر 7 أيام (يومي)',
     dash_prof_sub_30: 'آخر 30 يوم (يومي)',
     dash_prof_sub_365: 'آخر سنة (شهري)',
+
+    // products
+    products_title: 'المنتجات',
+    products_title_full: 'MyStock - المنتجات',
+    products_add: 'إضافة منتج',
+    products_search_ph: 'بحث بالاسم أو SKU...',
+    products_empty: 'لا توجد منتجات بعد',
+    products_error: 'خطأ:',
+    products_no_name: 'بدون اسم',
+    products_qty: 'الكمية',
+    products_price: 'الثمن',
+    products_total: 'المجموع',
   },
 
   fr: {
@@ -280,6 +289,18 @@ const translations = {
     dash_prof_sub_7: '7 derniers jours (journalier)',
     dash_prof_sub_30: '30 derniers jours (journalier)',
     dash_prof_sub_365: 'Dernière année (mensuel)',
+
+    // products
+    products_title: 'Produits',
+    products_title_full: 'MyStock - Produits',
+    products_add: 'Ajouter un produit',
+    products_search_ph: 'Rechercher par nom ou SKU...',
+    products_empty: 'Aucun produit pour le moment',
+    products_error: 'Erreur :',
+    products_no_name: 'Sans nom',
+    products_qty: 'Quantité',
+    products_price: 'Prix',
+    products_total: 'Total',
   },
 
   en: {
@@ -415,6 +436,18 @@ const translations = {
     dash_prof_sub_7: 'Last 7 days (daily)',
     dash_prof_sub_30: 'Last 30 days (daily)',
     dash_prof_sub_365: 'Last year (monthly)',
+
+    // products
+    products_title: 'Products',
+    products_title_full: 'MyStock - Products',
+    products_add: 'Add Product',
+    products_search_ph: 'Search by name or SKU...',
+    products_empty: 'No products yet',
+    products_error: 'Error:',
+    products_no_name: 'No name',
+    products_qty: 'Quantity',
+    products_price: 'Price',
+    products_total: 'Total',
   },
 };
 
@@ -452,7 +485,6 @@ const countries = {
   OTHER: { ar: 'أخرى', fr: 'Autre', en: 'Other' },
 };
 
-// اللغة الحالية
 let currentLang = localStorage.getItem('app_lang') || 'ar';
 
 function t(key) {
