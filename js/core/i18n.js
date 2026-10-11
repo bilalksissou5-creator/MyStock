@@ -65,6 +65,50 @@ const translations = {
     sub_pending_amount: 'المبلغ:',
     sub_pending_date: 'تاريخ الطلب:',
     sub_pay_now: 'إتمام الدفع الآن',
+
+    // payment
+    pay_admin_only: 'هذه الصفحة للمدير فقط',
+    pay_back: 'العودة',
+    pay_title: 'إتمام الدفع الآمن',
+    pay_subtitle: 'أدخل بيانات بطاقتك البنكية لتفعيل الاشتراك',
+    pay_step_summary: 'الملخص',
+    pay_step_payment: 'الدفع',
+    pay_step_confirm: 'التأكيد',
+    pay_summary_title: 'اشتراك MyStock',
+    pay_summary_subscription: 'الاشتراك الشهري',
+    pay_summary_fees: 'رسوم الدفع',
+    pay_summary_total: 'الإجمالي',
+    pay_card_label: 'بطاقة بنكية',
+    pay_card_holder: 'حامل البطاقة',
+    pay_card_holder_ph: 'الاسم هنا',
+    pay_card_expires: 'تاريخ الانتهاء',
+    pay_card_test_note: 'هذه البطاقة للاختبار فقط',
+    pay_card_data: 'بيانات البطاقة',
+    pay_card_number: 'رقم البطاقة',
+    pay_card_expiry: 'تاريخ الانتهاء',
+    pay_card_name: 'اسم حامل البطاقة',
+    pay_card_name_ph: 'الاسم كما هو على البطاقة',
+    pay_email_title: 'البريد الإلكتروني',
+    pay_email_subtitle: 'سيصلك إشعار على هذا البريد',
+    pay_agree: 'أوافق على الاشتراك الشهري والخصم التلقائي بمبلغ',
+    pay_or_pay_with: 'أو ادفع بـ',
+    pay_button: 'دفع الاشتراك',
+    pay_cancel: 'إلغاء والعودة',
+    pay_warning: 'هذه صفحة تجريبية — لن يتم خصم أي مبلغ فعلياً',
+    pay_processing: 'جارٍ معالجة الدفع...',
+    pay_success: '✅ تم الدفع بنجاح! جارٍ تحويلك...',
+    pay_success_btn: 'تم الدفع بنجاح',
+    pay_success_short: 'بنجاح!',
+    pay_via: 'جارٍ الدفع عبر',
+    pay_err_agree: 'يجب الموافقة على شروط الاشتراك',
+    pay_err_card: 'رقم البطاقة غير صحيح',
+    pay_err_expiry: 'تاريخ الانتهاء غير صحيح',
+    pay_err_cvv: 'CVV غير صحيح',
+    pay_err_name: 'اسم حامل البطاقة مطلوب',
+    pay_err_email: 'البريد الإلكتروني غير صحيح',
+    pay_err_generic: 'خطأ: ',
+    pay_confirm_apple: 'تأكيد الدفع عبر Apple Pay؟\n(محاكاة)',
+    pay_confirm_google: 'تأكيد الدفع عبر Google Pay؟\n(محاكاة)',
   },
 
   fr: {
@@ -121,6 +165,49 @@ const translations = {
     sub_pending_amount: 'Montant :',
     sub_pending_date: 'Date :',
     sub_pay_now: 'Payer maintenant',
+
+    pay_admin_only: 'Cette page est réservée à l\'administrateur',
+    pay_back: 'Retour',
+    pay_title: 'Paiement sécurisé',
+    pay_subtitle: 'Entrez les détails de votre carte pour activer l\'abonnement',
+    pay_step_summary: 'Résumé',
+    pay_step_payment: 'Paiement',
+    pay_step_confirm: 'Confirmation',
+    pay_summary_title: 'Abonnement MyStock',
+    pay_summary_subscription: 'Abonnement mensuel',
+    pay_summary_fees: 'Frais',
+    pay_summary_total: 'Total',
+    pay_card_label: 'Carte bancaire',
+    pay_card_holder: 'Titulaire',
+    pay_card_holder_ph: 'Nom ici',
+    pay_card_expires: 'Expiration',
+    pay_card_test_note: 'Carte de test uniquement',
+    pay_card_data: 'Données de la carte',
+    pay_card_number: 'Numéro de carte',
+    pay_card_expiry: 'Date d\'expiration',
+    pay_card_name: 'Nom du titulaire',
+    pay_card_name_ph: 'Nom tel qu\'il figure sur la carte',
+    pay_email_title: 'Email',
+    pay_email_subtitle: 'Vous recevrez une notification à cet email',
+    pay_agree: 'J\'accepte l\'abonnement mensuel et le prélèvement automatique de',
+    pay_or_pay_with: 'Ou payez avec',
+    pay_button: 'Payer l\'abonnement',
+    pay_cancel: 'Annuler et retourner',
+    pay_warning: 'Page de démonstration — aucun montant ne sera débité',
+    pay_processing: 'Traitement du paiement...',
+    pay_success: '✅ Paiement réussi ! Redirection...',
+    pay_success_btn: 'Paiement réussi',
+    pay_success_short: 'réussi !',
+    pay_via: 'Paiement via',
+    pay_err_agree: 'Vous devez accepter les conditions',
+    pay_err_card: 'Numéro de carte invalide',
+    pay_err_expiry: 'Date d\'expiration invalide',
+    pay_err_cvv: 'CVV invalide',
+    pay_err_name: 'Nom du titulaire requis',
+    pay_err_email: 'Email invalide',
+    pay_err_generic: 'Erreur : ',
+    pay_confirm_apple: 'Confirmer le paiement via Apple Pay ?\n(simulation)',
+    pay_confirm_google: 'Confirmer le paiement via Google Pay ?\n(simulation)',
   },
 
   en: {
@@ -177,6 +264,49 @@ const translations = {
     sub_pending_amount: 'Amount:',
     sub_pending_date: 'Date:',
     sub_pay_now: 'Pay now',
+
+    pay_admin_only: 'This page is for administrators only',
+    pay_back: 'Back',
+    pay_title: 'Secure Payment',
+    pay_subtitle: 'Enter your card details to activate the subscription',
+    pay_step_summary: 'Summary',
+    pay_step_payment: 'Payment',
+    pay_step_confirm: 'Confirm',
+    pay_summary_title: 'MyStock Subscription',
+    pay_summary_subscription: 'Monthly subscription',
+    pay_summary_fees: 'Fees',
+    pay_summary_total: 'Total',
+    pay_card_label: 'Bank card',
+    pay_card_holder: 'Card Holder',
+    pay_card_holder_ph: 'Name here',
+    pay_card_expires: 'Expires',
+    pay_card_test_note: 'Test card only',
+    pay_card_data: 'Card Details',
+    pay_card_number: 'Card Number',
+    pay_card_expiry: 'Expiry Date',
+    pay_card_name: 'Cardholder Name',
+    pay_card_name_ph: 'Name as shown on card',
+    pay_email_title: 'Email',
+    pay_email_subtitle: 'You will receive a notification at this email',
+    pay_agree: 'I agree to the monthly subscription and automatic charge of',
+    pay_or_pay_with: 'Or pay with',
+    pay_button: 'Pay Subscription',
+    pay_cancel: 'Cancel and return',
+    pay_warning: 'Demo page — no actual charge will be made',
+    pay_processing: 'Processing payment...',
+    pay_success: '✅ Payment successful! Redirecting...',
+    pay_success_btn: 'Payment successful',
+    pay_success_short: 'successful!',
+    pay_via: 'Paying via',
+    pay_err_agree: 'You must accept the terms',
+    pay_err_card: 'Invalid card number',
+    pay_err_expiry: 'Invalid expiry date',
+    pay_err_cvv: 'Invalid CVV',
+    pay_err_name: 'Cardholder name required',
+    pay_err_email: 'Invalid email',
+    pay_err_generic: 'Error: ',
+    pay_confirm_apple: 'Confirm payment via Apple Pay?\n(simulation)',
+    pay_confirm_google: 'Confirm payment via Google Pay?\n(simulation)',
   },
 };
 
@@ -217,64 +347,43 @@ const countries = {
 // اللغة الحالية
 let currentLang = localStorage.getItem('app_lang') || 'ar';
 
-// ============================================
-// دالة جلب النص المترجم
-// ============================================
 function t(key) {
   return translations[currentLang]?.[key] || translations.ar[key] || key;
 }
 
-// ============================================
-// دالة جلب اسم البلد حسب اللغة الحالية
-// ============================================
 function tCountry(code) {
   return countries[code]?.[currentLang] || countries[code]?.ar || code;
 }
 
-// ============================================
-// تطبيق اللغة على الصفحة
-// ✅ يغيّر اتجاه الصفحة (RTL/LTR) تلقائياً
-// ✅ يضيف كلاس lang-xx على body
-// ============================================
 function applyLanguage() {
   const html = document.documentElement;
   html.lang = currentLang;
   html.dir = currentLang === 'ar' ? 'rtl' : 'ltr';
 
-  // ✅ كلاس اللغة على body (لتمكين CSS من التكيّف)
   if (document.body) {
     document.body.classList.remove('lang-ar', 'lang-fr', 'lang-en');
     document.body.classList.add('lang-' + currentLang);
   }
 
-  // ترجمة النصوص
   document.querySelectorAll('[data-i18n]').forEach(el => {
     el.textContent = t(el.dataset.i18n);
   });
 
-  // ترجمة placeholders
   document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
     el.placeholder = t(el.dataset.i18nPlaceholder);
   });
 
-  // ترجمة عناصر البلدان
   document.querySelectorAll('[data-country]').forEach(el => {
     el.textContent = tCountry(el.dataset.country);
   });
 }
 
-// ============================================
-// تغيير اللغة
-// ============================================
 function setLanguage(lang) {
   currentLang = lang;
   localStorage.setItem('app_lang', lang);
   applyLanguage();
 }
 
-// ============================================
-// تصدير عالمي
-// ============================================
 window.t = t;
 window.tCountry = tCountry;
 window.applyLanguage = applyLanguage;

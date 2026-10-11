@@ -4,6 +4,7 @@
 // ✅ مؤشر تقدم (3 خطوات)
 // ✅ تحقق حي من الرقم
 // ✅ الموافقة على الاشتراك الشهري
+// ✅ دعم كامل للترجمة (عربية/فرنسية/إنجليزية)
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   const user = await getCurrentUser();
@@ -12,6 +13,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     window.location.href = '/login.html';
     return;
   }
+
+  // ✅ تطبيق اللغة
+  if (window.applyLanguage) window.applyLanguage();
+  const tr = (key) => (window.t ? window.t(key) : key);
 
   const container = document.getElementById('payment-content');
 
@@ -25,10 +30,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (!profile?.organization_id || profile.role !== 'admin') {
     container.innerHTML = `
       <div class="pay-box">
-        <div class="alert alert-error">هذه الصفحة للمدير فقط</div>
+        <div class="alert alert-error">${tr('pay_admin_only')}</div>
         <a href="/subscription.html" class="btn-secondary full-width">
           <i class="fas fa-arrow-right"></i>
-          <span>العودة</span>
+          <span>${tr('pay_back')}</span>
         </a>
       </div>
     `;
@@ -48,7 +53,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   // ✅ إعدادات الدفع
   // ============================================
   const SUBSCRIPTION_PRICE = 150;
-  const FEES = 0;   // رسوم الدفع (0 حالياً)
+  const FEES = 0;
   const TOTAL = SUBSCRIPTION_PRICE + FEES;
 
   // 3. بناء الواجهة
@@ -58,41 +63,41 @@ document.addEventListener('DOMContentLoaded', async () => {
       <!-- ══════ الرأس ══════ -->
       <div class="pay-header">
         <div class="pay-logo">MyStock</div>
-        <h2>إتمام الدفع الآمن</h2>
-        <p class="pay-subtitle">أدخل بيانات بطاقتك البنكية لتفعيل الاشتراك</p>
+        <h2>${tr('pay_title')}</h2>
+        <p class="pay-subtitle">${tr('pay_subtitle')}</p>
       </div>
 
       <!-- ══════ مؤشر التقدم ══════ -->
       <div class="progress-bar">
         <div class="progress-step active" data-step="1">
           <div class="step-circle">1</div>
-          <span>الملخص</span>
+          <span>${tr('pay_step_summary')}</span>
         </div>
         <div class="progress-line"></div>
         <div class="progress-step" data-step="2">
           <div class="step-circle">2</div>
-          <span>الدفع</span>
+          <span>${tr('pay_step_payment')}</span>
         </div>
         <div class="progress-line"></div>
         <div class="progress-step" data-step="3">
           <div class="step-circle">3</div>
-          <span>التأكيد</span>
+          <span>${tr('pay_step_confirm')}</span>
         </div>
       </div>
 
       <!-- ══════ ملخص الاشتراك ══════ -->
       <div class="pay-summary">
-        <h3>اشتراك MyStock</h3>
+        <h3>${tr('pay_summary_title')}</h3>
         <div class="summary-row">
-          <span>الاشتراك الشهري</span>
+          <span>${tr('pay_summary_subscription')}</span>
           <strong>${SUBSCRIPTION_PRICE.toFixed(2)} DH</strong>
         </div>
         <div class="summary-row">
-          <span>رسوم الدفع</span>
+          <span>${tr('pay_summary_fees')}</span>
           <strong id="fees-value">${FEES.toFixed(2)} DH</strong>
         </div>
         <div class="summary-row total">
-          <span>الإجمالي</span>
+          <span>${tr('pay_summary_total')}</span>
           <strong id="total-value">${TOTAL.toFixed(2)} DH</strong>
         </div>
       </div>
@@ -105,18 +110,18 @@ document.addEventListener('DOMContentLoaded', async () => {
               <span class="cc-brand">
                 <i class="fas fa-credit-card" id="cc-brand-icon"></i>
               </span>
-              <span class="cc-label">بطاقة بنكية</span>
+              <span class="cc-label">${tr('pay_card_label')}</span>
             </div>
             <div class="cc-number" id="cc-number-display">
               •••• •••• •••• ••••
             </div>
             <div class="cc-bottom">
               <div class="cc-field">
-                <span class="cc-field-label">حامل البطاقة</span>
-                <span class="cc-field-value" id="cc-name-display">${userName || 'الاسم هنا'}</span>
+                <span class="cc-field-label">${tr('pay_card_holder')}</span>
+                <span class="cc-field-value" id="cc-name-display">${userName || tr('pay_card_holder_ph')}</span>
               </div>
               <div class="cc-field">
-                <span class="cc-field-label">تاريخ الانتهاء</span>
+                <span class="cc-field-label">${tr('pay_card_expires')}</span>
                 <span class="cc-field-value" id="cc-expiry-display">MM/YY</span>
               </div>
             </div>
@@ -128,7 +133,7 @@ document.addEventListener('DOMContentLoaded', async () => {
               <span class="cc-cvv-label">CVV</span>
               <span class="cc-cvv-value" id="cc-cvv-display">•••</span>
             </div>
-            <div class="cc-back-note">هذه البطاقة للاختبار فقط</div>
+            <div class="cc-back-note">${tr('pay_card_test_note')}</div>
           </div>
         </div>
       </div>
@@ -141,11 +146,11 @@ document.addEventListener('DOMContentLoaded', async () => {
       <div class="pay-card">
         <h3>
           <i class="fas fa-credit-card"></i>
-          بيانات البطاقة
+          ${tr('pay_card_data')}
         </h3>
 
         <div class="form-group">
-          <label>رقم البطاقة</label>
+          <label>${tr('pay_card_number')}</label>
           <div class="input-wrap">
             <input
               type="text"
@@ -161,7 +166,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         <div class="pay-row">
           <div class="form-group">
-            <label>تاريخ الانتهاء</label>
+            <label>${tr('pay_card_expiry')}</label>
             <input
               type="text"
               id="card-expiry"
@@ -185,11 +190,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         </div>
 
         <div class="form-group">
-          <label>اسم حامل البطاقة</label>
+          <label>${tr('pay_card_name')}</label>
           <input
             type="text"
             id="card-name"
-            placeholder="الاسم كما هو على البطاقة"
+            placeholder="${tr('pay_card_name_ph')}"
             value="${userName}"
             autocomplete="cc-name">
         </div>
@@ -199,10 +204,10 @@ document.addEventListener('DOMContentLoaded', async () => {
       <div class="pay-card">
         <h3>
           <i class="fas fa-envelope"></i>
-          البريد الإلكتروني
+          ${tr('pay_email_title')}
         </h3>
         <div class="form-group">
-          <label>سيصلك إشعار على هذا البريد</label>
+          <label>${tr('pay_email_subtitle')}</label>
           <input
             type="email"
             id="billing-email"
@@ -213,12 +218,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         </div>
       </div>
 
-      <!-- ══════ الموافقة على الاشتراك ══════ -->
+      <!-- ══════ الموافقة ══════ -->
       <div class="pay-agreement">
         <label class="agreement-label">
           <input type="checkbox" id="agree-checkbox">
           <span class="agreement-text">
-            أوافق على الاشتراك الشهري والخصم التلقائي بمبلغ 
+            ${tr('pay_agree')}
             <strong>${SUBSCRIPTION_PRICE.toFixed(2)} DH</strong>
           </span>
         </label>
@@ -226,7 +231,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       <!-- ══════ أو ادفع بـ ══════ -->
       <div class="pay-divider">
-        <span>أو ادفع بـ</span>
+        <span>${tr('pay_or_pay_with')}</span>
       </div>
 
       <div class="pay-quick-actions">
@@ -243,15 +248,15 @@ document.addEventListener('DOMContentLoaded', async () => {
       <!-- ══════ زر الدفع ══════ -->
       <button type="button" class="btn-pay" id="pay-btn" disabled>
         <i class="fas fa-lock"></i>
-        <span>دفع الاشتراك</span>
+        <span>${tr('pay_button')}</span>
       </button>
 
       <a href="/subscription.html" class="btn-cancel">
         <i class="fas fa-arrow-right"></i>
-        <span>إلغاء والعودة</span>
+        <span>${tr('pay_cancel')}</span>
       </a>
 
-      <!-- ══════ شارة الأمان ══════ -->
+      <!-- ══════ شارات الأمان ══════ -->
       <div class="pay-security-badges">
         <div class="security-badge">
           <i class="fas fa-lock"></i>
@@ -269,7 +274,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       <p class="pay-warning">
         <i class="fas fa-info-circle"></i>
-        هذه صفحة تجريبية — لن يتم خصم أي مبلغ فعلياً
+        ${tr('pay_warning')}
       </p>
 
     </div>
@@ -292,10 +297,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   const ccNameDisplay = document.getElementById('cc-name-display');
   const ccExpiryDisplay = document.getElementById('cc-expiry-display');
   const ccCvvDisplay = document.getElementById('cc-cvv-display');
-  const ccBrandIcon = document.getElementById('cc-brand-icon');
   const validIcon = document.getElementById('valid-icon');
 
-  // ✅ تفعيل زر الدفع عند الموافقة
   agreeCheckbox.addEventListener('change', () => {
     payBtn.disabled = !agreeCheckbox.checked;
   });
@@ -361,8 +364,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     ccNumberDisplay.textContent = masked;
 
     const brand = detectCardBrand(value);
-    ccBrandIcon.outerHTML = getBrandIcon(brand);
-    document.getElementById('cc-brand-icon').outerHTML = getBrandIcon(brand);
+    const brandIconEl = document.getElementById('cc-brand-icon');
+    if (brandIconEl) {
+      brandIconEl.outerHTML = getBrandIcon(brand).replace('id="cc-brand-icon"', '') + '';
+      // نعيد الـ id إلى العنصر الجديد
+      const container = document.querySelector('.cc-brand');
+      if (container && container.lastElementChild) {
+        container.lastElementChild.id = 'cc-brand-icon';
+      }
+    }
 
     if (clean.length === 16) {
       if (isValidCardNumber(clean)) {
@@ -409,7 +419,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   // ✅ اسم حامل البطاقة
   // ============================================
   nameInput.addEventListener('input', () => {
-    ccNameDisplay.textContent = nameInput.value || 'الاسم هنا';
+    ccNameDisplay.textContent = nameInput.value || tr('pay_card_holder_ph');
   });
 
   // ============================================
@@ -419,9 +429,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     errBox.style.display = 'none';
     successBox.style.display = 'none';
 
-    // ✅ التحقق من الموافقة
     if (!agreeCheckbox.checked) {
-      showError('يجب الموافقة على شروط الاشتراك');
+      showError(tr('pay_err_agree'));
       return;
     }
 
@@ -432,37 +441,37 @@ document.addEventListener('DOMContentLoaded', async () => {
     const email = emailInput.value.trim();
 
     if (number.length !== 16 || !isValidCardNumber(number)) {
-      showError('رقم البطاقة غير صحيح');
+      showError(tr('pay_err_card'));
       numberInput.focus();
       return;
     }
 
     if (expiry.length !== 5) {
-      showError('تاريخ الانتهاء غير صحيح');
+      showError(tr('pay_err_expiry'));
       expiryInput.focus();
       return;
     }
 
     if (cvv.length < 3) {
-      showError('CVV غير صحيح');
+      showError(tr('pay_err_cvv'));
       cvvInput.focus();
       return;
     }
 
     if (!holderName) {
-      showError('اسم حامل البطاقة مطلوب');
+      showError(tr('pay_err_name'));
       nameInput.focus();
       return;
     }
 
     if (!email || !email.includes('@')) {
-      showError('البريد الإلكتروني غير صحيح');
+      showError(tr('pay_err_email'));
       emailInput.focus();
       return;
     }
 
     payBtn.disabled = true;
-    payBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> <span>جارٍ معالجة الدفع...</span>';
+    payBtn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> <span>${tr('pay_processing')}</span>`;
 
     try {
       await new Promise(resolve => setTimeout(resolve, 2000));
@@ -499,10 +508,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (error) throw error;
       }
 
-      successBox.textContent = '✅ تم الدفع بنجاح! جارٍ تحويلك...';
+      successBox.textContent = tr('pay_success');
       successBox.style.display = 'block';
 
-      payBtn.innerHTML = '<i class="fas fa-check"></i> <span>تم الدفع بنجاح</span>';
+      payBtn.innerHTML = `<i class="fas fa-check"></i> <span>${tr('pay_success_btn')}</span>`;
 
       setTimeout(() => {
         window.location.href = '/dashboard.html';
@@ -510,30 +519,28 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     } catch (err) {
       payBtn.disabled = false;
-      payBtn.innerHTML = '<i class="fas fa-lock"></i> <span>دفع الاشتراك</span>';
-      showError('خطأ: ' + err.message);
+      payBtn.innerHTML = `<i class="fas fa-lock"></i> <span>${tr('pay_button')}</span>`;
+      showError(tr('pay_err_generic') + err.message);
     }
   }
 
   payBtn.addEventListener('click', processPayment);
 
-  // ✅ Apple Pay
   document.getElementById('apple-pay-btn').addEventListener('click', async () => {
     if (!agreeCheckbox.checked) {
-      showError('يجب الموافقة على شروط الاشتراك أولاً');
+      showError(tr('pay_err_agree'));
       return;
     }
-    if (!confirm('تأكيد الدفع عبر Apple Pay؟\n(محاكاة)')) return;
+    if (!confirm(tr('pay_confirm_apple'))) return;
     await simulateQuickPay('Apple Pay');
   });
 
-  // ✅ Google Pay
   document.getElementById('google-pay-btn').addEventListener('click', async () => {
     if (!agreeCheckbox.checked) {
-      showError('يجب الموافقة على شروط الاشتراك أولاً');
+      showError(tr('pay_err_agree'));
       return;
     }
-    if (!confirm('تأكيد الدفع عبر Google Pay؟\n(محاكاة)')) return;
+    if (!confirm(tr('pay_confirm_google'))) return;
     await simulateQuickPay('Google Pay');
   });
 
@@ -542,7 +549,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     successBox.style.display = 'none';
 
     payBtn.disabled = true;
-    payBtn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> <span>جارٍ الدفع عبر ${method}...</span>`;
+    payBtn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> <span>${tr('pay_via')} ${method}...</span>`;
 
     try {
       await new Promise(resolve => setTimeout(resolve, 2000));
@@ -570,7 +577,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
       }
 
-      successBox.textContent = `✅ تم الدفع عبر ${method} بنجاح!`;
+      successBox.textContent = `${tr('pay_via')} ${method} ${tr('pay_success_short')}`;
       successBox.style.display = 'block';
 
       setTimeout(() => {
@@ -579,8 +586,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     } catch (err) {
       payBtn.disabled = false;
-      payBtn.innerHTML = '<i class="fas fa-lock"></i> <span>دفع الاشتراك</span>';
-      showError('خطأ: ' + err.message);
+      payBtn.innerHTML = `<i class="fas fa-lock"></i> <span>${tr('pay_button')}</span>`;
+      showError(tr('pay_err_generic') + err.message);
     }
   }
 
