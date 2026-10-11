@@ -13,9 +13,19 @@
     <p style="text-align:center; color:#737373;" data-i18n="loading">جارٍ التحميل...</p>
   </div>
 
+  <!-- ✅ تطبيق اللغة أول شيء قبل أي شيء آخر -->
+  <script src="/js/core/i18n.js"></script>
+  <script>
+    (function() {
+      const lang = localStorage.getItem('app_lang') || 'ar';
+      document.documentElement.lang = lang;
+      document.documentElement.dir = (lang === 'ar') ? 'rtl' : 'ltr';
+      if (window.applyLanguage) window.applyLanguage();
+    })();
+  </script>
+
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="/js/core/supabase.js"></script>
-  <script src="/js/core/i18n.js"></script>
   <script src="/js/core/auth.js"></script>
   <script src="/js/pages/subscription.js"></script>
 </body>
