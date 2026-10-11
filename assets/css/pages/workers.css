@@ -3,6 +3,16 @@
    ============================================ */
 
 /* ═══════════════════════════════════════════
+   0. إصلاح الحاوية الأم (إزالة الفراغ السفلي)
+   ═══════════════════════════════════════════ */
+#main-content {
+  min-height: auto !important;
+  height: auto !important;
+  padding-bottom: 0 !important;
+  margin-bottom: 0 !important;
+}
+
+/* ═══════════════════════════════════════════
    1. عنوان الصفحة
    ═══════════════════════════════════════════ */
 .page-header {
@@ -29,11 +39,15 @@
   margin-bottom: 16px;
 }
 
+.team-accordion:last-child {
+  margin-bottom: 0;
+}
+
 .team-accordion-header {
   width: 100%;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
   padding: 16px 20px;
   background: transparent;
   border: none;
@@ -57,16 +71,6 @@
 
 .team-accordion-title i {
   font-size: 16px;
-}
-
-.team-accordion-arrow {
-  font-size: 12px;
-  color: #a3a3a3;
-  transition: transform 0.3s ease;
-}
-
-.team-accordion.open .team-accordion-arrow {
-  transform: rotate(-90deg);
 }
 
 .team-accordion-body {
@@ -220,6 +224,10 @@
   text-align: center;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
   margin-bottom: 16px;
+}
+
+.empty-state:last-child {
+  margin-bottom: 0;
 }
 
 .empty-state i {
