@@ -2,7 +2,7 @@
 // صفحة لوحة التحكم
 // ✅ بطاقة قيمة المخزون + مبيان ApexCharts
 // ✅ استخدام UTC لتفادي فرق التوقيت
-// ✅ البطاقة السوداء على اليسار + العنوان والبطاقات على اليمين
+// ✅ زر "يوم": خطان (إضافة/إخراج) بنقطة لكل عملية
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   const user = await requireAuth();
@@ -20,41 +20,38 @@ document.addEventListener('DOMContentLoaded', async () => {
          ══════════════════════════════════════ -->
     <div class="stock-value-card">
 
-      <!-- ✅ الصف الأعلى: العنوان + 3 بطاقات (يمين) | البطاقة السوداء (يسار) -->
+      <!-- ✅ الصف الأعلى -->
       <div class="stock-top-row">
 
-        <!-- ══════ العمود اليمين: العنوان + 3 بطاقات ══════ -->
         <div class="stock-right-col">
 
-          <!-- العنوان + أيقونة -->
           <div class="stock-title-section">
             <div class="stock-title-text">
               <h3>قيمة المخزون</h3>
-              <p>تطور قيمة المخزون خلال آخر 30 يوم</p>
+              <p id="stock-subtitle">تطور قيمة المخزون خلال آخر 30 يوم</p>
             </div>
             <div class="stock-title-icon">
               <i class="fas fa-chart-line"></i>
             </div>
           </div>
 
-          <!-- 3 بطاقات صغيرة -->
           <div class="stock-stats-row">
             <div class="stock-stat-card">
-              <div class="stat-mini-label">أدنى قيمة</div>
+              <div class="stat-mini-label" id="label-min">أدنى قيمة</div>
               <div class="stat-mini-value" id="stat-min-value">—</div>
               <div class="stat-mini-icon down">
                 <i class="fas fa-arrow-down"></i>
               </div>
             </div>
             <div class="stock-stat-card">
-              <div class="stat-mini-label">متوسط القيمة</div>
+              <div class="stat-mini-label" id="label-avg">متوسط القيمة</div>
               <div class="stat-mini-value" id="stat-avg-value">—</div>
               <div class="stat-mini-icon up">
                 <i class="fas fa-arrow-up"></i>
               </div>
             </div>
             <div class="stock-stat-card">
-              <div class="stat-mini-label">أعلى قيمة</div>
+              <div class="stat-mini-label" id="label-max">أعلى قيمة</div>
               <div class="stat-mini-value" id="stat-max-value">—</div>
               <div class="stat-mini-icon chart">
                 <i class="fas fa-chart-line"></i>
@@ -64,13 +61,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         </div>
 
-        <!-- ══════ العمود اليسار: البطاقة السوداء ══════ -->
         <div class="stock-hero-card">
           <div class="stock-hero-icon">
             <i class="fas fa-database"></i>
           </div>
           <div class="stock-hero-info">
-            <div class="stock-hero-label">القيمة الحالية للمخزون</div>
+            <div class="stock-hero-label" id="hero-label">القيمة الحالية للمخزون</div>
             <div class="stock-hero-value">
               <span id="hero-value">—</span>
             </div>
@@ -83,11 +79,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       </div>
 
-      <!-- ✅ المبيان (بعرض كامل) -->
+      <!-- ✅ المبيان -->
       <div class="stock-chart-section">
         <div class="stock-chart-header">
-          <h3>تطور قيمة المخزون</h3>
-          <span class="stock-chart-badge">
+          <h3 id="chart-title">تطور قيمة المخزون</h3>
+          <span class="stock-chart-badge" id="chart-badge">
             <i class="fas fa-circle"></i>
             قيمة المخزون
           </span>
@@ -245,11 +241,65 @@ async function computeStockValueHistory(days) {
 }
 
 // ============================================
+// ✅ حساب عمليات اليوم (نقطة لكل عملية)
+// ============================================
+async function computeTodayOperations() {
+  const now = new Date();
+  const startOfDay = new Date(Date.UTC(
+    now.getUTCFullYear(),
+    now.getUTCMonth(),
+    now.getUTCDate(),
+    0, 0, 0, 0
+  ));
+  const endOfDay = new Date(Date.UTC(
+    now.getUTCFullYear(),
+    now.getUTCMonth(),
+    now.getUTCDate(),
+    23, 59, 59, 999
+  ));
+
+  const { data: movements } = await db
+    .from('stock_movements')
+    .select('id, type, quantity, created_at, performed_by, method')
+    .gte('created_at', startOfDay.toISOString())
+    .lte('created_at', endOfDay.toISOString())
+    .order('created_at', { ascending: true });
+
+  const inOps = [];
+  const outOps = [];
+
+  (movements ?? []).forEach(m => {
+    const ts = new Date(m.created_at).getTime();
+    const point = {
+      x: ts,
+      y: Number(m.quantity ?? 0),
+      method: m.method ?? 'manual',
+      performed_by: m.performed_by,
+    };
+    if (m.type === 'in') inOps.push(point);
+    else if (m.type === 'out') outOps.push(point);
+  });
+
+  return { inOps, outOps };
+}
+
+// ============================================
 // ✅ رسم المبيان
 // ============================================
 let stockChart = null;
 
 async function loadStockChart(days) {
+  // ═══════════════════════════════════════════
+  // ✅ إذا "يوم" → مبيان عمليات (خطان)
+  // ═══════════════════════════════════════════
+  if (days === 1) {
+    await renderTodayOperationsChart();
+    return;
+  }
+
+  // ═══════════════════════════════════════════
+  // المبيان العادي (قيمة المخزون)
+  // ═══════════════════════════════════════════
   const { dates, values } = await computeStockValueHistory(days);
 
   if (values.length === 0) {
@@ -257,6 +307,20 @@ async function loadStockChart(days) {
       '<div style="text-align:center; padding:40px; color:#a3a3a3;">لا توجد بيانات</div>';
     return;
   }
+
+  // ✅ استعادة العناوين الأصلية
+  document.getElementById('stock-subtitle').textContent =
+    days === 30 ? 'تطور قيمة المخزون خلال آخر 30 يوم'
+    : days === 90 ? 'تطور قيمة المخزون خلال آخر 90 يوم'
+    : days === 365 ? 'تطور قيمة المخزون خلال آخر سنة'
+    : 'تطور قيمة المخزون';
+  document.getElementById('chart-title').textContent = 'تطور قيمة المخزون';
+  document.getElementById('chart-badge').innerHTML =
+    '<i class="fas fa-circle"></i> قيمة المخزون';
+  document.getElementById('hero-label').textContent = 'القيمة الحالية للمخزون';
+  document.getElementById('label-min').textContent = 'أدنى قيمة';
+  document.getElementById('label-avg').textContent = 'متوسط القيمة';
+  document.getElementById('label-max').textContent = 'أعلى قيمة';
 
   const currentValue = values[values.length - 1] ?? 0;
   const minValue = Math.min(...values);
@@ -293,19 +357,11 @@ async function loadStockChart(days) {
       toolbar: { show: false },
       zoom: { enabled: false },
       fontFamily: 'system-ui, -apple-system, sans-serif',
-      animations: {
-        enabled: true,
-        easing: 'easeinout',
-        speed: 900,
-      },
+      animations: { enabled: true, easing: 'easeinout', speed: 900 },
     },
     colors: ['#2563eb'],
     dataLabels: { enabled: false },
-    stroke: {
-      curve: 'smooth',
-      width: 3,
-      colors: ['#2563eb'],
-    },
+    stroke: { curve: 'smooth', width: 3, colors: ['#2563eb'] },
     fill: {
       type: 'gradient',
       gradient: {
@@ -331,10 +387,7 @@ async function loadStockChart(days) {
       type: 'datetime',
       categories: dates,
       labels: {
-        style: {
-          fontSize: '11px',
-          colors: '#a3a3a3',
-        },
+        style: { fontSize: '11px', colors: '#a3a3a3' },
         datetimeUTC: true,
         format: days <= 30 ? 'dd MMM' : 'MMM yyyy',
       },
@@ -343,14 +396,8 @@ async function loadStockChart(days) {
     },
     yaxis: {
       labels: {
-        style: {
-          fontSize: '11px',
-          colors: '#a3a3a3',
-        },
-        formatter: (val) => {
-          if (val >= 1000) return (val / 1000).toFixed(1) + 'k';
-          return val.toFixed(0);
-        },
+        style: { fontSize: '11px', colors: '#a3a3a3' },
+        formatter: (val) => val >= 1000 ? (val / 1000).toFixed(1) + 'k' : val.toFixed(0),
       },
     },
     grid: {
@@ -371,14 +418,129 @@ async function loadStockChart(days) {
   };
 
   if (stockChart) {
-    stockChart.updateOptions({
-      series: [{ name: 'قيمة المخزون', data: values }],
-      xaxis: { categories: dates },
-    });
-  } else {
-    stockChart = new ApexCharts(document.getElementById('stock-chart'), options);
-    stockChart.render();
+    stockChart.destroy();
   }
+  stockChart = new ApexCharts(document.getElementById('stock-chart'), options);
+  stockChart.render();
+}
+
+// ============================================
+// ✅ مبيان عمليات اليوم (خطان + نقطة لكل عملية)
+// ============================================
+async function renderTodayOperationsChart() {
+  const { inOps, outOps } = await computeTodayOperations();
+
+  // ✅ تحديث العناوين
+  document.getElementById('stock-subtitle').textContent =
+    'حركات اليوم — كل نقطة تمثل عملية';
+  document.getElementById('chart-title').textContent = 'حركات اليوم';
+  document.getElementById('chart-badge').innerHTML =
+    '<i class="fas fa-circle" style="color:#2563eb;"></i> إضافة &nbsp;&nbsp; <i class="fas fa-circle" style="color:#f97316;"></i> إخراج';
+  document.getElementById('hero-label').textContent = 'مجموع حركات اليوم';
+  document.getElementById('label-min').textContent = 'عدد الإضافات';
+  document.getElementById('label-avg').textContent = 'إجمالي الكمية';
+  document.getElementById('label-max').textContent = 'عدد الإخراجات';
+
+  const totalIn = inOps.reduce((s, o) => s + o.y, 0);
+  const totalOut = outOps.reduce((s, o) => s + o.y, 0);
+
+  document.getElementById('hero-value').textContent =
+    String(inOps.length + outOps.length);
+
+  const trendEl = document.getElementById('hero-trend');
+  trendEl.className = 'stock-hero-trend up';
+  trendEl.innerHTML = `<i class="fas fa-arrow-up"></i> <span>${totalIn} إضافة | ${totalOut} إخراج</span>`;
+
+  document.getElementById('stat-min-value').textContent = String(inOps.length);
+  document.getElementById('stat-avg-value').textContent = String(totalIn + totalOut);
+  document.getElementById('stat-max-value').textContent = String(outOps.length);
+
+  // ✅ إذا لا توجد بيانات
+  if (inOps.length === 0 && outOps.length === 0) {
+    document.getElementById('stock-chart').innerHTML =
+      '<div style="text-align:center; padding:40px; color:#a3a3a3;">لا توجد حركات اليوم</div>';
+    return;
+  }
+
+  const options = {
+    series: [
+      { name: 'إضافة', data: inOps },
+      { name: 'إخراج', data: outOps },
+    ],
+    chart: {
+      type: 'line',
+      height: 380,
+      toolbar: { show: false },
+      zoom: { enabled: false },
+      fontFamily: 'system-ui, -apple-system, sans-serif',
+      animations: { enabled: true, easing: 'easeinout', speed: 900 },
+    },
+    colors: ['#2563eb', '#f97316'],
+    dataLabels: { enabled: false },
+    stroke: {
+      curve: 'straight',
+      width: 2,
+      colors: ['#2563eb', '#f97316'],
+    },
+    markers: {
+      size: 7,
+      colors: ['#ffffff', '#ffffff'],
+      strokeColors: ['#2563eb', '#f97316'],
+      strokeWidth: 3,
+      hover: { size: 10 },
+      shape: 'circle',
+    },
+    xaxis: {
+      type: 'datetime',
+      labels: {
+        style: { fontSize: '11px', colors: '#a3a3a3' },
+        datetimeUTC: true,
+        format: 'HH:mm',
+      },
+      axisBorder: { show: false },
+      axisTicks: { show: false },
+      tickAmount: 6,
+    },
+    yaxis: {
+      labels: {
+        style: { fontSize: '11px', colors: '#a3a3a3' },
+        formatter: (val) => Math.round(val).toString(),
+      },
+      title: {
+        text: 'الكمية',
+        style: { fontSize: '11px', color: '#a3a3a3', fontWeight: 500 },
+      },
+    },
+    grid: {
+      borderColor: '#f0f0f0',
+      strokeDashArray: 4,
+      xaxis: { lines: { show: false } },
+      yaxis: { lines: { show: true } },
+      padding: { left: 8, right: 8 },
+    },
+    legend: {
+      show: true,
+      position: 'top',
+      horizontalAlign: 'right',
+      fontSize: '12px',
+      fontFamily: 'system-ui, -apple-system, sans-serif',
+      markers: { radius: 12 },
+      itemMargin: { horizontal: 10, vertical: 0 },
+    },
+    tooltip: {
+      theme: 'light',
+      x: { format: 'HH:mm:ss' },
+      y: {
+        formatter: (val) => val.toString(),
+      },
+    },
+  };
+
+  if (stockChart) {
+    stockChart.destroy();
+  }
+  stockChart = new ApexCharts(document.getElementById('stock-chart'), options);
+  stockChart.render();
 }
 
 // ============================================
