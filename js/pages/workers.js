@@ -2,6 +2,7 @@
 // صفحة العمال — النواب + العمال فقط
 // ✅ لا يظهر المدير
 // ✅ عند الضغط → /member-profile.html?id=UUID
+// ✅ المحتوى ظاهر دائماً بدون Accordion
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   const user = await requireAuth();
@@ -71,19 +72,17 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   // ═══════════════════════════════════════════
-  // بناء قسم Accordion
+  // بناء قسم (بدون Accordion — ظاهر دائماً)
   // ═══════════════════════════════════════════
   function buildTeamSection({ id, icon, iconColor, label, count, content }) {
     return `
-      <div class="team-accordion" data-section="${id}">
-        <button type="button" class="team-accordion-header" data-toggle="${id}">
-          <div class="team-accordion-title">
-            <i class="fas ${icon}" ${iconColor ? `style="color:${iconColor};"` : ''}></i>
-            <span>${label}${count !== undefined ? ` (${count})` : ''}</span>
-          </div>
-        </button>
+      <div class="team-section" data-section="${id}">
+        <div class="team-section-header">
+          <i class="fas ${icon}" ${iconColor ? `style="color:${iconColor};"` : ''}></i>
+          <span>${label}${count !== undefined ? ` (${count})` : ''}</span>
+        </div>
 
-        <div class="team-accordion-body" data-body="${id}" style="display:none;">
+        <div class="team-section-body">
           ${content}
         </div>
       </div>
@@ -128,40 +127,4 @@ document.addEventListener('DOMContentLoaded', async () => {
       </div>
     `}
   `;
-
-  // ═══════════════════════════════════════════
-  // Accordion
-  // ═══════════════════════════════════════════
-  document.querySelectorAll('[data-toggle]').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const id = btn.dataset.toggle;
-      const body = document.querySelector(`[data-body="${id}"]`);
-      const accordion = btn.closest('.team-accordion');
-
-      if (!body) return;
-
-      const isOpen = body.style.display !== 'none';
-
-      document.querySelectorAll('.team-accordion-body').forEach(b => {
-        b.style.display = 'none';
-      });
-      document.querySelectorAll('.team-accordion').forEach(a => {
-        a.classList.remove('open');
-      });
-
-      if (!isOpen) {
-        body.style.display = 'block';
-        accordion.classList.add('open');
-      }
-    });
-  });
-
-  // ✅ فتح قسم "العمال" افتراضياً إذا لم يكن هناك نواب
-  if (deputies.length === 0 && workers.length > 0) {
-    const workersBody = document.querySelector('[data-body="workers"]');
-    if (workersBody) {
-      workersBody.style.display = 'block';
-      workersBody.closest('.team-accordion')?.classList.add('open');
-    }
-  }
 });
