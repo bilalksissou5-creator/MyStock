@@ -3,8 +3,7 @@
 // ✅ 3 لغات: العربية، الفرنسية، الإنجليزية
 // ✅ 28 بلداً بأسماء مترجمة
 // ✅ يغيّر ترتيب الصفحة تلقائياً (RTL/LTR)
-// ✅ دالة t(key) لجلب النص المترجم
-// ✅ دالة tCountry(code) لجلب اسم البلد
+// ✅ يعمل مع lang-boot.js
 // ============================================
 
 const translations = {
@@ -218,38 +217,64 @@ const countries = {
 // اللغة الحالية
 let currentLang = localStorage.getItem('app_lang') || 'ar';
 
+// ============================================
+// دالة جلب النص المترجم
+// ============================================
 function t(key) {
   return translations[currentLang]?.[key] || translations.ar[key] || key;
 }
 
+// ============================================
+// دالة جلب اسم البلد حسب اللغة الحالية
+// ============================================
 function tCountry(code) {
   return countries[code]?.[currentLang] || countries[code]?.ar || code;
 }
 
+// ============================================
+// تطبيق اللغة على الصفحة
+// ✅ يغيّر اتجاه الصفحة (RTL/LTR) تلقائياً
+// ✅ يضيف كلاس lang-xx على body
+// ============================================
 function applyLanguage() {
   const html = document.documentElement;
   html.lang = currentLang;
   html.dir = currentLang === 'ar' ? 'rtl' : 'ltr';
 
+  // ✅ كلاس اللغة على body (لتمكين CSS من التكيّف)
+  if (document.body) {
+    document.body.classList.remove('lang-ar', 'lang-fr', 'lang-en');
+    document.body.classList.add('lang-' + currentLang);
+  }
+
+  // ترجمة النصوص
   document.querySelectorAll('[data-i18n]').forEach(el => {
     el.textContent = t(el.dataset.i18n);
   });
 
+  // ترجمة placeholders
   document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
     el.placeholder = t(el.dataset.i18nPlaceholder);
   });
 
+  // ترجمة عناصر البلدان
   document.querySelectorAll('[data-country]').forEach(el => {
     el.textContent = tCountry(el.dataset.country);
   });
 }
 
+// ============================================
+// تغيير اللغة
+// ============================================
 function setLanguage(lang) {
   currentLang = lang;
   localStorage.setItem('app_lang', lang);
   applyLanguage();
 }
 
+// ============================================
+// تصدير عالمي
+// ============================================
 window.t = t;
 window.tCountry = tCountry;
 window.applyLanguage = applyLanguage;

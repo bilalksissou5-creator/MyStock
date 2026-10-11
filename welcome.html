@@ -4,7 +4,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <meta name="theme-color" content="#171717">
-  <title>مرحباً - MyStock</title>
+  <title>MyStock</title>
+
+  <!-- ✅ تشغيل اللغة فوراً قبل CSS -->
+  <script src="/js/core/lang-boot.js"></script>
+
   <link rel="stylesheet" href="/assets/css/common.css">
   <link rel="stylesheet" href="/assets/css/pages/welcome.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -13,7 +17,6 @@
 
   <div class="welcome-container">
 
-    <!-- الشعار والعنوان -->
     <header class="welcome-header">
       <div class="welcome-logo-icon">
         <i class="fas fa-boxes-stacked"></i>
@@ -60,15 +63,12 @@
           <span class="picker-name" id="country-name" data-i18n="welcome_select_country">-- اختر البلد --</span>
           <i class="fas fa-chevron-down picker-arrow"></i>
         </button>
-        <div class="picker-dropdown" id="country-dropdown">
-          <!-- تُملأ البلدان ديناميكياً من welcome.js -->
-        </div>
+        <div class="picker-dropdown" id="country-dropdown"></div>
       </div>
     </section>
 
   </div>
 
-  <!-- زر المتابعة (ثابت في الأسفل) -->
   <div class="welcome-footer">
     <button type="button" class="welcome-btn" id="continue-btn" disabled>
       <span data-i18n="welcome_continue">متابعة</span>
