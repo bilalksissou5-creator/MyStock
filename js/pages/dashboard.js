@@ -1,9 +1,8 @@
 // ============================================
 // صفحة لوحة التحكم
 // ✅ بطاقة حركات المخزون (خطان)
-// ✅ بطاقة الأرباح (أعمدة: استدارة أعلى فقط + عرض 70%)
-// ✅ استخدام UTC لتفادي فرق التوقيت
-// ✅ الأزرار: يوم / 7 أيام / 30 يوم / سنة
+// ✅ بطاقة الأرباح (أعمدة)
+// ✅ دعم كامل للترجمة
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   const user = await requireAuth();
@@ -11,10 +10,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   renderLayout('dashboard.html');
 
+  if (window.applyLanguage) window.applyLanguage();
+  const tr = (key) => (window.t ? window.t(key) : key);
+
   const main = document.getElementById('main-content');
 
   main.innerHTML = `
-    <h2>لوحة التحكم</h2>
+    <h2>${tr('dash_title')}</h2>
 
     <!-- ══════════════════════════════════════
          بطاقة حركات المخزون
@@ -27,8 +29,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
           <div class="stock-title-section">
             <div class="stock-title-text">
-              <h3 id="chart-title">حركات المخزون</h3>
-              <p id="stock-subtitle">آخر 30 يوم</p>
+              <h3 id="chart-title">${tr('dash_stock_moves')}</h3>
+              <p id="stock-subtitle">${tr('dash_last_30')}</p>
             </div>
             <div class="stock-title-icon">
               <i class="fas fa-chart-line"></i>
@@ -37,21 +39,21 @@ document.addEventListener('DOMContentLoaded', async () => {
 
           <div class="stock-stats-row">
             <div class="stock-stat-card">
-              <div class="stat-mini-label">إضافة (كمية)</div>
+              <div class="stat-mini-label">${tr('dash_in_qty')}</div>
               <div class="stat-mini-value" id="stat-min-value">—</div>
               <div class="stat-mini-icon up">
                 <i class="fas fa-arrow-up"></i>
               </div>
             </div>
             <div class="stock-stat-card">
-              <div class="stat-mini-label">إجمالي الحركات</div>
+              <div class="stat-mini-label">${tr('dash_total_moves')}</div>
               <div class="stat-mini-value" id="stat-avg-value">—</div>
               <div class="stat-mini-icon chart">
                 <i class="fas fa-chart-line"></i>
               </div>
             </div>
             <div class="stock-stat-card">
-              <div class="stat-mini-label">إخراج (كمية)</div>
+              <div class="stat-mini-label">${tr('dash_out_qty')}</div>
               <div class="stat-mini-value" id="stat-max-value">—</div>
               <div class="stat-mini-icon down">
                 <i class="fas fa-arrow-down"></i>
@@ -66,7 +68,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             <i class="fas fa-database"></i>
           </div>
           <div class="stock-hero-info">
-            <div class="stock-hero-label" id="hero-label">إجمالي الحركات</div>
+            <div class="stock-hero-label" id="hero-label">${tr('dash_total_moves')}</div>
             <div class="stock-hero-value">
               <span id="hero-value">—</span>
             </div>
@@ -81,20 +83,20 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       <div class="stock-chart-section">
         <div class="stock-chart-header">
-          <h3 id="chart-section-title">حركات المخزون</h3>
+          <h3 id="chart-section-title">${tr('dash_stock_moves')}</h3>
           <span class="stock-chart-badge" id="chart-badge">
-            <i class="fas fa-circle" style="color:#2563eb;"></i> إضافة &nbsp;&nbsp;
-            <i class="fas fa-circle" style="color:#f97316;"></i> إخراج
+            <i class="fas fa-circle" style="color:#2563eb;"></i> ${tr('dash_in')} &nbsp;&nbsp;
+            <i class="fas fa-circle" style="color:#f97316;"></i> ${tr('dash_out')}
           </span>
         </div>
         <div id="stock-chart"></div>
 
         <div class="stock-chart-filters">
           <div class="filters-left">
-            <button type="button" class="filter-btn" data-days="1">يوم</button>
-            <button type="button" class="filter-btn" data-days="7">7 أيام</button>
-            <button type="button" class="filter-btn active" data-days="30">30 يوم</button>
-            <button type="button" class="filter-btn" data-days="365">سنة</button>
+            <button type="button" class="filter-btn" data-days="1">${tr('dash_day')}</button>
+            <button type="button" class="filter-btn" data-days="7">${tr('dash_7days')}</button>
+            <button type="button" class="filter-btn active" data-days="30">${tr('dash_30days')}</button>
+            <button type="button" class="filter-btn" data-days="365">${tr('dash_year')}</button>
           </div>
         </div>
       </div>
@@ -112,8 +114,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
           <div class="stock-title-section">
             <div class="stock-title-text">
-              <h3>الأرباح</h3>
-              <p id="profit-subtitle">آخر 30 يوم</p>
+              <h3>${tr('dash_profit')}</h3>
+              <p id="profit-subtitle">${tr('dash_last_30')}</p>
             </div>
             <div class="stock-title-icon" style="color:#16a34a;">
               <i class="fas fa-coins"></i>
@@ -122,21 +124,21 @@ document.addEventListener('DOMContentLoaded', async () => {
 
           <div class="stock-stats-row">
             <div class="stock-stat-card">
-              <div class="stat-mini-label">أدنى فترة</div>
+              <div class="stat-mini-label">${tr('dash_min_period')}</div>
               <div class="stat-mini-value" id="profit-min">—</div>
               <div class="stat-mini-icon down">
                 <i class="fas fa-arrow-down"></i>
               </div>
             </div>
             <div class="stock-stat-card">
-              <div class="stat-mini-label">متوسط الفترة</div>
+              <div class="stat-mini-label">${tr('dash_avg_period')}</div>
               <div class="stat-mini-value" id="profit-avg">—</div>
               <div class="stat-mini-icon chart">
                 <i class="fas fa-chart-line"></i>
               </div>
             </div>
             <div class="stock-stat-card">
-              <div class="stat-mini-label">أعلى فترة</div>
+              <div class="stat-mini-label">${tr('dash_max_period')}</div>
               <div class="stat-mini-value" id="profit-max">—</div>
               <div class="stat-mini-icon up">
                 <i class="fas fa-arrow-up"></i>
@@ -151,7 +153,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             <i class="fas fa-coins"></i>
           </div>
           <div class="stock-hero-info">
-            <div class="stock-hero-label">إجمالي الربح</div>
+            <div class="stock-hero-label">${tr('dash_total_profit')}</div>
             <div class="stock-hero-value">
               <span id="profit-total">—</span>
             </div>
@@ -166,19 +168,19 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       <div class="stock-chart-section">
         <div class="stock-chart-header">
-          <h3>تطور الأرباح</h3>
+          <h3>${tr('dash_profit_evolution')}</h3>
           <span class="stock-chart-badge profit-badge">
-            <i class="fas fa-circle" style="color:#16a34a;"></i> الأرباح
+            <i class="fas fa-circle" style="color:#16a34a;"></i> ${tr('dash_profit')}
           </span>
         </div>
         <div id="profit-chart"></div>
 
         <div class="stock-chart-filters">
           <div class="filters-left">
-            <button type="button" class="profit-filter-btn" data-days="1">يوم</button>
-            <button type="button" class="profit-filter-btn" data-days="7">7 أيام</button>
-            <button type="button" class="profit-filter-btn active" data-days="30">30 يوم</button>
-            <button type="button" class="profit-filter-btn" data-days="365">سنة</button>
+            <button type="button" class="profit-filter-btn" data-days="1">${tr('dash_day')}</button>
+            <button type="button" class="profit-filter-btn" data-days="7">${tr('dash_7days')}</button>
+            <button type="button" class="profit-filter-btn active" data-days="30">${tr('dash_30days')}</button>
+            <button type="button" class="profit-filter-btn" data-days="365">${tr('dash_year')}</button>
           </div>
         </div>
       </div>
@@ -186,27 +188,27 @@ document.addEventListener('DOMContentLoaded', async () => {
     </div>
 
     <!-- ══════════════════════════════════════
-         البطاقات القديمة
+         البطاقات السريعة
          ══════════════════════════════════════ -->
     <div class="stats-grid">
       <div class="stat-card">
-        <div class="stat-label">المنتجات</div>
+        <div class="stat-label">${tr('dash_products')}</div>
         <div class="stat-value" id="stat-products">—</div>
       </div>
       <div class="stat-card">
-        <div class="stat-label">الحركات</div>
+        <div class="stat-label">${tr('dash_movements')}</div>
         <div class="stat-value" id="stat-movements">—</div>
       </div>
       <div class="stat-card">
-        <div class="stat-label">المستخدمون</div>
+        <div class="stat-label">${tr('dash_users')}</div>
         <div class="stat-value" id="stat-users">—</div>
       </div>
       <div class="stat-card">
-        <div class="stat-label">قاربت على النفاد</div>
+        <div class="stat-label">${tr('dash_low_stock')}</div>
         <div class="stat-value" id="stat-low">—</div>
       </div>
       <div class="stat-card">
-        <div class="stat-label">حركات اليوم</div>
+        <div class="stat-label">${tr('dash_today_moves')}</div>
         <div class="stat-value" id="stat-today">—</div>
       </div>
     </div>
@@ -320,27 +322,28 @@ async function computeMovementsHistory(days) {
 }
 
 // ============================================
-// ✅ رسم مبيان الحركات (خطان)
+// ✅ رسم مبيان الحركات
 // ============================================
 let stockChart = null;
 
 async function loadStockChart(days) {
+  const tr = (key) => (window.t ? window.t(key) : key);
   const data = await computeMovementsHistory(days);
 
   const subtitleMap = {
-    1: 'حركات اليوم (كل عملية = نقطة)',
-    7: 'آخر 7 أيام (مجموع يومي)',
-    30: 'آخر 30 يوم (مجموع يومي)',
-    365: 'آخر سنة (مجموع شهري)',
+    1: tr('dash_sub_1'),
+    7: tr('dash_sub_7'),
+    30: tr('dash_sub_30'),
+    365: tr('dash_sub_365'),
   };
   document.getElementById('stock-subtitle').textContent =
-    subtitleMap[days] ?? 'حركات المخزون';
+    subtitleMap[days] ?? tr('dash_stock_moves');
 
-  document.getElementById('chart-section-title').textContent = 'حركات المخزون';
+  document.getElementById('chart-section-title').textContent = tr('dash_stock_moves');
   document.getElementById('chart-badge').innerHTML =
-    '<i class="fas fa-circle" style="color:#2563eb;"></i> إضافة &nbsp;&nbsp; ' +
-    '<i class="fas fa-circle" style="color:#f97316;"></i> إخراج';
-  document.getElementById('hero-label').textContent = 'إجمالي الحركات';
+    `<i class="fas fa-circle" style="color:#2563eb;"></i> ${tr('dash_in')} &nbsp;&nbsp; ` +
+    `<i class="fas fa-circle" style="color:#f97316;"></i> ${tr('dash_out')}`;
+  document.getElementById('hero-label').textContent = tr('dash_total_moves');
 
   let totalIn = 0;
   let totalOut = 0;
@@ -359,7 +362,7 @@ async function loadStockChart(days) {
 
   const trendEl = document.getElementById('hero-trend');
   trendEl.className = 'stock-hero-trend up';
-  trendEl.innerHTML = `<i class="fas fa-arrow-up"></i> <span>${totalIn} إضافة | ${totalOut} إخراج</span>`;
+  trendEl.innerHTML = `<i class="fas fa-arrow-up"></i> <span>${totalIn} ${tr('dash_in')} | ${totalOut} ${tr('dash_out')}</span>`;
 
   document.getElementById('stat-min-value').textContent = String(totalIn);
   document.getElementById('stat-avg-value').textContent = String(countIn + countOut);
@@ -372,7 +375,7 @@ async function loadStockChart(days) {
   if (!hasData) {
     if (stockChart) { stockChart.destroy(); stockChart = null; }
     document.getElementById('stock-chart').innerHTML =
-      '<div style="text-align:center; padding:40px; color:#a3a3a3;">لا توجد حركات في هذه الفترة</div>';
+      `<div style="text-align:center; padding:40px; color:#a3a3a3;">${tr('dash_no_moves')}</div>`;
     return;
   }
 
@@ -381,8 +384,8 @@ async function loadStockChart(days) {
 
   if (data.mode === 'per-operation') {
     series = [
-      { name: 'إضافة', data: data.inOps },
-      { name: 'إخراج', data: data.outOps },
+      { name: tr('dash_in'), data: data.inOps },
+      { name: tr('dash_out'), data: data.outOps },
     ];
     xaxisConfig = {
       type: 'datetime',
@@ -395,8 +398,8 @@ async function loadStockChart(days) {
     };
   } else {
     series = [
-      { name: 'إضافة', data: data.inSeries },
-      { name: 'إخراج', data: data.outSeries },
+      { name: tr('dash_in'), data: data.inSeries },
+      { name: tr('dash_out'), data: data.outSeries },
     ];
     xaxisConfig = {
       type: 'datetime',
@@ -441,7 +444,7 @@ async function loadStockChart(days) {
         formatter: (val) => Math.round(val).toString(),
       },
       title: {
-        text: 'الكمية',
+        text: tr('dash_qty'),
         style: { fontSize: '11px', color: '#a3a3a3', fontWeight: 500 },
       },
     },
@@ -514,7 +517,6 @@ async function computeProfitHistory(days) {
     dayMap[day] += Number(it.profit ?? 0);
   });
 
-  // يوم → مجموع كل ساعة
   if (days === 1) {
     const hourMap = {};
     (items ?? []).forEach(it => {
@@ -532,7 +534,6 @@ async function computeProfitHistory(days) {
     return { mode: 'hourly', dates, profits };
   }
 
-  // سنة → شهري
   if (days >= 365) {
     const monthMap = {};
     Object.keys(dayMap).forEach(day => {
@@ -548,7 +549,6 @@ async function computeProfitHistory(days) {
     return { mode: 'monthly', dates, profits };
   }
 
-  // يومي
   const dates = [];
   const profits = [];
 
@@ -564,21 +564,21 @@ async function computeProfitHistory(days) {
 
 // ============================================
 // ✅ رسم مبيان الأرباح
-// ✅ استدارة أعلى فقط + عرض 70%
 // ============================================
 let profitChart = null;
 
 async function loadProfitChart(days) {
+  const tr = (key) => (window.t ? window.t(key) : key);
   const data = await computeProfitHistory(days);
 
   const subtitleMap = {
-    1: 'أرباح اليوم (كل ساعة)',
-    7: 'آخر 7 أيام (يومي)',
-    30: 'آخر 30 يوم (يومي)',
-    365: 'آخر سنة (شهري)',
+    1: tr('dash_prof_sub_1'),
+    7: tr('dash_prof_sub_7'),
+    30: tr('dash_prof_sub_30'),
+    365: tr('dash_prof_sub_365'),
   };
   document.getElementById('profit-subtitle').textContent =
-    subtitleMap[days] ?? 'الأرباح';
+    subtitleMap[days] ?? tr('dash_profit');
 
   const profits = data.profits;
   const totalProfit = profits.reduce((s, v) => s + v, 0);
@@ -593,20 +593,20 @@ async function loadProfitChart(days) {
 
   const trendEl = document.getElementById('profit-trend');
   trendEl.className = 'stock-hero-trend up';
-  trendEl.innerHTML = `<i class="fas fa-coins"></i> <span>${data.dates.length} فترة</span>`;
+  trendEl.innerHTML = `<i class="fas fa-coins"></i> <span>${data.dates.length} ${tr('dash_periods')}</span>`;
 
   const hasData = profits.some(v => v > 0);
 
   if (!hasData) {
     if (profitChart) { profitChart.destroy(); profitChart = null; }
     document.getElementById('profit-chart').innerHTML =
-      '<div style="text-align:center; padding:40px; color:#a3a3a3;">لا توجد أرباح في هذه الفترة</div>';
+      `<div style="text-align:center; padding:40px; color:#a3a3a3;">${tr('dash_no_profit')}</div>`;
     return;
   }
 
   const options = {
     series: [{
-      name: 'الربح',
+      name: tr('dash_profit'),
       data: profits,
     }],
     chart: {
@@ -620,10 +620,10 @@ async function loadProfitChart(days) {
     colors: ['#16a34a'],
     plotOptions: {
       bar: {
-        borderRadius: 8,                      // ✅ مقدار الاستدارة
-        borderRadiusApplication: 'end',       // ✅ الأعلى فقط (وليس الأسفل)
+        borderRadius: 8,
+        borderRadiusApplication: 'end',
         borderRadiusWhenStacked: 'last',
-        columnWidth: '70%',                   // ✅ عرض موحد
+        columnWidth: '70%',
         distributed: false,
         horizontal: false,
       },
@@ -649,7 +649,7 @@ async function loadProfitChart(days) {
         },
       },
       title: {
-        text: 'الربح',
+        text: tr('dash_profit'),
         style: { fontSize: '11px', color: '#a3a3a3', fontWeight: 500 },
       },
     },
@@ -665,7 +665,7 @@ async function loadProfitChart(days) {
       x: { format: days === 1 ? 'HH:mm' : 'dd MMM yyyy' },
       y: {
         formatter: (val) => val.toFixed(2),
-        title: { formatter: () => 'الربح: ' },
+        title: { formatter: () => tr('dash_profit') + ': ' },
       },
     },
   };
