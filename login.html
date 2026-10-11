@@ -11,17 +11,17 @@
 <body class="login-page">
   <form class="auth-box" id="login-form">
     <h1>MyStock</h1>
-    <p class="subtitle">نظام إدارة المخزون</p>
+    <p class="subtitle" data-i18n="app_tagline">نظام إدارة المخزون</p>
 
     <div class="alert alert-error" id="login-error" style="display:none;"></div>
 
     <div class="form-group">
-      <label>البريد الإلكتروني</label>
+      <label data-i18n="login_email">البريد الإلكتروني</label>
       <input type="email" id="email" required dir="ltr">
     </div>
 
     <div class="form-group">
-      <label>كلمة السر</label>
+      <label data-i18n="login_password">كلمة السر</label>
       <div class="password-wrapper">
         <input type="password" id="password" required dir="ltr">
         <button type="button" class="toggle-password" id="toggle-password">
@@ -32,23 +32,27 @@
 
     <button type="submit" class="btn-primary" style="width:100%; justify-content:center;" id="login-btn">
       <i class="fas fa-right-to-bracket"></i>
-      <span>دخول</span>
+      <span data-i18n="login_button">دخول</span>
     </button>
 
     <div class="auth-footer">
-      <p>ليس لديك حساب؟</p>
+      <p data-i18n="login_no_account">ليس لديك حساب؟</p>
       <a href="/welcome.html" class="btn-secondary" style="width:100%; justify-content:center;">
         <i class="fas fa-user-plus"></i>
-        <span>إنشاء حساب جديد</span>
+        <span data-i18n="login_create_account">إنشاء حساب جديد</span>
       </a>
     </div>
   </form>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="/js/core/supabase.js"></script>
+  <script src="/js/core/i18n.js"></script>
   <script src="/js/core/auth.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
+      // تطبيق اللغة
+      applyLanguage();
+
       const toggleBtn = document.getElementById('toggle-password');
       const passwordInput = document.getElementById('password');
       if (!toggleBtn || !passwordInput) return;

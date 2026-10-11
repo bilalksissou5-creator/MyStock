@@ -1,11 +1,15 @@
 // ============================================
 // صفحة إنشاء حساب جديد
-// ✅ يقرأ البلد من localStorage (المُختار في welcome.html)
+// ✅ يقرأ البلد من localStorage (welcome.html)
+// ✅ يطبق اللغة تلقائياً
 // ✅ يُنشئ subscriptions بحالة pending
 // ✅ يُحوّل إلى subscription.html بعد التسجيل
 // ✅ منع Enter/Go/Done من إرسال الفورم
 // ============================================
 document.addEventListener('DOMContentLoaded', () => {
+
+  // ✅ تطبيق اللغة
+  if (window.applyLanguage) window.applyLanguage();
 
   // إظهار/إخفاء كلمات السر
   document.querySelectorAll('.toggle-password').forEach(btn => {
