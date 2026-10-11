@@ -58,6 +58,8 @@ body.login-page {
   font-size: 14px;
   color: #404040;
   margin-bottom: 6px;
+  /* ✅ يتبع اتجاه الصفحة */
+  text-align: start;
 }
 
 .login-page .form-group input {
@@ -76,6 +78,7 @@ body.login-page {
   border-color: #171717;
 }
 
+/* ══════ الأزرار ══════ */
 .login-page .btn-primary {
   width: 100%;
   justify-content: center;
@@ -98,6 +101,7 @@ body.login-page {
   box-sizing: border-box;
 }
 
+/* ══════ حقل كلمة السر ══════ */
 .login-page .password-wrapper {
   position: relative;
   width: 100%;
@@ -110,9 +114,29 @@ body.login-page {
   box-sizing: border-box;
 }
 
+/* ✅ زر العين يتبع الاتجاه تلقائياً */
+[dir="ltr"] .login-page .toggle-password {
+  left: auto;
+  right: 12px;
+}
+
+[dir="rtl"] .login-page .toggle-password {
+  left: 12px;
+  right: auto;
+}
+
+[dir="ltr"] .login-page .password-wrapper input {
+  padding-left: 12px !important;
+  padding-right: 42px !important;
+}
+
+[dir="rtl"] .login-page .password-wrapper input {
+  padding-left: 42px !important;
+  padding-right: 12px !important;
+}
+
 .login-page .toggle-password {
   position: absolute;
-  left: 12px;
   top: 50%;
   transform: translateY(-50%);
   background: none;
@@ -131,6 +155,7 @@ body.login-page {
   color: #171717;
 }
 
+/* ══════ الفوتر ══════ */
 .login-page .auth-footer {
   text-align: center;
   margin-top: 20px;
@@ -142,6 +167,13 @@ body.login-page {
   color: #737373;
   font-size: 14px;
   margin-bottom: 12px;
+}
+
+/* ✅ عكس الأيقونات الاتجاهية في RTL */
+[dir="rtl"] .login-page .btn-primary i.fa-right-to-bracket,
+[dir="rtl"] .login-page .btn-primary i.fa-arrow-right,
+[dir="rtl"] .login-page .btn-primary i.fa-arrow-left {
+  transform: scaleX(-1);
 }
 
 @media (max-width: 480px) {
