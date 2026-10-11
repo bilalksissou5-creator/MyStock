@@ -1,100 +1,303 @@
 /* ============================================
-   صفحة العمال - تنسيقات خاصة فقط
+   صفحة العمال - تنسيقات كاملة
    ============================================ */
 
-.workers-grid {
+/* ═══════════════════════════════════════════
+   1. الحاويات العامة وعنوان الصفحة
+   ═══════════════════════════════════════════ */
+.page-header {
+  margin-bottom: 24px;
+}
+
+.page-header h2 {
+  font-size: 24px;
+  font-weight: 700;
+  color: #171717;
+  margin: 0;
+}
+
+.workers-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* ═══════════════════════════════════════════
+   2. الأكورديون (Accordion)
+   ═══════════════════════════════════════════ */
+.team-accordion {
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  overflow: hidden;
+  border: 1px solid #f5f5f5;
+  transition: all 0.2s ease;
+}
+
+.team-accordion-header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  color: #171717;
+  transition: background 0.2s ease;
+}
+
+.team-accordion-header:hover {
+  background: #fafafa;
+}
+
+.team-accordion-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.team-accordion-title i {
+  font-size: 16px;
+}
+
+.team-accordion-arrow {
+  font-size: 12px;
+  color: #a3a3a3;
+  transition: transform 0.3s ease;
+}
+
+/* دوران السهم عند فتح الأكورديون */
+.team-accordion.open .team-accordion-arrow {
+  transform: rotate(-90deg);
+}
+
+.team-accordion-body {
+  padding: 0 20px 20px 20px;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ═══════════════════════════════════════════
+   3. شبكة البطاقات
+   ═══════════════════════════════════════════ */
+.team-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
   gap: 16px;
 }
 
-.worker-card {
-  background: white;
-  border-radius: 10px;
-  padding: 20px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
-  display: flex;
-  align-items: center;
-  gap: 14px;
+/* ═══════════════════════════════════════════
+   4. بطاقة العضو (Member Card)
+   ═══════════════════════════════════════════ */
+.member-card-link {
+  text-decoration: none;
+  color: inherit;
+  display: block;
 }
 
-.worker-avatar {
-  width: 50px;
-  height: 50px;
+.member-card {
+  background: #fafafa;
+  border: 1px solid #f0f0f0;
+  border-radius: 10px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.member-card:hover {
+  background: white;
+  border-color: #e5e5e5;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transform: translateY(-2px);
+}
+
+/* صورة العضو وحالة الاتصال */
+.member-avatar-wrap {
+  position: relative;
+  width: 56px;
+  height: 56px;
+}
+
+.member-avatar {
+  width: 100%;
+  height: 100%;
   border-radius: 50%;
   background: #f5f5f5;
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  flex-shrink: 0;
 }
 
-.worker-avatar img {
+.member-avatar img {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
 
-.worker-avatar i {
+.member-avatar i {
   color: #a3a3a3;
-  font-size: 20px;
+  font-size: 22px;
 }
 
-.worker-info {
+.member-status-dot {
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2px solid white;
+}
+
+.member-status-dot.online {
+  background: #16a34a;
+}
+
+.member-status-dot.offline {
+  background: #a3a3a3;
+}
+
+/* اسم العضو والنجمة */
+.member-name-row {
   display: flex;
-  flex-direction: column;
-  gap: 4px;
-  min-width: 0;
-  flex: 1;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
 }
 
-.worker-info strong {
-  font-size: 15px;
+.member-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #171717;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  max-width: 140px;
 }
 
-.worker-role {
+.member-star-icon {
   font-size: 12px;
-  color: #737373;
 }
 
-.worker-status {
+.member-star-icon.deputy-star {
+  color: #fbbf24;
+}
+
+.member-star-icon.worker-star {
+  color: #d4d4d4;
+}
+
+/* دور العضو (نائب / عامل) */
+.member-role {
   font-size: 11px;
-  padding: 2px 8px;
+  padding: 2px 10px;
   border-radius: 10px;
-  width: fit-content;
+  font-weight: 500;
 }
 
-.worker-status.online {
-  background: #dcfce7;
-  color: #16a34a;
+.member-role.deputy {
+  background: #fef3c7;
+  color: #b45309;
 }
 
-.worker-status.offline {
+.member-role.worker {
   background: #f5f5f5;
-  color: #737373;
+  color: #525252;
 }
 
+/* ═══════════════════════════════════════════
+   5. الحالة الفارغة والتنبيهات
+   ═══════════════════════════════════════════ */
+.empty-state {
+  background: white;
+  border-radius: 10px;
+  padding: 40px 20px;
+  text-align: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+.empty-state i {
+  font-size: 32px;
+  margin-bottom: 12px;
+  display: block;
+}
+
+.empty-state p {
+  font-size: 14px;
+  color: #737373;
+  margin: 0;
+}
+
+.alert {
+  padding: 14px 18px;
+  border-radius: 10px;
+  font-size: 14px;
+  margin-bottom: 16px;
+}
+
+.alert-error {
+  background: #fef2f2;
+  color: #dc2626;
+  border: 1px solid #fecaca;
+}
+
+/* ═══════════════════════════════════════════
+   6. التجاوب مع الشاشات الصغيرة
+   ═══════════════════════════════════════════ */
 @media (max-width: 768px) {
-  .workers-grid {
-    grid-template-columns: 1fr;
+  .page-header h2 {
+    font-size: 20px;
+  }
+
+  .team-grid {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
     gap: 10px;
   }
 
-  .worker-card {
-    padding: 14px;
-    gap: 12px;
-  }
-
-  .worker-avatar {
-    width: 44px;
-    height: 44px;
-  }
-
-  .worker-info strong {
+  .team-accordion-header {
+    padding: 14px 16px;
     font-size: 14px;
+  }
+
+  .team-accordion-body {
+    padding: 0 16px 16px 16px;
+  }
+
+  .member-card {
+    padding: 12px;
+  }
+
+  .member-avatar-wrap {
+    width: 48px;
+    height: 48px;
+  }
+
+  .member-name {
+    font-size: 13px;
+    max-width: 100px;
+  }
+
+  .empty-state {
+    padding: 30px 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .team-grid {
+    grid-template-columns: 1fr 1fr;
   }
 }
