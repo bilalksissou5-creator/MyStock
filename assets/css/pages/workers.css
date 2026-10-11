@@ -5,11 +5,11 @@
 /* ═══════════════════════════════════════════
    0. إصلاح الحاوية الأم (إزالة الفراغ السفلي)
    ═══════════════════════════════════════════ */
+.main,
 #main-content {
+  padding-bottom: 12px !important;
   min-height: auto !important;
   height: auto !important;
-  padding-bottom: 0 !important;
-  margin-bottom: 0 !important;
 }
 
 /* ═══════════════════════════════════════════
@@ -259,6 +259,11 @@
    6. التجاوب مع الشاشات الصغيرة
    ═══════════════════════════════════════════ */
 @media (max-width: 768px) {
+  .main,
+  #main-content {
+    padding-bottom: 12px !important;
+  }
+
   .page-header h2 {
     font-size: 20px;
   }
