@@ -11,7 +11,7 @@
   flex-direction: column;
   padding: 0;
   margin: 0;
-  direction: rtl;
+  direction: inherit;
   font-family: system-ui, -apple-system, sans-serif;
 }
 
@@ -80,6 +80,8 @@
   margin: 0 0 10px 0;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  /* ✅ محاذاة تتبع الاتجاه */
+  text-align: start;
 }
 
 /* ============================================
@@ -128,6 +130,8 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  /* ✅ محاذاة تتبع الاتجاه */
+  text-align: start;
 }
 
 .picker-arrow {
@@ -147,8 +151,7 @@
 .picker-dropdown {
   position: absolute;
   top: calc(100% + 8px);
-  left: 0;
-  right: 0;
+  inset-inline: 0;
   background: white;
   border: 1px solid #e5e5e5;
   border-radius: 14px;
@@ -227,14 +230,23 @@
   opacity: 1;
 }
 
+/* ✅ في RTL: الأيقونة على اليسار (نهاية السطر)
+   ✅ في LTR: الأيقونة على اليمين (نهاية السطر) */
+[dir="rtl"] .picker-option {
+  flex-direction: row;
+}
+
+[dir="ltr"] .picker-option {
+  flex-direction: row;
+}
+
 /* ============================================
    زر المتابعة (ثابت في الأسفل)
    ============================================ */
 .welcome-footer {
   position: fixed;
   bottom: 0;
-  left: 0;
-  right: 0;
+  inset-inline: 0;
   padding: 16px 24px calc(16px + env(safe-area-inset-bottom, 0px));
   background: linear-gradient(180deg, rgba(245, 245, 245, 0) 0%, #f5f5f5 30%);
   display: flex;
@@ -278,8 +290,8 @@
   box-shadow: none;
 }
 
-/* دوران سهم الزر في RTL */
-html[dir="rtl"] .welcome-btn i {
+/* ✅ عكس سهم الزر في RTL */
+[dir="rtl"] .welcome-btn i {
   transform: scaleX(-1);
 }
 
