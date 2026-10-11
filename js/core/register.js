@@ -3,6 +3,7 @@
 // ✅ يُنشئ subscriptions بحالة pending
 // ✅ يُحوّل إلى subscription.html فقط عند الضغط على الزر
 // ✅ منع Enter/Go/Done من إرسال الفورم
+// ✅ حفظ البلد في profiles.country و organizations.country
 // ============================================
 document.addEventListener('DOMContentLoaded', () => {
 
@@ -45,6 +46,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const firstName = document.getElementById('first_name').value.trim();
     const lastName = document.getElementById('last_name').value.trim();
     const orgName = document.getElementById('org_name').value.trim();
+    const country = document.getElementById('country').value;
     const email = document.getElementById('email').value.trim();
     const password = document.getElementById('password').value;
     const passwordConfirm = document.getElementById('password_confirm').value;
@@ -58,6 +60,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (!orgName) {
       errBox.textContent = 'اسم المنظمة مطلوب';
+      errBox.style.display = 'block';
+      return;
+    }
+
+    if (!country) {
+      errBox.textContent = 'الرجاء اختيار البلد';
       errBox.style.display = 'block';
       return;
     }
@@ -112,6 +120,7 @@ document.addEventListener('DOMContentLoaded', () => {
       .insert({
         name: orgName,
         owner_id: userId,
+        country: country,
       })
       .select()
       .single();
@@ -131,6 +140,7 @@ document.addEventListener('DOMContentLoaded', () => {
         full_name: `${firstName} ${lastName}`,
         organization_id: orgData.id,
         role: 'admin',
+        country: country,
       })
       .eq('id', userId);
 
