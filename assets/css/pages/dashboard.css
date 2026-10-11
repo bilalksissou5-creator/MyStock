@@ -1,9 +1,11 @@
 /* ============================================
    صفحة لوحة التحكم
+   ✅ بطاقة حركات المخزون (خطان)
+   ✅ بطاقة الأرباح (أعمدة خضراء)
    ============================================ */
 
 /* ============================================
-   ✅ بطاقة قيمة المخزون
+   ✅ بطاقة قيمة المخزون (الحالية)
    ============================================ */
 .stock-value-card {
   background: #ffffff;
@@ -18,7 +20,22 @@
 }
 
 /* ============================================
-   ✅ الصف الأعلى — يظهر في نفس الصف دائماً
+   ✅ بطاقة الأرباح (جديدة — نفس البنية)
+   ============================================ */
+.profit-card {
+  background: #ffffff;
+  border: 1px solid #f0f0f0;
+  border-radius: 14px;
+  padding: 14px 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* ============================================
+   الصف الأعلى (مشترك)
    ============================================ */
 .stock-top-row {
   display: grid;
@@ -26,9 +43,6 @@
   gap: 8px;
 }
 
-/* ============================================
-   العمود اليمين
-   ============================================ */
 .stock-right-col {
   display: flex;
   flex-direction: column;
@@ -77,7 +91,7 @@
 }
 
 /* ============================================
-   البطاقة السوداء
+   البطاقة السوداء (مشتركة)
    ============================================ */
 .stock-hero-card {
   position: relative;
@@ -92,6 +106,12 @@
   overflow: hidden;
   min-width: 0;
   height: 100%;
+}
+
+/* ✅ البطاقة السوداء للأرباح (تدرج أخضر) */
+.profit-hero {
+  background: linear-gradient(135deg, #14532d 0%, #166534 50%, #15803d 100%);
+  box-shadow: 0 4px 12px rgba(22, 163, 74, 0.2);
 }
 
 .stock-hero-card::before {
@@ -139,6 +159,8 @@
   line-height: 1;
   margin-bottom: 4px;
   letter-spacing: -0.5px;
+  direction: ltr;
+  display: inline-block;
 }
 
 .stock-hero-trend {
@@ -215,6 +237,7 @@
   overflow: hidden;
   text-overflow: ellipsis;
   max-width: 100%;
+  direction: ltr;
 }
 
 .stat-mini-icon {
@@ -243,7 +266,7 @@
 }
 
 /* ============================================
-   قسم المبيان
+   قسم المبيان (مشترك)
    ============================================ */
 .stock-chart-section {
   border-top: 1px solid #f5f5f5;
@@ -278,12 +301,18 @@
   color: #2563eb;
 }
 
-.stock-chart-badge i {
-  font-size: 6px;
-  color: #2563eb;
+/* ✅ شارة الأرباح (أخضر) */
+.profit-badge {
+  color: #16a34a;
+  background: #f0fdf4;
 }
 
-#stock-chart {
+.stock-chart-badge i {
+  font-size: 6px;
+}
+
+#stock-chart,
+#profit-chart {
   width: 100%;
   min-height: 340px;
 }
@@ -308,7 +337,9 @@
   flex-wrap: wrap;
 }
 
-.filter-btn {
+/* ✅ أزرار مشتركة (filter-btn + profit-filter-btn) */
+.filter-btn,
+.profit-filter-btn {
   padding: 7px 14px;
   background: #f5f5f5;
   border: none;
@@ -322,17 +353,26 @@
   -webkit-tap-highlight-color: transparent;
 }
 
-.filter-btn:hover {
+.filter-btn:hover,
+.profit-filter-btn:hover {
   background: #e5e5e5;
   color: #171717;
 }
 
+/* ✅ filter-btn النشط (أزرق) */
 .filter-btn.active {
   background: #2563eb;
   color: #ffffff;
 }
 
-.filter-btn:active {
+/* ✅ profit-filter-btn النشط (أخضر) */
+.profit-filter-btn.active {
+  background: #16a34a;
+  color: #ffffff;
+}
+
+.filter-btn:active,
+.profit-filter-btn:active {
   transform: scale(0.97);
 }
 
@@ -391,16 +431,15 @@
 }
 
 /* ============================================
-   ✅ الهاتف — تصغير فقط (بدون تغيير التخطيط)
+   ✅ الهاتف
    ============================================ */
 @media (max-width: 768px) {
-  .stock-value-card {
+  .stock-value-card,
+  .profit-card {
     padding: 10px 8px;
     border-radius: 12px;
     gap: 8px;
   }
-
-  /* ✅ stock-top-row — لا تغيير (يبقى في صف) */
 
   .stock-hero-card {
     padding: 8px 8px;
@@ -482,7 +521,8 @@
     padding: 3px 8px;
   }
 
-  #stock-chart {
+  #stock-chart,
+  #profit-chart {
     min-height: 260px;
   }
 
@@ -496,7 +536,8 @@
     justify-content: center;
   }
 
-  .filter-btn {
+  .filter-btn,
+  .profit-filter-btn {
     flex: 1;
     padding: 6px 4px;
     font-size: 9px;
@@ -540,7 +581,8 @@
     font-size: 5px;
   }
 
-  .filter-btn {
+  .filter-btn,
+  .profit-filter-btn {
     font-size: 8px;
     padding: 5px 4px;
   }

@@ -1,8 +1,8 @@
 // ============================================
 // صفحة لوحة التحكم
-// ✅ بطاقة قيمة المخزون + مبيان ApexCharts
+// ✅ بطاقة حركات المخزون (خطان)
+// ✅ بطاقة الأرباح (أعمدة)
 // ✅ استخدام UTC لتفادي فرق التوقيت
-// ✅ خطان (إضافة/إخراج) لكل الأزرار
 // ✅ الأزرار: يوم / 7 أيام / 30 يوم / سنة
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     <h2>لوحة التحكم</h2>
 
     <!-- ══════════════════════════════════════
-         بطاقة قيمة المخزون
+         بطاقة حركات المخزون
          ══════════════════════════════════════ -->
     <div class="stock-value-card">
 
@@ -96,10 +96,90 @@ document.addEventListener('DOMContentLoaded', async () => {
             <button type="button" class="filter-btn active" data-days="30">30 يوم</button>
             <button type="button" class="filter-btn" data-days="365">سنة</button>
           </div>
-          <button type="button" class="filter-details-btn">
-            <i class="far fa-calendar-alt"></i>
-            <span>عرض التفاصيل</span>
-          </button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ══════════════════════════════════════
+         ✅ بطاقة الأرباح
+         ══════════════════════════════════════ -->
+    <div class="profit-card">
+
+      <div class="stock-top-row">
+
+        <div class="stock-right-col">
+
+          <div class="stock-title-section">
+            <div class="stock-title-text">
+              <h3>الأرباح</h3>
+              <p id="profit-subtitle">آخر 30 يوم</p>
+            </div>
+            <div class="stock-title-icon" style="color:#16a34a;">
+              <i class="fas fa-coins"></i>
+            </div>
+          </div>
+
+          <div class="stock-stats-row">
+            <div class="stock-stat-card">
+              <div class="stat-mini-label">أدنى يوم</div>
+              <div class="stat-mini-value" id="profit-min">—</div>
+              <div class="stat-mini-icon down">
+                <i class="fas fa-arrow-down"></i>
+              </div>
+            </div>
+            <div class="stock-stat-card">
+              <div class="stat-mini-label">متوسط اليوم</div>
+              <div class="stat-mini-value" id="profit-avg">—</div>
+              <div class="stat-mini-icon chart">
+                <i class="fas fa-chart-line"></i>
+              </div>
+            </div>
+            <div class="stock-stat-card">
+              <div class="stat-mini-label">أعلى يوم</div>
+              <div class="stat-mini-value" id="profit-max">—</div>
+              <div class="stat-mini-icon up">
+                <i class="fas fa-arrow-up"></i>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="stock-hero-card profit-hero">
+          <div class="stock-hero-icon">
+            <i class="fas fa-coins"></i>
+          </div>
+          <div class="stock-hero-info">
+            <div class="stock-hero-label">إجمالي الربح</div>
+            <div class="stock-hero-value">
+              <span id="profit-total">—</span>
+            </div>
+            <div class="stock-hero-trend up" id="profit-trend">
+              <i class="fas fa-arrow-up"></i>
+              <span>—</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="stock-chart-section">
+        <div class="stock-chart-header">
+          <h3>تطور الأرباح</h3>
+          <span class="stock-chart-badge profit-badge">
+            <i class="fas fa-circle" style="color:#16a34a;"></i> الأرباح
+          </span>
+        </div>
+        <div id="profit-chart"></div>
+
+        <div class="stock-chart-filters">
+          <div class="filters-left">
+            <button type="button" class="profit-filter-btn" data-days="1">يوم</button>
+            <button type="button" class="profit-filter-btn" data-days="7">7 أيام</button>
+            <button type="button" class="profit-filter-btn active" data-days="30">30 يوم</button>
+            <button type="button" class="profit-filter-btn" data-days="365">سنة</button>
+          </div>
         </div>
       </div>
 
@@ -134,7 +214,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   await loadStats();
   await loadStockChart(30);
+  await loadProfitChart(30);
   setupChartFilters();
+  setupProfitFilters();
 });
 
 // ============================================
@@ -161,7 +243,7 @@ async function loadStats() {
 }
 
 // ============================================
-// ✅ حساب عمليات المخزون (يومي أو لكل عملية)
+// ✅ حساب عمليات المخزون
 // ============================================
 async function computeMovementsHistory(days) {
   const now = new Date();
@@ -178,7 +260,6 @@ async function computeMovementsHistory(days) {
     .gte('created_at', startDate.toISOString())
     .order('created_at', { ascending: true });
 
-  // ✅ حالة "يوم" → كل عملية = نقطة
   if (days === 1) {
     const inOps = [];
     const outOps = [];
@@ -193,8 +274,7 @@ async function computeMovementsHistory(days) {
     return { mode: 'per-operation', inOps, outOps };
   }
 
-  // ✅ باقي الأزرار → مجموع يومي
-  const dayMap = {}; // { 'YYYY-MM-DD': { in: x, out: y } }
+  const dayMap = {};
 
   (movements ?? []).forEach(m => {
     const day = m.created_at.slice(0, 10);
@@ -207,11 +287,10 @@ async function computeMovementsHistory(days) {
   const inSeries = [];
   const outSeries = [];
 
-  // إذا "سنة" → تجميع شهري
   if (days >= 365) {
     const monthMap = {};
     Object.keys(dayMap).forEach(day => {
-      const month = day.slice(0, 7); // YYYY-MM
+      const month = day.slice(0, 7);
       if (!monthMap[month]) monthMap[month] = { in: 0, out: 0 };
       monthMap[month].in += dayMap[day].in;
       monthMap[month].out += dayMap[day].out;
@@ -227,7 +306,6 @@ async function computeMovementsHistory(days) {
     return { mode: 'daily', dates, inSeries, outSeries };
   }
 
-  // يومي
   for (let i = 0; i <= days; i++) {
     const date = new Date(startDate.getTime() + i * 24 * 60 * 60 * 1000);
     const key = date.toISOString().slice(0, 10);
@@ -242,14 +320,13 @@ async function computeMovementsHistory(days) {
 }
 
 // ============================================
-// ✅ رسم المبيان
+// ✅ رسم مبيان الحركات
 // ============================================
 let stockChart = null;
 
 async function loadStockChart(days) {
   const data = await computeMovementsHistory(days);
 
-  // ✅ تحديث العناوين
   const subtitleMap = {
     1: 'حركات اليوم (كل عملية = نقطة)',
     7: 'آخر 7 أيام (مجموع يومي)',
@@ -265,7 +342,6 @@ async function loadStockChart(days) {
     '<i class="fas fa-circle" style="color:#f97316;"></i> إخراج';
   document.getElementById('hero-label').textContent = 'إجمالي الحركات';
 
-  // ✅ تحديث الإحصائيات
   let totalIn = 0;
   let totalOut = 0;
   let countIn = 0;
@@ -279,8 +355,7 @@ async function loadStockChart(days) {
     data.outSeries.forEach(v => { totalOut += v; if (v > 0) countOut++; });
   }
 
-  document.getElementById('hero-value').textContent =
-    String(countIn + countOut);
+  document.getElementById('hero-value').textContent = String(countIn + countOut);
 
   const trendEl = document.getElementById('hero-trend');
   trendEl.className = 'stock-hero-trend up';
@@ -290,7 +365,6 @@ async function loadStockChart(days) {
   document.getElementById('stat-avg-value').textContent = String(countIn + countOut);
   document.getElementById('stat-max-value').textContent = String(totalOut);
 
-  // ✅ إذا لا توجد بيانات
   const hasData = data.mode === 'per-operation'
     ? (data.inOps.length + data.outOps.length > 0)
     : (data.inSeries.some(v => v > 0) || data.outSeries.some(v => v > 0));
@@ -302,7 +376,6 @@ async function loadStockChart(days) {
     return;
   }
 
-  // ✅ بناء السلسلتين
   let series;
   let xaxisConfig;
 
@@ -361,11 +434,7 @@ async function loadStockChart(days) {
       hover: { size: data.mode === 'per-operation' ? 10 : 7 },
       shape: 'circle',
     },
-    xaxis: {
-      ...xaxisConfig,
-      axisBorder: { show: false },
-      axisTicks: { show: false },
-    },
+    xaxis: { ...xaxisConfig, axisBorder: { show: false }, axisTicks: { show: false } },
     yaxis: {
       labels: {
         style: { fontSize: '11px', colors: '#a3a3a3' },
@@ -399,11 +468,212 @@ async function loadStockChart(days) {
     },
   };
 
-  if (stockChart) {
-    stockChart.destroy();
-  }
+  if (stockChart) stockChart.destroy();
   stockChart = new ApexCharts(document.getElementById('stock-chart'), options);
   stockChart.render();
+}
+
+// ============================================
+// ✅ حساب الأرباح
+// ============================================
+async function computeProfitHistory(days) {
+  const now = new Date();
+  const startDate = new Date(Date.UTC(
+    now.getUTCFullYear(),
+    now.getUTCMonth(),
+    now.getUTCDate() - days,
+    0, 0, 0, 0
+  ));
+
+  // جلب الإيصالات في الفترة + عناصرها
+  const { data: receipts } = await db
+    .from('receipts')
+    .select('id, created_at')
+    .gte('created_at', startDate.toISOString())
+    .order('created_at', { ascending: true });
+
+  if (!receipts || receipts.length === 0) {
+    return { mode: 'daily', dates: [], profits: [] };
+  }
+
+  const receiptIds = receipts.map(r => r.id);
+
+  const { data: items } = await db
+    .from('receipt_items')
+    .select('receipt_id, profit')
+    .in('receipt_id', receiptIds);
+
+  // خريطة: receipt_id → created_at
+  const receiptCreatedMap = {};
+  receipts.forEach(r => { receiptCreatedMap[r.id] = r.created_at; });
+
+  // يوم → مجموع الربح
+  const dayMap = {};
+  (items ?? []).forEach(it => {
+    const created = receiptCreatedMap[it.receipt_id];
+    if (!created) return;
+    const day = created.slice(0, 10);
+    if (!dayMap[day]) dayMap[day] = 0;
+    dayMap[day] += Number(it.profit ?? 0);
+  });
+
+  // ═══ حالة "يوم" → مجموع كل ساعة ═══
+  if (days === 1) {
+    const hourMap = {};
+    (items ?? []).forEach(it => {
+      const created = receiptCreatedMap[it.receipt_id];
+      if (!created) return;
+      const hourKey = created.slice(0, 13); // YYYY-MM-DDTHH
+      if (!hourMap[hourKey]) hourMap[hourKey] = 0;
+      hourMap[hourKey] += Number(it.profit ?? 0);
+    });
+
+    const hours = Object.keys(hourMap).sort();
+    const dates = hours.map(h => new Date(h + ':00:00Z').getTime());
+    const profits = hours.map(h => Number(hourMap[h].toFixed(2)));
+
+    return { mode: 'hourly', dates, profits };
+  }
+
+  // ═══ حالة "سنة" → تجميع شهري ═══
+  if (days >= 365) {
+    const monthMap = {};
+    Object.keys(dayMap).forEach(day => {
+      const month = day.slice(0, 7);
+      if (!monthMap[month]) monthMap[month] = 0;
+      monthMap[month] += dayMap[day];
+    });
+
+    const months = Object.keys(monthMap).sort();
+    const dates = months.map(m => new Date(m + '-01T00:00:00Z').getTime());
+    const profits = months.map(m => Number(monthMap[m].toFixed(2)));
+
+    return { mode: 'monthly', dates, profits };
+  }
+
+  // ═══ يومي ═══
+  const dates = [];
+  const profits = [];
+
+  for (let i = 0; i <= days; i++) {
+    const date = new Date(startDate.getTime() + i * 24 * 60 * 60 * 1000);
+    const key = date.toISOString().slice(0, 10);
+    dates.push(date.getTime());
+    profits.push(Number((dayMap[key] ?? 0).toFixed(2)));
+  }
+
+  return { mode: 'daily', dates, profits };
+}
+
+// ============================================
+// ✅ رسم مبيان الأرباح (أعمدة)
+// ============================================
+let profitChart = null;
+
+async function loadProfitChart(days) {
+  const data = await computeProfitHistory(days);
+
+  const subtitleMap = {
+    1: 'أرباح اليوم (مجموع كل ساعة)',
+    7: 'آخر 7 أيام',
+    30: 'آخر 30 يوم',
+    365: 'آخر سنة (مجموع شهري)',
+  };
+  document.getElementById('profit-subtitle').textContent =
+    subtitleMap[days] ?? 'الأرباح';
+
+  // ✅ الإحصائيات
+  const profits = data.profits;
+  const totalProfit = profits.reduce((s, v) => s + v, 0);
+  const minProfit = profits.length > 0 ? Math.min(...profits) : 0;
+  const maxProfit = profits.length > 0 ? Math.max(...profits) : 0;
+  const avgProfit = profits.length > 0 ? totalProfit / profits.length : 0;
+
+  document.getElementById('profit-total').textContent = totalProfit.toFixed(2);
+  document.getElementById('profit-min').textContent = minProfit.toFixed(2);
+  document.getElementById('profit-avg').textContent = avgProfit.toFixed(2);
+  document.getElementById('profit-max').textContent = maxProfit.toFixed(2);
+
+  const trendEl = document.getElementById('profit-trend');
+  trendEl.className = 'stock-hero-trend up';
+  trendEl.innerHTML = `<i class="fas fa-coins"></i> <span>${data.dates.length} فترة</span>`;
+
+  // ✅ إذا لا توجد بيانات
+  const hasData = profits.some(v => v > 0);
+
+  if (!hasData) {
+    if (profitChart) { profitChart.destroy(); profitChart = null; }
+    document.getElementById('profit-chart').innerHTML =
+      '<div style="text-align:center; padding:40px; color:#a3a3a3;">لا توجد أرباح في هذه الفترة</div>';
+    return;
+  }
+
+  const options = {
+    series: [{
+      name: 'الربح',
+      data: profits,
+    }],
+    chart: {
+      type: 'bar',
+      height: 380,
+      toolbar: { show: false },
+      zoom: { enabled: false },
+      fontFamily: 'system-ui, -apple-system, sans-serif',
+      animations: { enabled: true, easing: 'easeinout', speed: 900 },
+    },
+    colors: ['#16a34a'],
+    plotOptions: {
+      bar: {
+        borderRadius: 6,
+        columnWidth: days === 1 ? '60%' : days <= 7 ? '50%' : '65%',
+        distributed: false,
+      },
+    },
+    dataLabels: { enabled: false },
+    xaxis: {
+      type: 'datetime',
+      categories: data.dates,
+      labels: {
+        style: { fontSize: '11px', colors: '#a3a3a3' },
+        datetimeUTC: true,
+        format: days === 1 ? 'HH:mm' : days >= 365 ? 'MMM yyyy' : 'dd MMM',
+      },
+      axisBorder: { show: false },
+      axisTicks: { show: false },
+    },
+    yaxis: {
+      labels: {
+        style: { fontSize: '11px', colors: '#a3a3a3' },
+        formatter: (val) => {
+          if (val >= 1000) return (val / 1000).toFixed(1) + 'k';
+          return val.toFixed(0);
+        },
+      },
+      title: {
+        text: 'الربح',
+        style: { fontSize: '11px', color: '#a3a3a3', fontWeight: 500 },
+      },
+    },
+    grid: {
+      borderColor: '#f0f0f0',
+      strokeDashArray: 4,
+      xaxis: { lines: { show: false } },
+      yaxis: { lines: { show: true } },
+      padding: { left: 8, right: 8 },
+    },
+    tooltip: {
+      theme: 'light',
+      x: { format: days === 1 ? 'HH:mm' : 'dd MMM yyyy' },
+      y: {
+        formatter: (val) => val.toFixed(2),
+        title: { formatter: () => 'الربح: ' },
+      },
+    },
+  };
+
+  if (profitChart) profitChart.destroy();
+  profitChart = new ApexCharts(document.getElementById('profit-chart'), options);
+  profitChart.render();
 }
 
 // ============================================
@@ -417,6 +687,18 @@ function setupChartFilters() {
 
       const days = Number(btn.dataset.days);
       await loadStockChart(days);
+    });
+  });
+}
+
+function setupProfitFilters() {
+  document.querySelectorAll('.profit-filter-btn').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      document.querySelectorAll('.profit-filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+
+      const days = Number(btn.dataset.days);
+      await loadProfitChart(days);
     });
   });
 }
