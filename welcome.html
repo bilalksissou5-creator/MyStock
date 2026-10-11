@@ -1,13 +1,19 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html>
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <meta name="theme-color" content="#171717">
   <title>MyStock</title>
 
-  <!-- ✅ تشغيل اللغة فوراً قبل CSS -->
-  <script src="/js/core/lang-boot.js"></script>
+  <!-- ✅ تطبيق اللغة فوراً قبل أي CSS -->
+  <script>
+    (function() {
+      var lang = localStorage.getItem('app_lang') || 'ar';
+      document.documentElement.lang = lang;
+      document.documentElement.dir = (lang === 'ar') ? 'rtl' : 'ltr';
+    })();
+  </script>
 
   <link rel="stylesheet" href="/assets/css/common.css">
   <link rel="stylesheet" href="/assets/css/pages/welcome.css">
