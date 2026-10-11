@@ -88,7 +88,8 @@ body.subscription-page {
   border-radius: 14px;
   padding: 20px 18px;
   margin-bottom: 20px;
-  text-align: right;
+  /* ✅ الاتجاه يعتمد على dir */
+  text-align: start;
 }
 
 .plan-header {
@@ -144,6 +145,18 @@ body.subscription-page {
   font-size: 13px;
   color: #404040;
   font-weight: 500;
+  /* ✅ يتبع اتجاه الصفحة تلقائياً */
+  text-align: start;
+}
+
+/* ✅ في RTL: الأيقونة على اليمين والنص بعدها */
+html[dir="rtl"] .plan-features li {
+  flex-direction: row;
+}
+
+/* ✅ في LTR: الأيقونة على اليسار والنص بعدها */
+html[dir="ltr"] .plan-features li {
+  flex-direction: row;
 }
 
 .plan-features li i {
@@ -252,7 +265,8 @@ body.subscription-page {
   border-radius: 8px;
   margin-bottom: 12px;
   font-size: 13px;
-  text-align: right;
+  /* ✅ يتبع اتجاه الصفحة */
+  text-align: start;
 }
 
 .alert-error {
