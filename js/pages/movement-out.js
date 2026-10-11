@@ -5,6 +5,7 @@
 // ✅ تعديل الكمية بعد المسح يُحدّث البطاقة
 // ✅ يدعم الكميات العشرية (0.5، 1.75...)
 // ✅ سعر البيع الخاص بالمنتج (sell_price)
+// ✅ حفظ cost_price + profit في receipt_items
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   if (window.__movementOutLoaded) return;
@@ -27,9 +28,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     .single();
 
   // ═══════════════════════════════════════════
-  // ✅ حساب سعر البيع:
-  //    1. إذا sell_price_enabled && sell_price > 0 → sell_price
-  //    2. وإلا → price (سعر الشراء)
+  // ✅ حساب سعر البيع
   // ═══════════════════════════════════════════
   function getSellingPrice(product) {
     const sellPrice = Number(product.sell_price ?? 0);
@@ -367,6 +366,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     const sellingPrice = getSellingPrice(found);
+    const costPrice = Number(found.price ?? 0);
 
     addedProducts.push({
       id: found.id,
@@ -375,6 +375,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       image_url: found.image_url,
       qty: 1,
       price: sellingPrice,
+      costPrice: costPrice,        // ✅ سعر الشراء الأصلي
       available: available,
     });
 
@@ -500,11 +501,13 @@ document.addEventListener('DOMContentLoaded', async () => {
       return;
     }
 
+    const costPrice = Number(selectedProduct.price ?? 0);
     const existing = addedProducts.find(p => p.id === selectedProduct.id);
 
     if (existing) {
       existing.qty = qty;
       existing.price = price;
+      existing.costPrice = costPrice;
       renderAddedProducts();
       isAdding = false;
       addBtn.disabled = false;
@@ -518,6 +521,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       image_url: selectedProduct.image_url,
       qty: qty,
       price: price,
+      costPrice: costPrice,        // ✅ سعر الشراء الأصلي
       available: available,
     });
 
@@ -623,14 +627,23 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       if (receiptErr) throw new Error('فشل إنشاء الإيصال: ' + receiptErr.message);
 
-      const receiptItems = addedProducts.map(p => ({
-        receipt_id: newReceipt.id,
-        product_id: p.id,
-        product_name: p.name,
-        qty: Number(p.qty),
-        price: Number(p.price),
-        total: Number(p.qty) * Number(p.price),
-      }));
+      // ✅ حفظ cost_price + profit لكل عنصر
+      const receiptItems = addedProducts.map(p => {
+        const qty = Number(p.qty);
+        const price = Number(p.price);
+        const costPrice = Number(p.costPrice ?? 0);
+
+        return {
+          receipt_id: newReceipt.id,
+          product_id: p.id,
+          product_name: p.name,
+          qty: qty,
+          price: price,                  // سعر البيع
+          cost_price: costPrice,         // ✅ سعر الشراء
+          profit: (price - costPrice) * qty, // ✅ الربح الإجمالي
+          total: qty * price,
+        };
+      });
 
       const { error: itemsErr } = await db
         .from('receipt_items')
