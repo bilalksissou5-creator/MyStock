@@ -99,39 +99,35 @@ document.addEventListener('DOMContentLoaded', async () => {
       <h2>العمال</h2>
     </div>
 
-    <div class="workers-wrapper">
+    <!-- ══════ قسم النواب ══════ -->
+    ${deputies.length > 0 ? buildTeamSection({
+      id: 'deputies',
+      icon: 'fa-star',
+      iconColor: '#fbbf24',
+      label: 'النواب',
+      count: deputies.length,
+      content: `<div class="team-grid">${deputies.map(w => buildMemberCard(w, 'deputy')).join('')}</div>`,
+    }) : `
+      <div class="empty-state">
+        <i class="fas fa-star" style="color:#d4d4d4;"></i>
+        <p>لا يوجد نواب</p>
+      </div>
+    `}
 
-      <!-- ══════ قسم النواب ══════ -->
-      ${deputies.length > 0 ? buildTeamSection({
-        id: 'deputies',
-        icon: 'fa-star',
-        iconColor: '#fbbf24',
-        label: 'النواب',
-        count: deputies.length,
-        content: `<div class="team-grid">${deputies.map(w => buildMemberCard(w, 'deputy')).join('')}</div>`,
-      }) : `
-        <div class="empty-state">
-          <i class="fas fa-star" style="color:#d4d4d4;"></i>
-          <p>لا يوجد نواب</p>
-        </div>
-      `}
-
-      <!-- ══════ قسم العمال ══════ -->
-      ${workers.length > 0 ? buildTeamSection({
-        id: 'workers',
-        icon: 'fa-users',
-        iconColor: '#171717',
-        label: 'العمال',
-        count: workers.length,
-        content: `<div class="team-grid">${workers.map(w => buildMemberCard(w, 'worker')).join('')}</div>`,
-      }) : `
-        <div class="empty-state">
-          <i class="fas fa-users" style="color:#d4d4d4;"></i>
-          <p>لا يوجد عمال</p>
-        </div>
-      `}
-
-    </div>
+    <!-- ══════ قسم العمال ══════ -->
+    ${workers.length > 0 ? buildTeamSection({
+      id: 'workers',
+      icon: 'fa-users',
+      iconColor: '#171717',
+      label: 'العمال',
+      count: workers.length,
+      content: `<div class="team-grid">${workers.map(w => buildMemberCard(w, 'worker')).join('')}</div>`,
+    }) : `
+      <div class="empty-state">
+        <i class="fas fa-users" style="color:#d4d4d4;"></i>
+        <p>لا يوجد عمال</p>
+      </div>
+    `}
   `;
 
   // ═══════════════════════════════════════════
