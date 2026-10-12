@@ -75,23 +75,23 @@ document.addEventListener('DOMContentLoaded', async () => {
       </div>
 
       <h1 class="detail-title">
-        <span class="edit-field" id="f-name" data-value="${product.name ?? ''}">${product.name ?? tr('products_no_name')}</span>
+        <span class="edit-field" id="f-name" data-value="${product.name ?? ''}"></span>
       </h1>
       <p class="detail-sku">
-        <span class="edit-field" id="f-sku" data-value="${product.sku ?? ''}">${product.sku ?? '—'}</span>
+        <span class="edit-field" id="f-sku" data-value="${product.sku ?? ''}"></span>
       </p>
 
       <div class="product-stats">
         <div class="stat">
           <div class="stat-label">${tr('products_qty')}</div>
           <div class="stat-value ${(product.qty ?? 0) < 10 ? 'low' : ''}">
-            <span class="edit-field center" id="f-qty" data-value="${product.qty ?? 0}">${product.qty ?? 0}</span>
+            <span class="edit-field center" id="f-qty" data-value="${product.qty ?? 0}"></span>
           </div>
         </div>
         <div class="stat">
           <div class="stat-label">${tr('prod_detail_buy_price')}</div>
           <div class="stat-value">
-            <span class="edit-field center" id="f-price" data-value="${product.price ?? 0}">${product.price ?? 0}</span>
+            <span class="edit-field center" id="f-price" data-value="${product.price ?? 0}"></span>
           </div>
         </div>
         <div class="stat">
@@ -103,7 +103,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       <div class="product-extra">
         <div class="row">
           <span>${tr('prod_detail_category')}</span>
-          <strong class="edit-field" id="f-category" data-value="${product.category ?? product.suppliers?.specialty ?? ''}">${product.category ?? product.suppliers?.specialty ?? '—'}</strong>
+          <strong class="edit-field" id="f-category" data-value="${product.category ?? product.suppliers?.specialty ?? ''}"></strong>
         </div>
         <div class="row">
           <span>${tr('prod_detail_supplier')}</span>
@@ -111,11 +111,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         </div>
         <div class="row">
           <span>${tr('prod_detail_unit')}</span>
-          <strong class="edit-field" id="f-unit" data-value="${product.unit ?? ''}">${product.unit ?? '—'}</strong>
+          <strong class="edit-field" id="f-unit" data-value="${product.unit ?? ''}"></strong>
         </div>
         <div class="row">
           <span>${tr('prod_detail_barcode')}</span>
-          <strong class="edit-field" id="f-qr_code" data-value="${product.qr_code ?? ''}">${product.qr_code ?? '—'}</strong>
+          <strong class="edit-field" id="f-qr_code" data-value="${product.qr_code ?? ''}"></strong>
         </div>
       </div>
 
