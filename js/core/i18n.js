@@ -423,6 +423,20 @@ const translations = {
     mm_confirm_remove_2: 'تأكيد نهائي: سيتم إخراج',
     mm_success_role: '✅ تم التحويل إلى',
     mm_success_remove: '✅ تم إخراج العضو بنجاح',
+
+    mp_title_full: 'MyStock - ملف العضو',
+    mp_not_found: 'لم يتم العثور على العضو',
+    mp_role_admin: 'مدير',
+    mp_email_protected: 'محمي 🔒',
+    mp_online_now: '🟢 متصل الآن',
+    mp_offline_now: '⚪ غير متصل',
+    mp_manage: 'إدارة',
+    mp_personal_info: 'المعلومات الشخصية',
+    mp_admin: 'المدير',
+    mp_log: 'السجل',
+    mp_invoices: 'الفواتير',
+    mp_out: 'إخراج',
+    mp_no_out: 'لا توجد عمليات إخراج بعد',
   },
 
   fr: {
@@ -839,6 +853,20 @@ const translations = {
     mm_confirm_remove_2: 'Confirmation finale : retirer',
     mm_success_role: '✅ Converti en',
     mm_success_remove: '✅ Membre retiré avec succès',
+
+    mp_title_full: 'MyStock - Profil du membre',
+    mp_not_found: 'Membre introuvable',
+    mp_role_admin: 'Admin',
+    mp_email_protected: 'Protégé 🔒',
+    mp_online_now: '🟢 En ligne',
+    mp_offline_now: '⚪ Hors ligne',
+    mp_manage: 'Gérer',
+    mp_personal_info: 'Informations personnelles',
+    mp_admin: 'Admin',
+    mp_log: 'Journal',
+    mp_invoices: 'Factures',
+    mp_out: 'Sorties',
+    mp_no_out: 'Aucune sortie pour le moment',
   },
 
   en: {
@@ -1254,6 +1282,20 @@ const translations = {
     mm_confirm_remove_2: 'Final confirmation: remove',
     mm_success_role: '✅ Converted to',
     mm_success_remove: '✅ Member removed successfully',
+
+    mp_title_full: 'MyStock - Member Profile',
+    mp_not_found: 'Member not found',
+    mp_role_admin: 'Admin',
+    mp_email_protected: 'Protected 🔒',
+    mp_online_now: '🟢 Online now',
+    mp_offline_now: '⚪ Offline',
+    mp_manage: 'Manage',
+    mp_personal_info: 'Personal Information',
+    mp_admin: 'Admin',
+    mp_log: 'Log',
+    mp_invoices: 'Invoices',
+    mp_out: 'Outputs',
+    mp_no_out: 'No outputs yet',
   },
 
   
