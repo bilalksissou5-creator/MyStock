@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             <div class="settings-title">${tr('stg_profile')}</div>
             <div class="settings-subtitle">${tr('stg_profile_sub')}</div>
           </div>
-          <i class="fas fa-chevron-left settings-arrow"></i>
+          <i class="fas fa-chevron-right settings-arrow"></i>
         </a>
       </div>
 
@@ -41,7 +41,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           <div class="settings-text">
             <div class="settings-title">${tr('stg_admin_panel')}</div>
           </div>
-          <i class="fas fa-chevron-left settings-arrow"></i>
+          <i class="fas fa-chevron-right settings-arrow"></i>
         </div>
       </div>
 
@@ -53,7 +53,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           <div class="settings-text">
             <div class="settings-title">${tr('stg_notifications')}</div>
           </div>
-          <i class="fas fa-chevron-left settings-arrow"></i>
+          <i class="fas fa-chevron-right settings-arrow"></i>
         </div>
       </div>
 
@@ -66,7 +66,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           <div class="settings-text">
             <div class="settings-title">${tr('stg_update')}</div>
           </div>
-          <i class="fas fa-chevron-left settings-arrow"></i>
+          <i class="fas fa-chevron-right settings-arrow"></i>
         </div>
 
         <div class="settings-item" id="about-app-item">
@@ -76,7 +76,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           <div class="settings-text">
             <div class="settings-title">${tr('stg_about')}</div>
           </div>
-          <i class="fas fa-chevron-left settings-arrow"></i>
+          <i class="fas fa-chevron-right settings-arrow"></i>
         </div>
 
       </div>
