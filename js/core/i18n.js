@@ -328,6 +328,13 @@ const translations = {
     rcpt_thanks: 'شكراً لزيارتكم',
     rcpt_print: 'طباعة',
     rcpt_back: 'العودة',
+
+    rpt_title_full: 'MyStock - طباعة الإيصالات',
+    rpt_no_new: 'لا توجد إيصالات جديدة',
+    rpt_no_new_msg: 'جميع الإيصالات السابقة تمت طباعتها',
+    rpt_count: 'عدد الإيصالات',
+    rpt_total_qty: 'إجمالي الكمية',
+    rpt_print_all: 'طباعة الكل',
   },
 
   fr: {
@@ -649,6 +656,13 @@ const translations = {
     rcpt_thanks: 'Merci de votre visite',
     rcpt_print: 'Imprimer',
     rcpt_back: 'Retour',
+
+    rpt_title_full: 'MyStock - Imprimer les reçus',
+    rpt_no_new: 'Aucun nouveau reçu',
+    rpt_no_new_msg: 'Tous les reçus ont déjà été imprimés',
+    rpt_count: 'Nombre de reçus',
+    rpt_total_qty: 'Quantité totale',
+    rpt_print_all: 'Tout imprimer',
   },
 
   en: {
@@ -969,6 +983,13 @@ const translations = {
     rcpt_thanks: 'Thank you for your visit',
     rcpt_print: 'Print',
     rcpt_back: 'Back',
+
+    rpt_title_full: 'MyStock - Print Receipts',
+    rpt_no_new: 'No new receipts',
+    rpt_no_new_msg: 'All previous receipts have been printed',
+    rpt_count: 'Receipts count',
+    rpt_total_qty: 'Total quantity',
+    rpt_print_all: 'Print All',
   },
 
   

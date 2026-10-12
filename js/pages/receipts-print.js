@@ -1,16 +1,18 @@
 // ============================================
 // صفحة طباعة الإيصالات المجمّعة (80mm)
-// ✅ تجمع كل الإيصالات غير المطبوعة
-// ✅ كل إيصال منفصل بفاصل زمني
-// ✅ المجموع الكلي في الأسفل
+// ✅ دعم كامل للترجمة
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   const user = await requireAuth();
   if (!user) return;
 
+  if (window.applyLanguage) window.applyLanguage();
+  const tr = (key) => (window.t ? window.t(key) : key);
+
+  document.title = tr('rpt_title_full');
+
   const container = document.getElementById('print-content');
 
-  // 1. جلب بروفايل المستخدم
   const { data: profile } = await db
     .from('profiles')
     .select('organization_id, full_name')
@@ -18,18 +20,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     .single();
 
   if (!profile?.organization_id) {
-    container.innerHTML = `<div class="alert alert-error">لا يمكن تحديد المنظمة</div>`;
+    container.innerHTML = `<div class="alert alert-error">${tr('sub_no_org')}</div>`;
     return;
   }
 
-  // 2. جلب المنظمة
   const { data: org } = await db
     .from('organizations')
     .select('name, logo_url, logo_shape')
     .eq('id', profile.organization_id)
     .single();
 
-  // 3. جلب الإيصالات غير المطبوعة
   const { data: receipts, error } = await db
     .from('receipts')
     .select('*')
@@ -38,7 +38,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     .order('created_at', { ascending: true });
 
   if (error) {
-    container.innerHTML = `<div class="alert alert-error">خطأ: ${error.message}</div>`;
+    container.innerHTML = `<div class="alert alert-error">${tr('prod_detail_err')} ${error.message}</div>`;
     return;
   }
 
@@ -46,18 +46,17 @@ document.addEventListener('DOMContentLoaded', async () => {
     container.innerHTML = `
       <div class="print-empty">
         <i class="fas fa-check-circle" style="color:#22c55e; font-size:40px; margin-bottom:12px;"></i>
-        <p style="font-size:16px; font-weight:700;">لا توجد إيصالات جديدة</p>
-        <p style="color:#737373;">جميع الإيصالات السابقة تمت طباعتها</p>
+        <p style="font-size:16px; font-weight:700;">${tr('rpt_no_new')}</p>
+        <p style="color:#737373;">${tr('rpt_no_new_msg')}</p>
         <a href="/profile.html" class="btn-secondary" style="margin-top:16px; display:inline-flex;">
           <i class="fas fa-arrow-right"></i>
-          <span>العودة</span>
+          <span>${tr('prod_detail_back')}</span>
         </a>
       </div>
     `;
     return;
   }
 
-  // 4. جلب عناصر كل إيصال
   const receiptIds = receipts.map(r => r.id);
   const { data: allItems } = await db
     .from('receipt_items')
@@ -65,7 +64,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     .in('receipt_id', receiptIds)
     .order('created_at', { ascending: true });
 
-  // 5. تجميع العناصر حسب receipt_id
   const itemsByReceipt = {};
   (allItems ?? []).forEach(item => {
     if (!itemsByReceipt[item.receipt_id]) {
@@ -74,7 +72,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     itemsByReceipt[item.receipt_id].push(item);
   });
 
-  // 6. بناء الواجهة
   renderPrint({
     receipts,
     itemsByReceipt,
@@ -82,23 +79,19 @@ document.addEventListener('DOMContentLoaded', async () => {
     profile,
   });
 
-  // 7. زر الطباعة
   const printBtn = document.getElementById('print-btn');
   if (printBtn) {
     printBtn.addEventListener('click', async () => {
-      // علّم الإيصالات كمطبوعة
       const now = new Date().toISOString();
       await db
         .from('receipts')
         .update({ printed_at: now })
         .in('id', receiptIds);
 
-      // احفظ تقريراً
       const totalReceipts = receipts.length;
       const totalQty = receipts.reduce((s, r) => s + Number(r.total_qty ?? 0), 0);
       const totalValue = receipts.reduce((s, r) => s + Number(r.total_value ?? 0), 0);
 
-      // رقم التقرير التسلسلي
       const { data: lastReport } = await db
         .from('daily_reports')
         .select('report_number')
@@ -124,38 +117,36 @@ document.addEventListener('DOMContentLoaded', async () => {
         receipt_ids: receiptIds,
       });
 
-      // اطبع
       window.print();
     });
   }
 });
 
-// ============================================
-// بناء الواجهة
-// ============================================
 function renderPrint({ receipts, itemsByReceipt, org, profile }) {
+  const tr = (key) => (window.t ? window.t(key) : key);
+  const lang = window.getCurrentLang ? window.getCurrentLang() : 'ar';
+  const localeMap = { ar: 'ar-MA', fr: 'fr-FR', en: 'en-US' };
+  const locale = localeMap[lang] || 'en-US';
+
   const container = document.getElementById('print-content');
 
   const logoShape = org?.logo_shape || 'circle';
 
-  // الإجماليات
   const totalReceipts = receipts.length;
   const totalQty = receipts.reduce((s, r) => s + Number(r.total_qty ?? 0), 0);
   const totalValue = receipts.reduce((s, r) => s + Number(r.total_value ?? 0), 0);
 
-  // ══════ بناء الإيصالات ══════
   let receiptsHTML = '';
   let lastTime = '';
 
   receipts.forEach((receipt, idx) => {
     const date = new Date(receipt.created_at);
-    const dateStr = date.toLocaleDateString('ar-MA');
-    const timeStr = date.toLocaleTimeString('ar-MA', { hour: '2-digit', minute: '2-digit' });
+    const dateStr = date.toLocaleDateString(locale);
+    const timeStr = date.toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit' });
 
     const items = itemsByReceipt[receipt.id] ?? [];
     const total = Number(receipt.total_value ?? 0);
 
-    // الفاصل الزمني (بين الإيصالات)
     let separator = '';
     if (idx > 0 && timeStr !== lastTime) {
       separator = `
@@ -168,7 +159,6 @@ function renderPrint({ receipts, itemsByReceipt, org, profile }) {
     }
     lastTime = timeStr;
 
-    // أول إيصال: مع الشعار + اسم المنظمة
     const isFirst = idx === 0;
 
     receiptsHTML += `
@@ -187,12 +177,12 @@ function renderPrint({ receipts, itemsByReceipt, org, profile }) {
           <div class="rp-divider-solid"></div>
         ` : ''}
 
-        <div class="rp-receipt-num">إيصال رقم: <strong>${receipt.receipt_number}</strong></div>
+        <div class="rp-receipt-num">${tr('rcpt_number')} <strong>${receipt.receipt_number}</strong></div>
         <div class="rp-divider-dashed"></div>
 
         <div class="rp-table">
           ${items.length === 0 ? `
-            <div class="rp-empty">لا توجد عناصر</div>
+            <div class="rp-empty">${tr('rcpt_no_items')}</div>
           ` : items.map(item => `
             <div class="rp-line">
               <span class="rp-name">${item.product_name}</span>
@@ -206,18 +196,17 @@ function renderPrint({ receipts, itemsByReceipt, org, profile }) {
         <div class="rp-divider-solid"></div>
 
         <div class="rp-total-row">
-          المجموع الكلي: <strong>${total.toFixed(2)}</strong>
+          ${tr('rcpt_total')} <strong>${total.toFixed(2)}</strong>
         </div>
 
         <div class="rp-divider-solid"></div>
 
-        <div class="rp-date">التاريخ: ${dateStr}</div>
-        <div class="rp-time">الوقت: ${timeStr}</div>
+        <div class="rp-date">${tr('rcpt_date')} ${dateStr}</div>
+        <div class="rp-time">${tr('rcpt_time')} ${timeStr}</div>
       </div>
     `;
   });
 
-  // ══════ الملخص النهائي ══════
   const summaryHTML = `
     <div class="rp-separator-final">
       <div class="rp-separator-line"></div>
@@ -225,15 +214,15 @@ function renderPrint({ receipts, itemsByReceipt, org, profile }) {
 
     <div class="rp-summary">
       <div class="rp-summary-row">
-        <span>المجموع الكلي</span>
+        <span>${tr('rcpt_total')}</span>
         <strong>${totalValue.toFixed(2)}</strong>
       </div>
       <div class="rp-summary-row">
-        <span>عدد الإيصالات</span>
+        <span>${tr('rpt_count')}</span>
         <strong>${totalReceipts}</strong>
       </div>
       <div class="rp-summary-row">
-        <span>إجمالي الكمية</span>
+        <span>${tr('rpt_total_qty')}</span>
         <strong>${totalQty}</strong>
       </div>
     </div>
@@ -243,16 +232,15 @@ function renderPrint({ receipts, itemsByReceipt, org, profile }) {
     </div>
   `;
 
-  // ══════ الأزرار (لا تُطبع) ══════
   const actionsHTML = `
     <div class="rp-actions no-print">
       <button class="btn-primary full-width" id="print-btn">
         <i class="fas fa-print"></i>
-        <span>طباعة الكل</span>
+        <span>${tr('rpt_print_all')}</span>
       </button>
       <a href="/profile.html" class="btn-secondary full-width">
         <i class="fas fa-arrow-right"></i>
-        <span>إلغاء</span>
+        <span>${tr('mout_cancel')}</span>
       </a>
     </div>
   `;
