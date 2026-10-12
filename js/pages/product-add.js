@@ -3,6 +3,7 @@
 // ✅ يدعم اللمس + الفأرة + القلم (pointerdown)
 // ✅ ماسح باركود ذكي (نظامك → Open Food Facts)
 // ✅ يحفظ عناصر الفاتورة في invoice_items
+// ✅ دعم كامل للترجمة
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   if (window.__productAddLoaded) return;
@@ -13,6 +14,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   renderLayout('products/add.html');
 
+  if (window.applyLanguage) window.applyLanguage();
+  const tr = (key) => (window.t ? window.t(key) : key);
+
+  document.title = tr('prod_add_title_full');
+
   const main = document.getElementById('main-content');
 
   const { data: suppliers } = await db
@@ -22,10 +28,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   main.innerHTML = `
     <div class="page-header">
-      <h2>إضافة منتجات</h2>
+      <h2>${tr('prod_add_title')}</h2>
       <button type="button" class="btn-primary scan-btn" id="scan-btn">
         <i class="fas fa-barcode"></i>
-        <span>مسح</span>
+        <span>${tr('prod_add_scan')}</span>
       </button>
     </div>
 
@@ -36,8 +42,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       <div class="product-input-card">
         <div class="form-group supplier-group">
-          <label>المورد (لكل المنتجات)</label>
-          <input type="text" id="supplier-input" placeholder="اكتب اسم المورد..." autocomplete="off">
+          <label>${tr('prod_add_supplier')}</label>
+          <input type="text" id="supplier-input" placeholder="${tr('prod_add_supplier_ph')}" autocomplete="off">
           <div id="supplier-suggestions" class="suggestions-box"></div>
           <input type="hidden" id="supplier_id">
         </div>
@@ -46,56 +52,56 @@ document.addEventListener('DOMContentLoaded', async () => {
       <div class="product-input-card">
         <div class="form-grid">
           <div class="form-group">
-            <label>اسم المنتج *</label>
-            <input type="text" id="product-name" placeholder="اسم المنتج...">
+            <label>${tr('prod_add_name')}</label>
+            <input type="text" id="product-name" placeholder="${tr('prod_add_name_ph')}">
           </div>
           <div class="form-group">
-            <label>الكمية *</label>
+            <label>${tr('prod_add_qty')}</label>
             <input type="number" id="product-qty" value="1" min="1">
           </div>
           <div class="form-group">
-            <label>السعر *</label>
+            <label>${tr('prod_add_price')}</label>
             <input type="number" id="product-price" value="0" min="0" step="0.01">
           </div>
         </div>
 
         <div class="form-group">
-          <label>الفئة (تلقائياً من إختصاص المورد)</label>
-          <input type="text" id="product-category" placeholder="الفئة...">
+          <label>${tr('prod_add_category')}</label>
+          <input type="text" id="product-category" placeholder="${tr('prod_add_category_ph')}">
         </div>
 
         <div class="form-group">
-          <label>الباركود (SKU)</label>
-          <input type="text" id="product-sku" placeholder="امسح الباركود أو اكتبه..." dir="ltr">
+          <label>${tr('prod_add_barcode')}</label>
+          <input type="text" id="product-sku" placeholder="${tr('prod_add_barcode_ph')}" dir="ltr">
         </div>
 
         <button type="button" class="btn-primary add-product-btn" id="done-btn">
           <i class="fas fa-check"></i>
-          <span>تم</span>
+          <span>${tr('prod_add_done')}</span>
         </button>
       </div>
 
       <div class="added-products-section">
-        <label class="section-label">المنتجات المضافة</label>
+        <label class="section-label">${tr('prod_add_added')}</label>
         <div id="added-products" class="added-products">
           <div class="empty-added">
             <i class="fas fa-box-open"></i>
-            <p>لم تتم إضافة منتجات بعد</p>
+            <p>${tr('prod_add_empty')}</p>
           </div>
         </div>
       </div>
 
       <div class="form-summary">
         <div class="summary-row">
-          <span>عدد المنتجات</span>
+          <span>${tr('prod_add_sum_count')}</span>
           <strong id="sum-rows">0</strong>
         </div>
         <div class="summary-row">
-          <span>إجمالي الكمية</span>
+          <span>${tr('prod_add_sum_qty')}</span>
           <strong id="sum-qty">0</strong>
         </div>
         <div class="summary-row highlight">
-          <span>القيمة الإجمالية</span>
+          <span>${tr('prod_add_sum_total')}</span>
           <strong id="sum-total">0.00</strong>
         </div>
       </div>
@@ -103,24 +109,23 @@ document.addEventListener('DOMContentLoaded', async () => {
       <div class="form-actions">
         <button type="button" class="btn-primary" id="save-all-btn">
           <i class="fas fa-save"></i>
-          <span>حفظ المنتجات</span>
+          <span>${tr('prod_add_save')}</span>
         </button>
-        <a href="/products/list.html" class="btn-secondary">إلغاء</a>
+        <a href="/products/list.html" class="btn-secondary">${tr('prod_add_cancel')}</a>
       </div>
 
     </div>
 
-    <!-- ✅ Modal الماسح -->
     <div class="scanner-modal" id="scanner-modal" style="display:none;">
       <div class="scanner-box">
         <div class="scanner-header">
-          <h3>امسح الباركود</h3>
+          <h3>${tr('prod_add_scan_title')}</h3>
           <button type="button" class="scanner-close" id="scanner-close">
             <i class="fas fa-xmark"></i>
           </button>
         </div>
         <div id="scanner-reader" class="scanner-reader"></div>
-        <p class="scanner-hint" id="scanner-hint">وجّه الكاميرا نحو الباركود</p>
+        <p class="scanner-hint" id="scanner-hint">${tr('prod_add_scan_hint')}</p>
       </div>
     </div>
   `;
@@ -187,14 +192,14 @@ document.addEventListener('DOMContentLoaded', async () => {
             <i class="fas fa-plus"></i>
           </div>
           <div class="suggestion-info">
-            <strong>إضافة مورد جديد</strong>
+            <strong>${tr('prod_add_new_supplier')}</strong>
             <span class="suggestion-sku">"${filter.trim()}"</span>
           </div>
         </div>
       `;
     }
 
-    suggestions.innerHTML = html || '<div class="suggestion-empty">لا توجد نتائج</div>';
+    suggestions.innerHTML = html || `<div class="suggestion-empty">${tr('prod_add_no_results')}</div>`;
     suggestions.style.display = 'block';
 
     suggestions.querySelectorAll('.suggestion-card').forEach(card => {
@@ -239,17 +244,17 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
 
   // ============================================
-  // ✅ الماسح (html5-qrcode)
+  // ✅ الماسح
   // ============================================
   async function startScanner() {
     if (typeof Html5Qrcode === 'undefined') {
-      alert('مكتبة الماسح غير محمّلة');
+      alert(tr('prod_add_scanner_err'));
       return;
     }
 
     scannerModal.style.display = 'flex';
     scannerReader.innerHTML = '';
-    scannerHint.textContent = 'وجّه الكاميرا نحو الباركود';
+    scannerHint.textContent = tr('prod_add_scan_hint');
 
     try {
       html5QrCode = new Html5Qrcode("scanner-reader");
@@ -267,10 +272,10 @@ document.addEventListener('DOMContentLoaded', async () => {
           await handleScan(decodedText);
           await stopScanner();
         },
-        () => { /* تجاهل */ }
+        () => { }
       );
     } catch (err) {
-      alert('تعذّر فتح الكاميرا: ' + err.message);
+      alert(tr('prod_add_camera_err') + ' ' + err.message);
       scannerModal.style.display = 'none';
     }
   }
@@ -280,20 +285,16 @@ document.addEventListener('DOMContentLoaded', async () => {
       try {
         await html5QrCode.stop();
         await html5QrCode.clear();
-      } catch (e) { /* تجاهل */ }
+      } catch (e) { }
       html5QrCode = null;
     }
     scannerModal.style.display = 'none';
   }
 
-  // ✅ معالج المسح الذكي (3 مراحل)
   async function handleScan(barcode) {
     const value = String(barcode).trim();
     if (!value) return;
 
-    // ═══════════════════════════════════════════
-    // 1️⃣ المرحلة الأولى: ابحث في products (نظامك)
-    // ═══════════════════════════════════════════
     const { data: profile } = await db
       .from('profiles')
       .select('organization_id')
@@ -321,10 +322,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       return;
     }
 
-    // ═══════════════════════════════════════════
-    // 2️⃣ المرحلة الثانية: ابحث في Open Food Facts
-    // ═══════════════════════════════════════════
-    scannerHint.textContent = '🔍 جارٍ البحث في قاعدة البيانات العالمية...';
+    scannerHint.textContent = tr('prod_add_searching');
 
     try {
       const res = await fetch(`https://world.openfoodfacts.org/api/v2/product/${encodeURIComponent(value)}.json`);
@@ -365,9 +363,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       console.warn('Open Food Facts error:', err);
     }
 
-    // ═══════════════════════════════════════════
-    // 3️⃣ المرحلة الثالثة: الباركود فقط
-    // ═══════════════════════════════════════════
     skuInput.value = value;
     scannedImageUrl = null;
     nameInput.focus();
@@ -388,7 +383,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       addedContainer.innerHTML = `
         <div class="empty-added">
           <i class="fas fa-box-open"></i>
-          <p>لم تتم إضافة منتجات بعد</p>
+          <p>${tr('prod_add_empty')}</p>
         </div>
       `;
       updateSummary();
@@ -408,19 +403,19 @@ document.addEventListener('DOMContentLoaded', async () => {
         </div>
         <div class="added-product-stats">
           <div class="stat-mini">
-            <span>الكمية</span>
+            <span>${tr('products_qty')}</span>
             <b>${p.qty}</b>
           </div>
           <div class="stat-mini">
-            <span>السعر</span>
+            <span>${tr('products_price')}</span>
             <b>${Number(p.price).toFixed(2)}</b>
           </div>
           <div class="stat-mini highlight">
-            <span>المجموع</span>
+            <span>${tr('products_total')}</span>
             <b>${(Number(p.qty) * Number(p.price)).toFixed(2)}</b>
           </div>
         </div>
-        <button type="button" class="added-product-delete" data-index="${index}" title="حذف">
+        <button type="button" class="added-product-delete" data-index="${index}" title="${tr('prod_add_delete')}">
           <i class="fas fa-xmark"></i>
         </button>
       </div>
@@ -468,7 +463,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const sku = skuInput.value.trim() || ('SKU-' + Date.now() + '-' + Math.floor(Math.random() * 10000));
 
     if (!name) {
-      errBox.textContent = 'اسم المنتج مطلوب';
+      errBox.textContent = tr('prod_add_err_name');
       errBox.style.display = 'block';
       nameInput.focus();
       isAddingProduct = false;
@@ -477,7 +472,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     if (qty <= 0) {
-      errBox.textContent = 'الكمية يجب أن تكون أكبر من صفر';
+      errBox.textContent = tr('prod_add_err_qty');
       errBox.style.display = 'block';
       qtyInput.focus();
       isAddingProduct = false;
@@ -533,14 +528,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     successBox.style.display = 'none';
 
     if (addedProducts.length === 0) {
-      errBox.textContent = 'أضف منتجاً واحداً على الأقل';
+      errBox.textContent = tr('prod_add_err_empty');
       errBox.style.display = 'block';
       isSaving = false;
       saveAllBtn.disabled = false;
       return;
     }
 
-    saveAllBtn.querySelector('span').textContent = 'جارٍ الحفظ...';
+    saveAllBtn.querySelector('span').textContent = tr('prod_add_saving');
 
     try {
       const { data: { user: authUser } } = await db.auth.getUser();
@@ -551,7 +546,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         .single();
 
       if (!profile?.organization_id) {
-        throw new Error('لا يمكن تحديد المنظمة');
+        throw new Error(tr('prod_add_err_org'));
       }
 
       let finalSupplierId = supplierIdInput.value || null;
@@ -583,7 +578,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             .select()
             .single();
 
-          if (supErr) throw new Error('فشل إنشاء المورد: ' + supErr.message);
+          if (supErr) throw new Error(tr('prod_add_err_supplier') + ' ' + supErr.message);
           if (createdSupplier) finalSupplierId = createdSupplier.id;
         }
       }
@@ -616,7 +611,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           .order('created_at', { ascending: true })
           .limit(1);
 
-        if (findErr) throw new Error('فشل البحث: ' + findErr.message);
+        if (findErr) throw new Error(tr('prod_add_err_find') + ' ' + findErr.message);
         const matchedProduct = matchedRows?.[0] ?? null;
 
         let productId;
@@ -629,7 +624,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             .update({ invoice_id: invoiceNumber })
             .eq('id', productId);
 
-          if (linkErr) throw new Error('فشل ربط المنتج بالفاتورة: ' + linkErr.message);
+          if (linkErr) throw new Error(tr('prod_add_err_link') + ' ' + linkErr.message);
           updatedCount++;
         } else {
           const { data: newProduct, error: insertError } = await db
@@ -649,7 +644,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             .select()
             .single();
 
-          if (insertError) throw new Error('فشل إدراج المنتج: ' + insertError.message);
+          if (insertError) throw new Error(tr('prod_add_err_insert') + ' ' + insertError.message);
           productId = newProduct.id;
           insertedCount++;
         }
@@ -667,7 +662,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       const totalQty = addedProducts.reduce((s, p) => s + Number(p.qty), 0);
       const totalValue = addedProducts.reduce((s, p) => s + Number(p.qty) * Number(p.price), 0);
 
-      // ✅ 1. إنشاء الفاتورة (مع جلب الـ id)
       const { data: newInvoice, error: invoiceErr } = await db
         .from('invoices')
         .insert({
@@ -682,10 +676,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         .single();
 
       if (invoiceErr) {
-        throw new Error('فشل إنشاء الفاتورة: ' + invoiceErr.message);
+        throw new Error(tr('prod_add_err_invoice') + ' ' + invoiceErr.message);
       }
 
-      // ✅ 2. إدراج عناصر الفاتورة في invoice_items
       const invoiceItems = addedProducts.map(p => ({
         invoice_id: newInvoice.id,
         product_id: null,
@@ -707,8 +700,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         try {
           await notifyOrganization({
             orgId: profile.organization_id,
-            title: 'فاتورة جديدة',
-            message: `${profile.full_name || 'مستخدم'} أنشأ فاتورة ${invoiceNumber} (${totalQty} قطعة - ${totalValue.toFixed(2)})`,
+            title: tr('prod_add_notif_title'),
+            message: `${profile.full_name || tr('prod_detail_user')} ${tr('prod_add_notif_msg')} ${invoiceNumber} (${totalQty} - ${totalValue.toFixed(2)})`,
             type: 'success',
             link: `/invoice.html?id=${encodeURIComponent(invoiceNumber)}`,
             userName: profile.full_name || null,
@@ -725,7 +718,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       supplierInput.dataset.isNew = 'false';
       supplierIdInput.value = finalSupplierId || '';
 
-      successBox.textContent = `✅ جديد: ${insertedCount} | محدّث: ${updatedCount} | فاتورة: ${invoiceNumber}`;
+      successBox.textContent = `${tr('prod_add_new_count')} ${insertedCount} | ${tr('prod_add_upd_count')} ${updatedCount} | ${tr('prod_add_invoice_count')} ${invoiceNumber}`;
       successBox.style.display = 'block';
 
       setTimeout(() => {
@@ -736,7 +729,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       errBox.textContent = error.message;
       errBox.style.display = 'block';
       saveAllBtn.disabled = false;
-      saveAllBtn.querySelector('span').textContent = 'حفظ المنتجات';
+      saveAllBtn.querySelector('span').textContent = tr('prod_add_save');
       isSaving = false;
     }
   });
