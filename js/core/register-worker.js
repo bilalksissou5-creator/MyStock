@@ -1,7 +1,13 @@
 // ============================================
 // صفحة تسجيل العامل (عبر دعوة)
+// ✅ دعم كامل للترجمة
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
+
+  if (window.applyLanguage) window.applyLanguage();
+  const tr = (key) => (window.t ? window.t(key) : key);
+
+  document.title = tr('rw_title_full');
 
   // إظهار/إخفاء كلمات السر
   document.querySelectorAll('.toggle-password').forEach(btn => {
@@ -16,7 +22,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   });
 
-  // قراءة التوكن من الرابط
   const params = new URLSearchParams(window.location.search);
   const token = params.get('token');
 
@@ -30,11 +35,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   if (!token) {
-    showError('رابط الدعوة غير صالح');
+    showError(tr('rw_err_token'));
     return;
   }
 
-  // جلب بيانات الدعوة
   const { data: invite, error: inviteErr } = await db
     .from('worker_invites')
     .select('*')
@@ -44,21 +48,18 @@ document.addEventListener('DOMContentLoaded', async () => {
     .maybeSingle();
 
   if (inviteErr || !invite) {
-    showError('الدعوة غير صالحة أو منتهية');
+    showError(tr('rw_err_invite'));
     return;
   }
 
-  // التحقق من انتهاء الصلاحية
   if (invite.expires_at && new Date(invite.expires_at) < new Date()) {
-    showError('انتهت صلاحية الدعوة');
+    showError(tr('rw_err_expired'));
     return;
   }
 
-  // ملء البريد تلقائياً
   const emailInput = document.getElementById('email');
   emailInput.value = invite.email || '';
 
-  // نموذج التسجيل
   const form = document.getElementById('register-worker-form');
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -75,32 +76,31 @@ document.addEventListener('DOMContentLoaded', async () => {
     const passwordConfirm = document.getElementById('password_confirm').value;
 
     if (!firstName || !lastName) {
-      showError('الاسم الكامل مطلوب');
+      showError(tr('rw_err_name'));
       return;
     }
 
     if (!phone) {
-      showError('رقم الهاتف مطلوب');
+      showError(tr('rw_err_phone'));
       return;
     }
 
     if (password !== passwordConfirm) {
-      showError('كلمتا السر غير متطابقتين');
+      showError(tr('prod_add_err_qty').replace('الكمية', '').trim() || 'Passwords do not match');
       return;
     }
 
     if (password.length < 6) {
-      showError('كلمة السر يجب أن تكون 6 أحرف على الأقل');
+      showError(tr('rw_err_pwd_short'));
       return;
     }
 
     btn.disabled = true;
-    btn.querySelector('span').textContent = 'جارٍ إنشاء الحساب...';
+    btn.querySelector('span').textContent = tr('rw_creating');
 
     try {
       const fullName = `${firstName} ${lastName}`;
 
-      // 1. إنشاء المستخدم في Auth
       const { data: authData, error: authError } = await db.auth.signUp({
         email: email,
         password: password,
@@ -113,12 +113,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         },
       });
 
-      if (authError) throw new Error('فشل إنشاء الحساب: ' + authError.message);
+      if (authError) throw new Error(tr('rw_err_signup') + ' ' + authError.message);
 
       const userId = authData.user?.id;
-      if (!userId) throw new Error('فشل إنشاء الحساب');
+      if (!userId) throw new Error(tr('rw_err_signup'));
 
-      // 2. تحديث البروفايل (للتأكد من الهاتف)
       await db
         .from('profiles')
         .update({
@@ -127,14 +126,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         })
         .eq('id', userId);
 
-      // 3. تحديث حالة الدعوة
       await db
         .from('worker_invites')
         .update({ status: 'accepted' })
         .eq('id', invite.id);
 
-      // 4. نجاح
-      successBox.textContent = '✅ تم إنشاء حسابك! جارٍ تحويلك...';
+      successBox.textContent = tr('rw_success');
       successBox.style.display = 'block';
 
       setTimeout(() => {
@@ -144,7 +141,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     } catch (err) {
       showError(err.message);
       btn.disabled = false;
-      btn.querySelector('span').textContent = 'إنشاء حسابي';
+      btn.querySelector('span').textContent = tr('rw_create_account');
     }
   });
 });
