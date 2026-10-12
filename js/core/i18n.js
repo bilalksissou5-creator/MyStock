@@ -517,6 +517,15 @@ const translations = {
     oe_err_name: 'اسم المنظمة مطلوب',
     oe_err_symbol: 'رمز العملة مطلوب',
     oe_success: '✅ تم حفظ التعديلات بنجاح',
+
+    stg_title: 'الإعدادات',
+    stg_title_full: 'MyStock - الإعدادات',
+    stg_profile: 'الملف الشخصي',
+    stg_profile_sub: 'تعديل معلوماتك الشخصية',
+    stg_admin_panel: 'الإدارة العامة',
+    stg_notifications: 'الإشعارات',
+    stg_update: 'تحديث التطبيق',
+    stg_about: 'حول التطبيق',
   },
 
   fr: {
@@ -1027,6 +1036,15 @@ const translations = {
     oe_err_name: "Nom de l'organisation requis",
     oe_err_symbol: 'Symbole de devise requis',
     oe_success: '✅ Modifications enregistrées',
+
+    stg_title: 'Paramètres',
+    stg_title_full: 'MyStock - Paramètres',
+    stg_profile: 'Profil',
+    stg_profile_sub: 'Modifier vos informations',
+    stg_admin_panel: 'Administration',
+    stg_notifications: 'Notifications',
+    stg_update: 'Mettre à jour',
+    stg_about: "À propos de l'application",
   },
 
   en: {
@@ -1536,6 +1554,15 @@ const translations = {
     oe_err_name: 'Organization name required',
     oe_err_symbol: 'Currency symbol required',
     oe_success: '✅ Changes saved successfully',
+
+    stg_title: 'Settings',
+    stg_title_full: 'MyStock - Settings',
+    stg_profile: 'Profile',
+    stg_profile_sub: 'Edit your personal information',
+    stg_admin_panel: 'Admin Panel',
+    stg_notifications: 'Notifications',
+    stg_update: 'Update App',
+    stg_about: 'About App',
   },
 
   
