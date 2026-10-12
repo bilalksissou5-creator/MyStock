@@ -1,7 +1,13 @@
 // ============================================
 // صفحة الانضمام — بكود دعوة
+// ✅ دعم كامل للترجمة
 // ============================================
 document.addEventListener('DOMContentLoaded', () => {
+  if (window.applyLanguage) window.applyLanguage();
+  const tr = (key) => (window.t ? window.t(key) : key);
+
+  document.title = tr('jn_title_full');
+
   const codeInput = document.getElementById('invite-code');
   const fullNameInput = document.getElementById('full-name');
   const emailInput = document.getElementById('email');
@@ -10,7 +16,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const errBox = document.getElementById('join-error');
   const successBox = document.getElementById('join-success');
 
-  // ✅ إذا كان الكود في الرابط (?code=123456) — نملؤه تلقائياً
   const params = new URLSearchParams(window.location.search);
   const urlCode = params.get('code');
   if (urlCode) {
@@ -32,7 +37,6 @@ document.addEventListener('DOMContentLoaded', () => {
     successBox.style.display = 'block';
   }
 
-  // فقط أرقام
   codeInput.addEventListener('input', (e) => {
     e.target.value = e.target.value.replace(/\D/g, '').slice(0, 6);
   });
@@ -46,29 +50,27 @@ document.addEventListener('DOMContentLoaded', () => {
     const email = emailInput.value.trim().toLowerCase();
     const password = passwordInput.value;
 
-    // التحقق
     if (code.length !== 6) {
-      showError('الكود يجب أن يكون 6 أرقام');
+      showError(tr('jn_err_code'));
       return;
     }
     if (!fullName) {
-      showError('الاسم مطلوب');
+      showError(tr('rw_err_name'));
       return;
     }
     if (!email || !email.includes('@')) {
-      showError('بريد إلكتروني غير صالح');
+      showError(tr('aw_invalid_email'));
       return;
     }
     if (password.length < 6) {
-      showError('كلمة المرور يجب أن تكون 6 أحرف على الأقل');
+      showError(tr('rw_err_pwd_short'));
       return;
     }
 
     joinBtn.disabled = true;
-    joinBtn.querySelector('span').textContent = 'جارٍ إنشاء الحساب...';
+    joinBtn.querySelector('span').textContent = tr('rw_creating');
 
     try {
-      // 1. التحقق من صحة الكود
       const { data: invite, error: inviteError } = await db
         .from('worker_invites')
         .select('id, status, full_name')
@@ -77,13 +79,12 @@ document.addEventListener('DOMContentLoaded', () => {
         .limit(1)
         .maybeSingle();
 
-      if (inviteError) throw new Error('فشل التحقق: ' + inviteError.message);
+      if (inviteError) throw new Error(tr('jn_err_verify') + ' ' + inviteError.message);
 
       if (!invite) {
-        throw new Error('كود الدعوة غير صالح أو مستخدم مسبقاً');
+        throw new Error(tr('jn_err_invalid_code'));
       }
 
-      // 2. إنشاء الحساب (Trigger handle_new_user سيتولى الباقي)
       const { data: authData, error: authError } = await db.auth.signUp({
         email: email,
         password: password,
@@ -95,10 +96,9 @@ document.addEventListener('DOMContentLoaded', () => {
         },
       });
 
-      if (authError) throw new Error('فشل إنشاء الحساب: ' + authError.message);
+      if (authError) throw new Error(tr('rw_err_signup') + ' ' + authError.message);
 
-      // 3. نجاح
-      showSuccess('✅ تم إنشاء حسابك! جارٍ التحويل...');
+      showSuccess(tr('rw_success'));
 
       setTimeout(() => {
         window.location.href = '/login.html';
@@ -107,11 +107,10 @@ document.addEventListener('DOMContentLoaded', () => {
     } catch (err) {
       showError(err.message);
       joinBtn.disabled = false;
-      joinBtn.querySelector('span').textContent = 'إنشاء حسابي';
+      joinBtn.querySelector('span').textContent = tr('rw_create_account');
     }
   });
 
-  // Enter = إرسال
   [codeInput, fullNameInput, emailInput, passwordInput].forEach(input => {
     input.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') joinBtn.click();

@@ -568,6 +568,14 @@ const translations = {
     sup_det_confirm_del: 'هل أنت متأكد من حذف هذا المورد؟',
     sup_det_notif_del_title: 'حذف مورد',
     sup_det_notif_del_msg: 'حذف المورد',
+
+    jn_title: 'الانضمام للفريق',
+    jn_title_full: 'MyStock - الانضمام للفريق',
+    jn_subtitle: 'أدخل الكود المُرسل إليك من المدير',
+    jn_code: 'كود الدعوة *',
+    jn_err_code: 'الكود يجب أن يكون 6 أرقام',
+    jn_err_verify: 'فشل التحقق:',
+    jn_err_invalid_code: 'كود الدعوة غير صالح أو مستخدم مسبقاً',
   },
 
   fr: {
@@ -1129,6 +1137,14 @@ const translations = {
     sup_det_confirm_del: 'Êtes-vous sûr de vouloir supprimer ce fournisseur ?',
     sup_det_notif_del_title: 'Fournisseur supprimé',
     sup_det_notif_del_msg: 'a supprimé le fournisseur',
+
+    jn_title: "Rejoindre l'équipe",
+    jn_title_full: "MyStock - Rejoindre l'équipe",
+    jn_subtitle: 'Entrez le code envoyé par le gestionnaire',
+    jn_code: "Code d'invitation *",
+    jn_err_code: 'Le code doit contenir 6 chiffres',
+    jn_err_verify: 'Échec de vérification :',
+    jn_err_invalid_code: 'Code invalide ou déjà utilisé',
   },
 
   en: {
@@ -1689,6 +1705,14 @@ const translations = {
     sup_det_confirm_del: 'Are you sure you want to delete this supplier?',
     sup_det_notif_del_title: 'Supplier deleted',
     sup_det_notif_del_msg: 'deleted supplier',
+
+    jn_title: 'Join the Team',
+    jn_title_full: 'MyStock - Join the Team',
+    jn_subtitle: 'Enter the code sent by the manager',
+    jn_code: 'Invitation Code *',
+    jn_err_code: 'Code must be 6 digits',
+    jn_err_verify: 'Verification failed:',
+    jn_err_invalid_code: 'Invalid or already used invitation code',
   },
 
   
