@@ -33,14 +33,20 @@ async function uploadProductImage(file, productId) {
 // إضافة زر تعديل الصورة
 // ============================================
 function attachImageUpload(productId, container, currentUrl) {
-  function bindButton() {
-    const btn = container.querySelector('.image-edit-btn');
-    const input = container.querySelector('input[type="file"]');
-    if (!btn || !input) return;
-    if (btn.dataset.bound === '1') return;
-    btn.dataset.bound = '1';
-    btn.addEventListener('click', () => input.click());
+
+  // إنشاء input مخفي (مرة واحدة)
+  let input = document.getElementById('__img-upload-input');
+  if (!input) {
+    input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.id = '__img-upload-input';
+    input.style.display = 'none';
+    document.body.appendChild(input);
   }
+
+  // ✅ تفريغ الـ input لتفادي مشكلة "نفس الملف لا يُشغّل التغيير"
+  input.value = '';
 
   async function handleFile(e) {
     const file = e.target.files?.[0];
@@ -69,21 +75,29 @@ function attachImageUpload(productId, container, currentUrl) {
       <button class="image-edit-btn" title="تعديل الصورة">
         <i class="fas fa-camera"></i>
       </button>
-      <input type="file" accept="image/*" style="display:none;">
     `;
 
-    const newInput = container.querySelector('input[type="file"]');
-    newInput.addEventListener('change', handleFile);
+    // إعادة الربط
     bindButton();
   }
 
-  // إنشاء input وربطه
-  const input = document.createElement('input');
-  input.type = 'file';
-  input.accept = 'image/*';
-  input.style.display = 'none';
-  input.addEventListener('change', handleFile);
+  // ✅ إزالة المستمع القديم وإضافته من جديد
+  input.onchange = handleFile;
 
-  container.appendChild(input);
+  function bindButton() {
+    const btn = container.querySelector('.image-edit-btn');
+    if (!btn) return;
+
+    // إزالة أي مستمع قديم
+    const newBtn = btn.cloneNode(true);
+    btn.parentNode.replaceChild(newBtn, btn);
+
+    newBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      input.click();
+    });
+  }
+
   bindButton();
 }
