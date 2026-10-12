@@ -40,7 +40,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     .eq('id', user.id)
     .single();
 
-  // إعدادات العملة
   let currencySymbol = '';
   if (profile?.organization_id) {
     const { data: org } = await db
@@ -76,23 +75,23 @@ document.addEventListener('DOMContentLoaded', async () => {
       </div>
 
       <h1 class="detail-title">
-        <span class="edit-field" id="f-name" data-value="${product.name ?? ''}"></span>
+        <span class="edit-field" id="f-name" data-value="${product.name ?? ''}">${product.name ?? tr('products_no_name')}</span>
       </h1>
       <p class="detail-sku">
-        <span class="edit-field" id="f-sku" data-value="${product.sku ?? ''}"></span>
+        <span class="edit-field" id="f-sku" data-value="${product.sku ?? ''}">${product.sku ?? '—'}</span>
       </p>
 
       <div class="product-stats">
         <div class="stat">
           <div class="stat-label">${tr('products_qty')}</div>
           <div class="stat-value ${(product.qty ?? 0) < 10 ? 'low' : ''}">
-            <span class="edit-field center" id="f-qty" data-value="${product.qty ?? 0}"></span>
+            <span class="edit-field center" id="f-qty" data-value="${product.qty ?? 0}">${product.qty ?? 0}</span>
           </div>
         </div>
         <div class="stat">
           <div class="stat-label">${tr('prod_detail_buy_price')}</div>
           <div class="stat-value">
-            <span class="edit-field center" id="f-price" data-value="${product.price ?? 0}"></span>
+            <span class="edit-field center" id="f-price" data-value="${product.price ?? 0}">${product.price ?? 0}</span>
           </div>
         </div>
         <div class="stat">
@@ -104,7 +103,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       <div class="product-extra">
         <div class="row">
           <span>${tr('prod_detail_category')}</span>
-          <strong class="edit-field" id="f-category" data-value="${product.category ?? product.suppliers?.specialty ?? ''}"></strong>
+          <strong class="edit-field" id="f-category" data-value="${product.category ?? product.suppliers?.specialty ?? ''}">${product.category ?? product.suppliers?.specialty ?? '—'}</strong>
         </div>
         <div class="row">
           <span>${tr('prod_detail_supplier')}</span>
@@ -112,15 +111,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         </div>
         <div class="row">
           <span>${tr('prod_detail_unit')}</span>
-          <strong class="edit-field" id="f-unit" data-value="${product.unit ?? ''}"></strong>
+          <strong class="edit-field" id="f-unit" data-value="${product.unit ?? ''}">${product.unit ?? '—'}</strong>
         </div>
         <div class="row">
           <span>${tr('prod_detail_barcode')}</span>
-          <strong class="edit-field" id="f-qr_code" data-value="${product.qr_code ?? ''}"></strong>
+          <strong class="edit-field" id="f-qr_code" data-value="${product.qr_code ?? ''}">${product.qr_code ?? '—'}</strong>
         </div>
       </div>
 
-      <!-- ══════ سعر البيع ══════ -->
       <div class="sell-price-section">
         <h3 class="sell-price-title">💰 ${tr('prod_detail_sell_price')}</h3>
 
@@ -210,9 +208,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   const imgContainer = document.getElementById('product-image-container');
   attachImageUpload(productId, imgContainer, product.image_url);
 
-  // ═══════════════════════════════════════════
-  // ✅ Switch: تفعيل سعر البيع
-  // ═══════════════════════════════════════════
   const sellPriceToggle = document.getElementById('sell-price-toggle');
   const sellPriceStatus = document.getElementById('sell-price-status');
   const sellPriceInput = document.getElementById('sell-price-input');
@@ -221,7 +216,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   sellPriceToggle.addEventListener('change', async () => {
     const newValue = sellPriceToggle.checked;
-
     sellPriceToggle.disabled = true;
 
     try {
@@ -255,9 +249,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   });
 
-  // ═══════════════════════════════════════════
-  // ✅ حفظ سعر البيع عند تغيير القيمة
-  // ═══════════════════════════════════════════
   let sellPriceSaveTimeout = null;
 
   sellPriceInput.addEventListener('input', () => {
@@ -290,9 +281,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     }, 800);
   });
 
-  // ═══════════════════════════════════════════
-  // حذف المنتج
-  // ═══════════════════════════════════════════
   document.getElementById('delete-btn').addEventListener('click', async () => {
     if (!confirm(tr('prod_detail_confirm_delete'))) return;
 
