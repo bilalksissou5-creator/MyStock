@@ -40,7 +40,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     .eq('id', user.id)
     .single();
 
-  // إعدادات العملة
   let currencySymbol = '';
   if (profile?.organization_id) {
     const { data: org } = await db
@@ -120,7 +119,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         </div>
       </div>
 
-      <!-- ══════ سعر البيع ══════ -->
       <div class="sell-price-section">
         <h3 class="sell-price-title">💰 ${tr('prod_detail_sell_price')}</h3>
 
@@ -210,9 +208,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   const imgContainer = document.getElementById('product-image-container');
   attachImageUpload(productId, imgContainer, product.image_url);
 
-  // ═══════════════════════════════════════════
-  // ✅ Switch: تفعيل سعر البيع
-  // ═══════════════════════════════════════════
   const sellPriceToggle = document.getElementById('sell-price-toggle');
   const sellPriceStatus = document.getElementById('sell-price-status');
   const sellPriceInput = document.getElementById('sell-price-input');
@@ -237,7 +232,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       sellPriceStatus.classList.toggle('on', newValue);
       sellPriceStatus.classList.toggle('off', !newValue);
 
-      // إشعار
       if (typeof notifyOrganization === 'function' && profile?.organization_id) {
         await notifyOrganization({
           orgId: profile.organization_id,
@@ -250,16 +244,12 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
     } catch (err) {
       alert(tr('prod_detail_err') + ' ' + err.message);
-      // إرجاع الحالة السابقة
       sellPriceToggle.checked = !newValue;
     } finally {
       sellPriceToggle.disabled = false;
     }
   });
 
-  // ═══════════════════════════════════════════
-  // ✅ حفظ سعر البيع عند تغيير القيمة
-  // ═══════════════════════════════════════════
   let sellPriceSaveTimeout = null;
 
   sellPriceInput.addEventListener('input', () => {
@@ -276,7 +266,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         if (updateError) throw new Error(updateError.message);
 
-        // إشعار
         if (typeof notifyOrganization === 'function' && profile?.organization_id) {
           await notifyOrganization({
             orgId: profile.organization_id,
@@ -290,12 +279,9 @@ document.addEventListener('DOMContentLoaded', async () => {
       } catch (err) {
         console.error('فشل حفظ سعر البيع:', err);
       }
-    }, 800); // ✅ ينتظر 800ms بعد آخر إدخال
+    }, 800);
   });
 
-  // ═══════════════════════════════════════════
-  // حذف المنتج
-  // ═══════════════════════════════════════════
   document.getElementById('delete-btn').addEventListener('click', async () => {
     if (!confirm(tr('prod_detail_confirm_delete'))) return;
 
