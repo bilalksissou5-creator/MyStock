@@ -1,26 +1,40 @@
+// ============================================
+// صفحة الحركات
+// ✅ دعم كامل للترجمة
+// ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   const user = await requireAuth();
   if (!user) return;
 
   renderLayout('movements/list.html');
 
+  if (window.applyLanguage) window.applyLanguage();
+  const tr = (key) => (window.t ? window.t(key) : key);
+
+  document.title = tr('mv_title_full');
+
   const main = document.getElementById('main-content');
   main.innerHTML = `
     <div class="page-header">
-      <h2>الحركات</h2>
+      <h2>${tr('mv_title')}</h2>
       <a href="out.html" class="btn-primary">
         <i class="fas fa-circle-minus"></i>
-        <span>إخراج منتج</span>
+        <span>${tr('mv_out_product')}</span>
       </a>
     </div>
 
-    <div id="movements">جارٍ التحميل...</div>
+    <div id="movements">${tr('loading')}</div>
   `;
 
   await loadMovements();
 });
 
 async function loadMovements() {
+  const tr = (key) => (window.t ? window.t(key) : key);
+  const lang = window.getCurrentLang ? window.getCurrentLang() : 'ar';
+  const localeMap = { ar: 'ar-MA', fr: 'fr-FR', en: 'en-US' };
+  const locale = localeMap[lang] || 'en-US';
+
   const { data, error } = await db
     .from('stock_movements')
     .select('*, products(name, sku)')
@@ -31,7 +45,7 @@ async function loadMovements() {
   if (!container) return;
 
   if (error) {
-    container.innerHTML = `<div class="alert alert-error">خطأ: ${error.message}</div>`;
+    container.innerHTML = `<div class="alert alert-error">${tr('prod_detail_err')} ${error.message}</div>`;
     return;
   }
 
@@ -39,7 +53,7 @@ async function loadMovements() {
     container.innerHTML = `
       <div class="empty-state">
         <i class="fas fa-right-left"></i>
-        <p>لا توجد حركات بعد</p>
+        <p>${tr('mv_empty')}</p>
       </div>
     `;
     return;
@@ -48,9 +62,9 @@ async function loadMovements() {
   container.innerHTML = `
     <div class="movements-list">
       ${data.map(m => {
-        const typeLabel = m.type === 'in' ? 'إدخال' : 'إخراج';
+        const typeLabel = m.type === 'in' ? tr('mv_in') : tr('mv_out');
         const typeClass = m.type === 'in' ? 'in' : 'out';
-        const date = new Date(m.created_at).toLocaleString('ar');
+        const date = new Date(m.created_at).toLocaleString(locale);
 
         return `
           <div class="movement-item">
@@ -58,7 +72,7 @@ async function loadMovements() {
               <i class="fas fa-${m.type === 'in' ? 'arrow-down' : 'arrow-up'}"></i>
             </div>
             <div class="movement-info">
-              <strong>${m.products?.name ?? 'منتج محذوف'}</strong>
+              <strong>${m.products?.name ?? tr('mv_deleted')}</strong>
               <span class="movement-meta">${typeLabel} • ${date}</span>
             </div>
             <div class="movement-qty ${typeClass}">

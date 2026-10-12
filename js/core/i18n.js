@@ -335,6 +335,14 @@ const translations = {
     rpt_count: 'عدد الإيصالات',
     rpt_total_qty: 'إجمالي الكمية',
     rpt_print_all: 'طباعة الكل',
+
+    mv_title: 'الحركات',
+    mv_title_full: 'MyStock - الحركات',
+    mv_out_product: 'إخراج منتج',
+    mv_empty: 'لا توجد حركات بعد',
+    mv_in: 'إدخال',
+    mv_out: 'إخراج',
+    mv_deleted: 'منتج محذوف',
   },
 
   fr: {
@@ -663,6 +671,14 @@ const translations = {
     rpt_count: 'Nombre de reçus',
     rpt_total_qty: 'Quantité totale',
     rpt_print_all: 'Tout imprimer',
+
+    mv_title: 'Mouvements',
+    mv_title_full: 'MyStock - Mouvements',
+    mv_out_product: 'Sortir un produit',
+    mv_empty: 'Aucun mouvement',
+    mv_in: 'Entrée',
+    mv_out: 'Sortie',
+    mv_deleted: 'Produit supprimé',
   },
 
   en: {
@@ -990,6 +1006,14 @@ const translations = {
     rpt_count: 'Receipts count',
     rpt_total_qty: 'Total quantity',
     rpt_print_all: 'Print All',
+
+    mv_title: 'Movements',
+    mv_title_full: 'MyStock - Movements',
+    mv_out_product: 'Output Product',
+    mv_empty: 'No movements yet',
+    mv_in: 'In',
+    mv_out: 'Out',
+    mv_deleted: 'Deleted product',
   },
 
   
