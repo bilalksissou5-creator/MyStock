@@ -1,8 +1,6 @@
 // ============================================
 // صفحة العمال — النواب + العمال فقط
-// ✅ لا يظهر المدير
-// ✅ عند الضغط → /member-profile.html?id=UUID
-// ✅ المحتوى ظاهر دائماً بدون Accordion
+// ✅ دعم كامل للترجمة
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   const user = await requireAuth();
@@ -10,9 +8,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   renderLayout('workers/list.html');
 
+  if (window.applyLanguage) window.applyLanguage();
+  const tr = (key) => (window.t ? window.t(key) : key);
+
+  document.title = tr('wk_title_full');
+
   const main = document.getElementById('main-content');
 
-  // جلب بروفايل المستخدم
   const { data: myProfile } = await db
     .from('profiles')
     .select('organization_id, role')
@@ -20,11 +22,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     .single();
 
   if (!myProfile?.organization_id) {
-    main.innerHTML = `<div class="alert alert-error">لا يمكن تحديد المنظمة</div>`;
+    main.innerHTML = `<div class="alert alert-error">${tr('sub_no_org')}</div>`;
     return;
   }
 
-  // جلب كل أعضاء المنظمة
   const { data: members, error } = await db
     .from('profiles')
     .select('*')
@@ -32,22 +33,19 @@ document.addEventListener('DOMContentLoaded', async () => {
     .order('created_at', { ascending: true });
 
   if (error) {
-    main.innerHTML = `<div class="alert alert-error">خطأ: ${error.message}</div>`;
+    main.innerHTML = `<div class="alert alert-error">${tr('prod_detail_err')} ${error.message}</div>`;
     return;
   }
 
-  // ✅ استبعاد المدير (لا يظهر)
   const nonAdminMembers = (members ?? []).filter(m => m.role !== 'admin');
   const deputies = nonAdminMembers.filter(m => m.role === 'deputy');
   const workers = nonAdminMembers.filter(m => m.role === 'worker');
 
-  // ═══════════════════════════════════════════
-  // بناء بطاقة عضو
-  // ═══════════════════════════════════════════
   function buildMemberCard(m, type) {
     const isOnline = typeof isUserOnline === 'function' && isUserOnline(m);
     const starClass = type === 'deputy' ? 'deputy-star' : 'worker-star';
-    const roleLabel = type === 'deputy' ? 'نائب' : 'عامل';
+    const roleLabel = type === 'deputy' ? tr('wk_role_deputy') : tr('wk_role_worker');
+    const statusTitle = isOnline ? tr('wk_online') : tr('wk_offline');
 
     return `
       <a href="/member-profile.html?id=${m.id}" class="member-card member-card-link">
@@ -58,11 +56,11 @@ document.addEventListener('DOMContentLoaded', async () => {
               : `<i class="fas fa-user"></i>`}
           </div>
           <span class="member-status-dot ${isOnline ? 'online' : 'offline'}"
-                title="${isOnline ? 'متصل' : 'غير متصل'}"></span>
+                title="${statusTitle}"></span>
         </div>
 
         <div class="member-name-row">
-          <span class="member-name">${m.full_name ?? 'بدون اسم'}</span>
+          <span class="member-name">${m.full_name ?? tr('products_no_name')}</span>
           <i class="fas fa-star member-star-icon ${starClass}"></i>
         </div>
 
@@ -71,9 +69,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     `;
   }
 
-  // ═══════════════════════════════════════════
-  // بناء قسم (بدون Accordion — ظاهر دائماً)
-  // ═══════════════════════════════════════════
   function buildTeamSection({ id, icon, iconColor, label, count, content }) {
     return `
       <div class="team-section" data-section="${id}">
@@ -89,41 +84,36 @@ document.addEventListener('DOMContentLoaded', async () => {
     `;
   }
 
-  // ═══════════════════════════════════════════
-  // بناء الواجهة
-  // ═══════════════════════════════════════════
   main.innerHTML = `
     <div class="page-header">
-      <h2>العمال</h2>
+      <h2>${tr('wk_title')}</h2>
     </div>
 
-    <!-- ══════ قسم النواب ══════ -->
     ${deputies.length > 0 ? buildTeamSection({
       id: 'deputies',
       icon: 'fa-star',
       iconColor: '#fbbf24',
-      label: 'النواب',
+      label: tr('wk_deputies'),
       count: deputies.length,
       content: `<div class="team-grid">${deputies.map(w => buildMemberCard(w, 'deputy')).join('')}</div>`,
     }) : `
       <div class="empty-state">
         <i class="fas fa-star" style="color:#d4d4d4;"></i>
-        <p>لا يوجد نواب</p>
+        <p>${tr('wk_no_deputies')}</p>
       </div>
     `}
 
-    <!-- ══════ قسم العمال ══════ -->
     ${workers.length > 0 ? buildTeamSection({
       id: 'workers',
       icon: 'fa-users',
       iconColor: '#171717',
-      label: 'العمال',
+      label: tr('wk_workers'),
       count: workers.length,
       content: `<div class="team-grid">${workers.map(w => buildMemberCard(w, 'worker')).join('')}</div>`,
     }) : `
       <div class="empty-state">
         <i class="fas fa-users" style="color:#d4d4d4;"></i>
-        <p>لا يوجد عمال</p>
+        <p>${tr('wk_no_workers')}</p>
       </div>
     `}
   `;

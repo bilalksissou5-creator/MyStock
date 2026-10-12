@@ -343,6 +343,17 @@ const translations = {
     mv_in: 'إدخال',
     mv_out: 'إخراج',
     mv_deleted: 'منتج محذوف',
+
+    wk_title: 'العمال',
+    wk_title_full: 'MyStock - العمال',
+    wk_deputies: 'النواب',
+    wk_workers: 'العمال',
+    wk_no_deputies: 'لا يوجد نواب',
+    wk_no_workers: 'لا يوجد عمال',
+    wk_role_deputy: 'نائب',
+    wk_role_worker: 'عامل',
+    wk_online: 'متصل',
+    wk_offline: 'غير متصل',
   },
 
   fr: {
@@ -679,6 +690,17 @@ const translations = {
     mv_in: 'Entrée',
     mv_out: 'Sortie',
     mv_deleted: 'Produit supprimé',
+
+    wk_title: 'Travailleurs',
+    wk_title_full: 'MyStock - Travailleurs',
+    wk_deputies: 'Adjoints',
+    wk_workers: 'Travailleurs',
+    wk_no_deputies: 'Aucun adjoint',
+    wk_no_workers: 'Aucun travailleur',
+    wk_role_deputy: 'Adjoint',
+    wk_role_worker: 'Travailleur',
+    wk_online: 'En ligne',
+    wk_offline: 'Hors ligne',
   },
 
   en: {
@@ -1014,6 +1036,17 @@ const translations = {
     mv_in: 'In',
     mv_out: 'Out',
     mv_deleted: 'Deleted product',
+
+    wk_title: 'Workers',
+    wk_title_full: 'MyStock - Workers',
+    wk_deputies: 'Deputies',
+    wk_workers: 'Workers',
+    wk_no_deputies: 'No deputies',
+    wk_no_workers: 'No workers',
+    wk_role_deputy: 'Deputy',
+    wk_role_worker: 'Worker',
+    wk_online: 'Online',
+    wk_offline: 'Offline',
   },
 
   
