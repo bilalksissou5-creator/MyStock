@@ -1,22 +1,26 @@
 // ============================================
 // صفحة الإيصال (نمط سوبر ماركت)
-// ✅ احترام إعداد show_org_name + show_currency
+// ✅ دعم كامل للترجمة
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   const user = await requireAuth();
   if (!user) return;
+
+  if (window.applyLanguage) window.applyLanguage();
+  const tr = (key) => (window.t ? window.t(key) : key);
+
+  document.title = tr('rcpt_title_full');
 
   const params = new URLSearchParams(window.location.search);
   const receiptId = params.get('id');
 
   if (!receiptId) {
     document.getElementById('receipt-content').innerHTML = `
-      <div class="alert alert-error">لم يتم تحديد الإيصال</div>
+      <div class="alert alert-error">${tr('rcpt_no_id')}</div>
     `;
     return;
   }
 
-  // 1. جلب الإيصال
   const { data: receipt, error } = await db
     .from('receipts')
     .select('*')
@@ -25,39 +29,37 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   if (error || !receipt) {
     document.getElementById('receipt-content').innerHTML = `
-      <div class="alert alert-error">الإيصال غير موجود</div>
+      <div class="alert alert-error">${tr('rcpt_not_found')}</div>
     `;
     return;
   }
 
-  // 2. جلب المنظمة (مع كل الإعدادات)
   const { data: org } = await db
     .from('organizations')
     .select('name, logo_url, logo_shape, show_org_name, currency_code, currency_symbol, show_currency')
     .eq('id', receipt.organization_id)
     .single();
 
-  // 3. جلب عناصر الإيصال
   const { data: items } = await db
     .from('receipt_items')
     .select('*')
     .eq('receipt_id', receiptId)
     .order('created_at', { ascending: true });
 
-  // 4. ربط
   receipt.organizations = org;
 
-  // 5. عرض
   renderReceipt({
     receipt,
     items: items ?? [],
   });
 });
 
-// ============================================
-// عرض الإيصال
-// ============================================
 function renderReceipt({ receipt, items }) {
+  const tr = (key) => (window.t ? window.t(key) : key);
+  const lang = window.getCurrentLang ? window.getCurrentLang() : 'ar';
+  const localeMap = { ar: 'ar-MA', fr: 'fr-FR', en: 'en-US' };
+  const locale = localeMap[lang] || 'en-US';
+
   const container = document.getElementById('receipt-content');
 
   const org = receipt.organizations;
@@ -65,19 +67,17 @@ function renderReceipt({ receipt, items }) {
   const totalValue = Number(receipt.total_value ?? 0);
 
   const date = new Date(receipt.created_at);
-  const dateStr = date.toLocaleDateString('ar-MA');
-  const timeStr = date.toLocaleTimeString('ar-MA', { hour: '2-digit', minute: '2-digit' });
+  const dateStr = date.toLocaleDateString(locale);
+  const timeStr = date.toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit' });
 
   const logoShape = org?.logo_shape || 'circle';
   const showOrgName = org?.show_org_name !== false;
 
-  // إعدادات العملة
   const currencySymbol = org?.currency_symbol || '';
   const showCurrency = org?.show_currency !== false;
   const fmtCurrency = (v) => CurrencyUtils.formatCurrency(v, currencySymbol, showCurrency);
 
   container.innerHTML = `
-    <!-- ══════ الشعار ══════ -->
     <div class="rc-logo-wrap">
       <div class="rc-logo shape-${logoShape}">
         ${org?.logo_url
@@ -86,22 +86,19 @@ function renderReceipt({ receipt, items }) {
       </div>
     </div>
 
-    <!-- ══════ اسم المنظمة ══════ -->
     ${showOrgName ? `
       <div class="rc-org-name">${org?.name ?? 'MyStock'}</div>
     ` : ''}
 
     <div class="rc-divider"></div>
 
-    <!-- ══════ رقم الإيصال ══════ -->
-    <div class="rc-receipt-num">إيصال رقم: <strong>${receipt.receipt_number}</strong></div>
+    <div class="rc-receipt-num">${tr('rcpt_number')} <strong>${receipt.receipt_number}</strong></div>
 
     <div class="rc-divider-dashed"></div>
 
-    <!-- ══════ جدول العناصر ══════ -->
     <div class="rc-table">
       ${items.length === 0 ? `
-        <div class="rc-empty">لا توجد عناصر</div>
+        <div class="rc-empty">${tr('rcpt_no_items')}</div>
       ` : items.map(item => `
         <div class="rc-line">
           <span class="rc-name">${item.product_name}</span>
@@ -114,31 +111,27 @@ function renderReceipt({ receipt, items }) {
 
     <div class="rc-divider"></div>
 
-    <!-- ══════ المجموع الكلي ══════ -->
     <div class="rc-total-row">
-      المجموع الكلي: <strong>${fmtCurrency(totalValue)}</strong>
+      ${tr('rcpt_total')} <strong>${fmtCurrency(totalValue)}</strong>
     </div>
 
     <div class="rc-divider"></div>
 
-    <!-- ══════ التاريخ والوقت ══════ -->
-    <div class="rc-date">التاريخ: ${dateStr}</div>
-    <div class="rc-time">الوقت: ${timeStr}</div>
+    <div class="rc-date">${tr('rcpt_date')} ${dateStr}</div>
+    <div class="rc-time">${tr('rcpt_time')} ${timeStr}</div>
 
     <div class="rc-divider-dashed"></div>
 
-    <!-- ══════ شكر ══════ -->
-    <div class="rc-thanks">شكراً لزيارتكم</div>
+    <div class="rc-thanks">${tr('rcpt_thanks')}</div>
 
-    <!-- ══════ الأزرار ══════ -->
     <div class="rc-actions no-print">
       <button class="btn-primary" onclick="window.print()">
         <i class="fas fa-print"></i>
-        <span>طباعة</span>
+        <span>${tr('rcpt_print')}</span>
       </button>
       <a href="/movements/list.html" class="btn-secondary">
         <i class="fas fa-arrow-right"></i>
-        <span>العودة</span>
+        <span>${tr('rcpt_back')}</span>
       </a>
     </div>
   `;

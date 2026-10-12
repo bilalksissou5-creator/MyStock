@@ -316,6 +316,18 @@ const translations = {
     inv_page_err_items: 'فشل حذف عناصر الفاتورة:',
     inv_page_err_products: 'فشل حذف المنتجات:',
     inv_page_err_invoice: 'فشل حذف الفاتورة:',
+
+    rcpt_title_full: 'MyStock - إيصال',
+    rcpt_no_id: 'لم يتم تحديد الإيصال',
+    rcpt_not_found: 'الإيصال غير موجود',
+    rcpt_number: 'إيصال رقم:',
+    rcpt_no_items: 'لا توجد عناصر',
+    rcpt_total: 'المجموع الكلي:',
+    rcpt_date: 'التاريخ:',
+    rcpt_time: 'الوقت:',
+    rcpt_thanks: 'شكراً لزيارتكم',
+    rcpt_print: 'طباعة',
+    rcpt_back: 'العودة',
   },
 
   fr: {
@@ -625,6 +637,18 @@ const translations = {
     inv_page_err_items: 'Échec suppression articles :',
     inv_page_err_products: 'Échec suppression produits :',
     inv_page_err_invoice: 'Échec suppression facture :',
+
+    rcpt_title_full: 'MyStock - Reçu',
+    rcpt_no_id: 'Aucun reçu spécifié',
+    rcpt_not_found: 'Reçu introuvable',
+    rcpt_number: 'Reçu n° :',
+    rcpt_no_items: 'Aucun article',
+    rcpt_total: 'Total général :',
+    rcpt_date: 'Date :',
+    rcpt_time: 'Heure :',
+    rcpt_thanks: 'Merci de votre visite',
+    rcpt_print: 'Imprimer',
+    rcpt_back: 'Retour',
   },
 
   en: {
@@ -933,6 +957,18 @@ const translations = {
     inv_page_err_items: 'Failed to delete items:',
     inv_page_err_products: 'Failed to delete products:',
     inv_page_err_invoice: 'Failed to delete invoice:',
+
+    rcpt_title_full: 'MyStock - Receipt',
+    rcpt_no_id: 'No receipt specified',
+    rcpt_not_found: 'Receipt not found',
+    rcpt_number: 'Receipt No:',
+    rcpt_no_items: 'No items',
+    rcpt_total: 'Grand Total:',
+    rcpt_date: 'Date:',
+    rcpt_time: 'Time:',
+    rcpt_thanks: 'Thank you for your visit',
+    rcpt_print: 'Print',
+    rcpt_back: 'Back',
   },
 
   
