@@ -1,11 +1,17 @@
 // ============================================
 // صفحة إضافة عامل — بريد أو QR
+// ✅ دعم كامل للترجمة
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   const user = await requireAuth();
   if (!user) return;
 
   renderLayout('add-worker.html');
+
+  if (window.applyLanguage) window.applyLanguage();
+  const tr = (key) => (window.t ? window.t(key) : key);
+
+  document.title = tr('aw_title_full');
 
   const main = document.getElementById('main-content');
 
@@ -17,11 +23,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   const role = profile?.role;
 
-  // ⚠️ فقط المدير أو النائب
   if (role !== 'admin' && role !== 'deputy') {
     main.innerHTML = `
       <div class="alert alert-error">
-        ليس لديك صلاحية إضافة عمال
+        ${tr('aw_no_permission')}
       </div>
     `;
     return;
@@ -29,18 +34,17 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   main.innerHTML = `
     <div class="page-header">
-      <h2>إضافة عامل جديد</h2>
+      <h2>${tr('aw_title')}</h2>
       <a href="/profile.html" class="btn-secondary">
         <i class="fas fa-arrow-right"></i>
-        <span>العودة</span>
+        <span>${tr('prod_detail_back')}</span>
       </a>
     </div>
 
     <div class="add-worker-page">
 
-      <!-- ══════ اختيار الطريقة ══════ -->
       <div class="method-section" id="method-section">
-        <p class="method-title">اختر طريقة الإضافة:</p>
+        <p class="method-title">${tr('aw_choose_method')}</p>
 
         <div class="method-cards">
           <button type="button" class="method-card" data-method="email">
@@ -48,8 +52,8 @@ document.addEventListener('DOMContentLoaded', async () => {
               <i class="fas fa-envelope"></i>
             </div>
             <div class="method-info">
-              <strong>بالبريد الإلكتروني</strong>
-              <span>إرسال رابط دعوة تلقائياً</span>
+              <strong>${tr('aw_email_method')}</strong>
+              <span>${tr('aw_email_method_desc')}</span>
             </div>
           </button>
 
@@ -58,51 +62,49 @@ document.addEventListener('DOMContentLoaded', async () => {
               <i class="fas fa-qrcode"></i>
             </div>
             <div class="method-info">
-              <strong>QR Code</strong>
-              <span>امسح الرمز للانضمام</span>
+              <strong>${tr('aw_qr_method')}</strong>
+              <span>${tr('aw_qr_method_desc')}</span>
             </div>
           </button>
         </div>
       </div>
 
-      <!-- ══════ قسم البريد ══════ -->
       <div class="method-panel" id="email-panel" style="display:none;">
         <button type="button" class="back-btn" id="back-from-email">
-          <i class="fas fa-arrow-right"></i> تغيير الطريقة
+          <i class="fas fa-arrow-right"></i> ${tr('aw_change_method')}
         </button>
 
         <div class="panel-header">
           <div class="panel-icon email-icon">
             <i class="fas fa-envelope"></i>
           </div>
-          <h3>إرسال دعوة بالبريد</h3>
+          <h3>${tr('aw_send_email_title')}</h3>
         </div>
 
         <div class="alert alert-error" id="email-error" style="display:none;"></div>
         <div class="alert alert-success" id="email-success" style="display:none;"></div>
 
         <div class="form-group">
-          <label>البريد الإلكتروني للعامل *</label>
+          <label>${tr('aw_worker_email')}</label>
           <input type="email" id="worker-email" placeholder="email@example.com" dir="ltr">
         </div>
 
         <button type="button" class="btn-primary full-width" id="send-email-btn">
           <i class="fas fa-paper-plane"></i>
-          <span>إرسال الدعوة</span>
+          <span>${tr('aw_send_invite')}</span>
         </button>
       </div>
 
-      <!-- ══════ قسم QR ══════ -->
       <div class="method-panel" id="qr-panel" style="display:none;">
         <button type="button" class="back-btn" id="back-from-qr">
-          <i class="fas fa-arrow-right"></i> تغيير الطريقة
+          <i class="fas fa-arrow-right"></i> ${tr('aw_change_method')}
         </button>
 
         <div class="panel-header">
           <div class="panel-icon qr-icon">
             <i class="fas fa-qrcode"></i>
           </div>
-          <h3>رمز QR للانضمام</h3>
+          <h3>${tr('aw_qr_title')}</h3>
         </div>
 
         <div class="alert alert-error" id="qr-error" style="display:none;"></div>
@@ -111,46 +113,42 @@ document.addEventListener('DOMContentLoaded', async () => {
         <div class="qr-container" id="qr-container">
           <div class="qr-loading">
             <i class="fas fa-spinner fa-spin"></i>
-            <p>جارٍ توليد الرمز...</p>
+            <p>${tr('aw_qr_loading')}</p>
           </div>
         </div>
 
         <div class="qr-note">
           <i class="fas fa-info-circle"></i>
-          <span>⚠️ صالح لعامل واحد فقط</span>
+          <span>${tr('aw_qr_note')}</span>
         </div>
 
         <div class="qr-actions">
           <button type="button" class="btn-secondary" id="copy-link-btn">
             <i class="fas fa-copy"></i>
-            <span>نسخ الرابط</span>
+            <span>${tr('aw_copy_link')}</span>
           </button>
           <button type="button" class="btn-secondary" id="share-btn">
             <i class="fas fa-share-nodes"></i>
-            <span>مشاركة</span>
+            <span>${tr('aw_share')}</span>
           </button>
         </div>
 
         <button type="button" class="btn-primary full-width" id="generate-new-qr-btn">
           <i class="fas fa-rotate"></i>
-          <span>توليد QR جديد</span>
+          <span>${tr('aw_generate_new')}</span>
         </button>
       </div>
 
-      <!-- ══════ زر إضافة عامل آخر ══════ -->
       <div class="add-another-section" id="add-another-section" style="display:none;">
         <button type="button" class="btn-primary full-width" id="add-another-btn">
           <i class="fas fa-user-plus"></i>
-          <span>إضافة عامل آخر</span>
+          <span>${tr('aw_add_another')}</span>
         </button>
       </div>
 
     </div>
   `;
 
-  // ═══════════════════════════════════════════
-  // العناصر
-  // ═══════════════════════════════════════════
   const methodSection = document.getElementById('method-section');
   const emailPanel = document.getElementById('email-panel');
   const qrPanel = document.getElementById('qr-panel');
@@ -158,9 +156,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   let currentQrToken = null;
 
-  // ═══════════════════════════════════════════
-  // اختيار الطريقة
-  // ═══════════════════════════════════════════
   document.querySelectorAll('.method-card').forEach(card => {
     card.addEventListener('click', () => {
       const method = card.dataset.method;
@@ -179,7 +174,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   });
 
-  // العودة لاختيار الطريقة
   document.getElementById('back-from-email')?.addEventListener('click', resetToChoice);
   document.getElementById('back-from-qr')?.addEventListener('click', resetToChoice);
 
@@ -189,7 +183,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     qrPanel.style.display = 'none';
     addAnotherSection.style.display = 'none';
 
-    // نظّف
     document.getElementById('email-error').style.display = 'none';
     document.getElementById('email-success').style.display = 'none';
     document.getElementById('qr-error').style.display = 'none';
@@ -198,9 +191,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     currentQrToken = null;
   }
 
-  // ═══════════════════════════════════════════
-  // إرسال بالبريد
-  // ═══════════════════════════════════════════
   document.getElementById('send-email-btn')?.addEventListener('click', async () => {
     const btn = document.getElementById('send-email-btn');
     const emailInput = document.getElementById('worker-email');
@@ -212,13 +202,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     successBox.style.display = 'none';
 
     if (!email || !email.includes('@')) {
-      errBox.textContent = 'بريد إلكتروني غير صالح';
+      errBox.textContent = tr('aw_invalid_email');
       errBox.style.display = 'block';
       return;
     }
 
     btn.disabled = true;
-    btn.querySelector('span').textContent = 'جارٍ الإرسال...';
+    btn.querySelector('span').textContent = tr('aw_sending');
 
     try {
       const { data: { session } } = await db.auth.getSession();
@@ -241,14 +231,13 @@ document.addEventListener('DOMContentLoaded', async () => {
       const result = await fnRes.json();
 
       if (!fnRes.ok || !result.ok) {
-        throw new Error(result.error || 'فشل إرسال الدعوة');
+        throw new Error(result.error || tr('aw_send_failed'));
       }
 
-      successBox.textContent = `✅ تم إرسال الدعوة إلى ${email}`;
+      successBox.textContent = `✅ ${tr('aw_sent_to')} ${email}`;
       successBox.style.display = 'block';
       emailInput.value = '';
 
-      // أظهر زر "إضافة عامل آخر"
       addAnotherSection.style.display = 'block';
 
     } catch (err) {
@@ -256,13 +245,10 @@ document.addEventListener('DOMContentLoaded', async () => {
       errBox.style.display = 'block';
     } finally {
       btn.disabled = false;
-      btn.querySelector('span').textContent = 'إرسال الدعوة';
+      btn.querySelector('span').textContent = tr('aw_send_invite');
     }
   });
 
-  // ═══════════════════════════════════════════
-  // توليد QR (باستخدام qrcodejs)
-  // ═══════════════════════════════════════════
   async function generateQR() {
     const container = document.getElementById('qr-container');
     const errBox = document.getElementById('qr-error');
@@ -270,7 +256,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     container.innerHTML = `
       <div class="qr-loading">
         <i class="fas fa-spinner fa-spin"></i>
-        <p>جارٍ توليد الرمز...</p>
+        <p>${tr('aw_qr_loading')}</p>
       </div>
     `;
     errBox.style.display = 'none';
@@ -278,7 +264,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     try {
       const { data: { session } } = await db.auth.getSession();
 
-      // إنشاء token في DB
       const token = generateToken();
 
       const { error: insertError } = await db
@@ -293,17 +278,16 @@ document.addEventListener('DOMContentLoaded', async () => {
           token: token,
         });
 
-      if (insertError) throw new Error('فشل توليد الرمز: ' + insertError.message);
+      if (insertError) throw new Error(tr('aw_qr_gen_failed') + ' ' + insertError.message);
 
       currentQrToken = token;
 
       const qrUrl = `${window.location.origin}/register-worker.html?token=${token}`;
 
-      // توليد QR باستخدام qrcodejs
       container.innerHTML = '';
 
       if (typeof QRCode === 'undefined') {
-        throw new Error('مكتبة QR غير محمّلة');
+        throw new Error(tr('aw_qr_lib_missing'));
       }
 
       new QRCode(container, {
@@ -315,7 +299,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         correctLevel: QRCode.CorrectLevel.H,
       });
 
-      // عرض زر "إضافة عامل آخر"
       addAnotherSection.style.display = 'block';
 
     } catch (err) {
@@ -331,14 +314,10 @@ document.addEventListener('DOMContentLoaded', async () => {
       .join('');
   }
 
-  // زر "توليد QR جديد"
   document.getElementById('generate-new-qr-btn')?.addEventListener('click', () => {
     generateQR();
   });
 
-  // ═══════════════════════════════════════════
-  // نسخ الرابط
-  // ═══════════════════════════════════════════
   document.getElementById('copy-link-btn')?.addEventListener('click', async () => {
     if (!currentQrToken) return;
 
@@ -348,16 +327,13 @@ document.addEventListener('DOMContentLoaded', async () => {
       await navigator.clipboard.writeText(url);
       const btn = document.getElementById('copy-link-btn');
       const originalHTML = btn.innerHTML;
-      btn.innerHTML = '<i class="fas fa-check"></i> <span>تم النسخ</span>';
+      btn.innerHTML = `<i class="fas fa-check"></i> <span>${tr('aw_copied')}</span>`;
       setTimeout(() => { btn.innerHTML = originalHTML; }, 1500);
     } catch (err) {
-      alert('الرابط:\n' + url);
+      alert(tr('aw_link') + '\n' + url);
     }
   });
 
-  // ═══════════════════════════════════════════
-  // مشاركة
-  // ═══════════════════════════════════════════
   document.getElementById('share-btn')?.addEventListener('click', async () => {
     if (!currentQrToken) return;
 
@@ -366,27 +342,22 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (navigator.share) {
       try {
         await navigator.share({
-          title: 'دعوة للانضمام إلى MyStock',
-          text: 'انضم إلى فريقي على MyStock:',
+          title: tr('aw_share_title'),
+          text: tr('aw_share_text'),
           url: url,
         });
       } catch (err) {
-        // المستخدم ألغى
       }
     } else {
-      // نسخ كبديل
       try {
         await navigator.clipboard.writeText(url);
-        alert('تم نسخ الرابط');
+        alert(tr('aw_copied'));
       } catch (err) {
-        alert('الرابط:\n' + url);
+        alert(tr('aw_link') + '\n' + url);
       }
     }
   });
 
-  // ═══════════════════════════════════════════
-  // زر "إضافة عامل آخر"
-  // ═══════════════════════════════════════════
   document.getElementById('add-another-btn')?.addEventListener('click', () => {
     resetToChoice();
   });
