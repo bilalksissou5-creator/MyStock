@@ -537,6 +537,12 @@ const translations = {
     ntf_hour: 'ساعة',
     ntf_day_ago: 'قبل',
     ntf_day: 'يوم',
+
+    sup_title: 'الموردون',
+    sup_title_full: 'MyStock - الموردون',
+    sup_add: 'إضافة مورد',
+    sup_search_ph: 'بحث باسم المورد...',
+    sup_empty: 'لا يوجد موردون بعد',
   },
 
   fr: {
@@ -1067,6 +1073,12 @@ const translations = {
     ntf_hour: 'h',
     ntf_day_ago: 'Il y a',
     ntf_day: 'j',
+
+    sup_title: 'Fournisseurs',
+    sup_title_full: 'MyStock - Fournisseurs',
+    sup_add: 'Ajouter un fournisseur',
+    sup_search_ph: 'Rechercher par nom...',
+    sup_empty: 'Aucun fournisseur',
   },
 
   en: {
@@ -1596,6 +1608,12 @@ const translations = {
     ntf_hour: 'h ago',
     ntf_day_ago: '',
     ntf_day: 'd ago',
+
+    sup_title: 'Suppliers',
+    sup_title_full: 'MyStock - Suppliers',
+    sup_add: 'Add Supplier',
+    sup_search_ph: 'Search by supplier name...',
+    sup_empty: 'No suppliers yet',
   },
 
   

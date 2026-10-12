@@ -1,5 +1,6 @@
 // ============================================
 // صفحة الموردين
+// ✅ دعم كامل للترجمة
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   const user = await requireAuth();
@@ -7,24 +8,29 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   renderLayout('suppliers/list.html');
 
+  if (window.applyLanguage) window.applyLanguage();
+  const tr = (key) => (window.t ? window.t(key) : key);
+
+  document.title = tr('sup_title_full');
+
   const main = document.getElementById('main-content');
 
   main.innerHTML = `
     <div class="page-header">
-      <h2>الموردون</h2>
+      <h2>${tr('sup_title')}</h2>
       <a href="/suppliers/add.html" class="btn-primary">
         <i class="fas fa-plus"></i>
-        <span>إضافة مورد</span>
+        <span>${tr('sup_add')}</span>
       </a>
     </div>
 
     <div class="search-bar">
       <i class="fas fa-search"></i>
-      <input type="text" id="search-suppliers" placeholder="بحث باسم المورد...">
+      <input type="text" id="search-suppliers" placeholder="${tr('sup_search_ph')}">
     </div>
 
     <div id="suppliers-list" class="suppliers-list">
-      <p style="text-align:center; color:#737373;">جارٍ التحميل...</p>
+      <p style="text-align:center; color:#737373;">${tr('loading')}</p>
     </div>
   `;
 
@@ -40,6 +46,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 async function loadSuppliers() {
+  const tr = (key) => (window.t ? window.t(key) : key);
+
   const container = document.getElementById('suppliers-list');
 
   const { data, error } = await db
@@ -48,7 +56,7 @@ async function loadSuppliers() {
     .order('created_at', { ascending: false });
 
   if (error) {
-    container.innerHTML = `<div class="alert alert-error">خطأ: ${error.message}</div>`;
+    container.innerHTML = `<div class="alert alert-error">${tr('prod_detail_err')} ${error.message}</div>`;
     return;
   }
 
@@ -56,7 +64,7 @@ async function loadSuppliers() {
     container.innerHTML = `
       <div class="empty-state">
         <i class="fas fa-truck"></i>
-        <p>لا يوجد موردون بعد</p>
+        <p>${tr('sup_empty')}</p>
       </div>
     `;
     return;
