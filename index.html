@@ -1,11 +1,18 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html>
 <head>
   <meta charset="UTF-8">
   <title>MyStock</title>
-  <meta http-equiv="refresh" content="0; url=/login.html">
+  <script>
+    (function() {
+      var lang = localStorage.getItem('app_lang') || 'ar';
+      document.documentElement.lang = lang;
+      document.documentElement.dir = (lang === 'ar') ? 'rtl' : 'ltr';
+      window.location.replace('/login.html');
+    })();
+  </script>
 </head>
 <body>
-  <p>جارٍ التحويل...</p>
+  <p>Loading...</p>
 </body>
 </html>
