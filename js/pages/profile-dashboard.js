@@ -1,5 +1,6 @@
 // ============================================
 // لوحة معلومات المستخدم — البطاقات
+// ✅ دعم كامل للترجمة
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   const user = await requireAuth();
@@ -7,9 +8,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   renderLayout('profile.html');
 
+  if (window.applyLanguage) window.applyLanguage();
+  const tr = (key) => (window.t ? window.t(key) : key);
+
+  document.title = tr('pd_title_full');
+
   const main = document.getElementById('main-content');
 
-  // جلب بروفايل المستخدم الحالي
   const { data: myProfile } = await db
     .from('profiles')
     .select('*')
@@ -17,22 +22,20 @@ document.addEventListener('DOMContentLoaded', async () => {
     .single();
 
   if (!myProfile) {
-    main.innerHTML = `<div class="alert alert-error">خطأ في تحميل البيانات</div>`;
+    main.innerHTML = `<div class="alert alert-error">${tr('prod_detail_err')}</div>`;
     return;
   }
 
-  // قراءة id من الرابط
   const params = new URLSearchParams(window.location.search);
   const targetId = params.get('id') || user.id;
   const isMe = targetId === user.id;
   const isAdmin = myProfile.role === 'admin';
 
   if (!isMe && !isAdmin) {
-    main.innerHTML = `<div class="alert alert-error">ليس لديك صلاحية</div>`;
+    main.innerHTML = `<div class="alert alert-error">${tr('pd_no_permission')}</div>`;
     return;
   }
 
-  // جلب بروفايل العضو المستهدف
   const { data: target, error } = await db
     .from('profiles')
     .select('*')
@@ -40,16 +43,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     .single();
 
   if (error || !target) {
-    main.innerHTML = `<div class="alert alert-error">لم يتم العثور على العضو</div>`;
+    main.innerHTML = `<div class="alert alert-error">${tr('mp_not_found')}</div>`;
     return;
   }
 
   if (target.organization_id !== myProfile.organization_id) {
-    main.innerHTML = `<div class="alert alert-error">هذا العضو ليس في منظمتك</div>`;
+    main.innerHTML = `<div class="alert alert-error">${tr('mm_not_in_org')}</div>`;
     return;
   }
 
-  // جلب بيانات المنظمة
   const { data: org } = await db
     .from('organizations')
     .select('*')
@@ -58,9 +60,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   const isOnline = typeof isUserOnline === 'function' && isUserOnline(target);
 
-  // ═══════════════════════════════════════════
-  // ✅ بطاقة المنظمة (تظهر للجميع)
-  // ═══════════════════════════════════════════
   const orgCard = `
     ${isAdmin ? `
       <a href="/org-edit.html" class="pd-card">
@@ -68,9 +67,9 @@ document.addEventListener('DOMContentLoaded', async () => {
           <i class="fas fa-building"></i>
         </div>
         <div class="pd-card-body">
-          <div class="pd-card-title">المنظمة</div>
+          <div class="pd-card-title">${tr('pd_org')}</div>
           <div class="pd-card-value" dir="auto">
-            ${org?.name ?? 'منظمتي'}
+            ${org?.name ?? tr('pd_my_org')}
           </div>
         </div>
         <div class="pd-card-arrow">
@@ -83,9 +82,9 @@ document.addEventListener('DOMContentLoaded', async () => {
           <i class="fas fa-building"></i>
         </div>
         <div class="pd-card-body">
-          <div class="pd-card-title">المنظمة</div>
+          <div class="pd-card-title">${tr('pd_org')}</div>
           <div class="pd-card-value" dir="auto">
-            ${org?.name ?? 'منظمتي'}
+            ${org?.name ?? tr('pd_my_org')}
           </div>
         </div>
         <div class="pd-card-arrow">
@@ -95,62 +94,58 @@ document.addEventListener('DOMContentLoaded', async () => {
     `}
   `;
 
-  // ═══════════════════════════════════════════
-  // بيانات البطاقات العادية
-  // ═══════════════════════════════════════════
   const cards = [
     {
       id: 'cover',
       icon: 'fa-image',
-      title: 'صورة الغلاف',
-      value: target?.cover_url ? 'مُعدَّلة' : 'غير مُعدَّلة',
+      title: tr('pd_cover'),
+      value: target?.cover_url ? tr('pd_edited') : tr('pd_not_edited'),
       hasValue: !!target?.cover_url,
     },
     {
       id: 'avatar',
       icon: 'fa-user-circle',
-      title: 'صورة المستخدم',
-      value: target?.avatar_url ? 'مُعدَّلة' : 'غير مُعدَّلة',
+      title: tr('pd_avatar'),
+      value: target?.avatar_url ? tr('pd_edited') : tr('pd_not_edited'),
       hasValue: !!target?.avatar_url,
     },
     {
       id: 'name',
       icon: 'fa-user-pen',
-      title: 'الاسم',
-      value: target?.full_name || 'لم يُحدَّد',
+      title: tr('pd_name'),
+      value: target?.full_name || tr('pd_not_set'),
       hasValue: !!target?.full_name,
     },
     {
       id: 'email-password',
       icon: 'fa-envelope',
-      title: 'البريد وكلمة المرور',
-      value: isMe ? user.email : 'محمي',
+      title: tr('pd_email_pwd'),
+      value: isMe ? user.email : tr('pd_protected'),
       hasValue: true,
       disabled: !isMe,
     },
     {
       id: 'phone',
       icon: 'fa-phone',
-      title: 'رقم الهاتف',
-      value: target?.phone || 'لم يُحدَّد',
+      title: tr('rw_phone').replace(' *', ''),
+      value: target?.phone || tr('pd_not_set'),
       hasValue: !!target?.phone,
     },
   ];
 
-  const title = isMe ? 'لوحة المعلومات' : `لوحة ${target.full_name ?? 'العضو'}`;
+  const title = isMe ? tr('pd_title') : `${tr('pd_title_of')} ${target.full_name ?? tr('products_no_name')}`;
 
   main.innerHTML = `
     <div class="page-header">
       <h2>${title}</h2>
       <a href="${isMe ? '/profile.html' : `/member-profile.html?id=${target.id}`}" class="btn-secondary">
         <i class="fas fa-arrow-right"></i>
-        <span>العودة</span>
+        <span>${tr('prod_detail_back')}</span>
       </a>
     </div>
 
     <div class="pd-wrapper">
 
-      <!-- ══════ بطاقة المستخدم المصغّرة ══════ -->
       <div class="pd-user-card">
         <div class="pd-user-avatar">
           ${target?.avatar_url
@@ -158,12 +153,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             : `<i class="fas fa-user"></i>`}
         </div>
         <div class="pd-user-info">
-          <div class="pd-user-name">${target?.full_name ?? 'بدون اسم'}</div>
-          <div class="pd-user-email">${isMe ? user.email : (target.phone ?? 'عضو في الفريق')}</div>
+          <div class="pd-user-name">${target?.full_name ?? tr('products_no_name')}</div>
+          <div class="pd-user-email">${isMe ? user.email : (target.phone ?? tr('pd_team_member'))}</div>
         </div>
       </div>
 
-      <!-- ══════ بطاقة المنظمة + البطاقات ══════ -->
       <div class="pd-cards-list">
         ${orgCard}
 
