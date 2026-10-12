@@ -270,6 +270,19 @@ const translations = {
     mout_notif_msg: 'أخرج',
     mout_notif_unit: 'وحدة بقيمة',
     mout_success: '✅ تم إنشاء الإيصال',
+
+    inv_title: 'الفواتير',
+    inv_title_full: 'MyStock - الفواتير',
+    inv_add_products: 'إضافة منتجات',
+    inv_search_ph: 'بحث برقم الفاتورة أو اسم المورد...',
+    inv_empty: 'لا توجد فواتير بعد',
+    inv_empty_hint: 'أضف منتجات ← ستُنشأ الفواتير تلقائياً',
+    inv_no_supplier: 'بدون مورد',
+    inv_stat_products: 'المنتجات',
+    inv_stat_total: 'الإجمالي',
+    inv_notif_title: 'إنشاء فاتورة',
+    inv_notif_msg: 'أنشأ فاتورة',
+    inv_notif_unit: 'قطعة',
   },
 
   fr: {
@@ -533,6 +546,19 @@ const translations = {
     mout_notif_msg: 'a sorti',
     mout_notif_unit: 'unités pour',
     mout_success: '✅ Reçu créé',
+
+    inv_title: 'Factures',
+    inv_title_full: 'MyStock - Factures',
+    inv_add_products: 'Ajouter des produits',
+    inv_search_ph: 'Rechercher par numéro ou fournisseur...',
+    inv_empty: 'Aucune facture pour le moment',
+    inv_empty_hint: 'Ajoutez des produits ← les factures seront créées automatiquement',
+    inv_no_supplier: 'Sans fournisseur',
+    inv_stat_products: 'Produits',
+    inv_stat_total: 'Total',
+    inv_notif_title: 'Création de facture',
+    inv_notif_msg: 'a créé la facture',
+    inv_notif_unit: 'pièces',
   },
 
   en: {
@@ -795,6 +821,19 @@ const translations = {
     mout_notif_msg: 'output',
     mout_notif_unit: 'units worth',
     mout_success: '✅ Receipt created',
+
+    inv_title: 'Invoices',
+    inv_title_full: 'MyStock - Invoices',
+    inv_add_products: 'Add Products',
+    inv_search_ph: 'Search by invoice number or supplier...',
+    inv_empty: 'No invoices yet',
+    inv_empty_hint: 'Add products ← invoices will be created automatically',
+    inv_no_supplier: 'No supplier',
+    inv_stat_products: 'Products',
+    inv_stat_total: 'Total',
+    inv_notif_title: 'Invoice created',
+    inv_notif_msg: 'created invoice',
+    inv_notif_unit: 'items',
   },
 
   
