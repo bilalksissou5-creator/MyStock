@@ -19,12 +19,17 @@
 </head>
 <body>
   <div class="app"></div>
+
+  <!-- ✅ input مخفي لرفع الصورة -->
+  <input type="file" id="img-upload-input" accept="image/*" style="display:none;">
+
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="/js/core/supabase.js"></script>
   <script src="/js/core/i18n.js"></script>
   <script src="/js/core/auth.js"></script>
   <script src="/js/core/notifications.js"></script>
   <script src="/js/components/layout.js"></script>
+  <script src="/js/utils/image-upload.js"></script>
   <script src="/js/utils/inline-edit.js"></script>
   <script src="/js/pages/product-detail.js"></script>
 </body>

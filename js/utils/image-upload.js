@@ -33,19 +33,13 @@ async function uploadProductImage(file, productId) {
 // إضافة زر تعديل الصورة
 // ============================================
 function attachImageUpload(productId, container, currentUrl) {
-
-  // إنشاء input مخفي (مرة واحدة)
-  let input = document.getElementById('__img-upload-input');
+  const input = document.getElementById('img-upload-input');
   if (!input) {
-    input = document.createElement('input');
-    input.type = 'file';
-    input.accept = 'image/*';
-    input.id = '__img-upload-input';
-    input.style.display = 'none';
-    document.body.appendChild(input);
+    console.error('❌ input#img-upload-input غير موجود');
+    return;
   }
 
-  // ✅ تفريغ الـ input لتفادي مشكلة "نفس الملف لا يُشغّل التغيير"
+  // ✅ تفريغ الـ input
   input.value = '';
 
   async function handleFile(e) {
@@ -69,7 +63,6 @@ function attachImageUpload(productId, container, currentUrl) {
       return;
     }
 
-    // استبدال محتوى الحاوية
     container.innerHTML = `
       <img src="${result.url}?t=${Date.now()}" alt="صورة المنتج">
       <button class="image-edit-btn" title="تعديل الصورة">
@@ -77,24 +70,22 @@ function attachImageUpload(productId, container, currentUrl) {
       </button>
     `;
 
-    // إعادة الربط
     bindButton();
   }
 
-  // ✅ إزالة المستمع القديم وإضافته من جديد
   input.onchange = handleFile;
 
   function bindButton() {
     const btn = container.querySelector('.image-edit-btn');
     if (!btn) return;
 
-    // إزالة أي مستمع قديم
     const newBtn = btn.cloneNode(true);
     btn.parentNode.replaceChild(newBtn, btn);
 
     newBtn.addEventListener('click', (e) => {
       e.preventDefault();
       e.stopPropagation();
+      input.value = '';
       input.click();
     });
   }
