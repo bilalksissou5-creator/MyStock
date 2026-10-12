@@ -63,6 +63,7 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  text-align: start;
 }
 
 .pd-user-email {
@@ -71,6 +72,7 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  text-align: start;
 }
 
 /* ══════ قائمة البطاقات ══════ */
@@ -84,7 +86,8 @@
 .pd-card {
   display: flex;
   align-items: center;
-  gap: 14px;
+  justify-content: space-between;
+  gap: 12px;
   padding: 14px 16px;
   background: #ffffff;
   border: 1px solid #e5e5e5;
@@ -107,6 +110,15 @@
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
 }
 
+/* ✅ الحاوية: أيقونة + نص (بجانب بعضهما) */
+.pd-card-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex: 1;
+  min-width: 0;
+}
+
 /* ══════ أيقونة البطاقة ══════ */
 .pd-card-icon {
   width: 44px;
@@ -123,24 +135,24 @@
 
 /* ══════ نص البطاقة ══════ */
 .pd-card-body {
-  flex: 1;
   display: flex;
   flex-direction: column;
   gap: 3px;
   min-width: 0;
+  text-align: start;
 }
 
 .pd-card-title {
   font-size: 15px;
   font-weight: 600;
   color: #171717;
-  text-align: right;
+  text-align: start;
 }
 
 .pd-card-value {
   font-size: 13px;
   color: #737373;
-  text-align: right;
+  text-align: start;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -161,6 +173,15 @@
 
 .pd-card:hover .pd-card-arrow {
   color: #171717;
+}
+
+/* ✅ عكس السهم حسب اللغة */
+[dir="rtl"] .pd-card-arrow {
+  transform: none;
+}
+
+[dir="ltr"] .pd-card-arrow {
+  transform: scaleX(-1);
 }
 
 /* ══════════════════════════════════════════
@@ -207,6 +228,10 @@
 
   .pd-card {
     padding: 12px 14px;
+    gap: 10px;
+  }
+
+  .pd-card-left {
     gap: 12px;
   }
 

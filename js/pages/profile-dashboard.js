@@ -1,6 +1,7 @@
 // ============================================
 // لوحة معلومات المستخدم — البطاقات
 // ✅ دعم كامل للترجمة
+// ✅ تنسيق موحّد مع settings
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   const user = await requireAuth();
@@ -60,68 +61,59 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   const isOnline = typeof isUserOnline === 'function' && isUserOnline(target);
 
-  const orgCard = `
-    ${isAdmin ? `
-      <a href="/org-edit.html" class="pd-card">
-        <div class="pd-card-icon">
-          <i class="fas fa-building"></i>
-        </div>
-        <div class="pd-card-body">
-          <div class="pd-card-title">${tr('pd_org')}</div>
-          <div class="pd-card-value" dir="auto">
-            ${org?.name ?? tr('pd_my_org')}
-          </div>
-        </div>
-        <div class="pd-card-arrow">
-          <i class="fas fa-chevron-left"></i>
-        </div>
-      </a>
-    ` : `
-      <div class="pd-card pd-card-disabled">
-        <div class="pd-card-icon">
-          <i class="fas fa-building"></i>
-        </div>
-        <div class="pd-card-body">
-          <div class="pd-card-title">${tr('pd_org')}</div>
-          <div class="pd-card-value" dir="auto">
-            ${org?.name ?? tr('pd_my_org')}
-          </div>
-        </div>
-        <div class="pd-card-arrow">
-          <i class="fas fa-lock"></i>
-        </div>
-      </div>
-    `}
-  `;
+  // ═══════════════════════════════════════════
+  // البطاقات
+  // ═══════════════════════════════════════════
+  const cards = [];
 
-  const cards = [
+  // 1. بطاقة المنظمة
+  if (isAdmin) {
+    cards.push({
+      href: '/org-edit.html',
+      icon: 'fa-building',
+      title: tr('pd_org'),
+      value: org?.name ?? tr('pd_my_org'),
+      disabled: false,
+    });
+  } else {
+    cards.push({
+      href: null,
+      icon: 'fa-building',
+      title: tr('pd_org'),
+      value: org?.name ?? tr('pd_my_org'),
+      disabled: true,
+    });
+  }
+
+  // 2. البطاقات الأخرى
+  const otherCards = [
     {
       id: 'cover',
       icon: 'fa-image',
       title: tr('pd_cover'),
       value: target?.cover_url ? tr('pd_edited') : tr('pd_not_edited'),
-      hasValue: !!target?.cover_url,
+      empty: !target?.cover_url,
     },
     {
       id: 'avatar',
       icon: 'fa-user-circle',
       title: tr('pd_avatar'),
       value: target?.avatar_url ? tr('pd_edited') : tr('pd_not_edited'),
-      hasValue: !!target?.avatar_url,
+      empty: !target?.avatar_url,
     },
     {
       id: 'name',
       icon: 'fa-user-pen',
       title: tr('pd_name'),
       value: target?.full_name || tr('pd_not_set'),
-      hasValue: !!target?.full_name,
+      empty: !target?.full_name,
     },
     {
       id: 'email-password',
       icon: 'fa-envelope',
       title: tr('pd_email_pwd'),
       value: isMe ? user.email : tr('pd_protected'),
-      hasValue: true,
+      empty: false,
       disabled: !isMe,
     },
     {
@@ -129,9 +121,60 @@ document.addEventListener('DOMContentLoaded', async () => {
       icon: 'fa-phone',
       title: tr('rw_phone').replace(' *', ''),
       value: target?.phone || tr('pd_not_set'),
-      hasValue: !!target?.phone,
+      empty: !target?.phone,
     },
   ];
+
+  otherCards.forEach(c => {
+    if (c.disabled) {
+      cards.push({
+        href: null,
+        icon: c.icon,
+        title: c.title,
+        value: c.value,
+        empty: c.empty,
+        disabled: true,
+      });
+    } else {
+      const canEdit = isMe;
+      cards.push({
+        href: canEdit
+          ? `/profile-edit.html?section=${c.id}`
+          : `/member-profile.html?id=${target.id}`,
+        icon: c.icon,
+        title: c.title,
+        value: c.value,
+        empty: c.empty,
+        disabled: false,
+      });
+    }
+  });
+
+  // ═══════════════════════════════════════════
+  // بناء البطاقة
+  // ═══════════════════════════════════════════
+  function buildCard(card) {
+    const content = `
+      <div class="pd-card-left">
+        <div class="pd-card-icon">
+          <i class="fas ${card.icon}"></i>
+        </div>
+        <div class="pd-card-body">
+          <div class="pd-card-title">${card.title}</div>
+          <div class="pd-card-value ${card.empty ? 'empty' : ''}" dir="auto">${card.value}</div>
+        </div>
+      </div>
+      <div class="pd-card-arrow">
+        <i class="fas ${card.disabled ? 'fa-lock' : 'fa-chevron-left'}"></i>
+      </div>
+    `;
+
+    if (card.disabled) {
+      return `<div class="pd-card pd-card-disabled">${content}</div>`;
+    }
+
+    return `<a href="${card.href}" class="pd-card">${content}</a>`;
+  }
 
   const title = isMe ? tr('pd_title') : `${tr('pd_title_of')} ${target.full_name ?? tr('products_no_name')}`;
 
@@ -159,48 +202,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       </div>
 
       <div class="pd-cards-list">
-        ${orgCard}
-
-        ${cards.map(card => {
-          if (card.disabled) {
-            return `
-              <div class="pd-card pd-card-disabled">
-                <div class="pd-card-icon">
-                  <i class="fas ${card.icon}"></i>
-                </div>
-                <div class="pd-card-body">
-                  <div class="pd-card-title">${card.title}</div>
-                  <div class="pd-card-value" dir="auto">${card.value}</div>
-                </div>
-                <div class="pd-card-arrow">
-                  <i class="fas fa-lock"></i>
-                </div>
-              </div>
-            `;
-          }
-
-          const canEdit = isMe;
-          const href = canEdit
-            ? `/profile-edit.html?section=${card.id}`
-            : `/member-profile.html?id=${target.id}`;
-
-          return `
-            <a href="${href}" class="pd-card">
-              <div class="pd-card-icon">
-                <i class="fas ${card.icon}"></i>
-              </div>
-              <div class="pd-card-body">
-                <div class="pd-card-title">${card.title}</div>
-                <div class="pd-card-value ${card.hasValue ? '' : 'empty'}" dir="auto">
-                  ${card.value}
-                </div>
-              </div>
-              <div class="pd-card-arrow">
-                <i class="fas fa-chevron-left"></i>
-              </div>
-            </a>
-          `;
-        }).join('')}
+        ${cards.map(buildCard).join('')}
       </div>
 
     </div>
