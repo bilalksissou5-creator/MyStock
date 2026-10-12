@@ -1,6 +1,7 @@
 /* ============================================
    صفحة تفاصيل المنتج
    ✅ قسم سعر البيع (Switch + حقل)
+   ✅ دعم الاتجاه RTL/LTR
    ============================================ */
 
 .product-card-detail {
@@ -14,7 +15,7 @@
   box-sizing: border-box;
 }
 
-/* الصورة */
+/* ══════ الصورة ══════ */
 .product-image {
   position: relative;
   background: #fafafa;
@@ -40,11 +41,10 @@
   color: #d4d4d4;
 }
 
-/* زر تعديل الصورة - مصغّر */
 .image-edit-btn {
   position: absolute;
   bottom: 8px;
-  left: 8px;
+  inset-inline-start: 8px;
   background: rgba(23, 23, 23, 0.9);
   color: white;
   border: none;
@@ -71,21 +71,23 @@
   transform: scale(1.08);
 }
 
-/* العنوان */
+/* ══════ العنوان ══════ */
 .detail-title {
   font-size: 1.35rem;
   font-weight: 700;
   margin-bottom: 4px;
   line-height: 1.4;
+  text-align: start;
 }
 
 .detail-sku {
   color: #737373;
   font-size: 13px;
   margin-bottom: 16px;
+  text-align: start;
 }
 
-/* الصناديق */
+/* ══════ الصناديق ══════ */
 .product-stats {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -117,7 +119,7 @@
   color: #dc2626;
 }
 
-/* المعلومات الإضافية */
+/* ══════ المعلومات الإضافية ══════ */
 .product-extra {
   border-top: 1px solid #f0f0f0;
   padding-top: 8px;
@@ -140,12 +142,13 @@
 .product-extra .row > span {
   color: #737373;
   flex-shrink: 0;
+  text-align: start;
 }
 
 .product-extra .row > strong {
   font-weight: 500;
   color: #171717;
-  text-align: left;
+  text-align: end;
   min-width: 0;
 }
 
@@ -167,9 +170,10 @@
   display: flex;
   align-items: center;
   gap: 6px;
+  text-align: start;
 }
 
-/* Switch Component */
+/* ══════ Switch ══════ */
 .switch-item {
   display: flex;
   align-items: flex-start;
@@ -201,7 +205,7 @@
   font-size: 14px;
   font-weight: 600;
   color: #171717;
-  text-align: right;
+  text-align: start;
 }
 
 .switch-status {
@@ -228,10 +232,9 @@
   color: #737373;
   line-height: 1.5;
   margin: 0;
-  text-align: right;
+  text-align: start;
 }
 
-/* Switch */
 .switch {
   position: relative;
   display: inline-block;
@@ -262,7 +265,7 @@
   position: absolute;
   height: 22px;
   width: 22px;
-  left: 3px;
+  inset-inline-start: 3px;
   top: 3px;
   background-color: #ffffff;
   border-radius: 50%;
@@ -278,6 +281,10 @@
   transform: translateX(22px);
 }
 
+[dir="rtl"] .switch input:checked + .switch-slider::before {
+  transform: translateX(-22px);
+}
+
 .switch input:focus + .switch-slider {
   box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
 }
@@ -287,7 +294,7 @@
   cursor: not-allowed;
 }
 
-/* حقل سعر البيع */
+/* ══════ حقل سعر البيع ══════ */
 .sell-price-input-group {
   margin-top: 14px;
   margin-bottom: 0;
@@ -299,6 +306,7 @@
   font-weight: 600;
   color: #404040;
   margin-bottom: 6px;
+  text-align: start;
 }
 
 .sell-price-input-group input[type="number"] {
@@ -326,16 +334,18 @@
   font-size: 11px;
   color: #a3a3a3;
   margin-top: 6px;
+  text-align: start;
 }
 
-/* الأزرار */
+/* ══════ الأزرار ══════ */
 .actions {
   display: flex;
   gap: 8px;
   flex-wrap: wrap;
+  justify-content: center;
 }
 
-/* التعديل المباشر */
+/* ══════ التعديل المباشر ══════ */
 .edit-field {
   display: inline-flex;
   align-items: center;
@@ -402,11 +412,10 @@
   padding: 6px;
 }
 
-/* مؤشر الحفظ */
 .save-indicator {
   color: #16a34a;
   font-size: 12px;
-  margin-right: 4px;
+  margin-inline-start: 4px;
   animation: fadeInCheck 0.2s ease-out;
 }
 
@@ -416,7 +425,7 @@
 }
 
 /* ============================================
-   الهاتف
+   التجاوب — الهاتف
    ============================================ */
 @media (max-width: 768px) {
   .product-card-detail {
@@ -467,14 +476,13 @@
     width: 28px;
     height: 28px;
     bottom: 6px;
-    left: 6px;
+    inset-inline-start: 6px;
   }
 
   .image-edit-btn i {
     font-size: 11px;
   }
 
-  /* قسم سعر البيع */
   .sell-price-section {
     padding-top: 14px;
     margin-top: 14px;
@@ -507,7 +515,7 @@
   .switch-slider::before {
     height: 20px;
     width: 20px;
-    left: 3px;
+    inset-inline-start: 3px;
     top: 3px;
   }
 
@@ -515,8 +523,25 @@
     transform: translateX(20px);
   }
 
+  [dir="rtl"] .switch input:checked + .switch-slider::before {
+    transform: translateX(-20px);
+  }
+
   .sell-price-input-group input[type="number"] {
     padding: 10px 12px;
     font-size: 14px;
   }
+}
+
+/* ============================================
+   RTL / LTR
+   ============================================ */
+[dir="rtl"] .product-extra .row,
+[dir="ltr"] .product-extra .row {
+  flex-direction: row;
+}
+
+[dir="rtl"] .switch-item,
+[dir="ltr"] .switch-item {
+  flex-direction: row;
 }

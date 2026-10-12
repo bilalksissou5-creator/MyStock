@@ -1,6 +1,7 @@
 // ============================================
 // صفحة تفاصيل المنتج
 // ✅ قسم سعر البيع (Switch + قيمة)
+// ✅ دعم كامل للترجمة
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   const user = await requireAuth();
@@ -8,12 +9,17 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   renderLayout('products/detail.html');
 
+  if (window.applyLanguage) window.applyLanguage();
+  const tr = (key) => (window.t ? window.t(key) : key);
+
+  document.title = tr('prod_detail_title_full');
+
   const params = new URLSearchParams(window.location.search);
   const productId = params.get('id');
   const main = document.getElementById('main-content');
 
   if (!productId) {
-    main.innerHTML = `<div class="alert alert-error">لم يتم تحديد المنتج</div>`;
+    main.innerHTML = `<div class="alert alert-error">${tr('prod_detail_no_id')}</div>`;
     return;
   }
 
@@ -24,7 +30,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     .single();
 
   if (error || !product) {
-    main.innerHTML = `<div class="alert alert-error">المنتج غير موجود</div>`;
+    main.innerHTML = `<div class="alert alert-error">${tr('prod_detail_not_found')}</div>`;
     return;
   }
 
@@ -51,10 +57,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   main.innerHTML = `
     <div class="page-header">
-      <h2>تفاصيل المنتج</h2>
+      <h2>${tr('prod_detail_title')}</h2>
       <a href="list.html" class="btn-secondary">
         <i class="fas fa-arrow-right"></i>
-        <span>العودة</span>
+        <span>${tr('prod_detail_back')}</span>
       </a>
     </div>
 
@@ -62,9 +68,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       <div class="product-image" id="product-image-container">
         ${product.image_url
-          ? `<img src="${product.image_url}" alt="${product.name ?? 'منتج'}">`
+          ? `<img src="${product.image_url}" alt="${product.name ?? tr('products_no_name')}">`
           : `<i class="fas fa-box-open"></i>`}
-        <button class="image-edit-btn" title="تعديل الصورة">
+        <button class="image-edit-btn" title="${tr('prod_detail_edit_image')}">
           <i class="fas fa-camera"></i>
         </button>
       </div>
@@ -78,55 +84,55 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       <div class="product-stats">
         <div class="stat">
-          <div class="stat-label">الكمية</div>
+          <div class="stat-label">${tr('products_qty')}</div>
           <div class="stat-value ${(product.qty ?? 0) < 10 ? 'low' : ''}">
             <span class="edit-field center" id="f-qty" data-value="${product.qty ?? 0}"></span>
           </div>
         </div>
         <div class="stat">
-          <div class="stat-label">سعر الشراء</div>
+          <div class="stat-label">${tr('prod_detail_buy_price')}</div>
           <div class="stat-value">
             <span class="edit-field center" id="f-price" data-value="${product.price ?? 0}"></span>
           </div>
         </div>
         <div class="stat">
-          <div class="stat-label">المجموع</div>
+          <div class="stat-label">${tr('products_total')}</div>
           <div class="stat-value" id="f-total">${total}</div>
         </div>
       </div>
 
       <div class="product-extra">
         <div class="row">
-          <span>الفئة</span>
+          <span>${tr('prod_detail_category')}</span>
           <strong class="edit-field" id="f-category" data-value="${product.category ?? product.suppliers?.specialty ?? ''}"></strong>
         </div>
         <div class="row">
-          <span>المورد</span>
+          <span>${tr('prod_detail_supplier')}</span>
           <strong>${product.suppliers?.name ?? '—'}</strong>
         </div>
         <div class="row">
-          <span>الوحدة</span>
+          <span>${tr('prod_detail_unit')}</span>
           <strong class="edit-field" id="f-unit" data-value="${product.unit ?? ''}"></strong>
         </div>
         <div class="row">
-          <span>الباركود</span>
+          <span>${tr('prod_detail_barcode')}</span>
           <strong class="edit-field" id="f-qr_code" data-value="${product.qr_code ?? ''}"></strong>
         </div>
       </div>
 
       <!-- ══════ سعر البيع ══════ -->
       <div class="sell-price-section">
-        <h3 class="sell-price-title">💰 سعر البيع</h3>
+        <h3 class="sell-price-title">💰 ${tr('prod_detail_sell_price')}</h3>
 
         <div class="switch-item">
           <div class="switch-content">
             <div class="switch-header">
-              <strong class="switch-title">تفعيل سعر بيع خاص</strong>
+              <strong class="switch-title">${tr('prod_detail_enable_sell')}</strong>
               <span class="switch-status ${sellPriceEnabled ? 'on' : 'off'}" id="sell-price-status">
-                ${sellPriceEnabled ? 'مفعّل' : 'غير مفعّل'}
+                ${sellPriceEnabled ? tr('prod_detail_enabled') : tr('prod_detail_disabled')}
               </span>
             </div>
-            <p class="switch-desc">عند التفعيل يُستخدم هذا السعر في إيصال البيع (بدلاً من سعر الشراء)</p>
+            <p class="switch-desc">${tr('prod_detail_sell_desc')}</p>
           </div>
           <label class="switch">
             <input type="checkbox" id="sell-price-toggle" ${sellPriceEnabled ? 'checked' : ''}>
@@ -135,16 +141,16 @@ document.addEventListener('DOMContentLoaded', async () => {
         </div>
 
         <div class="sell-price-input-group">
-          <label>سعر البيع (${currencySymbol || 'DH'})</label>
+          <label>${tr('prod_detail_sell_input')} (${currencySymbol || 'DH'})</label>
           <input type="number" id="sell-price-input" value="${sellPrice}" min="0" step="0.01" dir="ltr" placeholder="0.00">
-          <small class="field-hint">أدخل السعر الذي تريد بيع المنتج به</small>
+          <small class="field-hint">${tr('prod_detail_sell_hint')}</small>
         </div>
       </div>
 
       <div class="actions">
         <button class="btn-danger" id="delete-btn">
           <i class="fas fa-trash"></i>
-          <span>حذف المنتج</span>
+          <span>${tr('prod_detail_delete')}</span>
         </button>
       </div>
 
@@ -158,13 +164,13 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   const fieldLabels = {
-    name: 'الاسم',
-    sku: 'SKU',
-    qty: 'الكمية',
-    price: 'سعر الشراء',
-    category: 'الفئة',
-    unit: 'الوحدة',
-    qr_code: 'الباركود',
+    name: tr('prod_detail_field_name'),
+    sku: tr('prod_detail_field_sku'),
+    qty: tr('products_qty'),
+    price: tr('prod_detail_buy_price'),
+    category: tr('prod_detail_category'),
+    unit: tr('prod_detail_unit'),
+    qr_code: tr('prod_detail_barcode'),
   };
 
   const fields = [
@@ -190,8 +196,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (typeof notifyOrganization === 'function' && profile?.organization_id) {
           await notifyOrganization({
             orgId: profile.organization_id,
-            title: 'تعديل منتج',
-            message: `${profile.full_name || 'مستخدم'} عدّل ${fieldLabels[savedField] || savedField} "${product.name}" إلى "${newValue}"`,
+            title: tr('prod_detail_notif_edit_title'),
+            message: `${profile.full_name || tr('prod_detail_user')} ${tr('prod_detail_notif_edit_msg')} ${fieldLabels[savedField] || savedField} "${product.name}" ${tr('prod_detail_to')} "${newValue}"`,
             type: 'info',
             link: `/products/detail.html?id=${productId}`,
             userName: profile.full_name || null,
@@ -227,24 +233,22 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (updateError) throw new Error(updateError.message);
 
       currentSellPriceEnabled = newValue;
-      sellPriceStatus.textContent = newValue ? 'مفعّل' : 'غير مفعّل';
+      sellPriceStatus.textContent = newValue ? tr('prod_detail_enabled') : tr('prod_detail_disabled');
       sellPriceStatus.classList.toggle('on', newValue);
       sellPriceStatus.classList.toggle('off', !newValue);
 
-      // إشعار
       if (typeof notifyOrganization === 'function' && profile?.organization_id) {
         await notifyOrganization({
           orgId: profile.organization_id,
-          title: 'تعديل سعر البيع',
-          message: `${profile.full_name || 'مستخدم'} ${newValue ? 'فعّل' : 'أوقف'} سعر البيع الخاص بـ "${product.name}"`,
+          title: tr('prod_detail_notif_sell_title'),
+          message: `${profile.full_name || tr('prod_detail_user')} ${newValue ? tr('prod_detail_notif_sell_on') : tr('prod_detail_notif_sell_off')} "${product.name}"`,
           type: 'info',
           link: `/products/detail.html?id=${productId}`,
           userName: profile.full_name || null,
         });
       }
     } catch (err) {
-      alert('خطأ: ' + err.message);
-      // إرجاع الحالة السابقة
+      alert(tr('prod_detail_err') + ' ' + err.message);
       sellPriceToggle.checked = !newValue;
     } finally {
       sellPriceToggle.disabled = false;
@@ -270,12 +274,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         if (updateError) throw new Error(updateError.message);
 
-        // إشعار
         if (typeof notifyOrganization === 'function' && profile?.organization_id) {
           await notifyOrganization({
             orgId: profile.organization_id,
-            title: 'تعديل سعر البيع',
-            message: `${profile.full_name || 'مستخدم'} عدّل سعر البيع الخاص بـ "${product.name}" إلى "${newPrice}"`,
+            title: tr('prod_detail_notif_sell_title'),
+            message: `${profile.full_name || tr('prod_detail_user')} ${tr('prod_detail_notif_sell_edit')} "${product.name}" ${tr('prod_detail_to')} "${newPrice}"`,
             type: 'info',
             link: `/products/detail.html?id=${productId}`,
             userName: profile.full_name || null,
@@ -284,27 +287,27 @@ document.addEventListener('DOMContentLoaded', async () => {
       } catch (err) {
         console.error('فشل حفظ سعر البيع:', err);
       }
-    }, 800); // ✅ ينتظر 800ms بعد آخر إدخال
+    }, 800);
   });
 
   // ═══════════════════════════════════════════
   // حذف المنتج
   // ═══════════════════════════════════════════
   document.getElementById('delete-btn').addEventListener('click', async () => {
-    if (!confirm('هل أنت متأكد من حذف هذا المنتج؟')) return;
+    if (!confirm(tr('prod_detail_confirm_delete'))) return;
 
     const { error } = await db.from('products').delete().eq('id', productId);
 
     if (error) {
-      alert('خطأ: ' + error.message);
+      alert(tr('prod_detail_err') + ' ' + error.message);
       return;
     }
 
     if (typeof notifyOrganization === 'function' && profile?.organization_id) {
       await notifyOrganization({
         orgId: profile.organization_id,
-        title: 'حذف منتج',
-        message: `${profile.full_name || 'مستخدم'} حذف "${product.name}"`,
+        title: tr('prod_detail_notif_del_title'),
+        message: `${profile.full_name || tr('prod_detail_user')} ${tr('prod_detail_notif_del_msg')} "${product.name}"`,
         type: 'danger',
         link: '/products/list.html',
         userName: profile.full_name || null,
