@@ -1,15 +1,17 @@
 // ============================================
 // صفحة تعديل المنظمة (للمدير فقط)
-// ✅ قسم العملة (اختيار + رمز + إظهار)
-// ✅ إظهار اسم المنظمة
-// ✅ الأشكال الصغيرة تحت الصورة
-// ✅ زر الحفظ ثابت بأسفل الشاشة
+// ✅ دعم كامل للترجمة
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   const user = await requireAuth();
   if (!user) return;
 
   renderLayout('profile.html');
+
+  if (window.applyLanguage) window.applyLanguage();
+  const tr = (key) => (window.t ? window.t(key) : key);
+
+  document.title = tr('oe_title_full');
 
   const main = document.getElementById('main-content');
 
@@ -20,7 +22,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     .single();
 
   if (myProfile?.role !== 'admin') {
-    main.innerHTML = `<div class="alert alert-error">ليس لديك صلاحية تعديل المنظمة</div>`;
+    main.innerHTML = `<div class="alert alert-error">${tr('oe_no_permission')}</div>`;
     return;
   }
 
@@ -31,7 +33,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     .single();
 
   if (error || !org) {
-    main.innerHTML = `<div class="alert alert-error">لم يتم العثور على المنظمة</div>`;
+    main.innerHTML = `<div class="alert alert-error">${tr('oe_not_found')}</div>`;
     return;
   }
 
@@ -48,10 +50,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   main.innerHTML = `
     <div class="page-header">
-      <h2>تعديل المنظمة</h2>
+      <h2>${tr('oe_title')}</h2>
       <a href="/profile-dashboard.html" class="btn-secondary">
         <i class="fas fa-arrow-right"></i>
-        <span>العودة</span>
+        <span>${tr('prod_detail_back')}</span>
       </a>
     </div>
 
@@ -60,26 +62,23 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     <div class="org-edit-wrapper">
 
-      <!-- ══════ الشعار ══════ -->
       <div class="org-section">
-        <h3>شعار المنظمة</h3>
+        <h3>${tr('oe_logo_title')}</h3>
 
-        <!-- ✅ الصورة أولاً -->
         <div class="org-logo-preview" id="org-logo-preview">
           ${org.logo_url
             ? `<img src="${org.logo_url}" alt="logo" id="logo-img">`
             : `<i class="fas fa-building" id="logo-placeholder"></i>`}
         </div>
 
-        <!-- ✅ الأشكال الصغيرة تحتها -->
         <div class="shape-picker">
-          <button type="button" class="shape-option" data-shape="circle" title="دائري">
+          <button type="button" class="shape-option" data-shape="circle" title="${tr('oe_shape_circle')}">
             <div class="shape-preview shape-circle"></div>
           </button>
-          <button type="button" class="shape-option" data-shape="square" title="مربع">
+          <button type="button" class="shape-option" data-shape="square" title="${tr('oe_shape_square')}">
             <div class="shape-preview shape-square"></div>
           </button>
-          <button type="button" class="shape-option" data-shape="rectangle" title="مستطيل">
+          <button type="button" class="shape-option" data-shape="rectangle" title="${tr('oe_shape_rectangle')}">
             <div class="shape-preview shape-rectangle"></div>
           </button>
         </div>
@@ -88,27 +87,26 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         <button type="button" class="btn-secondary full-width" id="choose-logo-btn">
           <i class="fas fa-camera"></i>
-          <span>اختيار صورة</span>
+          <span>${tr('pe_choose_image')}</span>
         </button>
       </div>
 
-      <!-- ══════ اسم المنظمة + إظهاره ══════ -->
       <div class="org-section">
-        <h3>اسم المنظمة</h3>
+        <h3>${tr('oe_name_title')}</h3>
         <div class="form-group">
-          <label>الاسم</label>
-          <input type="text" id="org-name" value="${org.name ?? ''}" placeholder="اسم المنظمة">
+          <label>${tr('pd_name')}</label>
+          <input type="text" id="org-name" value="${org.name ?? ''}" placeholder="${tr('oe_name_ph')}">
         </div>
 
         <div class="switch-item">
           <div class="switch-content">
             <div class="switch-header">
-              <strong class="switch-title">إظهار اسم المنظمة في الفواتير</strong>
+              <strong class="switch-title">${tr('oe_show_name')}</strong>
               <span class="switch-status ${showOrgName ? 'on' : 'off'}" id="show-org-name-status">
-                ${showOrgName ? 'مفعّل' : 'غير مفعّل'}
+                ${showOrgName ? tr('prod_detail_enabled') : tr('prod_detail_disabled')}
               </span>
             </div>
-            <p class="switch-desc">سيظهر الاسم في الفواتير والإيصالات المطبوعة</p>
+            <p class="switch-desc">${tr('oe_show_name_desc')}</p>
           </div>
           <label class="switch">
             <input type="checkbox" id="show-org-name-toggle" ${showOrgName ? 'checked' : ''}>
@@ -117,33 +115,32 @@ document.addEventListener('DOMContentLoaded', async () => {
         </div>
       </div>
 
-      <!-- ══════ العملة ══════ -->
       <div class="org-section">
-        <h3>💰 العملة</h3>
-        <p class="org-hint">اختر العملة ورمزها المستخدم في الفواتير</p>
+        <h3>💰 ${tr('oe_currency_title')}</h3>
+        <p class="org-hint">${tr('oe_currency_hint')}</p>
 
         <div class="form-group">
-          <label>العملة</label>
+          <label>${tr('oe_currency')}</label>
           <select id="currency-code" class="form-select">
             ${currenciesList}
           </select>
         </div>
 
         <div class="form-group">
-          <label>رمز العملة (قابل للتعديل)</label>
+          <label>${tr('oe_symbol')}</label>
           <input type="text" id="currency-symbol" value="${currencySymbol}" placeholder="DH" dir="ltr">
-          <small class="field-hint">مثال: DH، $، €، ر.س</small>
+          <small class="field-hint">${tr('oe_symbol_hint')}</small>
         </div>
 
         <div class="switch-item">
           <div class="switch-content">
             <div class="switch-header">
-              <strong class="switch-title">إظهار رمز العملة في الفواتير</strong>
+              <strong class="switch-title">${tr('oe_show_currency')}</strong>
               <span class="switch-status ${showCurrency ? 'on' : 'off'}" id="show-currency-status">
-                ${showCurrency ? 'مفعّل' : 'غير مفعّل'}
+                ${showCurrency ? tr('prod_detail_enabled') : tr('prod_detail_disabled')}
               </span>
             </div>
-            <p class="switch-desc">سيظهر الرمز بجانب السعر والمجموع (بدون الكمية)</p>
+            <p class="switch-desc">${tr('oe_show_currency_desc')}</p>
           </div>
           <label class="switch">
             <input type="checkbox" id="show-currency-toggle" ${showCurrency ? 'checked' : ''}>
@@ -152,7 +149,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         </div>
 
         <div class="currency-preview">
-          <span class="preview-label">معاينة:</span>
+          <span class="preview-label">${tr('oe_preview')}</span>
           <span class="preview-value" id="currency-preview-value">
             ${CurrencyUtils.formatCurrency(1500, currencySymbol, showCurrency)}
           </span>
@@ -161,11 +158,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     </div>
 
-    <!-- ══════ زر الحفظ ══════ -->
     <div class="org-save-bar">
       <button type="button" class="btn-primary full-width" id="save-btn">
         <i class="fas fa-check"></i>
-        <span>حفظ التعديلات</span>
+        <span>${tr('pe_save')}</span>
       </button>
     </div>
   `;
@@ -218,14 +214,14 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   showOrgNameToggle.addEventListener('change', () => {
     showOrgName = showOrgNameToggle.checked;
-    showOrgNameStatus.textContent = showOrgName ? 'مفعّل' : 'غير مفعّل';
+    showOrgNameStatus.textContent = showOrgName ? tr('prod_detail_enabled') : tr('prod_detail_disabled');
     showOrgNameStatus.classList.toggle('on', showOrgName);
     showOrgNameStatus.classList.toggle('off', !showOrgName);
   });
 
   showCurrencyToggle.addEventListener('change', () => {
     showCurrency = showCurrencyToggle.checked;
-    showCurrencyStatus.textContent = showCurrency ? 'مفعّل' : 'غير مفعّل';
+    showCurrencyStatus.textContent = showCurrency ? tr('prod_detail_enabled') : tr('prod_detail_disabled');
     showCurrencyStatus.classList.toggle('on', showCurrency);
     showCurrencyStatus.classList.toggle('off', !showCurrency);
     updateCurrencyPreview();
@@ -264,12 +260,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (!file) return;
 
     if (file.size > 5 * 1024 * 1024) {
-      showError('حجم الصورة يتجاوز 5 ميغابايت');
+      showError(tr('pe_err_size'));
       logoInput.value = '';
       return;
     }
     if (!file.type.startsWith('image/')) {
-      showError('الملف ليس صورة');
+      showError(tr('pe_err_not_image'));
       logoInput.value = '';
       return;
     }
@@ -291,7 +287,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         contentType: file.type,
       });
 
-    if (uploadError) throw new Error('فشل الرفع: ' + uploadError.message);
+    if (uploadError) throw new Error(tr('pe_err_upload') + ' ' + uploadError.message);
 
     const { data: urlData } = db.storage.from('organizations').getPublicUrl(fileName);
     return urlData.publicUrl;
@@ -302,17 +298,17 @@ document.addEventListener('DOMContentLoaded', async () => {
     const newName = nameInput.value.trim();
 
     if (!newName) {
-      showError('اسم المنظمة مطلوب');
+      showError(tr('oe_err_name'));
       return;
     }
 
     if (!currencySymbolInput.value.trim()) {
-      showError('رمز العملة مطلوب');
+      showError(tr('oe_err_symbol'));
       return;
     }
 
     btn.disabled = true;
-    btn.querySelector('span').textContent = 'جارٍ الحفظ...';
+    btn.querySelector('span').textContent = tr('pe_saving');
 
     try {
       let logoUrl = org.logo_url;
@@ -338,7 +334,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       if (updateError) throw new Error(updateError.message);
 
-      showSuccess('✅ تم حفظ التعديلات بنجاح');
+      showSuccess(tr('oe_success'));
       pendingLogoFile = null;
 
       setTimeout(() => {
@@ -348,7 +344,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     } catch (err) {
       showError(err.message);
       btn.disabled = false;
-      btn.querySelector('span').textContent = 'حفظ التعديلات';
+      btn.querySelector('span').textContent = tr('pe_save');
     }
   });
 });
