@@ -543,6 +543,20 @@ const translations = {
     sup_add: 'إضافة مورد',
     sup_search_ph: 'بحث باسم المورد...',
     sup_empty: 'لا يوجد موردون بعد',
+
+    sup_add_title: 'إضافة مورد',
+    sup_add_title_full: 'MyStock - إضافة مورد',
+    sup_name: 'اسم المورد *',
+    sup_specialty: 'الإختصاص',
+    sup_specialty_ph: 'مثال: مواد غذائية، إلكترونيات، ملابس...',
+    sup_address: 'العنوان',
+    sup_notes: 'ملاحظات',
+    sup_notes_ph: 'أي ملاحظات إضافية...',
+    sup_save: 'حفظ المورد',
+    sup_err_name: 'اسم المورد مطلوب',
+    sup_notif_title: 'مورد جديد',
+    sup_notif_msg: 'أضاف المورد',
+    sup_success: '✅ تم إضافة المورد بنجاح!',
   },
 
   fr: {
@@ -1079,6 +1093,20 @@ const translations = {
     sup_add: 'Ajouter un fournisseur',
     sup_search_ph: 'Rechercher par nom...',
     sup_empty: 'Aucun fournisseur',
+
+    sup_add_title: 'Ajouter un fournisseur',
+    sup_add_title_full: 'MyStock - Ajouter un fournisseur',
+    sup_name: 'Nom du fournisseur *',
+    sup_specialty: 'Spécialité',
+    sup_specialty_ph: 'Ex: Alimentaire, Électronique, Vêtements...',
+    sup_address: 'Adresse',
+    sup_notes: 'Notes',
+    sup_notes_ph: 'Notes supplémentaires...',
+    sup_save: 'Enregistrer',
+    sup_err_name: 'Nom du fournisseur requis',
+    sup_notif_title: 'Nouveau fournisseur',
+    sup_notif_msg: 'a ajouté le fournisseur',
+    sup_success: '✅ Fournisseur ajouté avec succès!',
   },
 
   en: {
@@ -1614,6 +1642,20 @@ const translations = {
     sup_add: 'Add Supplier',
     sup_search_ph: 'Search by supplier name...',
     sup_empty: 'No suppliers yet',
+
+    sup_add_title: 'Add Supplier',
+    sup_add_title_full: 'MyStock - Add Supplier',
+    sup_name: 'Supplier Name *',
+    sup_specialty: 'Specialty',
+    sup_specialty_ph: 'Ex: Food, Electronics, Clothing...',
+    sup_address: 'Address',
+    sup_notes: 'Notes',
+    sup_notes_ph: 'Any additional notes...',
+    sup_save: 'Save Supplier',
+    sup_err_name: 'Supplier name required',
+    sup_notif_title: 'New supplier',
+    sup_notif_msg: 'added supplier',
+    sup_success: '✅ Supplier added successfully!',
   },
 
   

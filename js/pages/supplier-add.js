@@ -1,5 +1,6 @@
 // ============================================
 // صفحة إضافة مورد
+// ✅ دعم كامل للترجمة
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   const user = await requireAuth();
@@ -7,13 +8,18 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   renderLayout('suppliers/add.html');
 
+  if (window.applyLanguage) window.applyLanguage();
+  const tr = (key) => (window.t ? window.t(key) : key);
+
+  document.title = tr('sup_add_title_full');
+
   const main = document.getElementById('main-content');
   main.innerHTML = `
     <div class="page-header">
-      <h2>إضافة مورد</h2>
+      <h2>${tr('sup_add_title')}</h2>
       <a href="list.html" class="btn-secondary">
         <i class="fas fa-arrow-right"></i>
-        <span>العودة</span>
+        <span>${tr('prod_detail_back')}</span>
       </a>
     </div>
 
@@ -22,42 +28,42 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     <form id="supplier-form" class="add-form">
       <div class="form-group">
-        <label>اسم المورد *</label>
+        <label>${tr('sup_name')}</label>
         <input type="text" id="name" required>
       </div>
 
       <div class="form-group">
-        <label>الإختصاص</label>
-        <input type="text" id="specialty" placeholder="مثال: مواد غذائية، إلكترونيات، ملابس...">
+        <label>${tr('sup_specialty')}</label>
+        <input type="text" id="specialty" placeholder="${tr('sup_specialty_ph')}">
       </div>
 
       <div class="form-grid">
         <div class="form-group">
-          <label>رقم الهاتف</label>
+          <label>${tr('inv_page_supplier_phone').replace(':', '')}</label>
           <input type="tel" id="phone" dir="ltr">
         </div>
         <div class="form-group">
-          <label>البريد الإلكتروني</label>
+          <label>${tr('register_email').replace(' *', '')}</label>
           <input type="email" id="email" dir="ltr">
         </div>
       </div>
 
       <div class="form-group">
-        <label>العنوان</label>
+        <label>${tr('sup_address')}</label>
         <input type="text" id="address">
       </div>
 
       <div class="form-group">
-        <label>ملاحظات</label>
-        <textarea id="notes" rows="3" placeholder="أي ملاحظات إضافية..."></textarea>
+        <label>${tr('sup_notes')}</label>
+        <textarea id="notes" rows="3" placeholder="${tr('sup_notes_ph')}"></textarea>
       </div>
 
       <div class="form-actions">
         <button type="submit" class="btn-primary" id="save-btn">
           <i class="fas fa-check"></i>
-          <span>حفظ المورد</span>
+          <span>${tr('sup_save')}</span>
         </button>
-        <a href="list.html" class="btn-secondary">إلغاء</a>
+        <a href="list.html" class="btn-secondary">${tr('prod_add_cancel')}</a>
       </div>
     </form>
   `;
@@ -67,6 +73,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 async function handleSubmit(e) {
   e.preventDefault();
+
+  const tr = (key) => (window.t ? window.t(key) : key);
 
   const btn = document.getElementById('save-btn');
   const errBox = document.getElementById('form-error');
@@ -83,14 +91,14 @@ async function handleSubmit(e) {
     .single();
 
   if (!profile?.organization_id) {
-    errBox.textContent = 'لا يمكن تحديد المنظمة';
+    errBox.textContent = tr('prod_add_err_org');
     errBox.style.display = 'block';
     return;
   }
 
   const nameValue = document.getElementById('name').value.trim();
   if (!nameValue) {
-    errBox.textContent = 'اسم المورد مطلوب';
+    errBox.textContent = tr('sup_err_name');
     errBox.style.display = 'block';
     return;
   }
@@ -107,7 +115,7 @@ async function handleSubmit(e) {
   };
 
   btn.disabled = true;
-  btn.querySelector('span').textContent = 'جارٍ الحفظ...';
+  btn.querySelector('span').textContent = tr('pe_saving');
 
   const { data: newSupplier, error } = await db
     .from('suppliers')
@@ -116,25 +124,25 @@ async function handleSubmit(e) {
     .single();
 
   if (error) {
-    errBox.textContent = 'خطأ: ' + error.message;
+    errBox.textContent = tr('prod_detail_err') + ' ' + error.message;
     errBox.style.display = 'block';
     btn.disabled = false;
-    btn.querySelector('span').textContent = 'حفظ المورد';
+    btn.querySelector('span').textContent = tr('sup_save');
     return;
   }
 
   if (typeof notifyOrganization === 'function') {
     await notifyOrganization({
       orgId: profile.organization_id,
-      title: 'مورد جديد',
-      message: `${profile.full_name || 'مستخدم'} أضاف المورد "${nameValue}"`,
+      title: tr('sup_notif_title'),
+      message: `${profile.full_name || tr('prod_detail_user')} ${tr('sup_notif_msg')} "${nameValue}"`,
       type: 'info',
       link: `/suppliers/detail.html?id=${newSupplier.id}`,
       userName: profile.full_name || null,
     });
   }
 
-  successBox.textContent = '✅ تم إضافة المورد بنجاح!';
+  successBox.textContent = tr('sup_success');
   successBox.style.display = 'block';
 
   setTimeout(() => {
