@@ -7,13 +7,17 @@
 function inlineEdit({ el, table, id, field, type = 'text', onSave }) {
   if (!el) return;
 
-  const original = el.dataset.value ?? el.textContent.trim();
+  // ✅ قراءة القيمة الأولية من dataset.value أولاً (أهم من textContent)
+  const initialValue = el.dataset.value !== undefined
+    ? el.dataset.value
+    : el.textContent.trim();
+
   const isNumber = type === 'number';
   const inputType = isNumber ? 'number' : 'text';
 
   let editing = false;
   let saving = false;
-  let currentValue = original;
+  let currentValue = initialValue;
 
   // عرض عادي
   function renderDisplay() {
@@ -23,7 +27,7 @@ function inlineEdit({ el, table, id, field, type = 'text', onSave }) {
 
     const span = document.createElement('span');
     span.className = 'inline-display';
-    span.textContent = currentValue === '' ? '—' : currentValue;
+    span.textContent = (currentValue === '' || currentValue == null) ? '—' : currentValue;
     el.appendChild(span);
   }
 
@@ -60,7 +64,7 @@ function inlineEdit({ el, table, id, field, type = 'text', onSave }) {
   function cancel() {
     if (!editing) return;
     editing = false;
-    currentValue = original;
+    currentValue = initialValue;
     renderDisplay();
   }
 
@@ -92,7 +96,7 @@ function inlineEdit({ el, table, id, field, type = 'text', onSave }) {
 
     if (error) {
       alert('خطأ: ' + error.message);
-      currentValue = original;
+      currentValue = initialValue;
       renderDisplay();
       return;
     }
@@ -107,18 +111,12 @@ function inlineEdit({ el, table, id, field, type = 'text', onSave }) {
     setTimeout(() => check.remove(), 1200);
 
     // ✅ callback — مع await و try/catch
-    console.log('🔍 [inlineEdit] onSave type:', typeof onSave);
-    console.log('🔍 [inlineEdit] field:', field, 'newValue:', newValue);
-
     if (typeof onSave === 'function') {
       try {
         await onSave(field, newValue);
-        console.log('✅ [inlineEdit] onSave executed successfully');
       } catch (err) {
         console.error('❌ [inlineEdit] onSave error:', err);
       }
-    } else {
-      console.warn('⚠️ [inlineEdit] onSave is not a function');
     }
   }
 
@@ -129,7 +127,7 @@ function inlineEdit({ el, table, id, field, type = 'text', onSave }) {
     renderEdit();
   });
 
-  // عرض أولي
-  el.dataset.value = original;
+  // ✅ عرض أولي — يعرض القيمة من dataset.value دائماً
+  el.dataset.value = currentValue;
   renderDisplay();
 }
