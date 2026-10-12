@@ -1,7 +1,6 @@
 // ============================================
 // صفحة تفاصيل المنتج
 // ✅ قسم سعر البيع (Switch + قيمة)
-// ✅ دعم كامل للترجمة
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   const user = await requireAuth();
@@ -9,17 +8,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   renderLayout('products/detail.html');
 
-  if (window.applyLanguage) window.applyLanguage();
-  const tr = (key) => (window.t ? window.t(key) : key);
-
-  document.title = tr('prod_detail_title_full');
-
   const params = new URLSearchParams(window.location.search);
   const productId = params.get('id');
   const main = document.getElementById('main-content');
 
   if (!productId) {
-    main.innerHTML = `<div class="alert alert-error">${tr('prod_detail_no_id')}</div>`;
+    main.innerHTML = `<div class="alert alert-error">لم يتم تحديد المنتج</div>`;
     return;
   }
 
@@ -30,7 +24,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     .single();
 
   if (error || !product) {
-    main.innerHTML = `<div class="alert alert-error">${tr('prod_detail_not_found')}</div>`;
+    main.innerHTML = `<div class="alert alert-error">المنتج غير موجود</div>`;
     return;
   }
 
@@ -40,6 +34,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     .eq('id', user.id)
     .single();
 
+  // إعدادات العملة
   let currencySymbol = '';
   if (profile?.organization_id) {
     const { data: org } = await db
@@ -56,10 +51,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   main.innerHTML = `
     <div class="page-header">
-      <h2>${tr('prod_detail_title')}</h2>
+      <h2>تفاصيل المنتج</h2>
       <a href="list.html" class="btn-secondary">
         <i class="fas fa-arrow-right"></i>
-        <span>${tr('prod_detail_back')}</span>
+        <span>العودة</span>
       </a>
     </div>
 
@@ -67,9 +62,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       <div class="product-image" id="product-image-container">
         ${product.image_url
-          ? `<img src="${product.image_url}" alt="${product.name ?? tr('products_no_name')}">`
+          ? `<img src="${product.image_url}" alt="${product.name ?? 'منتج'}">`
           : `<i class="fas fa-box-open"></i>`}
-        <button class="image-edit-btn" title="${tr('prod_detail_edit_image')}">
+        <button class="image-edit-btn" title="تعديل الصورة">
           <i class="fas fa-camera"></i>
         </button>
       </div>
@@ -83,54 +78,55 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       <div class="product-stats">
         <div class="stat">
-          <div class="stat-label">${tr('products_qty')}</div>
+          <div class="stat-label">الكمية</div>
           <div class="stat-value ${(product.qty ?? 0) < 10 ? 'low' : ''}">
             <span class="edit-field center" id="f-qty" data-value="${product.qty ?? 0}"></span>
           </div>
         </div>
         <div class="stat">
-          <div class="stat-label">${tr('prod_detail_buy_price')}</div>
+          <div class="stat-label">سعر الشراء</div>
           <div class="stat-value">
             <span class="edit-field center" id="f-price" data-value="${product.price ?? 0}"></span>
           </div>
         </div>
         <div class="stat">
-          <div class="stat-label">${tr('products_total')}</div>
+          <div class="stat-label">المجموع</div>
           <div class="stat-value" id="f-total">${total}</div>
         </div>
       </div>
 
       <div class="product-extra">
         <div class="row">
-          <span>${tr('prod_detail_category')}</span>
+          <span>الفئة</span>
           <strong class="edit-field" id="f-category" data-value="${product.category ?? product.suppliers?.specialty ?? ''}"></strong>
         </div>
         <div class="row">
-          <span>${tr('prod_detail_supplier')}</span>
+          <span>المورد</span>
           <strong>${product.suppliers?.name ?? '—'}</strong>
         </div>
         <div class="row">
-          <span>${tr('prod_detail_unit')}</span>
+          <span>الوحدة</span>
           <strong class="edit-field" id="f-unit" data-value="${product.unit ?? ''}"></strong>
         </div>
         <div class="row">
-          <span>${tr('prod_detail_barcode')}</span>
+          <span>الباركود</span>
           <strong class="edit-field" id="f-qr_code" data-value="${product.qr_code ?? ''}"></strong>
         </div>
       </div>
 
+      <!-- ══════ سعر البيع ══════ -->
       <div class="sell-price-section">
-        <h3 class="sell-price-title">💰 ${tr('prod_detail_sell_price')}</h3>
+        <h3 class="sell-price-title">💰 سعر البيع</h3>
 
         <div class="switch-item">
           <div class="switch-content">
             <div class="switch-header">
-              <strong class="switch-title">${tr('prod_detail_enable_sell')}</strong>
+              <strong class="switch-title">تفعيل سعر بيع خاص</strong>
               <span class="switch-status ${sellPriceEnabled ? 'on' : 'off'}" id="sell-price-status">
-                ${sellPriceEnabled ? tr('prod_detail_enabled') : tr('prod_detail_disabled')}
+                ${sellPriceEnabled ? 'مفعّل' : 'غير مفعّل'}
               </span>
             </div>
-            <p class="switch-desc">${tr('prod_detail_sell_desc')}</p>
+            <p class="switch-desc">عند التفعيل يُستخدم هذا السعر في إيصال البيع (بدلاً من سعر الشراء)</p>
           </div>
           <label class="switch">
             <input type="checkbox" id="sell-price-toggle" ${sellPriceEnabled ? 'checked' : ''}>
@@ -139,16 +135,16 @@ document.addEventListener('DOMContentLoaded', async () => {
         </div>
 
         <div class="sell-price-input-group">
-          <label>${tr('prod_detail_sell_input')} (${currencySymbol || 'DH'})</label>
+          <label>سعر البيع (${currencySymbol || 'DH'})</label>
           <input type="number" id="sell-price-input" value="${sellPrice}" min="0" step="0.01" dir="ltr" placeholder="0.00">
-          <small class="field-hint">${tr('prod_detail_sell_hint')}</small>
+          <small class="field-hint">أدخل السعر الذي تريد بيع المنتج به</small>
         </div>
       </div>
 
       <div class="actions">
         <button class="btn-danger" id="delete-btn">
           <i class="fas fa-trash"></i>
-          <span>${tr('prod_detail_delete')}</span>
+          <span>حذف المنتج</span>
         </button>
       </div>
 
@@ -162,13 +158,13 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   const fieldLabels = {
-    name: tr('prod_detail_field_name'),
-    sku: tr('prod_detail_field_sku'),
-    qty: tr('products_qty'),
-    price: tr('prod_detail_buy_price'),
-    category: tr('prod_detail_category'),
-    unit: tr('prod_detail_unit'),
-    qr_code: tr('prod_detail_barcode'),
+    name: 'الاسم',
+    sku: 'SKU',
+    qty: 'الكمية',
+    price: 'سعر الشراء',
+    category: 'الفئة',
+    unit: 'الوحدة',
+    qr_code: 'الباركود',
   };
 
   const fields = [
@@ -194,8 +190,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (typeof notifyOrganization === 'function' && profile?.organization_id) {
           await notifyOrganization({
             orgId: profile.organization_id,
-            title: tr('prod_detail_notif_edit_title'),
-            message: `${profile.full_name || tr('prod_detail_user')} ${tr('prod_detail_notif_edit_msg')} ${fieldLabels[savedField] || savedField} "${product.name}" ${tr('prod_detail_to')} "${newValue}"`,
+            title: 'تعديل منتج',
+            message: `${profile.full_name || 'مستخدم'} عدّل ${fieldLabels[savedField] || savedField} "${product.name}" إلى "${newValue}"`,
             type: 'info',
             link: `/products/detail.html?id=${productId}`,
             userName: profile.full_name || null,
@@ -208,6 +204,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   const imgContainer = document.getElementById('product-image-container');
   attachImageUpload(productId, imgContainer, product.image_url);
 
+  // ═══════════════════════════════════════════
+  // ✅ Switch: تفعيل سعر البيع
+  // ═══════════════════════════════════════════
   const sellPriceToggle = document.getElementById('sell-price-toggle');
   const sellPriceStatus = document.getElementById('sell-price-status');
   const sellPriceInput = document.getElementById('sell-price-input');
@@ -228,28 +227,33 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (updateError) throw new Error(updateError.message);
 
       currentSellPriceEnabled = newValue;
-      sellPriceStatus.textContent = newValue ? tr('prod_detail_enabled') : tr('prod_detail_disabled');
+      sellPriceStatus.textContent = newValue ? 'مفعّل' : 'غير مفعّل';
       sellPriceStatus.classList.toggle('on', newValue);
       sellPriceStatus.classList.toggle('off', !newValue);
 
+      // إشعار
       if (typeof notifyOrganization === 'function' && profile?.organization_id) {
         await notifyOrganization({
           orgId: profile.organization_id,
-          title: tr('prod_detail_notif_sell_title'),
-          message: `${profile.full_name || tr('prod_detail_user')} ${newValue ? tr('prod_detail_notif_sell_on') : tr('prod_detail_notif_sell_off')} "${product.name}"`,
+          title: 'تعديل سعر البيع',
+          message: `${profile.full_name || 'مستخدم'} ${newValue ? 'فعّل' : 'أوقف'} سعر البيع الخاص بـ "${product.name}"`,
           type: 'info',
           link: `/products/detail.html?id=${productId}`,
           userName: profile.full_name || null,
         });
       }
     } catch (err) {
-      alert(tr('prod_detail_err') + ' ' + err.message);
+      alert('خطأ: ' + err.message);
+      // إرجاع الحالة السابقة
       sellPriceToggle.checked = !newValue;
     } finally {
       sellPriceToggle.disabled = false;
     }
   });
 
+  // ═══════════════════════════════════════════
+  // ✅ حفظ سعر البيع عند تغيير القيمة
+  // ═══════════════════════════════════════════
   let sellPriceSaveTimeout = null;
 
   sellPriceInput.addEventListener('input', () => {
@@ -266,11 +270,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         if (updateError) throw new Error(updateError.message);
 
+        // إشعار
         if (typeof notifyOrganization === 'function' && profile?.organization_id) {
           await notifyOrganization({
             orgId: profile.organization_id,
-            title: tr('prod_detail_notif_sell_title'),
-            message: `${profile.full_name || tr('prod_detail_user')} ${tr('prod_detail_notif_sell_edit')} "${product.name}" ${tr('prod_detail_to')} "${newPrice}"`,
+            title: 'تعديل سعر البيع',
+            message: `${profile.full_name || 'مستخدم'} عدّل سعر البيع الخاص بـ "${product.name}" إلى "${newPrice}"`,
             type: 'info',
             link: `/products/detail.html?id=${productId}`,
             userName: profile.full_name || null,
@@ -279,24 +284,27 @@ document.addEventListener('DOMContentLoaded', async () => {
       } catch (err) {
         console.error('فشل حفظ سعر البيع:', err);
       }
-    }, 800);
+    }, 800); // ✅ ينتظر 800ms بعد آخر إدخال
   });
 
+  // ═══════════════════════════════════════════
+  // حذف المنتج
+  // ═══════════════════════════════════════════
   document.getElementById('delete-btn').addEventListener('click', async () => {
-    if (!confirm(tr('prod_detail_confirm_delete'))) return;
+    if (!confirm('هل أنت متأكد من حذف هذا المنتج؟')) return;
 
     const { error } = await db.from('products').delete().eq('id', productId);
 
     if (error) {
-      alert(tr('prod_detail_err') + ' ' + error.message);
+      alert('خطأ: ' + error.message);
       return;
     }
 
     if (typeof notifyOrganization === 'function' && profile?.organization_id) {
       await notifyOrganization({
         orgId: profile.organization_id,
-        title: tr('prod_detail_notif_del_title'),
-        message: `${profile.full_name || tr('prod_detail_user')} ${tr('prod_detail_notif_del_msg')} "${product.name}"`,
+        title: 'حذف منتج',
+        message: `${profile.full_name || 'مستخدم'} حذف "${product.name}"`,
         type: 'danger',
         link: '/products/list.html',
         userName: profile.full_name || null,
