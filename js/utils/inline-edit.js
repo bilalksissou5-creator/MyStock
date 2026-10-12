@@ -7,7 +7,6 @@
 function inlineEdit({ el, table, id, field, type = 'text', onSave }) {
   if (!el) return;
 
-  // ✅ قراءة القيمة الأولية من dataset.value أولاً (أهم من textContent)
   const initialValue = el.dataset.value !== undefined
     ? el.dataset.value
     : el.textContent.trim();
@@ -19,7 +18,6 @@ function inlineEdit({ el, table, id, field, type = 'text', onSave }) {
   let saving = false;
   let currentValue = initialValue;
 
-  // عرض عادي
   function renderDisplay() {
     el.innerHTML = '';
     el.classList.remove('editing');
@@ -31,7 +29,6 @@ function inlineEdit({ el, table, id, field, type = 'text', onSave }) {
     el.appendChild(span);
   }
 
-  // عرض تحرير
   function renderEdit() {
     el.innerHTML = '';
     el.classList.add('editing');
@@ -60,7 +57,6 @@ function inlineEdit({ el, table, id, field, type = 'text', onSave }) {
     input.addEventListener('blur', save);
   }
 
-  // إلغاء
   function cancel() {
     if (!editing) return;
     editing = false;
@@ -68,7 +64,6 @@ function inlineEdit({ el, table, id, field, type = 'text', onSave }) {
     renderDisplay();
   }
 
-  // حفظ
   async function save() {
     if (!editing || saving) return;
 
@@ -77,7 +72,6 @@ function inlineEdit({ el, table, id, field, type = 'text', onSave }) {
 
     const newValue = isNumber ? (input.value === '' ? 0 : Number(input.value)) : input.value.trim();
 
-    // لم يتغير؟ ← رجوع
     if (String(newValue) === String(currentValue)) {
       editing = false;
       renderDisplay();
@@ -104,13 +98,11 @@ function inlineEdit({ el, table, id, field, type = 'text', onSave }) {
     currentValue = newValue;
     renderDisplay();
 
-    // مؤشر الحفظ ✓
     const check = document.createElement('i');
     check.className = 'fas fa-check save-indicator';
     el.appendChild(check);
     setTimeout(() => check.remove(), 1200);
 
-    // ✅ callback — مع await و try/catch
     if (typeof onSave === 'function') {
       try {
         await onSave(field, newValue);
@@ -120,14 +112,12 @@ function inlineEdit({ el, table, id, field, type = 'text', onSave }) {
     }
   }
 
-  // الضغط للدخول في التحرير
   el.addEventListener('click', () => {
     if (editing) return;
     editing = true;
     renderEdit();
   });
 
-  // ✅ عرض أولي — يعرض القيمة من dataset.value دائماً
   el.dataset.value = currentValue;
   renderDisplay();
 }

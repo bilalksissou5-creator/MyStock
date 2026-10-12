@@ -30,15 +30,19 @@ async function uploadProductImage(file, productId) {
 }
 
 // ============================================
-// إضافة زر ✏️ فوق الصورة
+// إضافة زر تعديل الصورة
 // ============================================
 function attachImageUpload(productId, container, currentUrl) {
-  const input = document.createElement('input');
-  input.type = 'file';
-  input.accept = 'image/*';
-  input.style.display = 'none';
+  function bindButton() {
+    const btn = container.querySelector('.image-edit-btn');
+    const input = container.querySelector('input[type="file"]');
+    if (!btn || !input) return;
+    if (btn.dataset.bound === '1') return;
+    btn.dataset.bound = '1';
+    btn.addEventListener('click', () => input.click());
+  }
 
-  input.addEventListener('change', async (e) => {
+  async function handleFile(e) {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -53,31 +57,33 @@ function attachImageUpload(productId, container, currentUrl) {
     if (!result.ok) {
       alert('خطأ: ' + result.error);
       if (btn) {
-        btn.innerHTML = '<i class="fas fa-pen"></i>';
+        btn.innerHTML = '<i class="fas fa-camera"></i>';
         btn.disabled = false;
       }
       return;
     }
 
-    // تحديث الصورة
+    // استبدال محتوى الحاوية
     container.innerHTML = `
       <img src="${result.url}?t=${Date.now()}" alt="صورة المنتج">
       <button class="image-edit-btn" title="تعديل الصورة">
-        <i class="fas fa-pen"></i>
+        <i class="fas fa-camera"></i>
       </button>
       <input type="file" accept="image/*" style="display:none;">
     `;
-    container.appendChild(input);
 
-    // إعادة الربط
-    const newBtn = container.querySelector('.image-edit-btn');
     const newInput = container.querySelector('input[type="file"]');
-    newBtn.addEventListener('click', () => newInput.click());
-    newInput.addEventListener('change', input.onchange);
-  });
+    newInput.addEventListener('change', handleFile);
+    bindButton();
+  }
+
+  // إنشاء input وربطه
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = 'image/*';
+  input.style.display = 'none';
+  input.addEventListener('change', handleFile);
 
   container.appendChild(input);
-
-  const btn = container.querySelector('.image-edit-btn');
-  if (btn) btn.addEventListener('click', () => input.click());
+  bindButton();
 }
