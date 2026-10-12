@@ -1,11 +1,17 @@
 // ============================================
 // صفحة الملف الشخصي — تصميم Facebook + Accordion
+// ✅ دعم كامل للترجمة
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   const user = await requireAuth();
   if (!user) return;
 
   renderLayout('profile.html');
+
+  if (window.applyLanguage) window.applyLanguage();
+  const tr = (key) => (window.t ? window.t(key) : key);
+
+  document.title = tr('pf_title_full');
 
   const main = document.getElementById('main-content');
 
@@ -34,16 +40,13 @@ document.addEventListener('DOMContentLoaded', async () => {
   const deputies = others.filter(m => m.role === 'deputy');
   const workers = others.filter(m => m.role === 'worker');
 
-  // ✅ حالة اتصال المستخدم نفسه
   const isMeOnline = typeof isUserOnline === 'function' && isUserOnline(profile);
 
-  // ═══════════════════════════════════════════
-  // بناء بطاقة عضو (قابلة للضغط للجميع)
-  // ═══════════════════════════════════════════
   function buildMemberCard(member, type) {
     const isOnline = typeof isUserOnline === 'function' && isUserOnline(member);
     const starClass = type === 'deputy' ? 'deputy-star' : 'worker-star';
-    const roleLabel = type === 'deputy' ? 'نائب' : 'عامل';
+    const roleLabel = type === 'deputy' ? tr('wk_role_deputy') : tr('wk_role_worker');
+    const statusTitle = isOnline ? tr('wk_online') : tr('wk_offline');
 
     return `
       <a href="/member-profile.html?id=${member.id}" class="member-card member-card-link">
@@ -54,11 +57,11 @@ document.addEventListener('DOMContentLoaded', async () => {
               : `<i class="fas fa-user"></i>`}
           </div>
           <span class="member-status-dot ${isOnline ? 'online' : 'offline'}"
-                title="${isOnline ? 'متصل' : 'غير متصل'}"></span>
+                title="${statusTitle}"></span>
         </div>
 
         <div class="member-name-row">
-          <span class="member-name">${member.full_name ?? 'بدون اسم'}</span>
+          <span class="member-name">${member.full_name ?? tr('products_no_name')}</span>
           <i class="fas fa-star member-star-icon ${starClass}"></i>
         </div>
 
@@ -69,6 +72,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   function buildAdminCard(member) {
     const isOnline = typeof isUserOnline === 'function' && isUserOnline(member);
+    const statusTitle = isOnline ? tr('wk_online') : tr('wk_offline');
 
     return `
       <a href="/member-profile.html?id=${member.id}" class="member-card member-card-admin member-card-link">
@@ -79,15 +83,15 @@ document.addEventListener('DOMContentLoaded', async () => {
               : `<i class="fas fa-user"></i>`}
           </div>
           <span class="member-status-dot ${isOnline ? 'online' : 'offline'}"
-                title="${isOnline ? 'متصل' : 'غير متصل'}"></span>
+                title="${statusTitle}"></span>
         </div>
 
         <div class="member-name-row">
-          <span class="member-name">${member.full_name ?? 'بدون اسم'}</span>
+          <span class="member-name">${member.full_name ?? tr('products_no_name')}</span>
           <i class="fas fa-crown member-star-icon crown-star"></i>
         </div>
 
-        <div class="member-role admin">مدير</div>
+        <div class="member-role admin">${tr('mp_role_admin')}</div>
       </a>
     `;
   }
@@ -110,22 +114,23 @@ document.addEventListener('DOMContentLoaded', async () => {
     `;
   }
 
-  // ═══════════════════════════════════════════
-  // معلومات المستخدم الحالي
-  // ═══════════════════════════════════════════
   const roleIcon = currentRole === 'admin'
     ? '<i class="fas fa-crown info-icon" style="color:#fbbf24;"></i>'
     : currentRole === 'deputy'
       ? '<i class="fas fa-star info-icon" style="color:#fbbf24;"></i>'
       : '<i class="fas fa-users info-icon"></i>';
 
-  const roleLabel = currentRole === 'admin' ? 'مدير' : currentRole === 'deputy' ? 'نائب' : 'عامل';
+  const roleLabel = currentRole === 'admin'
+    ? tr('mp_role_admin')
+    : currentRole === 'deputy'
+      ? tr('wk_role_deputy')
+      : tr('wk_role_worker');
 
   const personalInfoContent = `
     <div class="info-list">
       <div class="info-row">
         <i class="fas fa-user info-icon"></i>
-        <span class="info-text">${profile?.full_name ?? 'بدون اسم'}</span>
+        <span class="info-text">${profile?.full_name ?? tr('products_no_name')}</span>
       </div>
 
       <div class="info-row">
@@ -148,130 +153,114 @@ document.addEventListener('DOMContentLoaded', async () => {
   main.innerHTML = `
     <div class="profile-fb-wrapper">
 
-      <!-- ══════ الغلاف ══════ -->
       <div class="profile-cover">
         ${profile?.cover_url
           ? `<img src="${profile.cover_url}" alt="cover">`
           : `<div class="cover-placeholder"></div>`}
       </div>
 
-      <!-- ══════ الصورة الشخصية + النقطة ══════ -->
       <div class="profile-avatar-fb-wrap">
         <div class="profile-avatar-fb">
           ${profile?.avatar_url
             ? `<img src="${profile.avatar_url}" alt="avatar">`
             : `<i class="fas fa-user"></i>`}
           <span class="profile-status-dot ${isMeOnline ? 'online' : 'offline'}"
-                title="${isMeOnline ? 'متصل' : 'غير متصل'}"></span>
+                title="${isMeOnline ? tr('wk_online') : tr('wk_offline')}"></span>
         </div>
       </div>
 
-      <!-- ══════ معلومات المستخدم ══════ -->
       <div class="profile-fb-info">
-        <h3>${profile?.full_name ?? 'بدون اسم'}</h3>
+        <h3>${profile?.full_name ?? tr('products_no_name')}</h3>
         <p class="profile-fb-email" dir="ltr">${user.email}</p>
         <div class="profile-fb-badges">
           <span class="badge-role">${roleLabel}</span>
         </div>
       </div>
 
-      <!-- ══════ شريط الأزرار ══════ -->
       <div class="profile-actions-bar">
         ${isAdminOrDeputy ? `
           <a href="/add-worker.html" class="btn-secondary">
             <i class="fas fa-user-plus"></i>
-            <span>إضافة عامل</span>
+            <span>${tr('pf_add_worker')}</span>
           </a>
         ` : ''}
         <a href="/profile-dashboard.html" class="btn-primary">
           <i class="fas fa-sliders"></i>
-          <span>لوحة المعلومات</span>
+          <span>${tr('pf_dashboard')}</span>
         </a>
       </div>
 
-      <!-- ══════ المعلومات الشخصية ══════ -->
       ${buildTeamSection({
         id: 'personal-info',
         icon: 'fa-user',
-        label: 'المعلومات الشخصية',
+        label: tr('mp_personal_info'),
         count: undefined,
         content: personalInfoContent,
       })}
 
-      <!-- ══════ قسم المدير ══════ -->
       ${admin ? buildTeamSection({
         id: 'admin',
         icon: 'fa-crown',
         iconColor: '#fbbf24',
-        label: 'المدير',
+        label: tr('mp_admin'),
         count: undefined,
         content: `<div class="team-grid">${buildAdminCard(admin)}</div>`,
       }) : ''}
 
-      <!-- ══════ قسم النواب ══════ -->
       ${deputies.length > 0 ? buildTeamSection({
         id: 'deputies',
         icon: 'fa-star',
         iconColor: '#fbbf24',
-        label: 'النواب',
+        label: tr('wk_deputies'),
         count: deputies.length,
         content: `<div class="team-grid">${deputies.map(w => buildMemberCard(w, 'deputy')).join('')}</div>`,
       }) : ''}
 
-      <!-- ══════ قسم العمال ══════ -->
       ${workers.length > 0 ? buildTeamSection({
         id: 'workers',
         icon: 'fa-users',
         iconColor: '#171717',
-        label: 'العمال',
+        label: tr('wk_workers'),
         count: workers.length,
         content: `<div class="team-grid">${workers.map(w => buildMemberCard(w, 'worker')).join('')}</div>`,
       }) : ''}
 
-      <!-- ═══════════════════════════════════════
-           السجلات
-           ═══════════════════════════════════════ -->
       <div class="records-row">
         <a href="#" class="record-item" data-record="log">
           <i class="fas fa-clipboard-list"></i>
-          <span>السجل</span>
+          <span>${tr('mp_log')}</span>
         </a>
 
         <div class="records-left">
           <a href="#" class="record-item" data-record="invoices">
             <i class="fas fa-file-invoice"></i>
-            <span>الفواتير</span>
+            <span>${tr('mp_invoices')}</span>
           </a>
 
           <a href="#" class="record-item" data-record="out">
             <i class="fas fa-arrow-up-from-bracket"></i>
-            <span>إخراج</span>
+            <span>${tr('mp_out')}</span>
           </a>
         </div>
       </div>
 
-      <!-- ══════ سجل الفواتير ══════ -->
       <div id="log-invoices" class="log-panel" style="display:none;">
         <div class="log-loading">
           <i class="fas fa-spinner fa-spin"></i>
-          <span>جارٍ التحميل...</span>
+          <span>${tr('loading')}</span>
         </div>
       </div>
 
-      <!-- ══════ سجل الإخراج ══════ -->
       <div id="log-out" class="log-panel" style="display:none;">
         <div class="log-loading">
           <i class="fas fa-spinner fa-spin"></i>
-          <span>جارٍ التحميل...</span>
+          <span>${tr('loading')}</span>
         </div>
       </div>
 
     </div>
   `;
 
-  // ═══════════════════════════════════════════
-  // Accordion
-  // ═══════════════════════════════════════════
   document.querySelectorAll('[data-toggle]').forEach(btn => {
     btn.addEventListener('click', () => {
       const id = btn.dataset.toggle;
@@ -296,17 +285,18 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   });
 
-  // ═══════════════════════════════════════════
-  // السجلات
-  // ═══════════════════════════════════════════
   const logInvoices = document.getElementById('log-invoices');
   const logOut = document.getElementById('log-out');
+
+  const lang = window.getCurrentLang ? window.getCurrentLang() : 'ar';
+  const localeMap = { ar: 'ar-MA', fr: 'fr-FR', en: 'en-US' };
+  const locale = localeMap[lang] || 'en-US';
 
   async function loadInvoices() {
     logInvoices.innerHTML = `
       <div class="log-loading">
         <i class="fas fa-spinner fa-spin"></i>
-        <span>جارٍ التحميل...</span>
+        <span>${tr('loading')}</span>
       </div>
     `;
 
@@ -317,12 +307,12 @@ document.addEventListener('DOMContentLoaded', async () => {
       .order('created_at', { ascending: false });
 
     if (error) {
-      logInvoices.innerHTML = `<div class="log-empty">خطأ: ${error.message}</div>`;
+      logInvoices.innerHTML = `<div class="log-empty">${tr('prod_detail_err')} ${error.message}</div>`;
       return;
     }
 
     if (!data || data.length === 0) {
-      logInvoices.innerHTML = `<div class="log-empty">لا توجد فواتير بعد</div>`;
+      logInvoices.innerHTML = `<div class="log-empty">${tr('inv_empty')}</div>`;
       return;
     }
 
@@ -332,9 +322,9 @@ document.addEventListener('DOMContentLoaded', async () => {
           <a href="/invoice.html?id=${encodeURIComponent(inv.invoice_number)}" class="log-row log-row-link">
             <div class="log-row-main">
               <strong>${inv.invoice_number}</strong>
-              <span>${inv.total_qty ?? 0} قطعة • ${Number(inv.total_value ?? 0).toFixed(2)}</span>
+              <span>${inv.total_qty ?? 0} ${tr('inv_notif_unit')} • ${Number(inv.total_value ?? 0).toFixed(2)}</span>
             </div>
-            <div class="log-row-date">${new Date(inv.created_at).toLocaleDateString('ar-MA')}</div>
+            <div class="log-row-date">${new Date(inv.created_at).toLocaleDateString(locale)}</div>
           </a>
         `).join('')}
       </div>
@@ -345,11 +335,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     logOut.innerHTML = `
       <div class="log-loading">
         <i class="fas fa-spinner fa-spin"></i>
-        <span>جارٍ التحميل...</span>
+        <span>${tr('loading')}</span>
       </div>
     `;
 
-    // ✅ جلب الإيصالات (كل الإيصالات - مطبوعة وغير مطبوعة)
     const { data, error } = await db
       .from('receipts')
       .select('id, receipt_number, total_qty, total_value, created_at, printed_at')
@@ -357,29 +346,27 @@ document.addEventListener('DOMContentLoaded', async () => {
       .order('created_at', { ascending: false });
 
     if (error) {
-      logOut.innerHTML = `<div class="log-empty">خطأ: ${error.message}</div>`;
+      logOut.innerHTML = `<div class="log-empty">${tr('prod_detail_err')} ${error.message}</div>`;
       return;
     }
 
     if (!data || data.length === 0) {
-      logOut.innerHTML = `<div class="log-empty">لا توجد عمليات إخراج بعد</div>`;
+      logOut.innerHTML = `<div class="log-empty">${tr('mp_no_out')}</div>`;
       return;
     }
 
-    // ✅ عدد الإيصالات غير المطبوعة
     const unprintedCount = data.filter(r => !r.printed_at).length;
 
     logOut.innerHTML = `
-      <!-- ✅ زر طباعة الكل (فقط إذا وُجدت إيصالات جديدة) -->
       ${unprintedCount > 0 ? `
         <a href="/receipts-print.html" class="print-all-btn">
           <i class="fas fa-print"></i>
-          <span>طباعة الكل (${unprintedCount} جديد)</span>
+          <span>${tr('pf_print_all')} (${unprintedCount} ${tr('pf_new')})</span>
         </a>
       ` : `
         <div class="print-all-info">
           <i class="fas fa-check-circle"></i>
-          <span>جميع الإيصالات مطبوعة</span>
+          <span>${tr('pf_all_printed')}</span>
         </div>
       `}
 
@@ -388,11 +375,11 @@ document.addEventListener('DOMContentLoaded', async () => {
           <a href="/receipt.html?id=${r.id}" class="log-row log-row-link">
             <div class="log-row-main">
               <strong>${r.receipt_number}</strong>
-              <span>${r.total_qty ?? 0} قطعة • ${Number(r.total_value ?? 0).toFixed(2)}</span>
+              <span>${r.total_qty ?? 0} ${tr('inv_notif_unit')} • ${Number(r.total_value ?? 0).toFixed(2)}</span>
             </div>
             <div class="log-row-date">
-              ${new Date(r.created_at).toLocaleDateString('ar-MA')}
-              ${r.printed_at ? '<i class="fas fa-check" style="color:#22c55e; margin-right:4px;" title="مطبوع"></i>' : ''}
+              ${new Date(r.created_at).toLocaleDateString(locale)}
+              ${r.printed_at ? '<i class="fas fa-check" style="color:#22c55e; margin-right:4px;" title="' + tr('pf_printed') + '"></i>' : ''}
             </div>
           </a>
         `).join('')}

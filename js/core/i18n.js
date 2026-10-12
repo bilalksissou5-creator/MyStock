@@ -437,6 +437,14 @@ const translations = {
     mp_invoices: 'الفواتير',
     mp_out: 'إخراج',
     mp_no_out: 'لا توجد عمليات إخراج بعد',
+
+    pf_title_full: 'MyStock - الملف الشخصي',
+    pf_add_worker: 'إضافة عامل',
+    pf_dashboard: 'لوحة المعلومات',
+    pf_print_all: 'طباعة الكل',
+    pf_new: 'جديد',
+    pf_all_printed: 'جميع الإيصالات مطبوعة',
+    pf_printed: 'مطبوع',
   },
 
   fr: {
@@ -867,6 +875,14 @@ const translations = {
     mp_invoices: 'Factures',
     mp_out: 'Sorties',
     mp_no_out: 'Aucune sortie pour le moment',
+
+    pf_title_full: 'MyStock - Profil',
+    pf_add_worker: 'Ajouter un travailleur',
+    pf_dashboard: 'Tableau de bord',
+    pf_print_all: 'Tout imprimer',
+    pf_new: 'nouveau',
+    pf_all_printed: 'Tous les reçus sont imprimés',
+    pf_printed: 'Imprimé',
   },
 
   en: {
@@ -1296,6 +1312,14 @@ const translations = {
     mp_invoices: 'Invoices',
     mp_out: 'Outputs',
     mp_no_out: 'No outputs yet',
+
+    pf_title_full: 'MyStock - Profile',
+    pf_add_worker: 'Add Worker',
+    pf_dashboard: 'Dashboard',
+    pf_print_all: 'Print All',
+    pf_new: 'new',
+    pf_all_printed: 'All receipts are printed',
+    pf_printed: 'Printed',
   },
 
   
