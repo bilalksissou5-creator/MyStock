@@ -1,5 +1,6 @@
 // ============================================
 // صفحة الإشعارات
+// ✅ دعم كامل للترجمة
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   const user = await requireAuth();
@@ -9,22 +10,24 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   renderLayout('notifications.html');
 
+  if (window.applyLanguage) window.applyLanguage();
+  const tr = (key) => (window.t ? window.t(key) : key);
+
+  document.title = tr('ntf_title_full');
+
   const main = document.getElementById('main-content');
 
   main.innerHTML = `
     <div class="notifications-header">
-      <h2>الإشعارات</h2>
+      <h2>${tr('ntf_title')}</h2>
     </div>
 
     <div id="notifications-list" class="notifications-list">
-      <p style="text-align:center; color:#737373;">جارٍ التحميل...</p>
+      <p style="text-align:center; color:#737373;">${tr('loading')}</p>
     </div>
   `;
 
-  // 1. علّم كل الإشعارات كـ "مرئية" (seen: true)
   await markAllAsSeen();
-
-  // 2. حمّل الإشعارات (ستُعرض بـ seen: true)
   await loadNotifications();
 });
 
@@ -46,6 +49,11 @@ async function markAllAsSeen() {
 // تحميل الإشعارات
 // ============================================
 async function loadNotifications() {
+  const tr = (key) => (window.t ? window.t(key) : key);
+  const lang = window.getCurrentLang ? window.getCurrentLang() : 'ar';
+  const localeMap = { ar: 'ar-MA', fr: 'fr-FR', en: 'en-US' };
+  const locale = localeMap[lang] || 'en-US';
+
   const { data: { user } } = await db.auth.getUser();
   const container = document.getElementById('notifications-list');
 
@@ -57,7 +65,7 @@ async function loadNotifications() {
     .limit(50);
 
   if (error) {
-    container.innerHTML = `<div class="alert alert-error">خطأ: ${error.message}</div>`;
+    container.innerHTML = `<div class="alert alert-error">${tr('prod_detail_err')} ${error.message}</div>`;
     return;
   }
 
@@ -65,7 +73,7 @@ async function loadNotifications() {
     container.innerHTML = `
       <div class="notifications-empty">
         <i class="fas fa-bell-slash"></i>
-        <p>لا توجد إشعارات</p>
+        <p>${tr('ntf_empty')}</p>
       </div>
     `;
     return;
@@ -79,11 +87,8 @@ async function loadNotifications() {
       danger: 'fa-circle-exclamation',
     };
     const icon = icons[n.type] || icons.info;
-    const time = formatTime(n.created_at);
+    const time = formatTime(n.created_at, tr, locale);
 
-    // الحالات:
-    // - seen فقط ← ✅❌
-    // - read ← ✅✅
     const seenClass = n.seen ? 'seen' : '';
     const readClass = n.is_read ? 'read' : '';
 
@@ -126,10 +131,8 @@ async function handleItemClick(id) {
     .single();
 
   if (data && !data.is_read) {
-    // علّم هذا الإشعار فقط كـ "مقروء"
     await db.from('notifications').update({ is_read: true }).eq('id', id);
 
-    // حدّث العرض فوراً
     const item = document.querySelector(`.notification-item[data-id="${id}"]`);
     if (item) item.classList.add('read');
   }
@@ -144,15 +147,15 @@ async function handleItemClick(id) {
 // ============================================
 // تنسيق الوقت
 // ============================================
-function formatTime(iso) {
+function formatTime(iso, tr, locale) {
   const date = new Date(iso);
   const now = new Date();
   const diff = Math.floor((now - date) / 1000);
 
-  if (diff < 60) return 'الآن';
-  if (diff < 3600) return `قبل ${Math.floor(diff / 60)} دقيقة`;
-  if (diff < 86400) return `قبل ${Math.floor(diff / 3600)} ساعة`;
-  if (diff < 604800) return `قبل ${Math.floor(diff / 86400)} يوم`;
+  if (diff < 60) return tr('ntf_now');
+  if (diff < 3600) return `${tr('ntf_min_ago')} ${Math.floor(diff / 60)} ${tr('ntf_min')}`;
+  if (diff < 86400) return `${tr('ntf_hour_ago')} ${Math.floor(diff / 3600)} ${tr('ntf_hour')}`;
+  if (diff < 604800) return `${tr('ntf_day_ago')} ${Math.floor(diff / 86400)} ${tr('ntf_day')}`;
 
-  return date.toLocaleDateString('ar');
+  return date.toLocaleDateString(locale);
 }

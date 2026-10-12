@@ -526,6 +526,17 @@ const translations = {
     stg_notifications: 'الإشعارات',
     stg_update: 'تحديث التطبيق',
     stg_about: 'حول التطبيق',
+
+    ntf_title: 'الإشعارات',
+    ntf_title_full: 'MyStock - الإشعارات',
+    ntf_empty: 'لا توجد إشعارات',
+    ntf_now: 'الآن',
+    ntf_min_ago: 'قبل',
+    ntf_min: 'دقيقة',
+    ntf_hour_ago: 'قبل',
+    ntf_hour: 'ساعة',
+    ntf_day_ago: 'قبل',
+    ntf_day: 'يوم',
   },
 
   fr: {
@@ -1045,6 +1056,17 @@ const translations = {
     stg_notifications: 'Notifications',
     stg_update: 'Mettre à jour',
     stg_about: "À propos de l'application",
+
+    ntf_title: 'Notifications',
+    ntf_title_full: 'MyStock - Notifications',
+    ntf_empty: 'Aucune notification',
+    ntf_now: "À l'instant",
+    ntf_min_ago: 'Il y a',
+    ntf_min: 'min',
+    ntf_hour_ago: 'Il y a',
+    ntf_hour: 'h',
+    ntf_day_ago: 'Il y a',
+    ntf_day: 'j',
   },
 
   en: {
@@ -1563,6 +1585,17 @@ const translations = {
     stg_notifications: 'Notifications',
     stg_update: 'Update App',
     stg_about: 'About App',
+
+    ntf_title: 'Notifications',
+    ntf_title_full: 'MyStock - Notifications',
+    ntf_empty: 'No notifications',
+    ntf_now: 'Just now',
+    ntf_min_ago: '',
+    ntf_min: 'min ago',
+    ntf_hour_ago: '',
+    ntf_hour: 'h ago',
+    ntf_day_ago: '',
+    ntf_day: 'd ago',
   },
 
   
