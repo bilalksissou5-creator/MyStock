@@ -1,11 +1,6 @@
 // ============================================
 // صفحة إخراج منتجات (متعددة) + إيصال بيع
-// ✅ يدعم اللمس + الفأرة + القلم (pointerdown)
-// ✅ ماسح باركود (html5-qrcode)
-// ✅ تعديل الكمية بعد المسح يُحدّث البطاقة
-// ✅ يدعم الكميات العشرية (0.5، 1.75...)
-// ✅ سعر البيع الخاص بالمنتج (sell_price)
-// ✅ حفظ cost_price + profit في receipt_items
+// ✅ دعم كامل للترجمة
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   if (window.__movementOutLoaded) return;
@@ -16,20 +11,19 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   renderLayout('movements/out.html');
 
+  if (window.applyLanguage) window.applyLanguage();
+  const tr = (key) => (window.t ? window.t(key) : key);
+
+  document.title = tr('mout_title_full');
+
   const main = document.getElementById('main-content');
 
-  // ═══════════════════════════════════════════
-  // جلب بيانات المستخدم
-  // ═══════════════════════════════════════════
   const { data: profile } = await db
     .from('profiles')
     .select('organization_id')
     .eq('id', user.id)
     .single();
 
-  // ═══════════════════════════════════════════
-  // ✅ حساب سعر البيع
-  // ═══════════════════════════════════════════
   function getSellingPrice(product) {
     const sellPrice = Number(product.sell_price ?? 0);
     const sellEnabled = product.sell_price_enabled === true;
@@ -41,9 +35,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     return basePrice;
   }
 
-  // ═══════════════════════════════════════════
-  // جلب المنتجات
-  // ═══════════════════════════════════════════
   const { data: products, error: productsError } = await db
     .from('products')
     .select('*')
@@ -52,7 +43,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (productsError) {
     main.innerHTML = `
       <div class="alert alert-error">
-        <strong>خطأ في تحميل المنتجات:</strong>
+        <strong>${tr('mout_load_err')}</strong>
         <br>
         <small>${productsError.message}</small>
       </div>
@@ -62,10 +53,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   main.innerHTML = `
     <div class="page-header">
-      <h2>إخراج منتجات</h2>
+      <h2>${tr('mout_title')}</h2>
       <button type="button" class="btn-primary scan-btn" id="scan-btn">
         <i class="fas fa-barcode"></i>
-        <span>مسح</span>
+        <span>${tr('mout_scan')}</span>
       </button>
     </div>
 
@@ -76,61 +67,61 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       <div class="product-input-card">
         <div class="form-group">
-          <label>ملاحظة عامة (اختياري)</label>
-          <input type="text" id="note" placeholder="سبب الإخراج...">
+          <label>${tr('mout_note')}</label>
+          <input type="text" id="note" placeholder="${tr('mout_note_ph')}">
         </div>
       </div>
 
       <div class="product-input-card">
         <div class="form-group" style="position:relative;margin-bottom:12px;">
-          <label>المنتج *</label>
-          <input type="text" id="product-input" placeholder="اكتب اسم المنتج..." autocomplete="off">
+          <label>${tr('mout_product')}</label>
+          <input type="text" id="product-input" placeholder="${tr('mout_product_ph')}" autocomplete="off">
           <div id="product-suggestions" class="suggestions-box"></div>
           <input type="hidden" id="product_id">
         </div>
 
         <div class="form-grid">
           <div class="form-group">
-            <label>الكمية *</label>
+            <label>${tr('mout_qty')}</label>
             <input type="number" id="quantity" value="1" min="0.01" step="0.01">
           </div>
           <div class="form-group">
-            <label>السعر *</label>
+            <label>${tr('mout_price')}</label>
             <input type="number" id="price" value="0" min="0" step="0.01">
           </div>
           <div class="form-group">
-            <label>المتوفر</label>
+            <label>${tr('mout_available')}</label>
             <input type="text" id="available-qty" value="—" disabled>
           </div>
         </div>
 
         <button type="button" class="btn-primary add-product-btn" id="add-product-btn">
           <i class="fas fa-plus"></i>
-          <span>إضافة المنتج</span>
+          <span>${tr('mout_add_product')}</span>
         </button>
       </div>
 
       <div class="added-products-section">
-        <label class="section-label">المنتجات المُخرَجة</label>
+        <label class="section-label">${tr('mout_added')}</label>
         <div id="added-products" class="added-products">
           <div class="empty-added">
             <i class="fas fa-box-open"></i>
-            <p>لم تتم إضافة منتجات بعد</p>
+            <p>${tr('mout_empty')}</p>
           </div>
         </div>
       </div>
 
       <div class="form-summary">
         <div class="summary-row">
-          <span>عدد المنتجات</span>
+          <span>${tr('mout_sum_count')}</span>
           <strong id="sum-rows">0</strong>
         </div>
         <div class="summary-row">
-          <span>إجمالي الكمية</span>
+          <span>${tr('mout_sum_qty')}</span>
           <strong id="sum-qty">0</strong>
         </div>
         <div class="summary-row highlight">
-          <span>القيمة الإجمالية</span>
+          <span>${tr('mout_sum_total')}</span>
           <strong id="sum-total">0.00</strong>
         </div>
       </div>
@@ -138,24 +129,23 @@ document.addEventListener('DOMContentLoaded', async () => {
       <div class="form-actions">
         <button type="button" class="btn-primary" id="save-btn">
           <i class="fas fa-save"></i>
-          <span>حفظ الإخراج</span>
+          <span>${tr('mout_save')}</span>
         </button>
-        <a href="/movements/list.html" class="btn-secondary">إلغاء</a>
+        <a href="/movements/list.html" class="btn-secondary">${tr('mout_cancel')}</a>
       </div>
 
     </div>
 
-    <!-- ✅ Modal الماسح -->
     <div class="scanner-modal" id="scanner-modal" style="display:none;">
       <div class="scanner-box">
         <div class="scanner-header">
-          <h3>امسح الباركود</h3>
+          <h3>${tr('mout_scan_title')}</h3>
           <button type="button" class="scanner-close" id="scanner-close">
             <i class="fas fa-xmark"></i>
           </button>
         </div>
         <div id="scanner-reader" class="scanner-reader"></div>
-        <p class="scanner-hint">وجّه الكاميرا نحو الباركود</p>
+        <p class="scanner-hint">${tr('mout_scan_hint')}</p>
       </div>
     </div>
   `;
@@ -180,9 +170,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   let isSaving = false;
   let html5QrCode = null;
 
-  // ============================================
-  // اقتراحات المنتج
-  // ============================================
   function showSuggestions(filter) {
     const q = filter.trim().toLowerCase();
     if (q.length < 1) {
@@ -197,7 +184,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     ).slice(0, 5);
 
     if (filtered.length === 0) {
-      suggestions.innerHTML = '<div class="suggestion-empty">لا توجد نتائج</div>';
+      suggestions.innerHTML = `<div class="suggestion-empty">${tr('mout_no_results')}</div>`;
       suggestions.style.display = 'block';
       return;
     }
@@ -208,11 +195,11 @@ document.addEventListener('DOMContentLoaded', async () => {
           ${p.image_url ? `<img src="${p.image_url}" alt="${p.name}">` : '<i class="fas fa-box-open"></i>'}
         </div>
         <div class="suggestion-info">
-          <strong>${p.name ?? 'بدون اسم'}</strong>
+          <strong>${p.name ?? tr('products_no_name')}</strong>
           <span class="suggestion-sku">${p.sku ?? '—'}</span>
         </div>
         <div class="suggestion-stats">
-          <span>الكمية: <b class="${(p.qty ?? 0) < 10 ? 'low' : ''}">${p.qty ?? 0}</b></span>
+          <span>${tr('products_qty')}: <b class="${(p.qty ?? 0) < 10 ? 'low' : ''}">${p.qty ?? 0}</b></span>
         </div>
       </div>
     `).join('');
@@ -235,7 +222,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   }
 
-  // ✅ اختيار منتج + تطبيق سعر البيع
   function selectProduct(found) {
     selectedProduct = found;
     productInput.value = `${found.name} (${found.sku ?? '—'})`;
@@ -261,9 +247,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   });
 
-  // ============================================
-  // عند تغيير الكمية
-  // ============================================
   quantityInput.addEventListener('input', () => {
     if (!selectedProduct) return;
     const idx = addedProducts.findIndex(p => p.id === selectedProduct.id);
@@ -276,12 +259,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     renderAddedProducts();
   });
 
-  // ============================================
-  // الماسح
-  // ============================================
   async function startScanner() {
     if (typeof Html5Qrcode === 'undefined') {
-      alert('مكتبة الماسح غير محمّلة');
+      alert(tr('prod_add_scanner_err'));
       return;
     }
 
@@ -304,10 +284,10 @@ document.addEventListener('DOMContentLoaded', async () => {
           await handleScan(decodedText);
           await stopScanner();
         },
-        () => { /* تجاهل */ }
+        () => { }
       );
     } catch (err) {
-      alert('تعذّر فتح الكاميرا: ' + err.message);
+      alert(tr('prod_add_camera_err') + ' ' + err.message);
       scannerModal.style.display = 'none';
     }
   }
@@ -317,7 +297,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       try {
         await html5QrCode.stop();
         await html5QrCode.clear();
-      } catch (e) { /* تجاهل */ }
+      } catch (e) { }
       html5QrCode = null;
     }
     scannerModal.style.display = 'none';
@@ -339,21 +319,21 @@ document.addEventListener('DOMContentLoaded', async () => {
         .maybeSingle();
 
       if (error) {
-        alert('خطأ في البحث: ' + error.message);
+        alert(tr('prod_add_err_find') + ' ' + error.message);
         return;
       }
       found = dbFound;
     }
 
     if (!found) {
-      alert(`منتج غير موجود بهذا الباركود:\n${value}`);
+      alert(`${tr('mout_not_found')}\n${value}`);
       return;
     }
 
     const available = Number(found.qty ?? 0);
 
     if (available <= 0) {
-      alert(`المنتج "${found.name}" غير متوفر في المخزون`);
+      alert(`${tr('mout_no_stock')} "${found.name}"`);
       return;
     }
 
@@ -375,7 +355,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       image_url: found.image_url,
       qty: 1,
       price: sellingPrice,
-      costPrice: costPrice,        // ✅ سعر الشراء الأصلي
+      costPrice: costPrice,
       available: available,
     });
 
@@ -389,15 +369,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (e.target === scannerModal) stopScanner();
   });
 
-  // ============================================
-  // عرض المنتجات المضافة
-  // ============================================
   function renderAddedProducts() {
     if (addedProducts.length === 0) {
       addedContainer.innerHTML = `
         <div class="empty-added">
           <i class="fas fa-box-open"></i>
-          <p>لم تتم إضافة منتجات بعد</p>
+          <p>${tr('mout_empty')}</p>
         </div>
       `;
       updateSummary();
@@ -417,19 +394,19 @@ document.addEventListener('DOMContentLoaded', async () => {
         </div>
         <div class="added-product-stats">
           <div class="stat-mini">
-            <span>الكمية</span>
+            <span>${tr('products_qty')}</span>
             <b>${p.qty}</b>
           </div>
           <div class="stat-mini">
-            <span>السعر</span>
+            <span>${tr('products_price')}</span>
             <b>${Number(p.price).toFixed(2)}</b>
           </div>
           <div class="stat-mini highlight">
-            <span>المجموع</span>
+            <span>${tr('products_total')}</span>
             <b>${(Number(p.qty) * Number(p.price)).toFixed(2)}</b>
           </div>
         </div>
-        <button type="button" class="added-product-delete" data-index="${index}" title="حذف">
+        <button type="button" class="added-product-delete" data-index="${index}" title="${tr('prod_add_delete')}">
           <i class="fas fa-xmark"></i>
         </button>
       </div>
@@ -459,9 +436,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('sum-total').textContent = totalValue.toFixed(2);
   }
 
-  // ============================================
-  // زر "إضافة المنتج"
-  // ============================================
   function addProduct() {
     if (isAdding || addBtn.disabled) return;
     isAdding = true;
@@ -471,7 +445,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     errBox.style.display = 'none';
 
     if (!selectedProduct) {
-      errBox.textContent = 'اختر منتجاً من القائمة';
+      errBox.textContent = tr('mout_err_select');
       errBox.style.display = 'block';
       productInput.focus();
       isAdding = false;
@@ -484,7 +458,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const available = Number(selectedProduct.qty ?? 0);
 
     if (!qty || qty <= 0) {
-      errBox.textContent = 'الكمية يجب أن تكون أكبر من صفر';
+      errBox.textContent = tr('prod_add_err_qty');
       errBox.style.display = 'block';
       quantityInput.focus();
       isAdding = false;
@@ -493,7 +467,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     if (qty > available) {
-      errBox.textContent = `الكمية المتوفرة ${available} فقط`;
+      errBox.textContent = `${tr('mout_err_max')} ${available}`;
       errBox.style.display = 'block';
       quantityInput.focus();
       isAdding = false;
@@ -521,7 +495,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       image_url: selectedProduct.image_url,
       qty: qty,
       price: price,
-      costPrice: costPrice,        // ✅ سعر الشراء الأصلي
+      costPrice: costPrice,
       available: available,
     });
 
@@ -556,9 +530,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   });
 
-  // ============================================
-  // حفظ الإخراج
-  // ============================================
   saveBtn.addEventListener('click', async (e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -574,14 +545,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     successBox.style.display = 'none';
 
     if (addedProducts.length === 0) {
-      errBox.textContent = 'أضف منتجاً واحداً على الأقل';
+      errBox.textContent = tr('prod_add_err_empty');
       errBox.style.display = 'block';
       isSaving = false;
       saveBtn.disabled = false;
       return;
     }
 
-    saveBtn.querySelector('span').textContent = 'جارٍ الحفظ...';
+    saveBtn.querySelector('span').textContent = tr('prod_add_saving');
 
     try {
       const { data: { user: authUser } } = await db.auth.getUser();
@@ -592,7 +563,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         .single();
 
       if (!prof?.organization_id) {
-        throw new Error('لا يمكن تحديد المنظمة');
+        throw new Error(tr('prod_add_err_org'));
       }
 
       const { data: lastReceipt } = await db
@@ -625,9 +596,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         .select()
         .single();
 
-      if (receiptErr) throw new Error('فشل إنشاء الإيصال: ' + receiptErr.message);
+      if (receiptErr) throw new Error(tr('mout_err_receipt') + ' ' + receiptErr.message);
 
-      // ✅ حفظ cost_price + profit لكل عنصر
       const receiptItems = addedProducts.map(p => {
         const qty = Number(p.qty);
         const price = Number(p.price);
@@ -638,9 +608,9 @@ document.addEventListener('DOMContentLoaded', async () => {
           product_id: p.id,
           product_name: p.name,
           qty: qty,
-          price: price,                  // سعر البيع
-          cost_price: costPrice,         // ✅ سعر الشراء
-          profit: (price - costPrice) * qty, // ✅ الربح الإجمالي
+          price: price,
+          cost_price: costPrice,
+          profit: (price - costPrice) * qty,
           total: qty * price,
         };
       });
@@ -649,7 +619,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         .from('receipt_items')
         .insert(receiptItems);
 
-      if (itemsErr) throw new Error('فشل حفظ عناصر الإيصال: ' + itemsErr.message);
+      if (itemsErr) throw new Error(tr('mout_err_items') + ' ' + itemsErr.message);
 
       const movements = addedProducts.map(p => ({
         organization_id: prof.organization_id,
@@ -664,14 +634,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         .from('stock_movements')
         .insert(movements);
 
-      if (moveError) throw new Error('فشل تسجيل الحركات: ' + moveError.message);
+      if (moveError) throw new Error(tr('mout_err_movements') + ' ' + moveError.message);
 
       if (typeof notifyOrganization === 'function') {
         try {
           await notifyOrganization({
             orgId: prof.organization_id,
-            title: addedProducts.length === 1 ? 'إيصال بيع' : `إيصال بيع (${addedProducts.length} منتجات)`,
-            message: `${prof.full_name || 'مستخدم'} أخرج ${totalQty} وحدة بقيمة ${totalValue.toFixed(2)} — ${receiptNumber}`,
+            title: addedProducts.length === 1 ? tr('mout_notif_title_1') : `${tr('mout_notif_title_n')} (${addedProducts.length})`,
+            message: `${prof.full_name || tr('prod_detail_user')} ${tr('mout_notif_msg')} ${totalQty} ${tr('mout_notif_unit')} ${totalValue.toFixed(2)} — ${receiptNumber}`,
             type: 'warning',
             link: `/receipt.html?id=${newReceipt.id}`,
             userName: prof.full_name || null,
@@ -681,7 +651,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
       }
 
-      successBox.textContent = `✅ تم إنشاء الإيصال ${receiptNumber}`;
+      successBox.textContent = `${tr('mout_success')} ${receiptNumber}`;
       successBox.style.display = 'block';
 
       addedProducts.length = 0;
@@ -696,7 +666,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       errBox.textContent = error.message;
       errBox.style.display = 'block';
       saveBtn.disabled = false;
-      saveBtn.querySelector('span').textContent = 'حفظ الإخراج';
+      saveBtn.querySelector('span').textContent = tr('mout_save');
       isSaving = false;
     }
   });
