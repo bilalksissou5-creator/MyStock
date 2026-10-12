@@ -557,6 +557,17 @@ const translations = {
     sup_notif_title: 'مورد جديد',
     sup_notif_msg: 'أضاف المورد',
     sup_success: '✅ تم إضافة المورد بنجاح!',
+
+    sup_det_title: 'تفاصيل المورد',
+    sup_det_title_full: 'MyStock - تفاصيل المورد',
+    sup_det_no_id: 'لم يتم تحديد المورد',
+    sup_det_not_found: 'المورد غير موجود',
+    sup_det_delete: 'حذف المورد',
+    sup_det_invoices: 'فواتير المورد',
+    sup_det_no_invoices: 'لا توجد فواتير لهذا المورد',
+    sup_det_confirm_del: 'هل أنت متأكد من حذف هذا المورد؟',
+    sup_det_notif_del_title: 'حذف مورد',
+    sup_det_notif_del_msg: 'حذف المورد',
   },
 
   fr: {
@@ -1107,6 +1118,17 @@ const translations = {
     sup_notif_title: 'Nouveau fournisseur',
     sup_notif_msg: 'a ajouté le fournisseur',
     sup_success: '✅ Fournisseur ajouté avec succès!',
+
+    sup_det_title: 'Détails du fournisseur',
+    sup_det_title_full: 'MyStock - Détails du fournisseur',
+    sup_det_no_id: 'Aucun fournisseur spécifié',
+    sup_det_not_found: 'Fournisseur introuvable',
+    sup_det_delete: 'Supprimer le fournisseur',
+    sup_det_invoices: 'Factures du fournisseur',
+    sup_det_no_invoices: 'Aucune facture pour ce fournisseur',
+    sup_det_confirm_del: 'Êtes-vous sûr de vouloir supprimer ce fournisseur ?',
+    sup_det_notif_del_title: 'Fournisseur supprimé',
+    sup_det_notif_del_msg: 'a supprimé le fournisseur',
   },
 
   en: {
@@ -1656,6 +1678,17 @@ const translations = {
     sup_notif_title: 'New supplier',
     sup_notif_msg: 'added supplier',
     sup_success: '✅ Supplier added successfully!',
+
+    sup_det_title: 'Supplier Details',
+    sup_det_title_full: 'MyStock - Supplier Details',
+    sup_det_no_id: 'No supplier specified',
+    sup_det_not_found: 'Supplier not found',
+    sup_det_delete: 'Delete Supplier',
+    sup_det_invoices: 'Supplier Invoices',
+    sup_det_no_invoices: 'No invoices for this supplier',
+    sup_det_confirm_del: 'Are you sure you want to delete this supplier?',
+    sup_det_notif_del_title: 'Supplier deleted',
+    sup_det_notif_del_msg: 'deleted supplier',
   },
 
   
