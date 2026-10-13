@@ -104,7 +104,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             <i class="fas ${icon}" ${iconColor ? `style="color:${iconColor};"` : ''}></i>
             <span>${label}${count !== undefined ? ` (${count})` : ''}</span>
           </div>
-          <i class="fas fa-chevron-left team-accordion-arrow"></i>
+          <i class="fas fa-chevron-right team-accordion-arrow"></i>
         </button>
 
         <div class="team-accordion-body" data-body="${id}" style="display:none;">

@@ -1,5 +1,6 @@
 /* ============================================
    صفحة الملف الشخصي — تصميم Facebook
+   ✅ دعم كامل للاتجاه RTL/LTR
    ============================================ */
 
 .profile-fb-wrapper {
@@ -76,11 +77,11 @@
   color: #a3a3a3;
 }
 
-/* ✅ النقطة على حافة الدائرة تماماً — تعمل على كل الشاشات */
+/* ✅ النقطة على حافة الدائرة */
 .profile-status-dot {
   position: absolute;
   bottom: 14.64%;
-  right: 14.64%;
+  inset-inline-end: 14.64%;
   width: 15px;
   height: 15px;
   border-radius: 50%;
@@ -88,6 +89,10 @@
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
   z-index: 10;
   transform: translate(50%, 50%);
+}
+
+[dir="rtl"] .profile-status-dot {
+  transform: translate(-50%, 50%);
 }
 
 .profile-status-dot.online {
@@ -178,7 +183,7 @@
 }
 
 /* ============================================
-   Accordion (مسطّح — بدون بطاقة)
+   Accordion
    ============================================ */
 .team-accordion {
   margin-bottom: 8px;
@@ -198,7 +203,7 @@
   font-size: 15px;
   font-weight: 700;
   color: #171717;
-  text-align: right;
+  text-align: start;
   -webkit-tap-highlight-color: transparent;
   transition: background 0.15s;
 }
@@ -224,11 +229,26 @@
   color: #a3a3a3;
   transition: transform 0.2s ease, color 0.15s;
   flex-shrink: 0;
-  margin-left: 4px;
+  margin-inline-start: 4px;
 }
 
-.team-accordion.open .team-accordion-arrow {
-  transform: rotate(-90deg);
+/* ✅ RTL: السهم يشير لليسار (chevron-right يعرض يمين في LTR) */
+[dir="rtl"] .team-accordion-arrow {
+  transform: scaleX(-1);
+}
+
+[dir="ltr"] .team-accordion-arrow {
+  transform: none;
+}
+
+/* ✅ عند الفتح: يدور 90 درجة */
+[dir="rtl"] .team-accordion.open .team-accordion-arrow {
+  transform: scaleX(-1) rotate(-90deg);
+  color: #171717;
+}
+
+[dir="ltr"] .team-accordion.open .team-accordion-arrow {
+  transform: rotate(90deg);
   color: #171717;
 }
 
@@ -281,7 +301,7 @@
   text-overflow: ellipsis;
   white-space: nowrap;
   flex: 1;
-  text-align: right;
+  text-align: start;
 }
 
 /* ============================================
@@ -293,20 +313,17 @@
   gap: 12px;
 }
 
-/* ══════════════════════════════════════════
-   نقطة الاتصال على بطاقة العضو
-   ══════════════════════════════════════════ */
+/* ══════ نقطة الاتصال ══════ */
 .member-avatar-wrap {
   position: relative;
   display: inline-block;
   margin-bottom: 10px;
 }
 
-/* ✅ النقطة على حافة الدائرة تماماً — تعمل على كل الشاشات */
 .member-status-dot {
   position: absolute;
   bottom: 14.64%;
-  right: 14.64%;
+  inset-inline-end: 14.64%;
   width: 14px;
   height: 14px;
   border-radius: 50%;
@@ -317,6 +334,10 @@
   transform: translate(50%, 50%);
 }
 
+[dir="rtl"] .member-status-dot {
+  transform: translate(-50%, 50%);
+}
+
 .member-status-dot.online {
   background: #22c55e;
 }
@@ -325,9 +346,7 @@
   background: #d4d4d4;
 }
 
-/* ══════════════════════════════════════════
-   بطاقة العضو
-   ══════════════════════════════════════════ */
+/* ══════ بطاقة العضو ══════ */
 .member-card {
   background: #fafafa;
   border: 1px solid #f0f0f0;
@@ -502,7 +521,6 @@
   white-space: nowrap;
 }
 
-/* ══════ السجل (بدون تأثير) ══════ */
 .record-item[data-record="log"]:hover,
 .record-item[data-record="log"]:active,
 .record-item[data-record="log"]:focus {
@@ -521,7 +539,6 @@
   color: #171717;
 }
 
-/* ══════ الفواتير + إخراج ══════ */
 .records-left {
   display: flex;
   align-items: center;
@@ -628,6 +645,7 @@
   gap: 2px;
   min-width: 0;
   flex: 1;
+  text-align: start;
 }
 
 .log-row-main strong {
@@ -695,8 +713,6 @@
     font-size: 40px;
   }
 
-  /* ✅ النقطة ترث من القاعدة الأساسية (لا تغيير) */
-
   .profile-fb-info h3 {
     font-size: 1.2rem;
   }
@@ -756,8 +772,6 @@
   .member-avatar i {
     font-size: 22px;
   }
-
-  /* ✅ النقطة ترث من القاعدة الأساسية (لا تغيير) */
 
   .member-name {
     font-size: 12px;
