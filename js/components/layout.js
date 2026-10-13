@@ -1,7 +1,80 @@
 // ============================================
 // الهيكل المشترك (Header + Sidebar)
-// الدور: يُنشئ الواجهة المشتركة في كل الصفحات
-// ✅ على الموبايل: sidebar مخفية افتراضياً + زر ☰ يفتح/يغلق
+// ✅ فحص تلقائي لقفل الدفع
+// ============================================
+
+const ALLOWED_PAGES = [
+  'payment.html',
+  'bank-card.html',
+  'login.html',
+  'subscription.html',
+  'welcome.html',
+  'register.html',
+  'register-worker.html',
+  'index.html',
+  'join.html',
+  '',
+];
+
+// ═══════════════════════════════════════════
+// ✅ فحص تلقائي يعمل عند تحميل الصفحة
+// ═══════════════════════════════════════════
+async function autoCheckPaymentBlock() {
+  const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+
+  if (ALLOWED_PAGES.includes(currentPage)) return;
+
+  try {
+    // انتظر تحميل supabase
+    if (typeof db === 'undefined') return;
+
+    const { data: { user } } = await db.auth.getUser();
+    if (!user) return;
+
+    const { data: profile } = await db
+      .from('profiles')
+      .select('role, bank_card_last4, bank_card_active, bank_card_deactivated_at')
+      .eq('id', user.id)
+      .single();
+
+    if (!profile) return;
+
+    if (profile.role !== 'admin') return;
+
+    let shouldBlock = false;
+
+    // الحالة 1: لا توجد بطاقة إطلاقاً
+    if (!profile.bank_card_last4) {
+      shouldBlock = true;
+    }
+    // الحالة 2: البطاقة غير مفعّلة منذ 3 أيام
+    else if (profile.bank_card_active === false && profile.bank_card_deactivated_at) {
+      const deactivatedAt = new Date(profile.bank_card_deactivated_at).getTime();
+      const now = Date.now();
+      const threeDaysMs = 3 * 24 * 60 * 60 * 1000;
+
+      if (now - deactivatedAt >= threeDaysMs) {
+        shouldBlock = true;
+      }
+    }
+
+    if (shouldBlock) {
+      window.location.replace('/bank-card.html?blocked=1');
+    }
+  } catch (err) {
+    console.error('❌ autoCheckPaymentBlock error:', err);
+  }
+}
+
+// ✅ تشغيل الفحص تلقائياً عند تحميل الصفحة
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', autoCheckPaymentBlock);
+} else {
+  autoCheckPaymentBlock();
+}
+
+// ============================================
+// renderLayout
 // ============================================
 function renderLayout(activePage) {
   const navItems = [
@@ -63,7 +136,6 @@ function renderLayout(activePage) {
   const app = document.querySelector('.app');
   if (app) app.innerHTML = layout;
 
-  // ✅ زر تسجيل الخروج
   document.querySelectorAll('.logout').forEach(b => {
     b.addEventListener('click', async (e) => {
       e.preventDefault();
@@ -76,21 +148,16 @@ function renderLayout(activePage) {
     });
   });
 
-  // ✅ مراجع العناصر
   const toggleBtn = document.getElementById('sidebar-toggle');
   const bodyEl = document.getElementById('app-body');
   const sidebar = document.getElementById('app-sidebar');
 
-  // ✅ دالة: هل الموبايل؟
   const isMobile = () => window.matchMedia('(max-width: 768px)').matches;
 
-  // ✅ فتح/إغلاق sidebar
   function toggleSidebar() {
     if (isMobile()) {
-      // على الموبايل: sidebar مخفية بـ display
       bodyEl.classList.toggle('sidebar-hidden-mobile');
     } else {
-      // على سطح المكتب: sidebar-closed
       bodyEl.classList.toggle('sidebar-closed');
       const isClosed = bodyEl.classList.contains('sidebar-closed');
       localStorage.setItem('sidebar_closed', isClosed ? 'true' : 'false');
@@ -103,7 +170,6 @@ function renderLayout(activePage) {
     }
   }
 
-  // ✅ زر ☰
   if (toggleBtn) {
     toggleBtn.addEventListener('click', (e) => {
       e.stopPropagation();
@@ -111,18 +177,15 @@ function renderLayout(activePage) {
     });
   }
 
-  // ✅ استرجاع الحالة (سطح المكتب فقط)
   if (!isMobile()) {
     const savedState = localStorage.getItem('sidebar_closed');
     if (savedState === 'true') {
       bodyEl.classList.add('sidebar-closed');
     }
   } else {
-    // على الموبايل: مخفية افتراضياً
     bodyEl.classList.add('sidebar-hidden-mobile');
   }
 
-  // ✅ الضغط على أي رابط في sidebar → يُغلق (موبايل فقط)
   if (sidebar) {
     sidebar.querySelectorAll('a.nav-item').forEach(link => {
       link.addEventListener('click', () => {
@@ -131,11 +194,9 @@ function renderLayout(activePage) {
     });
   }
 
-  // ✅ الضغط خارج sidebar → يُغلق (موبايل فقط)
   document.addEventListener('click', (e) => {
     if (!isMobile()) return;
     if (!bodyEl.classList.contains('sidebar-hidden-mobile') === false) {
-      // sidebar مخفية → تجاهل
       return;
     }
 
@@ -145,7 +206,6 @@ function renderLayout(activePage) {
     closeSidebarMobile();
   });
 
-  // ✅ السحب (swipe) على sidebar → يُغلق (موبايل فقط)
   if (sidebar) {
     let touchStartX = 0;
 
@@ -160,7 +220,6 @@ function renderLayout(activePage) {
     }, { passive: true });
   }
 
-  // ✅ تنظيف عند تغيير الحجم
   window.addEventListener('resize', () => {
     if (!isMobile()) {
       bodyEl.classList.remove('sidebar-hidden-mobile');
@@ -169,7 +228,6 @@ function renderLayout(activePage) {
     }
   });
 
-  // بدء تحديث عداد الإشعارات
   if (typeof startNotifPolling === 'function') {
     startNotifPolling();
   }

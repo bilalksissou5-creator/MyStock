@@ -1,7 +1,7 @@
 // ============================================
 // صفحة الدفع — تصميم احترافي
 // ✅ دعم كامل للترجمة
-// ✅ يحفظ آخر 4 أرقام + النوع + الاسم + التاريخ في profiles
+// ✅ يحفظ البطاقة + يفعّلها + يفك القفل
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   const user = await getCurrentUser();
@@ -390,23 +390,35 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
 
   // ═══════════════════════════════════════════
-  // ✅ حفظ البطاقة في profiles
+  // ✅ حفظ البطاقة + تفعيلها + فك القفل
   // ═══════════════════════════════════════════
-  async function saveCardToProfile(userId, cardData) {
-    const { error } = await db
+  async function saveCardAndActivate(userId, orgId, cardData) {
+    // 1. حفظ البطاقة + تفعيلها
+    const { error: cardError } = await db
       .from('profiles')
       .update({
         bank_card_last4: cardData.last4,
         bank_card_brand: cardData.brand,
         bank_card_holder: cardData.holder,
         bank_card_expiry: cardData.expiry,
+        bank_card_active: true,
+        bank_card_deactivated_at: null,
       })
       .eq('id', userId);
 
-    if (error) {
-      console.error('❌ فشل حفظ البطاقة:', error);
+    if (cardError) {
+      console.error('❌ فشل حفظ البطاقة:', cardError);
       return false;
     }
+
+    // 2. فك القفل من المنظمة
+    if (orgId) {
+      await db
+        .from('organizations')
+        .update({ payment_blocked: false })
+        .eq('id', orgId);
+    }
+
     return true;
   }
 
@@ -464,9 +476,9 @@ document.addEventListener('DOMContentLoaded', async () => {
       const now = new Date();
       const expiresAt = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
 
-      // ✅ 1. حفظ البطاقة في profiles
+      // ✅ 1. حفظ + تفعيل البطاقة + فك القفل
       const brand = detectCardBrand(number);
-      await saveCardToProfile(user.id, {
+      await saveCardAndActivate(user.id, profile.organization_id, {
         last4: number.slice(-4),
         brand: getBrandName(brand),
         holder: holderName,
@@ -552,8 +564,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       const now = new Date();
       const expiresAt = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
 
-      // ✅ حفظ البطاقة (لـ Apple/Google Pay: نوع البطاقة فقط)
-      await saveCardToProfile(user.id, {
+      // ✅ حفظ + تفعيل + فك القفل
+      await saveCardAndActivate(user.id, profile.organization_id, {
         last4: '••••',
         brand: method,
         holder: profile.full_name || 'User',
