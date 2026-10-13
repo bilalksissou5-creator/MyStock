@@ -136,13 +136,13 @@
   flex-shrink: 0;
 }
 
-/* ✅ عكس السهم حسب اللغة */
+/* ✅ السهم يتبع اللغة */
 [dir="rtl"] .settings-arrow {
-  transform: none;
+  transform: scaleX(-1);
 }
 
 [dir="ltr"] .settings-arrow {
-  transform: scaleX(-1);
+  transform: none;
 }
 
 /* ══════ Responsive ══════ */
