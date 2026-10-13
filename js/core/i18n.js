@@ -636,6 +636,12 @@ const translations = {
     warn_msg_1: 'لقد ألغيت تفعيل بطاقتك البنكية. لديك 3 أيام لإعادة تفعيلها أو إضافة بطاقة جديدة قبل إيقاف التطبيق.',
     warn_msg_2: 'مرّ يوم على إلغاء تفعيل بطاقتك. تبقى يومان قبل إيقاف التطبيق.',
     warn_msg_3: 'تبقى 12 ساعة فقط! أعد تفعيل بطاقتك أو أضف بطاقة جديدة الآن.',
+
+    lang_page_title: 'اللغة',
+    lang_title_full: 'MyStock - اللغة',
+    lang_edit: 'تعديل',
+    lang_apply: 'تطبيق',
+    lang_page_desc: 'سيتم استخدام اللغة الموجودة في أعلى القائمة بشكل افتراضي. إذا لم يكن أحد التطبيقات يدعم لغتك الافتراضية، فسيتم استخدام اللغة التالية في القائمة كبديل.',
   },
 
   fr: {
@@ -1264,6 +1270,11 @@ const translations = {
     warn_msg_1: 'Vous avez désactivé votre carte bancaire. Vous avez 3 jours pour la réactiver ou ajouter une nouvelle carte.',
     warn_msg_2: 'Un jour s\'est écoulé. Il vous reste 2 jours avant la suspension.',
     warn_msg_3: 'Il ne reste que 12 heures ! Réactivez votre carte ou ajoutez-en une nouvelle.',
+    lang_page_title: 'Langue',
+    lang_title_full: 'MyStock - Langue',
+    lang_edit: 'Modifier',
+    lang_apply: 'Appliquer',
+    lang_page_desc: 'La langue en haut de la liste sera utilisée par défaut. Si une application ne prend pas en charge votre langue par défaut, la langue suivante dans la liste sera utilisée à la place.',
   },
 
   en: {
@@ -1892,6 +1903,11 @@ const translations = {
     warn_msg_1: 'You deactivated your bank card. You have 3 days to reactivate it or add a new card before suspension.',
     warn_msg_2: 'A day has passed. 2 days left before suspension.',
     warn_msg_3: 'Only 12 hours left! Reactivate your card or add a new one now.',
+    lang_page_title: 'Language',
+    lang_title_full: 'MyStock - Language',
+    lang_edit: 'Edit',
+    lang_apply: 'Apply',
+    lang_page_desc: 'The language at the top of the list will be used by default. If an application does not support your default language, the next language in the list will be used instead.',
   },
 
   

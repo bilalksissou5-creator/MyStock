@@ -1,0 +1,254 @@
+/* ============================================
+   صفحة اختيار اللغة (One UI Style)
+   ============================================ */
+
+.language-page {
+  min-height: 100vh;
+  min-height: 100dvh;
+  background: #f5f5f5;
+  padding: 20px 16px 40px;
+  display: flex;
+  justify-content: center;
+  direction: inherit;
+}
+
+#language-content {
+  width: 100%;
+  max-width: 600px;
+}
+
+/* ══════════════════════════════════════════
+   رأس الصفحة
+   ══════════════════════════════════════════ */
+.lang-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 8px 20px;
+}
+
+.lang-header-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: #171717;
+  margin: 0;
+}
+
+.lang-edit-btn {
+  background: none;
+  border: none;
+  color: #2563eb;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  padding: 6px 12px;
+  border-radius: 8px;
+  transition: background 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.lang-edit-btn:hover {
+  background: #e8f0fe;
+}
+
+/* ══════════════════════════════════════════
+   شرح
+   ══════════════════════════════════════════ */
+.lang-description {
+  font-size: 14px;
+  line-height: 1.7;
+  color: #404040;
+  padding: 0 12px 24px;
+  text-align: start;
+}
+
+/* ══════════════════════════════════════════
+   بطاقة اللغات
+   ══════════════════════════════════════════ */
+.lang-card {
+  background: #ffffff;
+  border-radius: 28px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  margin-bottom: 24px;
+}
+
+.lang-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 20px 24px;
+  cursor: pointer;
+  transition: background 0.15s;
+  -webkit-tap-highlight-color: transparent;
+  position: relative;
+}
+
+.lang-item:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  inset-inline-start: 24px;
+  inset-inline-end: 24px;
+  height: 1px;
+  background: #f0f0f0;
+}
+
+.lang-item:hover {
+  background: #fafafa;
+}
+
+.lang-item.active {
+  background: #f8faff;
+}
+
+/* ══════════════════════════════════════════
+   الجزء الأيسر: رقم + اسم اللغة
+   ══════════════════════════════════════════ */
+.lang-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex: 1;
+  min-width: 0;
+}
+
+.lang-number {
+  font-size: 16px;
+  font-weight: 700;
+  color: #2563eb;
+  width: 20px;
+  text-align: start;
+  flex-shrink: 0;
+}
+
+.lang-name {
+  font-size: 16px;
+  font-weight: 500;
+  color: #171717;
+  text-align: start;
+  line-height: 1.4;
+}
+
+/* ══════════════════════════════════════════
+   علامة الاختيار
+   ══════════════════════════════════════════ */
+.lang-check {
+  color: #2563eb;
+  font-size: 20px;
+  flex-shrink: 0;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+
+.lang-item.active .lang-check {
+  opacity: 1;
+}
+
+/* ══════════════════════════════════════════
+   زر "تطبيق"
+   ══════════════════════════════════════════ */
+.lang-apply-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  max-width: 240px;
+  margin: 0 auto;
+  padding: 16px 32px;
+  background: #2563eb;
+  color: #ffffff;
+  border: none;
+  border-radius: 100px;
+  font-size: 16px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  -webkit-tap-highlight-color: transparent;
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.25);
+}
+
+.lang-apply-btn:hover:not(:disabled) {
+  background: #1d4ed8;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(37, 99, 235, 0.3);
+}
+
+.lang-apply-btn:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.2);
+}
+
+.lang-apply-btn:disabled {
+  background: #93c5fd;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.lang-apply-btn i {
+  font-size: 15px;
+}
+
+/* ══════════════════════════════════════════
+   Responsive
+   ══════════════════════════════════════════ */
+@media (max-width: 480px) {
+  .language-page {
+    padding: 16px 12px 32px;
+  }
+
+  .lang-header {
+    padding: 6px 6px 16px;
+  }
+
+  .lang-header-title {
+    font-size: 20px;
+  }
+
+  .lang-edit-btn {
+    font-size: 14px;
+  }
+
+  .lang-description {
+    font-size: 13px;
+    padding: 0 10px 20px;
+  }
+
+  .lang-card {
+    border-radius: 24px;
+    margin-bottom: 20px;
+  }
+
+  .lang-item {
+    padding: 18px 20px;
+    gap: 10px;
+  }
+
+  .lang-item:not(:last-child)::after {
+    inset-inline-start: 20px;
+    inset-inline-end: 20px;
+  }
+
+  .lang-number {
+    font-size: 15px;
+    width: 18px;
+  }
+
+  .lang-name {
+    font-size: 15px;
+  }
+
+  .lang-check {
+    font-size: 18px;
+  }
+
+  .lang-apply-btn {
+    padding: 14px 28px;
+    font-size: 15px;
+  }
+}

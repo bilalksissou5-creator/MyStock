@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MyStock</title>
+
+  <script>
+    (function() {
+      var lang = localStorage.getItem('app_lang') || 'ar';
+      document.documentElement.lang = lang;
+      document.documentElement.dir = (lang === 'ar') ? 'rtl' : 'ltr';
+    })();
+  </script>
+
+  <link rel="stylesheet" href="/assets/css/common.css">
+  <link rel="stylesheet" href="/assets/css/pages/language.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+  <div class="language-page">
+    <div id="language-content"></div>
+  </div>
+
+  <script src="/js/core/i18n.js"></script>
+  <script src="/js/pages/language.js"></script>
+</body>
+</html>

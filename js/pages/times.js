@@ -28,10 +28,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   };
 
   const activeLangName = langNames[currentLang] || langNames.ar;
-  const otherLangs = Object.keys(langNames)
-    .filter(k => k !== currentLang)
-    .map(k => langNames[k])
-    .join('، ');
 
   main.innerHTML = `
     <div class="page-header">
@@ -49,7 +45,7 @@ document.addEventListener('DOMContentLoaded', async () => {
            ══════════════════════════════════ -->
       <div class="times-card">
 
-        <a href="/welcome.html" class="times-item">
+        <a href="/language.html" class="times-item">
           <div class="times-item-left">
             <div class="times-title">${tr('adm_language')}</div>
             <div class="times-subtitle">${activeLangName}</div>
