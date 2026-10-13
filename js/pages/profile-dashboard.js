@@ -1,6 +1,7 @@
 // ============================================
 // لوحة معلومات المستخدم — البطاقات
 // ✅ دعم كامل للترجمة
+// ✅ البطاقة البنكية → bank-card.html
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   const user = await requireAuth();
@@ -87,6 +88,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       title: tr('pd_cover'),
       value: target?.cover_url ? tr('pd_edited') : tr('pd_not_edited'),
       empty: !target?.cover_url,
+      href: isMe ? `/profile-edit.html?section=cover` : `/member-profile.html?id=${target.id}`,
     },
     {
       id: 'avatar',
@@ -94,6 +96,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       title: tr('pd_avatar'),
       value: target?.avatar_url ? tr('pd_edited') : tr('pd_not_edited'),
       empty: !target?.avatar_url,
+      href: isMe ? `/profile-edit.html?section=avatar` : `/member-profile.html?id=${target.id}`,
     },
     {
       id: 'name',
@@ -101,6 +104,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       title: tr('pd_name'),
       value: target?.full_name || tr('pd_not_set'),
       empty: !target?.full_name,
+      href: isMe ? `/profile-edit.html?section=name` : `/member-profile.html?id=${target.id}`,
     },
     {
       id: 'email-password',
@@ -109,6 +113,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       value: isMe ? user.email : tr('pd_protected'),
       empty: false,
       disabled: !isMe,
+      href: `/profile-edit.html?section=email-password`,
     },
     {
       id: 'phone',
@@ -116,8 +121,9 @@ document.addEventListener('DOMContentLoaded', async () => {
       title: tr('rw_phone').replace(' *', ''),
       value: target?.phone || tr('pd_not_set'),
       empty: !target?.phone,
+      href: isMe ? `/profile-edit.html?section=phone` : `/member-profile.html?id=${target.id}`,
     },
-    // ✅ البطاقة البنكية
+    // ✅ البطاقة البنكية — تفتح صفحة مخصصة
     {
       id: 'bank-card',
       icon: 'fa-credit-card',
@@ -130,6 +136,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       })(),
       empty: !target?.bank_card_last4,
       disabled: !isMe,
+      href: '/bank-card.html',
     },
   ];
 
@@ -144,11 +151,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         disabled: true,
       });
     } else {
-      const canEdit = isMe;
       cards.push({
-        href: canEdit
-          ? `/profile-edit.html?section=${c.id}`
-          : `/member-profile.html?id=${target.id}`,
+        href: c.href,
         icon: c.icon,
         title: c.title,
         value: c.value,

@@ -594,6 +594,13 @@ const translations = {
     pe_bank_remove: 'حذف البطاقة',
     pe_bank_confirm_remove: 'هل أنت متأكد من حذف البطاقة البنكية؟',
     pe_success_bank_remove: '✅ تم حذف البطاقة البنكية',
+
+    bc_title: 'البطاقة البنكية',
+    bc_title_full: 'MyStock - البطاقة البنكية',
+    bc_default: 'البطاقة الافتراضية',
+    bc_empty: 'لا توجد بطاقة بنكية',
+    bc_empty_hint: 'أضف بطاقتك لعرضها هنا',
+    bc_add: 'إضافة بطاقة',
   },
 
   fr: {
@@ -1181,6 +1188,13 @@ const translations = {
     pe_bank_remove: 'Supprimer la carte',
     pe_bank_confirm_remove: 'Êtes-vous sûr de vouloir supprimer la carte bancaire ?',
     pe_success_bank_remove: '✅ Carte bancaire supprimée',
+
+    bc_title: 'Carte bancaire',
+    bc_title_full: 'MyStock - Carte bancaire',
+    bc_default: 'Carte par défaut',
+    bc_empty: 'Aucune carte bancaire',
+    bc_empty_hint: 'Ajoutez votre carte pour la voir ici',
+    bc_add: 'Ajouter une carte',
   },
 
   en: {
@@ -1767,6 +1781,13 @@ const translations = {
     pe_bank_remove: 'Delete Card',
     pe_bank_confirm_remove: 'Are you sure you want to delete the bank card?',
     pe_success_bank_remove: '✅ Bank card deleted',
+
+    bc_title: 'Bank Card',
+    bc_title_full: 'MyStock - Bank Card',
+    bc_default: 'Default Card',
+    bc_empty: 'No bank card',
+    bc_empty_hint: 'Add your card to see it here',
+    bc_add: 'Add Card',
   },
 
   
