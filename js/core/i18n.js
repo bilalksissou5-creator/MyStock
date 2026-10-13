@@ -605,6 +605,14 @@ const translations = {
     bc_deactivate: 'إلغاء تفعيل هذه البطاقة',
     bc_confirm_deactivate: 'هل أنت متأكد من إلغاء تفعيل هذه البطاقة؟\nستحتاج إلى إضافة بطاقة جديدة للدفع.',
     bc_deactivated: '✅ تم إلغاء تفعيل البطاقة',
+
+    bc_deactivate: 'إلغاء تفعيل هذه البطاقة',
+    bc_reactivate: 'إعادة تفعيل البطاقة',
+    bc_add_new: 'إضافة بطاقة جديدة',
+    bc_confirm_deactivate: 'هل أنت متأكد من إلغاء تفعيل هذه البطاقة؟\nلديك 3 أيام لإعادة تفعيلها قبل إيقاف التطبيق.',
+    bc_deactivated: '✅ تم إلغاء تفعيل البطاقة',
+    bc_reactivated: '✅ تم إعادة تفعيل البطاقة',
+    bc_inactive: 'غير مفعّلة',
   },
 
   fr: {
@@ -1203,6 +1211,13 @@ const translations = {
     bc_deactivate: 'Désactiver cette carte',
     bc_confirm_deactivate: 'Êtes-vous sûr de vouloir désactiver cette carte ?\nVous devrez ajouter une nouvelle carte pour payer.',
     bc_deactivated: '✅ Carte désactivée',
+    bc_deactivate: 'Désactiver cette carte',
+    bc_reactivate: 'Réactiver la carte',
+    bc_add_new: 'Ajouter une nouvelle carte',
+    bc_confirm_deactivate: 'Êtes-vous sûr de vouloir désactiver cette carte ?\nVous avez 3 jours pour la réactiver avant la suspension.',
+    bc_deactivated: '✅ Carte désactivée',
+    bc_reactivated: '✅ Carte réactivée',
+    bc_inactive: 'Inactive',
   },
 
   en: {
@@ -1800,6 +1815,14 @@ const translations = {
     bc_deactivate: 'Deactivate this card',
     bc_confirm_deactivate: 'Are you sure you want to deactivate this card?\nYou will need to add a new card to pay.',
     bc_deactivated: '✅ Card deactivated',
+
+    bc_deactivate: 'Deactivate this card',
+    bc_reactivate: 'Reactivate Card',
+    bc_add_new: 'Add New Card',
+    bc_confirm_deactivate: 'Are you sure you want to deactivate this card?\nYou have 3 days to reactivate it before suspension.',
+    bc_deactivated: '✅ Card deactivated',
+    bc_reactivated: '✅ Card reactivated',
+    bc_inactive: 'Inactive',
   },
 
   

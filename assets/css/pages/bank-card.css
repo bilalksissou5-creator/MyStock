@@ -1,6 +1,6 @@
 /* ============================================
    صفحة البطاقة البنكية
-   ✅ تصميم ثلاثي الأبعاد + نموذج تعديل
+   ✅ تصميم ثلاثي الأبعاد + حالة نشطة/غير نشطة
    ============================================ */
 
 .bank-card-wrapper {
@@ -192,6 +192,31 @@
 }
 
 /* ══════════════════════════════════════════
+   ✅ البطاقة غير المفعّلة
+   ══════════════════════════════════════════ */
+.bank-card-visual.inactive {
+  filter: grayscale(0.8);
+  opacity: 0.6;
+}
+
+.bc-inactive-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 16px;
+  z-index: 5;
+}
+
+.bc-inactive-overlay i {
+  font-size: 48px;
+  color: #dc2626;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+}
+
+/* ══════════════════════════════════════════
    شارة "افتراضية"
    ══════════════════════════════════════════ */
 .bc-default-badge {
@@ -209,57 +234,20 @@
 }
 
 /* ══════════════════════════════════════════
-   نموذج التعديل
+   شارة "غير مفعّلة"
    ══════════════════════════════════════════ */
-.bank-card-form {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.bank-card-form .form-group {
-  margin-bottom: 0;
-}
-
-.bank-card-form label {
-  display: block;
-  font-size: 13px;
-  font-weight: 600;
-  color: #404040;
-  margin-bottom: 6px;
-  text-align: start;
-}
-
-.bank-card-form input {
-  width: 100%;
-  padding: 12px 14px;
-  border: 1px solid #d4d4d4;
-  border-radius: 10px;
-  background: white;
-  outline: none;
-  font-size: 14px;
-  font-family: inherit;
-  box-sizing: border-box;
-  transition: border-color 0.15s;
-}
-
-.bank-card-form input:focus {
-  border-color: #171717;
-}
-
-.bank-card-form input[dir="ltr"] {
-  font-family: 'Courier New', monospace;
-  letter-spacing: 1px;
-}
-
-/* ══════════════════════════════════════════
-   الأزرار
-   ══════════════════════════════════════════ */
-.bank-card-actions {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  margin-top: 8px;
+.bc-inactive-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  background: #fee2e2;
+  color: #dc2626;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+  margin: 0 auto;
+  width: fit-content;
 }
 
 /* ══════════════════════════════════════════
@@ -293,7 +281,19 @@
   color: #a3a3a3;
 }
 
-/* ✅ زر إلغاء التفعيل */
+/* ══════════════════════════════════════════
+   الأزرار
+   ══════════════════════════════════════════ */
+.bank-card-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+/* ══════════════════════════════════════════
+   زر إلغاء التفعيل (أحمر)
+   ══════════════════════════════════════════ */
 #deactivate-btn {
   background: #dc2626;
   color: white;
@@ -302,6 +302,7 @@
 #deactivate-btn:hover {
   background: #b91c1c;
 }
+
 /* ══════════════════════════════════════════
    Responsive
    ══════════════════════════════════════════ */
