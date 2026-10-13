@@ -13,10 +13,14 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (window.applyLanguage) window.applyLanguage();
   const tr = (key) => (window.t ? window.t(key) : key);
 
+  document.title = tr('dash_title_full');
+
   const main = document.getElementById('main-content');
 
   main.innerHTML = `
-    <h2>${tr('dash_title')}</h2>
+    <div class="page-header">
+      <h2>${tr('dash_title')}</h2>
+    </div>
 
     <!-- ══════════════════════════════════════
          بطاقة حركات المخزون
@@ -221,9 +225,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   setupProfitFilters();
 });
 
-// ============================================
-// تحميل الإحصاءات
-// ============================================
 async function loadStats() {
   const { data: products } = await db.from('products').select('qty, price');
   const { count: movements } = await db.from('stock_movements').select('*', { count: 'exact', head: true });
@@ -244,9 +245,6 @@ async function loadStats() {
   if (el('stat-today')) el('stat-today').textContent = todayMovements;
 }
 
-// ============================================
-// ✅ حساب عمليات المخزون
-// ============================================
 async function computeMovementsHistory(days) {
   const now = new Date();
   const startDate = new Date(Date.UTC(
@@ -321,9 +319,6 @@ async function computeMovementsHistory(days) {
   return { mode: 'daily', dates, inSeries, outSeries };
 }
 
-// ============================================
-// ✅ رسم مبيان الحركات
-// ============================================
 let stockChart = null;
 
 async function loadStockChart(days) {
@@ -476,9 +471,6 @@ async function loadStockChart(days) {
   stockChart.render();
 }
 
-// ============================================
-// ✅ حساب الأرباح
-// ============================================
 async function computeProfitHistory(days) {
   const now = new Date();
   const startDate = new Date(Date.UTC(
@@ -562,9 +554,6 @@ async function computeProfitHistory(days) {
   return { mode: 'daily', dates, profits };
 }
 
-// ============================================
-// ✅ رسم مبيان الأرباح
-// ============================================
 let profitChart = null;
 
 async function loadProfitChart(days) {
@@ -675,9 +664,6 @@ async function loadProfitChart(days) {
   profitChart.render();
 }
 
-// ============================================
-// ✅ أزرار الفلترة
-// ============================================
 function setupChartFilters() {
   document.querySelectorAll('.filter-btn').forEach(btn => {
     btn.addEventListener('click', async () => {

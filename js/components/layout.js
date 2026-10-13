@@ -1,6 +1,6 @@
 // ============================================
 // الهيكل المشترك (Header + Sidebar)
-// ✅ فحص تلقائي + تحذيرات قبل القفل
+// ✅ فحص تلقائي + تحذيرات + ترجمة كاملة
 // ============================================
 
 const ALLOWED_PAGES = [
@@ -40,13 +40,11 @@ async function autoCheckPaymentBlock() {
 
     if (profile.role !== 'admin') return;
 
-    // لا يوجد بطاقة إطلاقاً → قفل فوري
     if (!profile.bank_card_last4) {
       window.location.replace('/bank-card.html?blocked=1');
       return;
     }
 
-    // البطاقة موجودة
     if (profile.bank_card_active === false && profile.bank_card_deactivated_at) {
       const deactivatedAt = new Date(profile.bank_card_deactivated_at).getTime();
       const now = Date.now();
@@ -57,23 +55,19 @@ async function autoCheckPaymentBlock() {
 
       const currentWarning = profile.card_warning_sent ?? 0;
 
-      // ✅ بعد 3 أيام → قفل
       if (elapsed >= 3 * DAY_MS) {
         window.location.replace('/bank-card.html?blocked=1');
         return;
       }
 
-      // ✅ تحذير يوم 3 (آخر 12 ساعة)
       if (daysElapsed >= 2 && currentWarning < 3) {
         if (elapsed >= 2 * DAY_MS + 12 * 60 * 60 * 1000) {
           await sendWarning(user.id, 3);
         }
       }
-      // ✅ تحذير يوم 2
       else if (daysElapsed >= 1 && currentWarning < 2) {
         await sendWarning(user.id, 2);
       }
-      // ✅ تحذير يوم 1
       else if (daysElapsed >= 0 && currentWarning < 1) {
         await sendWarning(user.id, 1);
       }
@@ -84,19 +78,21 @@ async function autoCheckPaymentBlock() {
 }
 
 // ═══════════════════════════════════════════
-// إرسال تحذير + تحديث الحقل
+// إرسال تحذير
 // ═══════════════════════════════════════════
 async function sendWarning(userId, level) {
+  const tr = (key) => (window.t ? window.t(key) : key);
+
   const titles = {
-    1: '⚠️ بطاقتك غير مفعّلة',
-    2: '🔔 تبقى يومان',
-    3: '🚨 تبقى 12 ساعة',
+    1: tr('warn_title_1'),
+    2: tr('warn_title_2'),
+    3: tr('warn_title_3'),
   };
 
   const messages = {
-    1: 'لقد ألغيت تفعيل بطاقتك البنكية. لديك 3 أيام لإعادة تفعيلها أو إضافة بطاقة جديدة قبل إيقاف التطبيق.',
-    2: 'مرّ يوم على إلغاء تفعيل بطاقتك. تبقى يومان قبل إيقاف التطبيق.',
-    3: 'تبقى 12 ساعة فقط! أعد تفعيل بطاقتك أو أضف بطاقة جديدة الآن.',
+    1: tr('warn_msg_1'),
+    2: tr('warn_msg_2'),
+    3: tr('warn_msg_3'),
   };
 
   await db.from('notifications').insert({
@@ -124,16 +120,18 @@ if (document.readyState === 'loading') {
 // renderLayout
 // ============================================
 function renderLayout(activePage) {
+  const tr = (key) => (window.t ? window.t(key) : key);
+
   const navItems = [
-    { href: '/dashboard.html', label: 'لوحة التحكم', icon: 'fa-house' },
-    { href: '/products/add.html', label: 'إضافة منتج', icon: 'fa-circle-plus' },
-    { href: '/movements/out.html', label: 'إخراج منتج', icon: 'fa-circle-minus' },
-    { href: '/products/list.html', label: 'المنتجات', icon: 'fa-box' },
-    { href: '/movements/list.html', label: 'الحركات', icon: 'fa-right-left' },
-    { href: '/workers/list.html', label: 'العمال', icon: 'fa-users' },
-    { href: '/suppliers/list.html', label: 'الموردون', icon: 'fa-truck' },
-    { href: '/invoices/list.html', label: 'الفواتير', icon: 'fa-file-invoice' },
-    { href: '/settings.html', label: 'الإعدادات', icon: 'fa-gear' },
+    { href: '/dashboard.html', label: tr('nav_dashboard'), icon: 'fa-house' },
+    { href: '/products/add.html', label: tr('nav_add_product'), icon: 'fa-circle-plus' },
+    { href: '/movements/out.html', label: tr('nav_out_product'), icon: 'fa-circle-minus' },
+    { href: '/products/list.html', label: tr('nav_products'), icon: 'fa-box' },
+    { href: '/movements/list.html', label: tr('nav_movements'), icon: 'fa-right-left' },
+    { href: '/workers/list.html', label: tr('nav_workers'), icon: 'fa-users' },
+    { href: '/suppliers/list.html', label: tr('nav_suppliers'), icon: 'fa-truck' },
+    { href: '/invoices/list.html', label: tr('nav_invoices'), icon: 'fa-file-invoice' },
+    { href: '/settings.html', label: tr('nav_settings'), icon: 'fa-gear' },
   ];
 
   const navHTML = navItems.map(item => `
@@ -145,16 +143,16 @@ function renderLayout(activePage) {
 
   const layout = `
     <header class="header">
-      <button type="button" class="sidebar-toggle" id="sidebar-toggle" title="القائمة">
+      <button type="button" class="sidebar-toggle" id="sidebar-toggle" title="${tr('nav_menu')}">
         <i class="fas fa-bars"></i>
       </button>
-      <a href="/notifications.html" class="notif" id="notif-btn" title="الإشعارات">
+      <a href="/notifications.html" class="notif" id="notif-btn" title="${tr('nav_notifications')}">
         <i class="fas fa-bell"></i>
         <span class="notif-count" id="notif-count">0</span>
       </a>
       <div class="search">
         <i class="fas fa-search"></i>
-        <input type="text" placeholder="بحث...">
+        <input type="text" placeholder="${tr('nav_search')}">
       </div>
       <h1 class="logo">MyStock</h1>
     </header>
@@ -168,11 +166,11 @@ function renderLayout(activePage) {
         <div class="sidebar-footer">
           <a href="/profile.html" class="nav-item ${activePage === '/profile.html' ? 'active' : ''}">
             <i class="fas fa-user"></i>
-            <span>الملف الشخصي</span>
+            <span>${tr('nav_profile')}</span>
           </a>
           <button class="nav-item logout" id="logout-btn">
             <i class="fas fa-right-from-bracket"></i>
-            <span>تسجيل الخروج</span>
+            <span>${tr('nav_logout')}</span>
           </button>
         </div>
       </aside>
