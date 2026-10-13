@@ -1,6 +1,6 @@
 // ============================================
 // صفحة البطاقة البنكية
-// ✅ عرض + تعديل + حذف
+// ✅ عرض + إلغاء تفعيل + التوجيه لـ payment
 // ✅ دعم كامل للترجمة
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
@@ -45,25 +45,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     setTimeout(() => { successBox.style.display = 'none'; }, 3000);
   }
 
-  function detectCardBrand(number) {
-    const clean = number.replace(/\s/g, '');
-    if (/^4/.test(clean)) return 'visa';
-    if (/^(5[1-5]|2[2-7])/.test(clean)) return 'mastercard';
-    if (/^3[47]/.test(clean)) return 'amex';
-    if (/^6/.test(clean)) return 'discover';
-    return null;
-  }
-
-  function getBrandName(brand) {
-    switch (brand) {
-      case 'visa': return 'Visa';
-      case 'mastercard': return 'Mastercard';
-      case 'amex': return 'Amex';
-      case 'discover': return 'Discover';
-      default: return 'Card';
-    }
-  }
-
   function getBrandIcon(brandName) {
     const b = (brandName || '').toLowerCase();
     if (b.includes('visa')) return '<i class="fab fa-cc-visa"></i>';
@@ -98,7 +79,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     wrapper.className = 'bank-card-wrapper';
 
     if (hasCard) {
-      // ═══════════ عرض البطاقة + التعديل ═══════════
+      // ═══════════ عرض البطاقة + إلغاء التفعيل ═══════════
       const last4 = profile.bank_card_last4;
       const brand = profile.bank_card_brand || 'Card';
       const holder = profile.bank_card_holder || '—';
@@ -106,7 +87,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       wrapper.innerHTML = `
         <div class="bank-card-container">
-          <div class="bank-card-visual" id="bank-card-visual">
+          <div class="bank-card-visual">
             <div class="bank-card-front">
               <div class="bc-top">
                 <span class="bc-brand">${getBrandIcon(brand)}</span>
@@ -141,33 +122,10 @@ document.addEventListener('DOMContentLoaded', async () => {
           <span>${tr('bc_default')}</span>
         </div>
 
-        <div class="bank-card-form">
-          <div class="form-group">
-            <label>${tr('pe_bank_holder')}</label>
-            <input type="text" id="bank-holder" value="${holder}">
-          </div>
-
-          <div class="form-group">
-            <label>${tr('pe_bank_number')}</label>
-            <input type="text" id="bank-number" dir="ltr" inputmode="numeric" maxlength="19"
-                   placeholder="${tr('pe_bank_number_ph')}" value="">
-          </div>
-
-          <div class="form-group">
-            <label>${tr('pe_bank_expiry')}</label>
-            <input type="text" id="bank-expiry" dir="ltr" inputmode="numeric" maxlength="5"
-                   placeholder="${tr('pe_bank_expiry_ph')}" value="${expiry}">
-          </div>
-        </div>
-
         <div class="bank-card-actions">
-          <button type="button" class="btn-primary full-width" id="save-btn">
-            <i class="fas fa-check"></i>
-            <span>${tr('pe_bank_save')}</span>
-          </button>
-          <button type="button" class="btn-danger full-width" id="remove-btn">
-            <i class="fas fa-trash"></i>
-            <span>${tr('pe_bank_remove')}</span>
+          <button type="button" class="btn-danger full-width" id="deactivate-btn">
+            <i class="fas fa-ban"></i>
+            <span>${tr('bc_deactivate')}</span>
           </button>
         </div>
       `;
@@ -180,30 +138,11 @@ document.addEventListener('DOMContentLoaded', async () => {
           <small>${tr('bc_empty_hint')}</small>
         </div>
 
-        <div class="bank-card-form">
-          <div class="form-group">
-            <label>${tr('pe_bank_holder')}</label>
-            <input type="text" id="bank-holder" placeholder="${tr('pe_bank_holder_ph')}" value="">
-          </div>
-
-          <div class="form-group">
-            <label>${tr('pe_bank_number')}</label>
-            <input type="text" id="bank-number" dir="ltr" inputmode="numeric" maxlength="19"
-                   placeholder="${tr('pe_bank_number_ph')}" value="">
-          </div>
-
-          <div class="form-group">
-            <label>${tr('pe_bank_expiry')}</label>
-            <input type="text" id="bank-expiry" dir="ltr" inputmode="numeric" maxlength="5"
-                   placeholder="${tr('pe_bank_expiry_ph')}" value="">
-          </div>
-        </div>
-
         <div class="bank-card-actions">
-          <button type="button" class="btn-primary full-width" id="save-btn">
+          <a href="/payment.html" class="btn-primary full-width">
             <i class="fas fa-plus"></i>
             <span>${tr('bc_add')}</span>
-          </button>
+          </a>
         </div>
       `;
     }
@@ -211,91 +150,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     main.appendChild(wrapper);
 
     // ═══════════════════════════════════════════
-    // التنسيق التلقائي للحقول
+    // زر إلغاء التفعيل
     // ═══════════════════════════════════════════
-    const numberInput = document.getElementById('bank-number');
-    const expiryInput = document.getElementById('bank-expiry');
+    document.getElementById('deactivate-btn')?.addEventListener('click', async () => {
+      if (!confirm(tr('bc_confirm_deactivate'))) return;
 
-    if (numberInput) {
-      numberInput.addEventListener('input', () => {
-        let value = numberInput.value.replace(/\D/g, '').slice(0, 16);
-        value = value.replace(/(\d{4})(?=\d)/g, '$1 ');
-        numberInput.value = value;
-      });
-    }
-
-    if (expiryInput) {
-      expiryInput.addEventListener('input', () => {
-        let value = expiryInput.value.replace(/\D/g, '').slice(0, 4);
-        if (value.length >= 3) {
-          value = value.slice(0, 2) + '/' + value.slice(2);
-        }
-        expiryInput.value = value;
-      });
-    }
-
-    // ═══════════════════════════════════════════
-    // زر الحفظ
-    // ═══════════════════════════════════════════
-    document.getElementById('save-btn')?.addEventListener('click', async () => {
-      const holder = document.getElementById('bank-holder').value.trim();
-      const number = numberInput.value.replace(/\s/g, '');
-      const expiry = expiryInput.value.trim();
-
-      if (!holder) {
-        showError(tr('pe_bank_err_holder'));
-        return;
-      }
-
-      if (number.length !== 16) {
-        showError(tr('pe_bank_err_number'));
-        return;
-      }
-
-      if (!expiry || expiry.length !== 5) {
-        showError(tr('pe_bank_err_expiry'));
-        return;
-      }
-
-      const last4 = number.slice(-4);
-      const brand = getBrandName(detectCardBrand(number));
-
-      const btn = document.getElementById('save-btn');
-      btn.disabled = true;
-      btn.querySelector('span').textContent = tr('pe_saving');
-
-      const { error } = await db
-        .from('profiles')
-        .update({
-          bank_card_last4: last4,
-          bank_card_brand: brand,
-          bank_card_holder: holder,
-          bank_card_expiry: expiry,
-        })
-        .eq('id', user.id);
-
-      btn.disabled = false;
-
-      if (error) {
-        showError(error.message);
-      } else {
-        profile.bank_card_last4 = last4;
-        profile.bank_card_brand = brand;
-        profile.bank_card_holder = holder;
-        profile.bank_card_expiry = expiry;
-
-        showSuccess(tr('pe_success_bank'));
-        setTimeout(() => render(), 1200);
-      }
-    });
-
-    // ═══════════════════════════════════════════
-    // زر الحذف
-    // ═══════════════════════════════════════════
-    document.getElementById('remove-btn')?.addEventListener('click', async () => {
-      if (!confirm(tr('pe_bank_confirm_remove'))) return;
-
-      const btn = document.getElementById('remove-btn');
+      const btn = document.getElementById('deactivate-btn');
       btn.disabled = true;
       btn.querySelector('span').textContent = tr('pe_saving');
 
@@ -312,15 +172,15 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (error) {
         showError(error.message);
         btn.disabled = false;
-        btn.querySelector('span').textContent = tr('pe_bank_remove');
+        btn.querySelector('span').textContent = tr('bc_deactivate');
       } else {
         profile.bank_card_last4 = null;
         profile.bank_card_brand = null;
         profile.bank_card_holder = null;
         profile.bank_card_expiry = null;
 
-        showSuccess(tr('pe_success_bank_remove'));
-        setTimeout(() => render(), 1200);
+        showSuccess(tr('bc_deactivated'));
+        setTimeout(() => render(), 800);
       }
     });
   }

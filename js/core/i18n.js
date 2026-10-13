@@ -601,6 +601,10 @@ const translations = {
     bc_empty: 'لا توجد بطاقة بنكية',
     bc_empty_hint: 'أضف بطاقتك لعرضها هنا',
     bc_add: 'إضافة بطاقة',
+
+    bc_deactivate: 'إلغاء تفعيل هذه البطاقة',
+    bc_confirm_deactivate: 'هل أنت متأكد من إلغاء تفعيل هذه البطاقة؟\nستحتاج إلى إضافة بطاقة جديدة للدفع.',
+    bc_deactivated: '✅ تم إلغاء تفعيل البطاقة',
   },
 
   fr: {
@@ -1195,6 +1199,10 @@ const translations = {
     bc_empty: 'Aucune carte bancaire',
     bc_empty_hint: 'Ajoutez votre carte pour la voir ici',
     bc_add: 'Ajouter une carte',
+
+    bc_deactivate: 'Désactiver cette carte',
+    bc_confirm_deactivate: 'Êtes-vous sûr de vouloir désactiver cette carte ?\nVous devrez ajouter une nouvelle carte pour payer.',
+    bc_deactivated: '✅ Carte désactivée',
   },
 
   en: {
@@ -1788,6 +1796,10 @@ const translations = {
     bc_empty: 'No bank card',
     bc_empty_hint: 'Add your card to see it here',
     bc_add: 'Add Card',
+
+    bc_deactivate: 'Deactivate this card',
+    bc_confirm_deactivate: 'Are you sure you want to deactivate this card?\nYou will need to add a new card to pay.',
+    bc_deactivated: '✅ Card deactivated',
   },
 
   

@@ -293,6 +293,15 @@
   color: #a3a3a3;
 }
 
+/* ✅ زر إلغاء التفعيل */
+#deactivate-btn {
+  background: #dc2626;
+  color: white;
+}
+
+#deactivate-btn:hover {
+  background: #b91c1c;
+}
 /* ══════════════════════════════════════════
    Responsive
    ══════════════════════════════════════════ */
