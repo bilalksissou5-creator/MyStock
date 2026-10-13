@@ -245,6 +245,24 @@ button { font-family: inherit; }
 }
 
 /* ============================================
+   ✅ صفحة الرأس (موحّدة لكل الصفحات)
+   ============================================ */
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.page-header h2 {
+  margin: 0;
+  font-size: 1.75rem;
+  font-weight: 700;
+}
+
+/* ============================================
    أزرار
    ============================================ */
 .btn-primary {
@@ -293,18 +311,9 @@ button { font-family: inherit; }
 }
 .btn-danger:hover { background: #b91c1c; }
 
-/* صفحة الرأس */
-.page-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 20px;
-  gap: 12px;
-  flex-wrap: wrap;
-}
-.page-header h2 { margin: 0; font-size: 1.75rem; font-weight: 700; }
-
-/* البحث */
+/* ============================================
+   البحث
+   ============================================ */
 .search-bar {
   position: relative;
   margin-bottom: 20px;
@@ -330,14 +339,18 @@ button { font-family: inherit; }
   box-sizing: border-box;
 }
 
-/* النماذج */
+/* ============================================
+   النماذج
+   ============================================ */
 .form-group { margin-bottom: 16px; }
+
 .form-group label {
   display: block;
   font-size: 14px;
   color: #404040;
   margin-bottom: 6px;
 }
+
 .form-group input,
 .form-group select,
 .form-group textarea {
@@ -351,6 +364,7 @@ button { font-family: inherit; }
   font-family: inherit;
   box-sizing: border-box;
 }
+
 .form-group input:focus,
 .form-group select:focus,
 .form-group textarea:focus { border-color: #171717; }
@@ -361,7 +375,9 @@ button { font-family: inherit; }
   gap: 16px;
 }
 
-/* تنبيهات */
+/* ============================================
+   التنبيهات
+   ============================================ */
 .alert {
   padding: 12px 16px;
   border-radius: 8px;
@@ -371,7 +387,9 @@ button { font-family: inherit; }
 .alert-error { background: #fee2e2; color: #991b1b; }
 .alert-success { background: #dcfce7; color: #166534; }
 
-/* حالات فارغة */
+/* ============================================
+   الحالات الفارغة
+   ============================================ */
 .empty-state {
   background: white;
   padding: 48px 24px;
@@ -386,33 +404,8 @@ button { font-family: inherit; }
 }
 
 /* ============================================
-   ✅ دعم تلقائي للاتجاه حسب اللغة
+   ✅ دعم تلقائي للاتجاه
    ============================================ */
-
-/* الأزرار: عكس ترتيب الأيقونة والنص حسب اللغة */
-[dir="ltr"] .btn-primary,
-[dir="ltr"] .btn-secondary,
-[dir="ltr"] .btn-danger,
-[dir="ltr"] .welcome-btn,
-[dir="ltr"] .google-btn,
-[dir="ltr"] .auth-box button,
-[dir="ltr"] .nav-item,
-[dir="ltr"] .toggle-password {
-  flex-direction: row;
-}
-
-[dir="rtl"] .btn-primary,
-[dir="rtl"] .btn-secondary,
-[dir="rtl"] .btn-danger,
-[dir="rtl"] .welcome-btn,
-[dir="rtl"] .google-btn,
-[dir="rtl"] .auth-box button,
-[dir="rtl"] .nav-item,
-[dir="rtl"] .toggle-password {
-  flex-direction: row-reverse;
-}
-
-/* النصوص: محاذاة حسب اللغة */
 [dir="ltr"] .form-group label,
 [dir="ltr"] .section-title,
 [dir="ltr"] .sub-text,
@@ -421,8 +414,7 @@ button { font-family: inherit; }
 [dir="ltr"] .page-header h2,
 [dir="ltr"] .empty-state p,
 [dir="ltr"] .alert,
-[dir="ltr"] .plan-card,
-[dir="ltr"] .auth-footer p {
+[dir="ltr"] .plan-card {
   text-align: left;
 }
 
@@ -434,24 +426,19 @@ button { font-family: inherit; }
 [dir="rtl"] .page-header h2,
 [dir="rtl"] .empty-state p,
 [dir="rtl"] .alert,
-[dir="rtl"] .plan-card,
-[dir="rtl"] .auth-footer p {
+[dir="rtl"] .plan-card {
   text-align: right;
 }
 
-/* عكس الأيقونات الاتجاهية في RTL */
 [dir="rtl"] .btn-primary i.fa-arrow-left,
 [dir="rtl"] .btn-secondary i.fa-arrow-left,
 [dir="rtl"] .btn-primary i.fa-arrow-right,
 [dir="rtl"] .btn-secondary i.fa-arrow-right,
-[dir="rtl"] .btn-primary i.fa-right-to-bracket,
-[dir="rtl"] .btn-secondary i.fa-right-to-bracket,
 [dir="rtl"] .welcome-btn i.fa-arrow-left,
 [dir="rtl"] .welcome-btn i.fa-arrow-right {
   transform: scaleX(-1);
 }
 
-/* حقول كلمة السر */
 [dir="ltr"] .password-wrapper .toggle-password {
   right: 12px;
   left: auto;
@@ -462,7 +449,6 @@ button { font-family: inherit; }
   right: auto;
 }
 
-/* القوائم المنسدلة (Picker) */
 [dir="ltr"] .picker-check {
   margin-left: auto;
   margin-right: 0;
