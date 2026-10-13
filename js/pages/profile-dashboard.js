@@ -1,7 +1,6 @@
 // ============================================
 // لوحة معلومات المستخدم — البطاقات
 // ✅ دعم كامل للترجمة
-// ✅ تنسيق موحّد مع settings
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   const user = await requireAuth();
@@ -61,12 +60,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   const isOnline = typeof isUserOnline === 'function' && isUserOnline(target);
 
-  // ═══════════════════════════════════════════
-  // البطاقات
-  // ═══════════════════════════════════════════
   const cards = [];
 
-  // 1. بطاقة المنظمة
   if (isAdmin) {
     cards.push({
       href: '/org-edit.html',
@@ -85,7 +80,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   }
 
-  // 2. البطاقات الأخرى
   const otherCards = [
     {
       id: 'cover',
@@ -150,9 +144,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   });
 
-  // ═══════════════════════════════════════════
-  // بناء البطاقة
-  // ═══════════════════════════════════════════
   function buildCard(card) {
     const content = `
       <div class="pd-card-left">
@@ -165,7 +156,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         </div>
       </div>
       <div class="pd-card-arrow">
-        <i class="fas ${card.disabled ? 'fa-lock' : 'fa-chevron-left'}"></i>
+        <i class="fas ${card.disabled ? 'fa-lock' : 'fa-chevron-right'}"></i>
       </div>
     `;
 
