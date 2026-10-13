@@ -1,6 +1,5 @@
 // ============================================
 // صفحة تعديل الملف الشخصي
-// تعمل مع ?section=cover | avatar | name | email-password | phone
 // ✅ دعم كامل للترجمة
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
@@ -370,12 +369,165 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   }
 
+  // ═══════════════════════════════════════════
+  // ✅ القسم: البطاقة البنكية
+  // ═══════════════════════════════════════════
+  function renderBankCard() {
+    const hasCard = !!profile?.bank_card_last4;
+
+    wrapper.innerHTML = `
+      <div class="edit-section">
+        <div class="edit-section-icon">
+          <i class="fas fa-credit-card"></i>
+        </div>
+        <h3>${tr('pe_bank_title')}</h3>
+        <p class="edit-hint">${tr('pe_bank_hint')}</p>
+
+        <div class="form-group">
+          <label>${tr('pe_bank_holder')}</label>
+          <input type="text" id="bank-holder" value="${profile?.bank_card_holder ?? ''}" placeholder="${tr('pe_bank_holder_ph')}">
+        </div>
+
+        <div class="form-group">
+          <label>${tr('pe_bank_number')}</label>
+          <input type="text" id="bank-number" dir="ltr" inputmode="numeric" maxlength="19" 
+                 placeholder="${tr('pe_bank_number_ph')}" value="">
+        </div>
+
+        <div class="form-group">
+          <label>${tr('pe_bank_expiry')}</label>
+          <input type="text" id="bank-expiry" dir="ltr" inputmode="numeric" maxlength="5" 
+                 placeholder="${tr('pe_bank_expiry_ph')}" value="${profile?.bank_card_expiry ?? ''}">
+        </div>
+
+        ${hasCard ? `
+          <button type="button" class="btn-danger full-width" id="remove-bank-btn">
+            <i class="fas fa-trash"></i>
+            <span>${tr('pe_bank_remove')}</span>
+          </button>
+        ` : ''}
+      </div>
+    `;
+
+    footer.style.display = 'block';
+
+    const numberInput = document.getElementById('bank-number');
+    const expiryInput = document.getElementById('bank-expiry');
+
+    // تنسيق رقم البطاقة (مجموعات من 4)
+    numberInput.addEventListener('input', () => {
+      let value = numberInput.value.replace(/\D/g, '').slice(0, 16);
+      value = value.replace(/(\d{4})(?=\d)/g, '$1 ');
+      numberInput.value = value;
+    });
+
+    // تنسيق تاريخ الانتهاء (MM/YY)
+    expiryInput.addEventListener('input', () => {
+      let value = expiryInput.value.replace(/\D/g, '').slice(0, 4);
+      if (value.length >= 3) {
+        value = value.slice(0, 2) + '/' + value.slice(2);
+      }
+      expiryInput.value = value;
+    });
+
+    // زر الحفظ
+    document.getElementById('save-btn').addEventListener('click', async () => {
+      const holder = document.getElementById('bank-holder').value.trim();
+      const number = numberInput.value.replace(/\s/g, '');
+      const expiry = expiryInput.value.trim();
+
+      if (!holder) {
+        showError(tr('pe_bank_err_holder'));
+        return;
+      }
+
+      if (number.length !== 16) {
+        showError(tr('pe_bank_err_number'));
+        return;
+      }
+
+      if (!expiry || expiry.length !== 5) {
+        showError(tr('pe_bank_err_expiry'));
+        return;
+      }
+
+      // ✅ نستخرج آخر 4 أرقام + النوع
+      const last4 = number.slice(-4);
+      const brand = detectCardBrand(number);
+
+      const btn = document.getElementById('save-btn');
+      btn.disabled = true;
+      btn.querySelector('span').textContent = tr('pe_saving');
+
+      const { error } = await db
+        .from('profiles')
+        .update({
+          bank_card_last4: last4,
+          bank_card_brand: brand,
+          bank_card_holder: holder,
+          bank_card_expiry: expiry,
+        })
+        .eq('id', user.id);
+
+      btn.disabled = false;
+      btn.querySelector('span').textContent = tr('pe_save');
+
+      if (error) {
+        showError(error.message);
+      } else {
+        showSuccess(tr('pe_success_bank'));
+        setTimeout(() => window.location.href = '/profile-dashboard.html', 1500);
+      }
+    });
+
+    // زر الحذف
+    const removeBtn = document.getElementById('remove-bank-btn');
+    if (removeBtn) {
+      removeBtn.addEventListener('click', async () => {
+        if (!confirm(tr('pe_bank_confirm_remove'))) return;
+
+        removeBtn.disabled = true;
+        removeBtn.querySelector('span').textContent = tr('pe_saving');
+
+        const { error } = await db
+          .from('profiles')
+          .update({
+            bank_card_last4: null,
+            bank_card_brand: null,
+            bank_card_holder: null,
+            bank_card_expiry: null,
+          })
+          .eq('id', user.id);
+
+        if (error) {
+          showError(error.message);
+          removeBtn.disabled = false;
+          removeBtn.querySelector('span').textContent = tr('pe_bank_remove');
+        } else {
+          showSuccess(tr('pe_success_bank_remove'));
+          setTimeout(() => window.location.href = '/profile-dashboard.html', 1500);
+        }
+      });
+    }
+  }
+
+  // ✅ تحديد نوع البطاقة
+  function detectCardBrand(number) {
+    const clean = number.replace(/\s/g, '');
+    if (/^4/.test(clean)) return 'Visa';
+    if (/^(5[1-5]|2[2-7])/.test(clean)) return 'Mastercard';
+    if (/^3[47]/.test(clean)) return 'Amex';
+    if (/^6/.test(clean)) return 'Discover';
+    return 'Card';
+  }
+
   switch (section) {
     case 'cover':          renderCover(); break;
     case 'avatar':         renderAvatar(); break;
     case 'name':           renderName(); break;
     case 'email-password': renderEmailPassword(); break;
     case 'phone':          renderPhone(); break;
+    case 'bank-card':      renderBankCard(); break;
     default:
       wrapper.innerHTML = `<div class="alert alert-error">${tr('pe_unknown_section')} ${section}</div>`;
   }
