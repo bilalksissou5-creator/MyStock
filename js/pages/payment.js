@@ -1,10 +1,7 @@
 // ============================================
 // صفحة الدفع — تصميم احترافي
-// ✅ بطاقة ثلاثية الأبعاد
-// ✅ مؤشر تقدم (3 خطوات)
-// ✅ تحقق حي من الرقم
-// ✅ الموافقة على الاشتراك الشهري
-// ✅ دعم كامل للترجمة (عربية/فرنسية/إنجليزية)
+// ✅ دعم كامل للترجمة
+// ✅ يحفظ آخر 4 أرقام + النوع + الاسم + التاريخ في profiles
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   const user = await getCurrentUser();
@@ -14,13 +11,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     return;
   }
 
-  // ✅ تطبيق اللغة
   if (window.applyLanguage) window.applyLanguage();
   const tr = (key) => (window.t ? window.t(key) : key);
 
   const container = document.getElementById('payment-content');
 
-  // 1. جلب البروفايل
   const { data: profile } = await db
     .from('profiles')
     .select('organization_id, full_name, role, phone')
@@ -40,7 +35,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     return;
   }
 
-  // 2. جلب الاشتراك
   const { data: subscription } = await db
     .from('subscriptions')
     .select('*')
@@ -49,25 +43,19 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   const userName = profile.full_name || '';
 
-  // ============================================
-  // ✅ إعدادات الدفع
-  // ============================================
   const SUBSCRIPTION_PRICE = 150;
   const FEES = 0;
   const TOTAL = SUBSCRIPTION_PRICE + FEES;
 
-  // 3. بناء الواجهة
   container.innerHTML = `
     <div class="pay-box">
 
-      <!-- ══════ الرأس ══════ -->
       <div class="pay-header">
         <div class="pay-logo">MyStock</div>
         <h2>${tr('pay_title')}</h2>
         <p class="pay-subtitle">${tr('pay_subtitle')}</p>
       </div>
 
-      <!-- ══════ مؤشر التقدم ══════ -->
       <div class="progress-bar">
         <div class="progress-step active" data-step="1">
           <div class="step-circle">1</div>
@@ -85,7 +73,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         </div>
       </div>
 
-      <!-- ══════ ملخص الاشتراك ══════ -->
       <div class="pay-summary">
         <h3>${tr('pay_summary_title')}</h3>
         <div class="summary-row">
@@ -102,7 +89,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         </div>
       </div>
 
-      <!-- ══════ البطاقة ثلاثية الأبعاد ══════ -->
       <div class="credit-card-container">
         <div class="credit-card" id="credit-card">
           <div class="credit-card-front">
@@ -138,11 +124,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         </div>
       </div>
 
-      <!-- ══════ تنبيهات ══════ -->
       <div class="alert alert-error" id="pay-error" style="display:none;"></div>
       <div class="alert alert-success" id="pay-success" style="display:none;"></div>
 
-      <!-- ══════ بيانات البطاقة ══════ -->
       <div class="pay-card">
         <h3>
           <i class="fas fa-credit-card"></i>
@@ -200,7 +184,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         </div>
       </div>
 
-      <!-- ══════ البريد الإلكتروني ══════ -->
       <div class="pay-card">
         <h3>
           <i class="fas fa-envelope"></i>
@@ -218,7 +201,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         </div>
       </div>
 
-      <!-- ══════ الموافقة ══════ -->
       <div class="pay-agreement">
         <label class="agreement-label">
           <input type="checkbox" id="agree-checkbox">
@@ -229,7 +211,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         </label>
       </div>
 
-      <!-- ══════ أو ادفع بـ ══════ -->
       <div class="pay-divider">
         <span>${tr('pay_or_pay_with')}</span>
       </div>
@@ -245,7 +226,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         </button>
       </div>
 
-      <!-- ══════ زر الدفع ══════ -->
       <button type="button" class="btn-pay" id="pay-btn" disabled>
         <i class="fas fa-lock"></i>
         <span>${tr('pay_button')}</span>
@@ -256,7 +236,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         <span>${tr('pay_cancel')}</span>
       </a>
 
-      <!-- ══════ شارات الأمان ══════ -->
       <div class="pay-security-badges">
         <div class="security-badge">
           <i class="fas fa-lock"></i>
@@ -280,9 +259,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     </div>
   `;
 
-  // ============================================
-  // المراجع
-  // ============================================
   const numberInput = document.getElementById('card-number');
   const expiryInput = document.getElementById('card-expiry');
   const cvvInput = document.getElementById('card-cvv');
@@ -303,9 +279,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     payBtn.disabled = !agreeCheckbox.checked;
   });
 
-  // ============================================
-  // ✅ نوع البطاقة
-  // ============================================
   function detectCardBrand(number) {
     const clean = number.replace(/\s/g, '');
     if (/^4/.test(clean)) return 'visa';
@@ -325,9 +298,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
 
-  // ============================================
-  // ✅ Luhn Algorithm
-  // ============================================
+  function getBrandName(brand) {
+    switch (brand) {
+      case 'visa': return 'Visa';
+      case 'mastercard': return 'Mastercard';
+      case 'amex': return 'Amex';
+      case 'discover': return 'Discover';
+      default: return 'Card';
+    }
+  }
+
   function isValidCardNumber(number) {
     const clean = number.replace(/\s/g, '');
     if (clean.length < 13 || clean.length > 19) return false;
@@ -350,9 +330,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     return sum % 10 === 0;
   }
 
-  // ============================================
-  // ✅ تنسيق رقم البطاقة
-  // ============================================
   numberInput.addEventListener('input', () => {
     let value = numberInput.value.replace(/\D/g, '');
     value = value.slice(0, 16);
@@ -367,7 +344,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     const brandIconEl = document.getElementById('cc-brand-icon');
     if (brandIconEl) {
       brandIconEl.outerHTML = getBrandIcon(brand).replace('id="cc-brand-icon"', '') + '';
-      // نعيد الـ id إلى العنصر الجديد
       const container = document.querySelector('.cc-brand');
       if (container && container.lastElementChild) {
         container.lastElementChild.id = 'cc-brand-icon';
@@ -385,9 +361,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   });
 
-  // ============================================
-  // ✅ تاريخ الانتهاء
-  // ============================================
   expiryInput.addEventListener('input', () => {
     let value = expiryInput.value.replace(/\D/g, '');
     value = value.slice(0, 4);
@@ -398,9 +371,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     ccExpiryDisplay.textContent = value || 'MM/YY';
   });
 
-  // ============================================
-  // ✅ CVV
-  // ============================================
   cvvInput.addEventListener('input', () => {
     cvvInput.value = cvvInput.value.replace(/\D/g, '').slice(0, 4);
     const val = cvvInput.value;
@@ -415,16 +385,31 @@ document.addEventListener('DOMContentLoaded', async () => {
     creditCard.classList.remove('flipped');
   });
 
-  // ============================================
-  // ✅ اسم حامل البطاقة
-  // ============================================
   nameInput.addEventListener('input', () => {
     ccNameDisplay.textContent = nameInput.value || tr('pay_card_holder_ph');
   });
 
-  // ============================================
-  // ✅ الدفع
-  // ============================================
+  // ═══════════════════════════════════════════
+  // ✅ حفظ البطاقة في profiles
+  // ═══════════════════════════════════════════
+  async function saveCardToProfile(userId, cardData) {
+    const { error } = await db
+      .from('profiles')
+      .update({
+        bank_card_last4: cardData.last4,
+        bank_card_brand: cardData.brand,
+        bank_card_holder: cardData.holder,
+        bank_card_expiry: cardData.expiry,
+      })
+      .eq('id', userId);
+
+    if (error) {
+      console.error('❌ فشل حفظ البطاقة:', error);
+      return false;
+    }
+    return true;
+  }
+
   async function processPayment() {
     errBox.style.display = 'none';
     successBox.style.display = 'none';
@@ -479,6 +464,16 @@ document.addEventListener('DOMContentLoaded', async () => {
       const now = new Date();
       const expiresAt = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
 
+      // ✅ 1. حفظ البطاقة في profiles
+      const brand = detectCardBrand(number);
+      await saveCardToProfile(user.id, {
+        last4: number.slice(-4),
+        brand: getBrandName(brand),
+        holder: holderName,
+        expiry: expiry,
+      });
+
+      // ✅ 2. تحديث الاشتراك
       if (subscription?.id) {
         const { error } = await db
           .from('subscriptions')
@@ -556,6 +551,14 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       const now = new Date();
       const expiresAt = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
+
+      // ✅ حفظ البطاقة (لـ Apple/Google Pay: نوع البطاقة فقط)
+      await saveCardToProfile(user.id, {
+        last4: '••••',
+        brand: method,
+        holder: profile.full_name || 'User',
+        expiry: '—',
+      });
 
       if (subscription?.id) {
         await db.from('subscriptions').update({
