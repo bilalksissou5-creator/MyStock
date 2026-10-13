@@ -16,7 +16,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   const main = document.getElementById('main-content');
 
   main.innerHTML = `
-    <h2>${tr('stg_title')}</h2>
+    <div class="page-header">
+      <h2>${tr('stg_title')}</h2>
+    </div>
 
     <div class="settings-wrapper">
 
@@ -31,7 +33,7 @@ document.addEventListener('DOMContentLoaded', async () => {
               <div class="settings-subtitle">${tr('stg_profile_sub')}</div>
             </div>
           </div>
-          <i class="fas fa-chevron-left settings-arrow"></i>
+          <i class="fas fa-chevron-right settings-arrow"></i>
         </a>
       </div>
 
@@ -45,7 +47,7 @@ document.addEventListener('DOMContentLoaded', async () => {
               <div class="settings-title">${tr('stg_admin_panel')}</div>
             </div>
           </div>
-          <i class="fas fa-chevron-left settings-arrow"></i>
+          <i class="fas fa-chevron-right settings-arrow"></i>
         </div>
       </div>
 
@@ -59,7 +61,7 @@ document.addEventListener('DOMContentLoaded', async () => {
               <div class="settings-title">${tr('stg_notifications')}</div>
             </div>
           </div>
-          <i class="fas fa-chevron-left settings-arrow"></i>
+          <i class="fas fa-chevron-right settings-arrow"></i>
         </div>
       </div>
 
@@ -74,7 +76,7 @@ document.addEventListener('DOMContentLoaded', async () => {
               <div class="settings-title">${tr('stg_update')}</div>
             </div>
           </div>
-          <i class="fas fa-chevron-left settings-arrow"></i>
+          <i class="fas fa-chevron-right settings-arrow"></i>
         </div>
 
         <div class="settings-item" id="about-app-item">
@@ -86,7 +88,7 @@ document.addEventListener('DOMContentLoaded', async () => {
               <div class="settings-title">${tr('stg_about')}</div>
             </div>
           </div>
-          <i class="fas fa-chevron-left settings-arrow"></i>
+          <i class="fas fa-chevron-right settings-arrow"></i>
         </div>
 
       </div>
