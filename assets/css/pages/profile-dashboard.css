@@ -110,7 +110,7 @@
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
 }
 
-/* ✅ الحاوية: أيقونة + نص (بجانب بعضهما) */
+/* ✅ الحاوية: أيقونة + نص بجانب بعضهما */
 .pd-card-left {
   display: flex;
   align-items: center;
@@ -139,7 +139,6 @@
   flex-direction: column;
   gap: 3px;
   min-width: 0;
-  text-align: start;
 }
 
 .pd-card-title {
@@ -175,17 +174,17 @@
   color: #171717;
 }
 
-/* ✅ عكس السهم حسب اللغة */
+/* ✅ السهم يتبع اللغة */
 [dir="rtl"] .pd-card-arrow {
-  transform: none;
-}
-
-[dir="ltr"] .pd-card-arrow {
   transform: scaleX(-1);
 }
 
+[dir="ltr"] .pd-card-arrow {
+  transform: none;
+}
+
 /* ══════════════════════════════════════════
-   ✅ بطاقة معطّلة (للعرض فقط)
+   ✅ بطاقة معطّلة
    ══════════════════════════════════════════ */
 .pd-card-disabled {
   opacity: 0.7;
