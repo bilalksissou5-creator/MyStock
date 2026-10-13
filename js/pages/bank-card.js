@@ -1,6 +1,7 @@
 // ============================================
 // صفحة البطاقة البنكية
 // ✅ عرض + إلغاء/إعادة تفعيل + إضافة جديدة
+// ✅ إعادة تعيين التحذيرات عند إعادة التفعيل
 // ✅ دعم كامل للترجمة
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
@@ -63,6 +64,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     const hasCard = !!profile?.bank_card_last4;
     const isActive = profile?.bank_card_active === true;
 
+    // ⚠️ تحقق إذا كان المستخدم قادماً من إعادة توجيه "blocked"
+    const params = new URLSearchParams(window.location.search);
+    const isBlocked = params.get('blocked') === '1';
+
     main.innerHTML = `
       <div class="page-header">
         <h2>${tr('bc_title')}</h2>
@@ -72,6 +77,21 @@ document.addEventListener('DOMContentLoaded', async () => {
         </a>
       </div>
     `;
+
+    // ✅ إذا قادم من "blocked"، اعرض تنبيهاً
+    if (isBlocked) {
+      const blockedMsg = document.createElement('div');
+      blockedMsg.className = 'alert alert-error';
+      blockedMsg.style.background = '#fef2f2';
+      blockedMsg.style.border = '2px solid #dc2626';
+      blockedMsg.style.color = '#991b1b';
+      blockedMsg.style.fontWeight = '600';
+      blockedMsg.innerHTML = `
+        <i class="fas fa-lock" style="font-size:18px;"></i>
+        <strong style="margin-inline-start:6px;">${tr('bc_blocked_msg')}</strong>
+      `;
+      main.appendChild(blockedMsg);
+    }
 
     main.appendChild(errBox);
     main.appendChild(successBox);
@@ -86,7 +106,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       const holder = profile.bank_card_holder || '—';
       const expiry = profile.bank_card_expiry || 'MM/YY';
 
-      // شارة الحالة
       const statusBadge = isActive
         ? `<div class="bc-default-badge">
              <i class="fas fa-check-circle"></i>
@@ -97,7 +116,6 @@ document.addEventListener('DOMContentLoaded', async () => {
              <span>${tr('bc_inactive')}</span>
            </div>`;
 
-      // الأزرار حسب الحالة
       const actions = isActive
         ? `<button type="button" class="btn-danger full-width" id="deactivate-btn">
              <i class="fas fa-ban"></i>
@@ -186,6 +204,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         .update({
           bank_card_active: false,
           bank_card_deactivated_at: new Date().toISOString(),
+          card_warning_sent: 0,
         })
         .eq('id', user.id);
 
@@ -196,6 +215,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       } else {
         profile.bank_card_active = false;
         profile.bank_card_deactivated_at = new Date().toISOString();
+        profile.card_warning_sent = 0;
 
         showSuccess(tr('bc_deactivated'));
         setTimeout(() => render(), 800);
@@ -215,6 +235,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         .update({
           bank_card_active: true,
           bank_card_deactivated_at: null,
+          card_warning_sent: 0,
         })
         .eq('id', user.id);
 
@@ -233,6 +254,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       } else {
         profile.bank_card_active = true;
         profile.bank_card_deactivated_at = null;
+        profile.card_warning_sent = 0;
 
         showSuccess(tr('bc_reactivated'));
         setTimeout(() => render(), 800);

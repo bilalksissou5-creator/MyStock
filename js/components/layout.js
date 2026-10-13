@@ -1,6 +1,6 @@
 // ============================================
 // الهيكل المشترك (Header + Sidebar)
-// ✅ فحص تلقائي لقفل الدفع
+// ✅ فحص تلقائي + تحذيرات قبل القفل
 // ============================================
 
 const ALLOWED_PAGES = [
@@ -17,7 +17,7 @@ const ALLOWED_PAGES = [
 ];
 
 // ═══════════════════════════════════════════
-// ✅ فحص تلقائي يعمل عند تحميل الصفحة
+// ✅ فحص + تحذيرات + قفل
 // ═══════════════════════════════════════════
 async function autoCheckPaymentBlock() {
   const currentPage = window.location.pathname.split('/').pop() || 'index.html';
@@ -25,7 +25,6 @@ async function autoCheckPaymentBlock() {
   if (ALLOWED_PAGES.includes(currentPage)) return;
 
   try {
-    // انتظر تحميل supabase
     if (typeof db === 'undefined') return;
 
     const { data: { user } } = await db.auth.getUser();
@@ -33,7 +32,7 @@ async function autoCheckPaymentBlock() {
 
     const { data: profile } = await db
       .from('profiles')
-      .select('role, bank_card_last4, bank_card_active, bank_card_deactivated_at')
+      .select('role, bank_card_last4, bank_card_active, bank_card_deactivated_at, card_warning_sent')
       .eq('id', user.id)
       .single();
 
@@ -41,32 +40,80 @@ async function autoCheckPaymentBlock() {
 
     if (profile.role !== 'admin') return;
 
-    let shouldBlock = false;
-
-    // الحالة 1: لا توجد بطاقة إطلاقاً
+    // لا يوجد بطاقة إطلاقاً → قفل فوري
     if (!profile.bank_card_last4) {
-      shouldBlock = true;
+      window.location.replace('/bank-card.html?blocked=1');
+      return;
     }
-    // الحالة 2: البطاقة غير مفعّلة منذ 3 أيام
-    else if (profile.bank_card_active === false && profile.bank_card_deactivated_at) {
+
+    // البطاقة موجودة
+    if (profile.bank_card_active === false && profile.bank_card_deactivated_at) {
       const deactivatedAt = new Date(profile.bank_card_deactivated_at).getTime();
       const now = Date.now();
-      const threeDaysMs = 3 * 24 * 60 * 60 * 1000;
+      const elapsed = now - deactivatedAt;
 
-      if (now - deactivatedAt >= threeDaysMs) {
-        shouldBlock = true;
+      const DAY_MS = 24 * 60 * 60 * 1000;
+      const daysElapsed = Math.floor(elapsed / DAY_MS);
+
+      const currentWarning = profile.card_warning_sent ?? 0;
+
+      // ✅ بعد 3 أيام → قفل
+      if (elapsed >= 3 * DAY_MS) {
+        window.location.replace('/bank-card.html?blocked=1');
+        return;
       }
-    }
 
-    if (shouldBlock) {
-      window.location.replace('/bank-card.html?blocked=1');
+      // ✅ تحذير يوم 3 (آخر 12 ساعة)
+      if (daysElapsed >= 2 && currentWarning < 3) {
+        if (elapsed >= 2 * DAY_MS + 12 * 60 * 60 * 1000) {
+          await sendWarning(user.id, 3);
+        }
+      }
+      // ✅ تحذير يوم 2
+      else if (daysElapsed >= 1 && currentWarning < 2) {
+        await sendWarning(user.id, 2);
+      }
+      // ✅ تحذير يوم 1
+      else if (daysElapsed >= 0 && currentWarning < 1) {
+        await sendWarning(user.id, 1);
+      }
     }
   } catch (err) {
     console.error('❌ autoCheckPaymentBlock error:', err);
   }
 }
 
-// ✅ تشغيل الفحص تلقائياً عند تحميل الصفحة
+// ═══════════════════════════════════════════
+// إرسال تحذير + تحديث الحقل
+// ═══════════════════════════════════════════
+async function sendWarning(userId, level) {
+  const titles = {
+    1: '⚠️ بطاقتك غير مفعّلة',
+    2: '🔔 تبقى يومان',
+    3: '🚨 تبقى 12 ساعة',
+  };
+
+  const messages = {
+    1: 'لقد ألغيت تفعيل بطاقتك البنكية. لديك 3 أيام لإعادة تفعيلها أو إضافة بطاقة جديدة قبل إيقاف التطبيق.',
+    2: 'مرّ يوم على إلغاء تفعيل بطاقتك. تبقى يومان قبل إيقاف التطبيق.',
+    3: 'تبقى 12 ساعة فقط! أعد تفعيل بطاقتك أو أضف بطاقة جديدة الآن.',
+  };
+
+  await db.from('notifications').insert({
+    user_id: userId,
+    title: titles[level],
+    message: messages[level],
+    type: level === 3 ? 'danger' : 'warning',
+    link: '/bank-card.html',
+  });
+
+  await db
+    .from('profiles')
+    .update({ card_warning_sent: level })
+    .eq('id', userId);
+}
+
+// ✅ تشغيل الفحص
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', autoCheckPaymentBlock);
 } else {

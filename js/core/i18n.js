@@ -613,6 +613,8 @@ const translations = {
     bc_deactivated: '✅ تم إلغاء تفعيل البطاقة',
     bc_reactivated: '✅ تم إعادة تفعيل البطاقة',
     bc_inactive: 'غير مفعّلة',
+
+    bc_blocked_msg: 'تم إيقاف التطبيق بسبب عدم وجود بطاقة بنكية مفعّلة. يرجى إعادة تفعيل بطاقتك أو إضافة بطاقة جديدة.',
   },
 
   fr: {
@@ -1218,6 +1220,8 @@ const translations = {
     bc_deactivated: '✅ Carte désactivée',
     bc_reactivated: '✅ Carte réactivée',
     bc_inactive: 'Inactive',
+
+    bc_blocked_msg: "L'application est suspendue en raison d'une carte bancaire inactive. Veuillez réactiver votre carte ou en ajouter une nouvelle.",
   },
 
   en: {
@@ -1823,6 +1827,8 @@ const translations = {
     bc_deactivated: '✅ Card deactivated',
     bc_reactivated: '✅ Card reactivated',
     bc_inactive: 'Inactive',
+
+    bc_blocked_msg: 'The application is suspended due to an inactive bank card. Please reactivate your card or add a new one.',
   },
 
   

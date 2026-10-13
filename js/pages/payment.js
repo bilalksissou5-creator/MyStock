@@ -1,7 +1,7 @@
 // ============================================
 // صفحة الدفع — تصميم احترافي
 // ✅ دعم كامل للترجمة
-// ✅ يحفظ البطاقة + يفعّلها + يفك القفل
+// ✅ يحفظ البطاقة + يفعّلها + يفك القفل + يعيد تعيين التحذيرات
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   const user = await getCurrentUser();
@@ -390,10 +390,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
 
   // ═══════════════════════════════════════════
-  // ✅ حفظ البطاقة + تفعيلها + فك القفل
+  // ✅ حفظ البطاقة + تفعيلها + فك القفل + إعادة تعيين التحذيرات
   // ═══════════════════════════════════════════
   async function saveCardAndActivate(userId, orgId, cardData) {
-    // 1. حفظ البطاقة + تفعيلها
     const { error: cardError } = await db
       .from('profiles')
       .update({
@@ -403,6 +402,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         bank_card_expiry: cardData.expiry,
         bank_card_active: true,
         bank_card_deactivated_at: null,
+        card_warning_sent: 0,
       })
       .eq('id', userId);
 
@@ -411,7 +411,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       return false;
     }
 
-    // 2. فك القفل من المنظمة
     if (orgId) {
       await db
         .from('organizations')
@@ -476,7 +475,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       const now = new Date();
       const expiresAt = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
 
-      // ✅ 1. حفظ + تفعيل البطاقة + فك القفل
       const brand = detectCardBrand(number);
       await saveCardAndActivate(user.id, profile.organization_id, {
         last4: number.slice(-4),
@@ -485,7 +483,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         expiry: expiry,
       });
 
-      // ✅ 2. تحديث الاشتراك
       if (subscription?.id) {
         const { error } = await db
           .from('subscriptions')
@@ -564,7 +561,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       const now = new Date();
       const expiresAt = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
 
-      // ✅ حفظ + تفعيل + فك القفل
       await saveCardAndActivate(user.id, profile.organization_id, {
         last4: '••••',
         brand: method,
