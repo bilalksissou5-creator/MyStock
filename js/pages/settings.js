@@ -38,7 +38,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       </div>
 
       <div class="settings-card">
-        <div class="settings-item" id="admin-panel-item">
+        <a href="/times.html" class="settings-item">
           <div class="settings-item-left">
             <div class="settings-icon icon-purple">
               <i class="fas fa-sliders"></i>
@@ -48,7 +48,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             </div>
           </div>
           <i class="fas fa-chevron-right settings-arrow"></i>
-        </div>
+        </a>
       </div>
 
       <div class="settings-card">
