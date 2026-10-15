@@ -667,6 +667,9 @@ const translations = {
     bc_sub_expires: 'ينتهي في',
     bc_manage_subscription: 'إدارة الاشتراك',
     bc_subscribe_now: 'اشترك الآن',
+
+    sub_change_plan: 'تغيير الباقة',
+    sub_change_plan_desc: 'اختر باقة جديدة. سيتم استبدال بطاقتك الحالية.',
   },
 
   fr: {
@@ -1325,6 +1328,9 @@ const translations = {
     bc_sub_expires: 'Expire le',
     bc_manage_subscription: "Gérer l'abonnement",
     bc_subscribe_now: "S'abonner maintenant",
+
+    sub_change_plan: 'Changer de forfait',
+    sub_change_plan_desc: 'Choisissez un nouveau forfait. Votre carte actuelle sera remplacée.',
   },
 
   en: {
@@ -1983,6 +1989,9 @@ const translations = {
     bc_sub_expires: 'Expires on',
     bc_manage_subscription: 'Manage Subscription',
     bc_subscribe_now: 'Subscribe Now',
+
+    sub_change_plan: 'Change Plan',
+    sub_change_plan_desc: 'Choose a new plan. Your current card will be replaced.',
   },
 
   

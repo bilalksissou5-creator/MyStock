@@ -68,7 +68,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   function render() {
     const hasCard = !!profile?.bank_card_last4;
-    const isActive = profile?.bank_card_active === true || (hasCard && subscription?.status === 'active');
+
+    // ✅ فقط bank_card_active يحدد الحالة
+    const isActive = profile?.bank_card_active !== false;
 
     const params = new URLSearchParams(window.location.search);
     const isBlocked = params.get('blocked') === '1';
@@ -124,7 +126,7 @@ document.addEventListener('DOMContentLoaded', async () => {
              <i class="fas fa-ban"></i>
              <span>${tr('bc_deactivate')}</span>
            </button>
-           <a href="/subscription.html" class="btn-secondary full-width" style="margin-top:8px;">
+           <a href="/subscription.html?change=1" class="btn-secondary full-width" style="margin-top:8px;">
              <i class="fas fa-plus"></i>
              <span>${tr('bc_add_new')}</span>
            </a>`
@@ -132,7 +134,7 @@ document.addEventListener('DOMContentLoaded', async () => {
              <i class="fas fa-check"></i>
              <span>${tr('bc_reactivate')}</span>
            </button>
-           <a href="/subscription.html" class="btn-secondary full-width" style="margin-top:8px;">
+           <a href="/subscription.html?change=1" class="btn-secondary full-width" style="margin-top:8px;">
              <i class="fas fa-plus"></i>
              <span>${tr('bc_add_new')}</span>
            </a>`;
@@ -200,7 +202,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         </div>
 
         <div class="bank-card-actions">
-          <a href="/subscription.html" class="btn-primary full-width">
+          <a href="/subscription.html?change=1" class="btn-primary full-width">
             <i class="fas fa-credit-card"></i>
             <span>${tr('bc_subscribe_now')}</span>
           </a>

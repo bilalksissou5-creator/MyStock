@@ -2,6 +2,7 @@
 // صفحة الاشتراك (One UI Style)
 // ✅ 3 بطاقات اشتراك + Lemon Squeezy Checkout
 // ✅ تفعيل تلقائي عند العودة من Lemon Squeezy
+// ✅ دعم وضع "تغيير البطاقة" (?change=1)
 // ✅ دعم كامل للترجمة
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
@@ -40,11 +41,16 @@ document.addEventListener('DOMContentLoaded', async () => {
   const isAdmin = profile?.role === 'admin';
 
   // ═══════════════════════════════════════════
-  // ✅ التحقق من العودة من Lemon Squeezy (?paid=1)
+  // ✅ قراءة URL params مرة واحدة
   // ═══════════════════════════════════════════
   const urlParams = new URLSearchParams(window.location.search);
-  if (urlParams.get('paid') === '1' && isAdmin && profile?.organization_id) {
-    // عرض شاشة "جارٍ التفعيل"
+  const isPaidReturn = urlParams.get('paid') === '1';
+  const isChangeMode = urlParams.get('change') === '1';
+
+  // ═══════════════════════════════════════════
+  // ✅ التحقق من العودة من Lemon Squeezy (?paid=1)
+  // ═══════════════════════════════════════════
+  if (isPaidReturn && isAdmin && profile?.organization_id) {
     container.innerHTML = `
       <div class="sub-box" style="text-align:center; padding:60px 24px;">
         <div class="sub-icon" style="background:#dcfce7; margin:0 auto 20px; width:80px; height:80px; border-radius:50%; display:flex; align-items:center; justify-content:center;">
@@ -55,7 +61,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       </div>
     `;
 
-    // ✅ تفعيل الاشتراك
     const now = new Date();
     const expiresAt = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
 
@@ -72,7 +77,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       console.error('Update error:', updateError);
     }
 
-    // ✅ انتظر قليلاً ثم حوّل
     setTimeout(() => {
       window.location.replace('/dashboard.html');
     }, 1500);
@@ -93,8 +97,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     subscription = sub;
   }
 
-  // ✅ إذا كان الاشتراك نشطاً → حول إلى لوحة التحكم
-  if (subscription?.status === 'active') {
+  // ✅ إذا كان الاشتراك نشطاً → حول إلى لوحة التحكم (إلا في وضع التغيير)
+  if (subscription?.status === 'active' && !isChangeMode) {
     const expiresAt = subscription.expires_at
       ? new Date(subscription.expires_at)
       : null;
@@ -140,8 +144,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   function renderPlans() {
     container.innerHTML = `
       <div class="sub-header">
-        <h2>${tr('sub_choose_plan')}</h2>
-        <p>${tr('sub_choose_plan_desc')}</p>
+        <h2>${isChangeMode ? tr('sub_change_plan') : tr('sub_choose_plan')}</h2>
+        <p>${isChangeMode ? tr('sub_change_plan_desc') : tr('sub_choose_plan_desc')}</p>
       </div>
 
       ${buildPlanCard({
@@ -187,10 +191,17 @@ document.addEventListener('DOMContentLoaded', async () => {
         ],
       })}
 
-      <button class="btn-secondary full-width" onclick="logout()" style="margin-top:12px;">
-        <i class="fas fa-right-from-bracket"></i>
-        <span>${tr('sub_logout')}</span>
-      </button>
+      ${isChangeMode ? `
+        <a href="/bank-card.html" class="btn-secondary full-width" style="margin-top:12px;">
+          <i class="fas fa-arrow-right"></i>
+          <span>${tr('prod_detail_back')}</span>
+        </a>
+      ` : `
+        <button class="btn-secondary full-width" onclick="logout()" style="margin-top:12px;">
+          <i class="fas fa-right-from-bracket"></i>
+          <span>${tr('sub_logout')}</span>
+        </button>
+      `}
     `;
 
     // ✅ الضغط على البطاقة → تحديد
