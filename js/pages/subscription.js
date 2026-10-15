@@ -1,7 +1,7 @@
 // ============================================
 // صفحة الاشتراك (One UI Style)
 // ✅ 3 بطاقات اشتراك + Lemon Squeezy Checkout
-// ✅ تأثير اختيار عند الضغط
+// ✅ تفعيل تلقائي عند العودة من Lemon Squeezy
 // ✅ دعم كامل للترجمة
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const container = document.getElementById('subscription-content');
 
   // ═══════════════════════════════════════════
-  // ✅ روابط Lemon Squeezy الفعلية
+  // ✅ روابط Lemon Squeezy
   // ═══════════════════════════════════════════
   const PLAN_LINKS = {
     basic: 'https://mystock.lemonsqueezy.com/checkout/buy/8fbf8e0d-0f4d-486d-8873-d3506dd637f4',
@@ -28,6 +28,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     advanced: 'https://mystock.lemonsqueezy.com/checkout/buy/11270e93-e8d7-4a63-b6f7-a3424e168361',
   };
 
+  // ═══════════════════════════════════════════
+  // جلب بروفايل المستخدم
+  // ═══════════════════════════════════════════
   const { data: profile } = await db
     .from('profiles')
     .select('organization_id, role, full_name')
@@ -36,6 +39,50 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   const isAdmin = profile?.role === 'admin';
 
+  // ═══════════════════════════════════════════
+  // ✅ التحقق من العودة من Lemon Squeezy (?paid=1)
+  // ═══════════════════════════════════════════
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.get('paid') === '1' && isAdmin && profile?.organization_id) {
+    // عرض شاشة "جارٍ التفعيل"
+    container.innerHTML = `
+      <div class="sub-box" style="text-align:center; padding:60px 24px;">
+        <div class="sub-icon" style="background:#dcfce7; margin:0 auto 20px; width:80px; height:80px; border-radius:50%; display:flex; align-items:center; justify-content:center;">
+          <i class="fas fa-spinner fa-spin" style="font-size:32px; color:#22c55e;"></i>
+        </div>
+        <h2 style="margin:0 0 12px; font-size:1.4rem; font-weight:800;">${tr('sub_activating')}</h2>
+        <p class="sub-text" style="color:#6b7280; font-size:14px;">${tr('sub_activating_desc')}</p>
+      </div>
+    `;
+
+    // ✅ تفعيل الاشتراك
+    const now = new Date();
+    const expiresAt = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
+
+    const { error: updateError } = await db
+      .from('subscriptions')
+      .update({
+        status: 'active',
+        started_at: now.toISOString(),
+        expires_at: expiresAt.toISOString(),
+      })
+      .eq('organization_id', profile.organization_id);
+
+    if (updateError) {
+      console.error('Update error:', updateError);
+    }
+
+    // ✅ انتظر قليلاً ثم حوّل
+    setTimeout(() => {
+      window.location.replace('/dashboard.html');
+    }, 1500);
+
+    return;
+  }
+
+  // ═══════════════════════════════════════════
+  // جلب الاشتراك الحالي
+  // ═══════════════════════════════════════════
   let subscription = null;
   if (profile?.organization_id) {
     const { data: sub } = await db
@@ -46,6 +93,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     subscription = sub;
   }
 
+  // ✅ إذا كان الاشتراك نشطاً → حول إلى لوحة التحكم
   if (subscription?.status === 'active') {
     const expiresAt = subscription.expires_at
       ? new Date(subscription.expires_at)
@@ -58,6 +106,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
 
+  // ✅ إذا لم يكن المدير → انتظار
   if (!isAdmin) {
     container.innerHTML = `
       <div class="sub-box">
@@ -75,12 +124,18 @@ document.addEventListener('DOMContentLoaded', async () => {
     return;
   }
 
+  // ✅ إذا كان الاشتراك pending
   if (subscription?.status === 'pending' && subscription.started_at) {
     renderPending(subscription);
     return;
   }
 
+  // ✅ عرض البطاقات الثلاث
   renderPlans();
+
+  // ═══════════════════════════════════════════
+  // الدوال
+  // ═══════════════════════════════════════════
 
   function renderPlans() {
     container.innerHTML = `
@@ -138,6 +193,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       </button>
     `;
 
+    // ✅ الضغط على البطاقة → تحديد
     container.querySelectorAll('.plan-card').forEach(card => {
       card.addEventListener('click', (e) => {
         if (e.target.closest('.plan-btn')) return;
@@ -147,6 +203,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       });
     });
 
+    // ✅ أزرار الاشتراك
     container.querySelectorAll('[data-plan]').forEach(btn => {
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
