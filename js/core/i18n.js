@@ -661,6 +661,12 @@ const translations = {
     sub_unlimited: 'غير محدود',
     sub_link_missing: '⚠️ رابط الدفع غير مُعدّ. يرجى التواصل مع الإدارة.',
     sub_subscribe_now: 'اشترك الآن',
+
+    bc_sub_status: 'حالة الاشتراك',
+    bc_sub_active: 'نشط',
+    bc_sub_expires: 'ينتهي في',
+    bc_manage_subscription: 'إدارة الاشتراك',
+    bc_subscribe_now: 'اشترك الآن',
   },
 
   fr: {
@@ -1313,6 +1319,12 @@ const translations = {
     sub_unlimited: 'Illimité',
     sub_link_missing: '⚠️ Lien de paiement non configuré. Contactez l\'administrateur.',
     sub_subscribe_now: 'S\'abonner',
+
+    bc_sub_status: "Statut de l'abonnement",
+    bc_sub_active: 'Actif',
+    bc_sub_expires: 'Expire le',
+    bc_manage_subscription: "Gérer l'abonnement",
+    bc_subscribe_now: "S'abonner maintenant",
   },
 
   en: {
@@ -1965,6 +1977,12 @@ const translations = {
     sub_unlimited: 'Unlimited',
     sub_link_missing: '⚠️ Payment link not configured. Contact administrator.',
     sub_subscribe_now: 'Subscribe Now',
+
+    bc_sub_status: 'Subscription Status',
+    bc_sub_active: 'Active',
+    bc_sub_expires: 'Expires on',
+    bc_manage_subscription: 'Manage Subscription',
+    bc_subscribe_now: 'Subscribe Now',
   },
 
   

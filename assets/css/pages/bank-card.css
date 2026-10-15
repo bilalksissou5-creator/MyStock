@@ -1,6 +1,6 @@
 /* ============================================
    صفحة البطاقة البنكية
-   ✅ تصميم ثلاثي الأبعاد + حالة نشطة/غير نشطة
+   ✅ تصميم ثلاثي الأبعاد + معلومات الاشتراك
    ============================================ */
 
 .bank-card-wrapper {
@@ -251,6 +251,44 @@
 }
 
 /* ══════════════════════════════════════════
+   ✅ معلومات الاشتراك
+   ══════════════════════════════════════════ */
+.bc-subscription-info {
+  background: #f8faff;
+  border: 1px solid #dbeafe;
+  border-radius: 16px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.bc-info-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  color: #404040;
+}
+
+.bc-info-row i {
+  color: #2563eb;
+  width: 18px;
+  text-align: center;
+  flex-shrink: 0;
+  font-size: 15px;
+}
+
+.bc-info-row span {
+  text-align: start;
+}
+
+.bc-info-row strong {
+  color: #171717;
+  font-weight: 700;
+}
+
+/* ══════════════════════════════════════════
    حالة عدم وجود بطاقة
    ══════════════════════════════════════════ */
 .bank-card-empty {
@@ -292,7 +330,7 @@
 }
 
 /* ══════════════════════════════════════════
-   زر إلغاء التفعيل (أحمر)
+   زر إلغاء التفعيل (أحمر) — legacy
    ══════════════════════════════════════════ */
 #deactivate-btn {
   background: #dc2626;

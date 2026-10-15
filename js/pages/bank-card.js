@@ -1,7 +1,7 @@
 // ============================================
-// صفحة البطاقة البنكية
-// ✅ عرض + إلغاء/إعادة تفعيل + إضافة جديدة
-// ✅ إعادة تعيين التحذيرات عند إعادة التفعيل
+// صفحة البطاقة البنكية (Lemon Squeezy)
+// ✅ عرض البطاقة من profiles (يُملأ عبر Webhook)
+// ✅ إذا لا توجد بطاقة → زر "اشترك الآن"
 // ✅ دعم كامل للترجمة
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
@@ -23,27 +23,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     .eq('id', user.id)
     .single();
 
-  const errBox = document.createElement('div');
-  errBox.className = 'alert alert-error';
-  errBox.style.display = 'none';
-
-  const successBox = document.createElement('div');
-  successBox.className = 'alert alert-success';
-  successBox.style.display = 'none';
-
-  function showError(msg) {
-    successBox.style.display = 'none';
-    errBox.textContent = msg;
-    errBox.style.display = 'block';
-    errBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
-  }
-
-  function showSuccess(msg) {
-    errBox.style.display = 'none';
-    successBox.textContent = msg;
-    successBox.style.display = 'block';
-    successBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    setTimeout(() => { successBox.style.display = 'none'; }, 3000);
+  // جلب الاشتراك
+  let subscription = null;
+  if (profile?.organization_id) {
+    const { data: sub } = await db
+      .from('subscriptions')
+      .select('*')
+      .eq('organization_id', profile.organization_id)
+      .maybeSingle();
+    subscription = sub;
   }
 
   function getBrandIcon(brandName) {
@@ -57,16 +45,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     return '<i class="fas fa-credit-card"></i>';
   }
 
-  // ═══════════════════════════════════════════
-  // عرض الصفحة
-  // ═══════════════════════════════════════════
   function render() {
     const hasCard = !!profile?.bank_card_last4;
-    const isActive = profile?.bank_card_active === true;
-
-    // ⚠️ تحقق إذا كان المستخدم قادماً من إعادة توجيه "blocked"
-    const params = new URLSearchParams(window.location.search);
-    const isBlocked = params.get('blocked') === '1';
+    const isActive = profile?.bank_card_active !== false && hasCard;
 
     main.innerHTML = `
       <div class="page-header">
@@ -78,24 +59,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       </div>
     `;
 
-    // ✅ إذا قادم من "blocked"، اعرض تنبيهاً
-    if (isBlocked) {
-      const blockedMsg = document.createElement('div');
-      blockedMsg.className = 'alert alert-error';
-      blockedMsg.style.background = '#fef2f2';
-      blockedMsg.style.border = '2px solid #dc2626';
-      blockedMsg.style.color = '#991b1b';
-      blockedMsg.style.fontWeight = '600';
-      blockedMsg.innerHTML = `
-        <i class="fas fa-lock" style="font-size:18px;"></i>
-        <strong style="margin-inline-start:6px;">${tr('bc_blocked_msg')}</strong>
-      `;
-      main.appendChild(blockedMsg);
-    }
-
-    main.appendChild(errBox);
-    main.appendChild(successBox);
-
     const wrapper = document.createElement('div');
     wrapper.className = 'bank-card-wrapper';
 
@@ -106,33 +69,9 @@ document.addEventListener('DOMContentLoaded', async () => {
       const holder = profile.bank_card_holder || '—';
       const expiry = profile.bank_card_expiry || 'MM/YY';
 
-      const statusBadge = isActive
-        ? `<div class="bc-default-badge">
-             <i class="fas fa-check-circle"></i>
-             <span>${tr('bc_default')}</span>
-           </div>`
-        : `<div class="bc-inactive-badge">
-             <i class="fas fa-exclamation-circle"></i>
-             <span>${tr('bc_inactive')}</span>
-           </div>`;
-
-      const actions = isActive
-        ? `<button type="button" class="btn-danger full-width" id="deactivate-btn">
-             <i class="fas fa-ban"></i>
-             <span>${tr('bc_deactivate')}</span>
-           </button>`
-        : `<button type="button" class="btn-primary full-width" id="reactivate-btn">
-             <i class="fas fa-check"></i>
-             <span>${tr('bc_reactivate')}</span>
-           </button>
-           <a href="/payment.html" class="btn-secondary full-width" style="margin-top:8px;">
-             <i class="fas fa-plus"></i>
-             <span>${tr('bc_add_new')}</span>
-           </a>`;
-
       wrapper.innerHTML = `
         <div class="bank-card-container">
-          <div class="bank-card-visual ${isActive ? '' : 'inactive'}">
+          <div class="bank-card-visual">
             <div class="bank-card-front">
               <div class="bc-top">
                 <span class="bc-brand">${getBrandIcon(brand)}</span>
@@ -149,7 +88,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                   <span class="bc-field-value">${expiry}</span>
                 </div>
               </div>
-              ${!isActive ? `<div class="bc-inactive-overlay"><i class="fas fa-ban"></i></div>` : ''}
             </div>
 
             <div class="bank-card-back">
@@ -163,10 +101,31 @@ document.addEventListener('DOMContentLoaded', async () => {
           </div>
         </div>
 
-        ${statusBadge}
+        <div class="bc-default-badge">
+          <i class="fas fa-check-circle"></i>
+          <span>${tr('bc_default')}</span>
+        </div>
+
+        ${subscription?.status === 'active' ? `
+          <div class="bc-subscription-info">
+            <div class="bc-info-row">
+              <i class="fas fa-crown"></i>
+              <span>${tr('bc_sub_status')}: <strong>${tr('bc_sub_active')}</strong></span>
+            </div>
+            ${subscription.expires_at ? `
+              <div class="bc-info-row">
+                <i class="fas fa-calendar"></i>
+                <span>${tr('bc_sub_expires')}: <strong>${new Date(subscription.expires_at).toLocaleDateString()}</strong></span>
+              </div>
+            ` : ''}
+          </div>
+        ` : ''}
 
         <div class="bank-card-actions">
-          ${actions}
+          <a href="/subscription.html" class="btn-secondary full-width">
+            <i class="fas fa-sliders"></i>
+            <span>${tr('bc_manage_subscription')}</span>
+          </a>
         </div>
       `;
     } else {
@@ -179,87 +138,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         </div>
 
         <div class="bank-card-actions">
-          <a href="/payment.html" class="btn-primary full-width">
-            <i class="fas fa-plus"></i>
-            <span>${tr('bc_add')}</span>
+          <a href="/subscription.html" class="btn-primary full-width">
+            <i class="fas fa-credit-card"></i>
+            <span>${tr('bc_subscribe_now')}</span>
           </a>
         </div>
       `;
     }
 
     main.appendChild(wrapper);
-
-    // ═══════════════════════════════════════════
-    // زر إلغاء التفعيل
-    // ═══════════════════════════════════════════
-    document.getElementById('deactivate-btn')?.addEventListener('click', async () => {
-      if (!confirm(tr('bc_confirm_deactivate'))) return;
-
-      const btn = document.getElementById('deactivate-btn');
-      btn.disabled = true;
-      btn.querySelector('span').textContent = tr('pe_saving');
-
-      const { error } = await db
-        .from('profiles')
-        .update({
-          bank_card_active: false,
-          bank_card_deactivated_at: new Date().toISOString(),
-          card_warning_sent: 0,
-        })
-        .eq('id', user.id);
-
-      if (error) {
-        showError(error.message);
-        btn.disabled = false;
-        btn.querySelector('span').textContent = tr('bc_deactivate');
-      } else {
-        profile.bank_card_active = false;
-        profile.bank_card_deactivated_at = new Date().toISOString();
-        profile.card_warning_sent = 0;
-
-        showSuccess(tr('bc_deactivated'));
-        setTimeout(() => render(), 800);
-      }
-    });
-
-    // ═══════════════════════════════════════════
-    // زر إعادة التفعيل
-    // ═══════════════════════════════════════════
-    document.getElementById('reactivate-btn')?.addEventListener('click', async () => {
-      const btn = document.getElementById('reactivate-btn');
-      btn.disabled = true;
-      btn.querySelector('span').textContent = tr('pe_saving');
-
-      const { error } = await db
-        .from('profiles')
-        .update({
-          bank_card_active: true,
-          bank_card_deactivated_at: null,
-          card_warning_sent: 0,
-        })
-        .eq('id', user.id);
-
-      // ✅ فك القفل من المنظمة
-      if (profile?.organization_id) {
-        await db
-          .from('organizations')
-          .update({ payment_blocked: false })
-          .eq('id', profile.organization_id);
-      }
-
-      if (error) {
-        showError(error.message);
-        btn.disabled = false;
-        btn.querySelector('span').textContent = tr('bc_reactivate');
-      } else {
-        profile.bank_card_active = true;
-        profile.bank_card_deactivated_at = null;
-        profile.card_warning_sent = 0;
-
-        showSuccess(tr('bc_reactivated'));
-        setTimeout(() => render(), 800);
-      }
-    });
   }
 
   render();
