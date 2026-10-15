@@ -1,6 +1,7 @@
 // ============================================
 // صفحة الاشتراك (One UI Style)
 // ✅ 3 بطاقات اشتراك + Lemon Squeezy Checkout
+// ✅ تأثير اختيار عند الضغط
 // ✅ دعم كامل للترجمة
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
@@ -52,9 +53,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     subscription = sub;
   }
 
-  // ═══════════════════════════════════════════
   // ✅ إذا كان الاشتراك نشطاً → حول إلى لوحة التحكم
-  // ═══════════════════════════════════════════
   if (subscription?.status === 'active') {
     const expiresAt = subscription.expires_at
       ? new Date(subscription.expires_at)
@@ -67,9 +66,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
 
-  // ═══════════════════════════════════════════
   // ✅ إذا لم يكن المدير → انتظار
-  // ═══════════════════════════════════════════
   if (!isAdmin) {
     container.innerHTML = `
       <div class="sub-box">
@@ -87,17 +84,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     return;
   }
 
-  // ═══════════════════════════════════════════
   // ✅ إذا كان الاشتراك pending
-  // ═══════════════════════════════════════════
   if (subscription?.status === 'pending' && subscription.started_at) {
     renderPending(subscription);
     return;
   }
 
-  // ═══════════════════════════════════════════
   // ✅ عرض البطاقات الثلاث
-  // ═══════════════════════════════════════════
   renderPlans();
 
   // ═══════════════════════════════════════════
@@ -160,18 +153,37 @@ document.addEventListener('DOMContentLoaded', async () => {
       </button>
     `;
 
+    // ✅ إضافة حدث الضغط على البطاقة (لتحديدها)
+    container.querySelectorAll('.plan-card').forEach(card => {
+      card.addEventListener('click', (e) => {
+        if (e.target.closest('.plan-btn')) return;
+
+        container.querySelectorAll('.plan-card').forEach(c => c.classList.remove('selected'));
+        card.classList.add('selected');
+      });
+    });
+
     // ✅ ربط أزرار الاشتراك
     container.querySelectorAll('[data-plan]').forEach(btn => {
-      btn.addEventListener('click', () => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+
         const planId = btn.dataset.plan;
         const link = PLAN_LINKS[planId];
 
-        if (!link || link.includes('LINK_HERE')) {
-          alert(tr('sub_link_missing'));
-          return;
-        }
+        // ✅ تحديد البطاقة أولاً
+        const card = btn.closest('.plan-card');
+        container.querySelectorAll('.plan-card').forEach(c => c.classList.remove('selected'));
+        card.classList.add('selected');
 
-        window.location.href = link;
+        // ✅ فتح الرابط بعد 300ms (لرؤية الحركة)
+        setTimeout(() => {
+          if (!link || link.includes('LINK_HERE')) {
+            alert(tr('sub_link_missing'));
+            return;
+          }
+          window.location.href = link;
+        }, 300);
       });
     });
   }
@@ -213,9 +225,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     `;
   }
 
-  // ═══════════════════════════════════════════
-  // عرض "قيد الانتظار"
-  // ═══════════════════════════════════════════
   function renderPending(sub) {
     const sentAt = sub.started_at
       ? new Date(sub.started_at).toLocaleString()

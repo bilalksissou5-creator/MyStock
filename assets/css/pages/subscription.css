@@ -1,6 +1,6 @@
 /* ============================================
    صفحة الاشتراك (One UI Style)
-   ✅ 3 بطاقات اشتراك بتصميم أنيق
+   ✅ 3 بطاقات اشتراك + تأثير اختيار
    ============================================ */
 
 html, body {
@@ -61,6 +61,7 @@ body.subscription-page {
   border: 2px solid transparent;
   transition: all 0.2s ease;
   position: relative;
+  cursor: pointer;
 }
 
 .plan-card:hover {
@@ -68,10 +69,18 @@ body.subscription-page {
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
 }
 
-/* ✅ الباقة الاحترافية — مميزة */
+/* ✅ الباقة الاحترافية — مميزة افتراضياً */
 .plan-card.popular {
   border-color: #2563eb;
   background: linear-gradient(180deg, #ffffff 0%, #f8faff 100%);
+}
+
+/* ✅ البطاقة المُختارة */
+.plan-card.selected {
+  border-color: #2563eb;
+  background: linear-gradient(180deg, #ffffff 0%, #f8faff 100%);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 28px rgba(37, 99, 235, 0.15);
 }
 
 /* ══════════════════════════════════════════
@@ -240,6 +249,17 @@ body.subscription-page {
 }
 
 .plan-card.popular .plan-btn:hover {
+  background: #1d4ed8;
+  box-shadow: 0 6px 18px rgba(37, 99, 235, 0.4);
+}
+
+/* ✅ الزر عند الاختيار (يصبح أزرق) */
+.plan-card.selected .plan-btn {
+  background: #2563eb;
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3);
+}
+
+.plan-card.selected .plan-btn:hover {
   background: #1d4ed8;
   box-shadow: 0 6px 18px rgba(37, 99, 235, 0.4);
 }
