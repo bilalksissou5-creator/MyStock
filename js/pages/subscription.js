@@ -1,8 +1,7 @@
 // ============================================
-// صفحة الاشتراك
-// ✅ تُعرض للمدير فقط (بعد التسجيل أو عند انتهاء الاشتراك)
-// ✅ زر "طلب الاشتراك" → يُحوّل إلى payment.html
-// ✅ يدعم الترجمة (عربية / فرنسية / إنجليزية)
+// صفحة الاشتراك (One UI Style)
+// ✅ 3 بطاقات اشتراك + Lemon Squeezy Checkout
+// ✅ دعم كامل للترجمة
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   const user = await getCurrentUser();
@@ -12,48 +11,65 @@ document.addEventListener('DOMContentLoaded', async () => {
     return;
   }
 
-  // ✅ تطبيق اللغة
   if (window.applyLanguage) window.applyLanguage();
-
-  const container = document.getElementById('subscription-content');
   const tr = (key) => (window.t ? window.t(key) : key);
 
-  // 1. جلب بروفايل المستخدم
+  document.title = tr('sub_title_full');
+
+  const container = document.getElementById('subscription-content');
+
+  // ═══════════════════════════════════════════
+  // ✅ روابط Lemon Squeezy لكل باقة
+  // ⚠️ استبدل هذه الروابط بروابطك الفعلية
+  // ═══════════════════════════════════════════
+  const PLAN_LINKS = {
+    basic: 'https://mystock.lemonsqueezy.com/checkout/buy/BASIC_LINK_HERE',
+    pro: 'https://mystock.lemonsqueezy.com/checkout/buy/PRO_LINK_HERE',
+    advanced: 'https://mystock.lemonsqueezy.com/checkout/buy/ADVANCED_LINK_HERE',
+  };
+
+  // ═══════════════════════════════════════════
+  // جلب بروفايل المستخدم
+  // ═══════════════════════════════════════════
   const { data: profile } = await db
     .from('profiles')
-    .select('*')
+    .select('organization_id, role, full_name')
     .eq('id', user.id)
     .single();
 
-  if (!profile?.organization_id) {
-    container.innerHTML = `
-      <div class="sub-box">
-        <div class="alert alert-error">${tr('sub_no_org')}</div>
-        <button class="btn-secondary full-width" onclick="logout()">
-          <i class="fas fa-right-from-bracket"></i>
-          <span>${tr('sub_logout')}</span>
-        </button>
-      </div>
-    `;
-    return;
+  const isAdmin = profile?.role === 'admin';
+
+  // ═══════════════════════════════════════════
+  // جلب الاشتراك الحالي
+  // ═══════════════════════════════════════════
+  let subscription = null;
+  if (profile?.organization_id) {
+    const { data: sub } = await db
+      .from('subscriptions')
+      .select('*')
+      .eq('organization_id', profile.organization_id)
+      .maybeSingle();
+    subscription = sub;
   }
 
-  // 2. جلب الاشتراك
-  const { data: subscription } = await db
-    .from('subscriptions')
-    .select('*')
-    .eq('organization_id', profile.organization_id)
-    .maybeSingle();
+  // ═══════════════════════════════════════════
+  // ✅ إذا كان الاشتراك نشطاً → حول إلى لوحة التحكم
+  // ═══════════════════════════════════════════
+  if (subscription?.status === 'active') {
+    const expiresAt = subscription.expires_at
+      ? new Date(subscription.expires_at)
+      : null;
+    const isExpired = expiresAt && expiresAt < new Date();
 
-  const role = profile.role;
-  const isAdmin = role === 'admin';
+    if (!isExpired && isAdmin) {
+      window.location.href = '/dashboard.html';
+      return;
+    }
+  }
 
   // ═══════════════════════════════════════════
-  // 3. تحديد الحالة
+  // ✅ إذا لم يكن المدير → انتظار
   // ═══════════════════════════════════════════
-  const status = subscription?.status ?? 'none';
-
-  // ✅ غير المدير → انتظار
   if (!isAdmin) {
     container.innerHTML = `
       <div class="sub-box">
@@ -61,9 +77,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           <i class="fas fa-clock"></i>
         </div>
         <h2>${tr('sub_wait_title')}</h2>
-        <p class="sub-text">
-          ${tr('sub_wait_text')}
-        </p>
+        <p class="sub-text">${tr('sub_wait_text')}</p>
         <button class="btn-secondary full-width" onclick="logout()">
           <i class="fas fa-right-from-bracket"></i>
           <span>${tr('sub_logout')}</span>
@@ -74,82 +88,137 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   // ═══════════════════════════════════════════
-  // 4. المدير
+  // ✅ إذا كان الاشتراك pending
   // ═══════════════════════════════════════════
-
-  // ✅ الحالة: active → تحقق من الانتهاء
-  if (status === 'active') {
-    const expiresAt = subscription.expires_at
-      ? new Date(subscription.expires_at)
-      : null;
-    const isExpired = expiresAt && expiresAt < new Date();
-
-    if (!isExpired) {
-      window.location.href = '/dashboard.html';
-      return;
-    }
-  }
-
-  // ✅ الحالة: pending (طلب مُرسل)
-  if (status === 'pending' && subscription.started_at) {
-    renderPending({ subscription });
+  if (subscription?.status === 'pending' && subscription.started_at) {
+    renderPending(subscription);
     return;
   }
 
-  // ✅ الحالة: none أو pending (بدون طلب)
-  renderPlan({ subscription, profile, user });
+  // ═══════════════════════════════════════════
+  // ✅ عرض البطاقات الثلاث
+  // ═══════════════════════════════════════════
+  renderPlans();
 
   // ═══════════════════════════════════════════
-  // 5. الدوال
+  // الدوال
   // ═══════════════════════════════════════════
 
-  // ✅ عرض الخطة
-  function renderPlan({ subscription, profile, user }) {
+  function renderPlans() {
     container.innerHTML = `
-      <div class="sub-box">
-        <div class="sub-icon plan">
-          <i class="fas fa-crown" style="color:#fbbf24;"></i>
-        </div>
+      <div class="sub-header">
+        <h2>${tr('sub_choose_plan')}</h2>
+        <p>${tr('sub_choose_plan_desc')}</p>
+      </div>
 
-        <h2>${tr('sub_plan_title')}</h2>
-        <p class="sub-text">${tr('sub_plan_text')}</p>
+      ${buildPlanCard({
+        id: 'basic',
+        name: tr('sub_plan_basic'),
+        price: '199',
+        badge: null,
+        features: [
+          { icon: 'fa-users', label: tr('sub_feat_users'), value: '10' },
+          { icon: 'fa-box', label: tr('sub_feat_products'), value: '500' },
+          { icon: 'fa-file-invoice', label: tr('sub_feat_invoices'), value: '100' },
+          { icon: 'fa-print', label: tr('sub_feat_export'), value: '✓' },
+          { icon: 'fa-headset', label: tr('sub_feat_support'), value: tr('sub_support_email') },
+        ],
+      })}
 
-        <div class="plan-card">
-          <div class="plan-header">
-            <h3>${tr('sub_plan_name')}</h3>
-            <div class="plan-price">
-              <span class="price-value">150</span>
-              <span class="price-currency">${tr('sub_plan_price')}</span>
-            </div>
+      ${buildPlanCard({
+        id: 'pro',
+        name: tr('sub_plan_pro'),
+        price: '299',
+        badge: tr('sub_most_popular'),
+        popular: true,
+        features: [
+          { icon: 'fa-users', label: tr('sub_feat_users'), value: '30' },
+          { icon: 'fa-box', label: tr('sub_feat_products'), value: '5,000' },
+          { icon: 'fa-file-invoice', label: tr('sub_feat_invoices'), value: '500' },
+          { icon: 'fa-print', label: tr('sub_feat_export'), value: '✓' },
+          { icon: 'fa-headset', label: tr('sub_feat_support'), value: tr('sub_support_email_wa') },
+        ],
+      })}
+
+      ${buildPlanCard({
+        id: 'advanced',
+        name: tr('sub_plan_advanced'),
+        price: '499',
+        badge: null,
+        features: [
+          { icon: 'fa-users', label: tr('sub_feat_users'), value: tr('sub_unlimited'), unlimited: true },
+          { icon: 'fa-box', label: tr('sub_feat_products'), value: tr('sub_unlimited'), unlimited: true },
+          { icon: 'fa-file-invoice', label: tr('sub_feat_invoices'), value: tr('sub_unlimited'), unlimited: true },
+          { icon: 'fa-print', label: tr('sub_feat_export'), value: '✓' },
+          { icon: 'fa-headset', label: tr('sub_feat_support'), value: '24/7' },
+        ],
+      })}
+
+      <button class="btn-secondary full-width" onclick="logout()" style="margin-top:12px;">
+        <i class="fas fa-right-from-bracket"></i>
+        <span>${tr('sub_logout')}</span>
+      </button>
+    `;
+
+    // ✅ ربط أزرار الاشتراك
+    container.querySelectorAll('[data-plan]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const planId = btn.dataset.plan;
+        const link = PLAN_LINKS[planId];
+
+        if (!link || link.includes('LINK_HERE')) {
+          alert(tr('sub_link_missing'));
+          return;
+        }
+
+        window.location.href = link;
+      });
+    });
+  }
+
+  function buildPlanCard({ id, name, price, badge, popular, features }) {
+    return `
+      <div class="plan-card ${popular ? 'popular' : ''}">
+        ${badge ? `
+          <div class="plan-badge">
+            <i class="fas fa-star"></i>
+            <span>${badge}</span>
           </div>
+        ` : ''}
 
-          <ul class="plan-features">
-            <li><i class="fas fa-check"></i> ${tr('sub_feature_1')}</li>
-            <li><i class="fas fa-check"></i> ${tr('sub_feature_2')}</li>
-            <li><i class="fas fa-check"></i> ${tr('sub_feature_3')}</li>
-            <li><i class="fas fa-check"></i> ${tr('sub_feature_4')}</li>
-            <li><i class="fas fa-check"></i> ${tr('sub_feature_5')}</li>
-            <li><i class="fas fa-check"></i> ${tr('sub_feature_6')}</li>
-          </ul>
+        <div class="plan-header">
+          <h3 class="plan-name">${name}</h3>
+          <div class="plan-price">
+            <span class="plan-price-value">${price}</span>
+            <span class="plan-price-currency">MAD</span>
+          </div>
+          <span class="plan-price-period">${tr('sub_per_month')}</span>
         </div>
 
-        <a href="/payment.html" class="btn-primary full-width">
+        <div class="plan-features">
+          ${features.map(f => `
+            <div class="feature-row">
+              <i class="fas ${f.icon}"></i>
+              <span class="feature-label">${f.label}</span>
+              <span class="feature-value ${f.unlimited ? 'unlimited' : ''}">${f.value}</span>
+            </div>
+          `).join('')}
+        </div>
+
+        <button type="button" class="plan-btn" data-plan="${id}">
           <i class="fas fa-credit-card"></i>
           <span>${tr('sub_subscribe_now')}</span>
-        </a>
-
-        <button class="btn-secondary full-width" onclick="logout()" style="margin-top:8px;">
-          <i class="fas fa-right-from-bracket"></i>
-          <span>${tr('sub_logout')}</span>
         </button>
       </div>
     `;
   }
 
-  // ✅ عرض "قيد الانتظار"
-  function renderPending({ subscription }) {
-    const sentAt = subscription.started_at
-      ? new Date(subscription.started_at).toLocaleString()
+  // ═══════════════════════════════════════════
+  // عرض "قيد الانتظار"
+  // ═══════════════════════════════════════════
+  function renderPending(sub) {
+    const sentAt = sub.started_at
+      ? new Date(sub.started_at).toLocaleString()
       : '—';
 
     container.innerHTML = `
@@ -164,15 +233,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         <div class="pending-details">
           <div class="pending-row">
             <span>${tr('sub_pending_order')}</span>
-            <strong>${subscription.id.slice(0, 8).toUpperCase()}</strong>
+            <strong>${sub.id.slice(0, 8).toUpperCase()}</strong>
           </div>
           <div class="pending-row">
             <span>${tr('sub_pending_plan')}</span>
-            <strong>${tr('sub_plan_name')}</strong>
+            <strong>${sub.plan || 'Basic'}</strong>
           </div>
           <div class="pending-row">
             <span>${tr('sub_pending_amount')}</span>
-            <strong>150 DH</strong>
+            <strong>${sub.price || 199} MAD</strong>
           </div>
           <div class="pending-row">
             <span>${tr('sub_pending_date')}</span>
@@ -180,17 +249,10 @@ document.addEventListener('DOMContentLoaded', async () => {
           </div>
         </div>
 
-        <div class="sub-actions">
-          <a href="/payment.html" class="btn-primary full-width">
-            <i class="fas fa-credit-card"></i>
-            <span>${tr('sub_pay_now')}</span>
-          </a>
-
-          <button class="btn-secondary full-width" onclick="logout()">
-            <i class="fas fa-right-from-bracket"></i>
-            <span>${tr('sub_logout')}</span>
-          </button>
-        </div>
+        <button class="btn-secondary full-width" onclick="logout()">
+          <i class="fas fa-right-from-bracket"></i>
+          <span>${tr('sub_logout')}</span>
+        </button>
       </div>
     `;
   }

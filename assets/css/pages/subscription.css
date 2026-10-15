@@ -1,5 +1,6 @@
 /* ============================================
-   صفحة الاشتراك
+   صفحة الاشتراك (One UI Style)
+   ✅ 3 بطاقات اشتراك بتصميم أنيق
    ============================================ */
 
 html, body {
@@ -11,308 +12,278 @@ html, body {
 
 body.subscription-page {
   background: #f5f5f5;
-  padding: 20px;
+  padding: 20px 16px 40px;
   min-height: 100vh;
   display: flex;
-  align-items: center;
   justify-content: center;
+  align-items: flex-start;
 }
 
 .subscription-wrapper {
-  max-width: 420px;
   width: 100%;
+  max-width: 480px;
   margin: 0 auto;
-}
-
-/* ══════ الحاوية ══════ */
-.sub-box {
-  background: #ffffff;
-  border-radius: 16px;
-  padding: 30px 22px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-  text-align: center;
-}
-
-/* ══════ الأيقونة العلوية ══════ */
-.sub-icon {
-  width: 70px;
-  height: 70px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto 16px;
-  font-size: 30px;
-}
-
-.sub-icon.plan {
-  background: #fffbeb;
-}
-
-.sub-icon.waiting {
-  background: #fef3c7;
-  color: #d97706;
-  animation: pulse 2s ease-in-out infinite;
-}
-
-@keyframes pulse {
-  0%, 100% {
-    transform: scale(1);
-    opacity: 1;
-  }
-  50% {
-    transform: scale(1.05);
-    opacity: 0.9;
-  }
-}
-
-/* ══════ العنوان ══════ */
-.sub-box h2 {
-  font-size: 1.4rem;
-  font-weight: 800;
-  color: #171717;
-  margin: 0 0 10px;
-}
-
-.sub-text {
-  font-size: 14px;
-  color: #737373;
-  line-height: 1.6;
-  margin: 0 0 22px;
-}
-
-/* ══════ بطاقة الخطة ══════ */
-.plan-card {
-  background: #fafafa;
-  border: 2px solid #e5e5e5;
-  border-radius: 14px;
-  padding: 20px 18px;
-  margin-bottom: 20px;
-  /* ✅ الاتجاه يعتمد على dir */
-  text-align: start;
-}
-
-.plan-header {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 10px;
-  padding-bottom: 14px;
-  border-bottom: 1px dashed #d4d4d4;
-  margin-bottom: 14px;
+  gap: 16px;
 }
 
-.plan-header h3 {
-  font-size: 1.1rem;
+/* ══════════════════════════════════════════
+   رأس الصفحة
+   ══════════════════════════════════════════ */
+.sub-header {
+  text-align: center;
+  padding: 12px 0 20px;
+}
+
+.sub-header h2 {
+  font-size: 26px;
   font-weight: 800;
   color: #171717;
+  margin: 0 0 8px;
+}
+
+.sub-header p {
+  font-size: 14px;
+  color: #6b7280;
   margin: 0;
+  line-height: 1.5;
+}
+
+/* ══════════════════════════════════════════
+   البطاقة الأساسية
+   ══════════════════════════════════════════ */
+.plan-card {
+  background: #ffffff;
+  border-radius: 24px;
+  padding: 24px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  border: 2px solid transparent;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.plan-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+/* ✅ الباقة الاحترافية — مميزة */
+.plan-card.popular {
+  border-color: #2563eb;
+  background: linear-gradient(180deg, #ffffff 0%, #f8faff 100%);
+}
+
+/* ══════════════════════════════════════════
+   شارة "الأكثر شيوعاً"
+   ══════════════════════════════════════════ */
+.plan-badge {
+  position: absolute;
+  top: -12px;
+  inset-inline-start: 50%;
+  transform: translateX(-50%);
+  background: #2563eb;
+  color: #ffffff;
+  padding: 6px 16px;
+  border-radius: 100px;
+  font-size: 12px;
+  font-weight: 700;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+[dir="rtl"] .plan-badge {
+  transform: translateX(50%);
+}
+
+.plan-badge i {
+  font-size: 11px;
+}
+
+/* ══════════════════════════════════════════
+   رأس البطاقة
+   ══════════════════════════════════════════ */
+.plan-header {
+  text-align: center;
+  padding-bottom: 20px;
+  border-bottom: 1px dashed #e5e5e5;
+  margin-bottom: 20px;
+}
+
+.plan-name {
+  font-size: 20px;
+  font-weight: 800;
+  color: #171717;
+  margin: 0 0 12px;
 }
 
 .plan-price {
   display: flex;
   align-items: baseline;
+  justify-content: center;
   gap: 6px;
+  margin-bottom: 4px;
 }
 
-.price-value {
-  font-size: 2.2rem;
+.plan-price-value {
+  font-size: 42px;
   font-weight: 900;
   color: #171717;
   line-height: 1;
+  letter-spacing: -1px;
 }
 
-.price-currency {
+.plan-price-currency {
+  font-size: 16px;
+  font-weight: 700;
+  color: #6b7280;
+}
+
+.plan-price-period {
   font-size: 13px;
-  font-weight: 600;
-  color: #737373;
+  color: #a3a3a3;
+  font-weight: 500;
+  display: block;
+  text-align: center;
 }
 
-/* ══════ قائمة الميزات ══════ */
+/* ══════════════════════════════════════════
+   جدول المميزات
+   ══════════════════════════════════════════ */
 .plan-features {
-  list-style: none;
-  padding: 0;
-  margin: 0;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
+  margin-bottom: 20px;
 }
 
-.plan-features li {
+.feature-row {
   display: flex;
   align-items: center;
   gap: 10px;
-  font-size: 13px;
-  color: #404040;
+  padding: 10px 12px;
+  background: #fafafa;
+  border-radius: 12px;
+  font-size: 14px;
+}
+
+.feature-row i {
+  color: #2563eb;
+  font-size: 14px;
+  flex-shrink: 0;
+  width: 18px;
+  text-align: center;
+}
+
+.feature-label {
+  flex: 1;
   font-weight: 500;
-  /* ✅ يتبع اتجاه الصفحة تلقائياً */
+  color: #171717;
   text-align: start;
 }
 
-/* ✅ في RTL: الأيقونة على اليمين والنص بعدها */
-html[dir="rtl"] .plan-features li {
-  flex-direction: row;
-}
-
-/* ✅ في LTR: الأيقونة على اليسار والنص بعدها */
-html[dir="ltr"] .plan-features li {
-  flex-direction: row;
-}
-
-.plan-features li i {
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  background: #dcfce7;
-  color: #16a34a;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 9px;
+.feature-value {
+  font-weight: 700;
+  color: #171717;
+  text-align: end;
   flex-shrink: 0;
 }
 
-/* ══════ الأزرار ══════ */
-.btn-primary,
-.btn-secondary {
-  display: inline-flex;
+.feature-value.unlimited {
+  color: #2563eb;
+}
+
+/* ══════════════════════════════════════════
+   زر الاشتراك
+   ══════════════════════════════════════════ */
+.plan-btn {
+  display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  padding: 12px 16px;
-  font-size: 14px;
-  font-weight: 700;
-  border-radius: 10px;
-  cursor: pointer;
-  text-decoration: none;
-  border: none;
-  font-family: inherit;
-  transition: background 0.15s, transform 0.15s;
-  -webkit-tap-highlight-color: transparent;
-}
-
-.btn-primary {
+  gap: 10px;
+  width: 100%;
+  padding: 16px 24px;
   background: #171717;
   color: #ffffff;
-}
-
-.btn-primary:hover {
-  background: #404040;
-}
-
-.btn-secondary {
-  background: #f5f5f5;
-  color: #171717;
-  border: 1px solid #e5e5e5;
-}
-
-.btn-secondary:hover {
-  background: #e5e5e5;
-}
-
-.btn-primary:active,
-.btn-secondary:active {
-  transform: scale(0.98);
-}
-
-.btn-primary:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-.full-width {
-  width: 100%;
-}
-
-/* ══════ تفاصيل الطلب (قيد الانتظار) ══════ */
-.pending-details {
-  background: #fafafa;
-  border: 1px solid #f0f0f0;
-  border-radius: 12px;
-  padding: 14px 16px;
-  margin-bottom: 18px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.pending-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 13px;
-}
-
-.pending-row span {
-  color: #737373;
-}
-
-.pending-row strong {
-  color: #171717;
+  border: none;
+  border-radius: 100px;
+  font-size: 15px;
   font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.15s ease;
+  -webkit-tap-highlight-color: transparent;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-/* ══════ الأزرار المجمّعة ══════ */
-.sub-actions {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+.plan-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
 }
 
-/* ══════ التنبيهات ══════ */
-.alert {
-  padding: 12px 16px;
-  border-radius: 8px;
-  margin-bottom: 12px;
-  font-size: 13px;
-  /* ✅ يتبع اتجاه الصفحة */
-  text-align: start;
+.plan-btn:active {
+  transform: translateY(0);
 }
 
-.alert-error {
-  background: #fee2e2;
-  color: #991b1b;
+.plan-btn i {
+  font-size: 14px;
 }
 
-.alert-success {
-  background: #dcfce7;
-  color: #166534;
+/* ✅ زر الباقة الاحترافية (أزرق) */
+.plan-card.popular .plan-btn {
+  background: #2563eb;
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3);
 }
 
-/* ══════ الموبايل ══════ */
+.plan-card.popular .plan-btn:hover {
+  background: #1d4ed8;
+  box-shadow: 0 6px 18px rgba(37, 99, 235, 0.4);
+}
+
+/* ══════════════════════════════════════════
+   Responsive
+   ══════════════════════════════════════════ */
 @media (max-width: 480px) {
   body.subscription-page {
-    padding: 12px;
+    padding: 16px 12px 32px;
   }
 
-  .sub-box {
-    padding: 24px 18px;
-    border-radius: 12px;
+  .sub-header h2 {
+    font-size: 22px;
   }
 
-  .sub-icon {
-    width: 60px;
-    height: 60px;
-    font-size: 26px;
-  }
-
-  .sub-box h2 {
-    font-size: 1.2rem;
-  }
-
-  .sub-text {
+  .sub-header p {
     font-size: 13px;
   }
 
-  .price-value {
-    font-size: 1.9rem;
-  }
-
   .plan-card {
-    padding: 16px 14px;
+    padding: 20px;
+    border-radius: 20px;
   }
 
-  .plan-features li {
-    font-size: 12px;
+  .plan-price-value {
+    font-size: 36px;
+  }
+
+  .plan-price-currency {
+    font-size: 14px;
+  }
+
+  .plan-name {
+    font-size: 18px;
+  }
+
+  .feature-row {
+    font-size: 13px;
+    padding: 8px 10px;
+  }
+
+  .plan-btn {
+    padding: 14px 20px;
+    font-size: 14px;
   }
 }
