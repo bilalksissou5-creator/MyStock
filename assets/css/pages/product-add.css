@@ -448,6 +448,137 @@
 }
 
 /* ============================================
+   ✅ الحاسوب والشاشات الكبيرة (> 1024px)
+   تخطيط 3 أعمدة: 20% | 50% | 30%
+   ============================================ */
+@media (min-width: 1024px) {
+
+  /* ✅ الحاوية الرئيسية: 3 أعمدة، بدون بطاقات */
+  .add-form {
+    max-width: 100%;
+    display: grid;
+    grid-template-columns: 20% 50% 30%;
+    gap: 20px;
+    align-items: start;
+    margin: 0;
+  }
+
+  /* ✅ إزالة الخلفيات والحدود والظلال */
+  .product-input-card,
+  .added-products-section,
+  .form-summary {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    padding: 0;
+    border-radius: 0;
+  }
+
+  /* ══════════════════════════════════
+     العمود الأول (20%): عناصر الإضافة
+     ══════════════════════════════════ */
+  .product-input-card {
+    grid-column: 1;
+    grid-row: 1 / 4;
+    position: sticky;
+    top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .product-input-card .form-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+    margin-bottom: 0;
+  }
+
+  .product-input-card .form-group {
+    margin-bottom: 0;
+  }
+
+  .add-product-btn {
+    margin-top: 4px;
+  }
+
+  /* ══════════════════════════════════
+     العمود الثاني (50%): المنتجات المضافة
+     ══════════════════════════════════ */
+  .added-products-section {
+    grid-column: 2;
+    grid-row: 1 / 4;
+  }
+
+  .added-products {
+    max-height: calc(100vh - 220px);
+    overflow-y: auto;
+    padding-inline-end: 4px;
+  }
+
+  .added-products::-webkit-scrollbar { width: 4px; }
+  .added-products::-webkit-scrollbar-thumb {
+    background: #d4d4d4;
+    border-radius: 4px;
+  }
+
+  /* ══════════════════════════════════
+     العمود الثالث (30%): الملخص والأزرار
+     ══════════════════════════════════ */
+  .form-summary {
+    grid-column: 3;
+    grid-row: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .summary-row {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    text-align: start;
+    padding: 12px 16px;
+  }
+
+  .summary-row strong {
+    font-size: 1.2rem;
+  }
+
+  .summary-row.highlight strong {
+    font-size: 1.5rem;
+  }
+
+  .form-actions {
+    grid-column: 3;
+    grid-row: 2;
+    flex-direction: column;
+    gap: 8px;
+    position: sticky;
+    top: 20px;
+  }
+
+  .form-actions .btn-primary,
+  .form-actions .btn-secondary {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* ============================================
+   الهاتف والتابلت (< 1024px)
+   ============================================ */
+@media (max-width: 1023px) {
+  .product-input-card .form-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .product-input-card .form-group:first-child {
+    grid-column: 1 / -1;
+  }
+}
+
+/* ============================================
    الهاتف
    ============================================ */
 @media (max-width: 768px) {
@@ -553,7 +684,6 @@
     justify-content: center;
   }
 
-  /* ✅ Modal الماسح */
   .scanner-box {
     padding: 16px;
   }
