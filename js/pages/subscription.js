@@ -1,7 +1,6 @@
 // ============================================
 // صفحة الاشتراك (One UI Style)
-// ✅ 3 بطاقات اشتراك + Lemon Squeezy Checkout
-// ✅ تفعيل تلقائي عند العودة من Lemon Squeezy
+// ✅ 3 بطاقات اشتراك + Gumroad Checkout
 // ✅ دعم وضع "تغيير البطاقة" (?change=1)
 // ✅ دعم كامل للترجمة
 // ============================================
@@ -21,12 +20,12 @@ document.addEventListener('DOMContentLoaded', async () => {
   const container = document.getElementById('subscription-content');
 
   // ═══════════════════════════════════════════
-  // ✅ روابط Lemon Squeezy
+  // ✅ روابط Gumroad
   // ═══════════════════════════════════════════
   const PLAN_LINKS = {
-    basic: 'https://mystock.lemonsqueezy.com/checkout/buy/8fbf8e0d-0f4d-486d-8873-d3506dd637f4',
-    pro: 'https://mystock.lemonsqueezy.com/checkout/buy/9092659f-0002-49c8-8595-8babb4ea06d8',
-    advanced: 'https://mystock.lemonsqueezy.com/checkout/buy/11270e93-e8d7-4a63-b6f7-a3424e168361',
+    basic: 'https://sissou7.gumroad.com/l/bpqhes?wanted=true',
+    pro: 'https://sissou7.gumroad.com/l/fzfypg?wanted=true',
+    advanced: 'https://sissou7.gumroad.com/l/gobrys?wanted=true',
   };
 
   // ═══════════════════════════════════════════
@@ -41,14 +40,14 @@ document.addEventListener('DOMContentLoaded', async () => {
   const isAdmin = profile?.role === 'admin';
 
   // ═══════════════════════════════════════════
-  // ✅ قراءة URL params مرة واحدة
+  // ✅ قراءة URL params
   // ═══════════════════════════════════════════
   const urlParams = new URLSearchParams(window.location.search);
   const isPaidReturn = urlParams.get('paid') === '1';
   const isChangeMode = urlParams.get('change') === '1';
 
   // ═══════════════════════════════════════════
-  // ✅ التحقق من العودة من Lemon Squeezy (?paid=1)
+  // ✅ التحقق من العودة من Gumroad (?paid=1)
   // ═══════════════════════════════════════════
   if (isPaidReturn && isAdmin && profile?.organization_id) {
     container.innerHTML = `
