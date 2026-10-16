@@ -51,59 +51,63 @@ async function requireAuth() {
   startHeartbeat(user.id);
 
   const currentPage = window.location.pathname;
+
+  // ✅ الصفحات المسموحة بدون اشتراك
   const isSubscriptionPage = currentPage.includes('subscription.html');
   const isRegisterPage = currentPage.includes('register');
   const isLoginPage = currentPage.includes('login');
-  const isInvoicePage = currentPage.includes('invoice.html');
-  const isReceiptPage = currentPage.includes('receipt');
-  const isReceiptsPrintPage = currentPage.includes('receipts-print');
   const isBankCardPage = currentPage.includes('bank-card');
 
   if (isSubscriptionPage || isRegisterPage || isLoginPage || isBankCardPage) {
     return user;
   }
 
-  const { data: subscription } = await db
+  // ⚠️ باقي الصفحات تحتاج اشتراك نشط
+
+  // جلب بيانات المستخدم
+  const { data: profile } = await db
+    .from('profiles')
+    .select('organization_id, role')
+    .eq('id', user.id)
+    .single();
+
+  // ✅ إذا لم تكن هناك منظمة → حول للتسجيل
+  if (!profile?.organization_id) {
+    window.location.href = '/register.html';
+    return null;
+  }
+
+  // جلب الاشتراك (من المستخدم أولاً، ثم من المنظمة)
+  let sub = null;
+
+  const { data: userSub } = await db
     .from('subscriptions')
     .select('status, expires_at')
     .eq('owner_id', user.id)
     .maybeSingle();
 
-  let sub = subscription;
+  sub = userSub;
 
   if (!sub) {
-    const { data: profile } = await db
-      .from('profiles')
-      .select('organization_id, role')
-      .eq('id', user.id)
-      .single();
-
-    if (profile?.organization_id) {
-      const { data: orgSub } = await db
-        .from('subscriptions')
-        .select('status, expires_at')
-        .eq('organization_id', profile.organization_id)
-        .maybeSingle();
-      sub = orgSub;
-    }
+    const { data: orgSub } = await db
+      .from('subscriptions')
+      .select('status, expires_at')
+      .eq('organization_id', profile.organization_id)
+      .maybeSingle();
+    sub = orgSub;
   }
 
+  // ✅ فحص الحالة
   const status = sub?.status ?? 'none';
   const expiresAt = sub?.expires_at ? new Date(sub.expires_at) : null;
   const isExpired = expiresAt && expiresAt < new Date();
 
+  // ✅ الاشتراك النشط فقط
   if (status === 'active' && !isExpired) {
     return user;
   }
 
-  if (isSubscriptionPage) {
-    return user;
-  }
-
-  if (isInvoicePage || isReceiptPage || isReceiptsPrintPage) {
-    return user;
-  }
-
+  // ❌ غير مشترك (pending / none / cancelled / expired) → حوّل إلى subscription
   window.location.href = '/subscription.html';
   return null;
 }
