@@ -434,16 +434,13 @@
   }
 
   /* ✅ القسم 1 (20%): كل بطاقات الإضافة */
-  .add-form > .product-input-card:nth-of-type(1),
-  .add-form > .product-input-card:nth-of-type(2) {
+  .add-form > div:nth-child(1),
+  .add-form > div:nth-child(2) {
     grid-column: 1;
   }
 
-  .add-form > .product-input-card:nth-of-type(1) { grid-row: 1; }
-  .add-form > .product-input-card:nth-of-type(2) { grid-row: 2; }
-
   /* ✅ القسم 2 (50%): المنتجات المضافة */
-  .added-products-section {
+  .add-form > div:nth-child(3) {
     grid-column: 2;
     grid-row: 1 / 5;
     position: sticky;
@@ -464,7 +461,7 @@
   }
 
   /* ✅ القسم 3 (30%): الملخص + الأزرار */
-  .form-summary {
+  .add-form > div:nth-child(4) {
     grid-column: 3;
     grid-row: 1;
     display: flex;
@@ -487,15 +484,15 @@
 
   .summary-row.highlight strong { font-size: 1.5rem; }
 
-  .form-actions {
+  .add-form > div:nth-child(5) {
     grid-column: 3;
     grid-row: 2;
     flex-direction: column;
     gap: 8px;
   }
 
-  .form-actions .btn-primary,
-  .form-actions .btn-secondary {
+  .add-form > div:nth-child(5) .btn-primary,
+  .add-form > div:nth-child(5) .btn-secondary {
     width: 100%;
     justify-content: center;
   }
