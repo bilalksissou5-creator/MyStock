@@ -1,0 +1,659 @@
+/* ============================================
+   صفحة Landing (الصفحة الرئيسية)
+   ✅ تصميم One UI عصري
+   ============================================ */
+
+/* ✅ إصلاح الارتفاع (تجاوز common.css) */
+html:has(body.landing-page) {
+  height: auto !important;
+  overflow-y: auto !important;
+}
+
+body.landing-page {
+  height: auto !important;
+  min-height: 100vh !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  background: #ffffff;
+  color: #171717;
+  font-family: system-ui, -apple-system, sans-serif;
+  margin: 0;
+  padding: 0;
+  direction: inherit;
+  display: block;
+}
+
+/* ══════════════════════════════════════════
+   Header
+   ══════════════════════════════════════════ */
+.landing-header {
+  position: sticky;
+  top: 0;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid #f0f0f0;
+  z-index: 100;
+}
+
+.landing-header-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 16px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.landing-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  color: #171717;
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+}
+
+.landing-logo-icon {
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(135deg, #171717 0%, #404040 100%);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.landing-logo-icon.small {
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  font-size: 14px;
+}
+
+.landing-nav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.landing-nav a {
+  padding: 8px 16px;
+  border-radius: 10px;
+  text-decoration: none;
+  color: #404040;
+  font-size: 14px;
+  font-weight: 600;
+  transition: background 0.15s, color 0.15s;
+}
+
+.landing-nav a:hover {
+  background: #f5f5f5;
+  color: #171717;
+}
+
+.landing-btn-login {
+  background: #171717 !important;
+  color: #ffffff !important;
+}
+
+.landing-btn-login:hover {
+  background: #404040 !important;
+}
+
+/* ══════════════════════════════════════════
+   Hero
+   ══════════════════════════════════════════ */
+.landing-hero {
+  padding: 80px 24px 100px;
+  text-align: center;
+  background: linear-gradient(180deg, #ffffff 0%, #fafafa 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.landing-hero::before {
+  content: '';
+  position: absolute;
+  top: -100px;
+  inset-inline-start: 50%;
+  transform: translateX(-50%);
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(37, 99, 235, 0.06) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+[dir="rtl"] .landing-hero::before {
+  transform: translateX(50%);
+}
+
+.landing-hero-inner {
+  max-width: 800px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
+}
+
+.landing-hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 16px;
+  background: #e8f0fe;
+  color: #1a73e8;
+  border-radius: 100px;
+  font-size: 13px;
+  font-weight: 700;
+  margin-bottom: 20px;
+}
+
+.landing-hero-title {
+  font-size: 48px;
+  font-weight: 900;
+  line-height: 1.15;
+  color: #171717;
+  margin: 0 0 20px;
+  letter-spacing: -1.5px;
+}
+
+.landing-hero-subtitle {
+  font-size: 18px;
+  line-height: 1.7;
+  color: #6b7280;
+  margin: 0 0 32px;
+  max-width: 640px;
+  margin-inline: auto;
+}
+
+.landing-hero-cta {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 40px;
+}
+
+.landing-hero-trust {
+  display: flex;
+  gap: 24px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.landing-trust-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #6b7280;
+  font-weight: 600;
+}
+
+.landing-trust-item i {
+  color: #2563eb;
+  font-size: 16px;
+}
+
+/* ══════════════════════════════════════════
+   Buttons
+   ══════════════════════════════════════════ */
+.landing-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 14px 28px;
+  border-radius: 100px;
+  text-decoration: none;
+  font-size: 15px;
+  font-weight: 700;
+  transition: all 0.15s ease;
+  cursor: pointer;
+  border: none;
+  font-family: inherit;
+  white-space: nowrap;
+}
+
+.landing-btn-primary {
+  background: #171717;
+  color: #ffffff;
+  box-shadow: 0 6px 20px rgba(23, 23, 23, 0.2);
+}
+
+.landing-btn-primary:hover {
+  background: #404040;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(23, 23, 23, 0.25);
+}
+
+.landing-btn-secondary {
+  background: #f5f5f5;
+  color: #171717;
+  border: 1px solid #e5e5e5;
+}
+
+.landing-btn-secondary:hover {
+  background: #e5e5e5;
+  transform: translateY(-2px);
+}
+
+.landing-btn-full {
+  width: 100%;
+}
+
+.landing-btn-large {
+  padding: 18px 40px;
+  font-size: 17px;
+}
+
+/* ══════════════════════════════════════════
+   Section
+   ══════════════════════════════════════════ */
+.landing-section {
+  padding: 80px 24px;
+}
+
+.landing-section-gray {
+  background: #fafafa;
+}
+
+.landing-section-header {
+  max-width: 700px;
+  margin: 0 auto 60px;
+  text-align: center;
+}
+
+.landing-section-header h2 {
+  font-size: 36px;
+  font-weight: 900;
+  color: #171717;
+  margin: 0 0 12px;
+  letter-spacing: -1px;
+}
+
+.landing-section-header p {
+  font-size: 17px;
+  color: #6b7280;
+  margin: 0;
+  line-height: 1.6;
+}
+
+/* ══════════════════════════════════════════
+   Features Grid
+   ══════════════════════════════════════════ */
+.landing-features-grid {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.landing-feature-card {
+  background: #ffffff;
+  border: 1px solid #f0f0f0;
+  border-radius: 20px;
+  padding: 28px 24px;
+  transition: all 0.2s ease;
+}
+
+.landing-feature-card:hover {
+  border-color: #e5e5e5;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+  transform: translateY(-2px);
+}
+
+.landing-feature-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  margin-bottom: 16px;
+}
+
+.landing-feature-icon.icon-blue { background: #e8f0fe; color: #1a73e8; }
+.landing-feature-icon.icon-green { background: #e6f4ea; color: #1e8e3e; }
+.landing-feature-icon.icon-orange { background: #fef3e2; color: #ea8600; }
+.landing-feature-icon.icon-purple { background: #f3e8fd; color: #8e24aa; }
+.landing-feature-icon.icon-red { background: #fce8e6; color: #d93025; }
+.landing-feature-icon.icon-teal { background: #e0f2f1; color: #00897b; }
+
+.landing-feature-card h3 {
+  font-size: 18px;
+  font-weight: 800;
+  color: #171717;
+  margin: 0 0 8px;
+}
+
+.landing-feature-card p {
+  font-size: 14px;
+  color: #6b7280;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* ══════════════════════════════════════════
+   Pricing Grid
+   ══════════════════════════════════════════ */
+.landing-pricing-grid {
+  max-width: 1000px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+  align-items: stretch;
+}
+
+.landing-price-card {
+  background: #ffffff;
+  border: 2px solid #e5e5e5;
+  border-radius: 24px;
+  padding: 32px 24px;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+.landing-price-card:hover {
+  border-color: #d4d4d4;
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.08);
+}
+
+.landing-price-card.featured {
+  border-color: #2563eb;
+  background: linear-gradient(180deg, #ffffff 0%, #f8faff 100%);
+  box-shadow: 0 12px 32px rgba(37, 99, 235, 0.12);
+}
+
+.landing-price-badge {
+  position: absolute;
+  top: -12px;
+  inset-inline-start: 50%;
+  transform: translateX(-50%);
+  background: #2563eb;
+  color: #ffffff;
+  padding: 6px 16px;
+  border-radius: 100px;
+  font-size: 12px;
+  font-weight: 700;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+  white-space: nowrap;
+}
+
+[dir="rtl"] .landing-price-badge {
+  transform: translateX(50%);
+}
+
+.landing-price-card h3 {
+  font-size: 20px;
+  font-weight: 800;
+  color: #171717;
+  margin: 0 0 16px;
+  text-align: center;
+}
+
+.landing-price {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 6px;
+  margin-bottom: 24px;
+}
+
+.landing-price-value {
+  font-size: 44px;
+  font-weight: 900;
+  color: #171717;
+  line-height: 1;
+  letter-spacing: -1.5px;
+}
+
+.landing-price-currency {
+  font-size: 16px;
+  font-weight: 700;
+  color: #6b7280;
+}
+
+.landing-price-period {
+  font-size: 13px;
+  color: #a3a3a3;
+  font-weight: 500;
+}
+
+.landing-price-features {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex: 1;
+}
+
+.landing-price-features li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  color: #404040;
+  padding: 10px 12px;
+  background: #fafafa;
+  border-radius: 12px;
+}
+
+.landing-price-features li::before {
+  content: '✓';
+  color: #2563eb;
+  font-weight: 900;
+  flex-shrink: 0;
+}
+
+/* ══════════════════════════════════════════
+   CTA Section
+   ══════════════════════════════════════════ */
+.landing-cta-section {
+  padding: 60px 24px 80px;
+}
+
+.landing-cta-box {
+  max-width: 720px;
+  margin: 0 auto;
+  background: linear-gradient(135deg, #171717 0%, #404040 100%);
+  border-radius: 28px;
+  padding: 60px 32px;
+  text-align: center;
+  color: #ffffff;
+  box-shadow: 0 20px 60px rgba(23, 23, 23, 0.25);
+}
+
+.landing-cta-box h2 {
+  font-size: 32px;
+  font-weight: 900;
+  margin: 0 0 12px;
+  letter-spacing: -1px;
+}
+
+.landing-cta-box p {
+  font-size: 16px;
+  color: rgba(255, 255, 255, 0.75);
+  margin: 0 0 28px;
+  line-height: 1.6;
+}
+
+.landing-cta-box .landing-btn-primary {
+  background: #ffffff;
+  color: #171717;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+
+.landing-cta-box .landing-btn-primary:hover {
+  background: #f5f5f5;
+}
+
+/* ══════════════════════════════════════════
+   Footer
+   ══════════════════════════════════════════ */
+.landing-footer {
+  background: #fafafa;
+  border-top: 1px solid #f0f0f0;
+  padding: 48px 24px 32px;
+}
+
+.landing-footer-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  align-items: center;
+  text-align: center;
+}
+
+.landing-footer-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 18px;
+  font-weight: 800;
+  color: #171717;
+}
+
+.landing-footer-links {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.landing-footer-links a {
+  color: #6b7280;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 600;
+  transition: color 0.15s;
+}
+
+.landing-footer-links a:hover {
+  color: #171717;
+}
+
+.landing-footer-contact a {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #6b7280;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.landing-footer-contact a:hover {
+  color: #171717;
+}
+
+.landing-footer-copy {
+  color: #a3a3a3;
+  font-size: 13px;
+  margin: 8px 0 0;
+}
+
+/* ══════════════════════════════════════════
+   Responsive
+   ══════════════════════════════════════════ */
+@media (max-width: 768px) {
+  .landing-nav a:not(.landing-btn-login) {
+    display: none;
+  }
+
+  .landing-hero {
+    padding: 60px 20px 80px;
+  }
+
+  .landing-hero-title {
+    font-size: 32px;
+    letter-spacing: -1px;
+  }
+
+  .landing-hero-subtitle {
+    font-size: 15px;
+  }
+
+  .landing-hero-trust {
+    gap: 16px;
+  }
+
+  .landing-trust-item {
+    font-size: 12px;
+  }
+
+  .landing-section {
+    padding: 60px 20px;
+  }
+
+  .landing-section-header h2 {
+    font-size: 26px;
+  }
+
+  .landing-section-header p {
+    font-size: 15px;
+  }
+
+  .landing-features-grid,
+  .landing-pricing-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .landing-cta-box {
+    padding: 40px 24px;
+    border-radius: 24px;
+  }
+
+  .landing-cta-box h2 {
+    font-size: 24px;
+  }
+
+  .landing-footer {
+    padding: 32px 20px 24px;
+  }
+}
+
+@media (max-width: 480px) {
+  .landing-header-inner {
+    padding: 12px 16px;
+  }
+
+  .landing-logo {
+    font-size: 18px;
+  }
+
+  .landing-hero-title {
+    font-size: 28px;
+  }
+
+  .landing-btn {
+    padding: 12px 22px;
+    font-size: 14px;
+  }
+
+  .landing-btn-large {
+    padding: 16px 32px;
+    font-size: 15px;
+  }
+
+  .landing-price-value {
+    font-size: 36px;
+  }
+}

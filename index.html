@@ -2,17 +2,256 @@
 <html>
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>MyStock</title>
+
   <script>
     (function() {
       var lang = localStorage.getItem('app_lang') || 'ar';
       document.documentElement.lang = lang;
       document.documentElement.dir = (lang === 'ar') ? 'rtl' : 'ltr';
-      window.location.replace('/login.html');
     })();
   </script>
+
+  <link rel="stylesheet" href="/assets/css/common.css">
+  <link rel="stylesheet" href="/assets/css/pages/landing.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
-<body>
-  <p>Loading...</p>
+<body class="landing-page">
+
+  <!-- ════════ Header ════════ -->
+  <header class="landing-header">
+    <div class="landing-header-inner">
+      <a href="/" class="landing-logo">
+        <div class="landing-logo-icon">
+          <i class="fas fa-boxes-stacked"></i>
+        </div>
+        <span>MyStock</span>
+      </a>
+
+      <nav class="landing-nav">
+        <a href="#features" data-i18n="landing_nav_features">الميزات</a>
+        <a href="#pricing" data-i18n="landing_nav_pricing">الأسعار</a>
+        <a href="/login.html" class="landing-btn-login" data-i18n="landing_nav_login">تسجيل الدخول</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- ════════ Hero ════════ -->
+  <section class="landing-hero">
+    <div class="landing-hero-inner">
+      <div class="landing-hero-badge">
+        <i class="fas fa-star"></i>
+        <span data-i18n="landing_hero_badge">للمتاجر الصغيرة</span>
+      </div>
+
+      <h1 class="landing-hero-title" data-i18n="landing_hero_title">
+        أدر مخزونك بذكاء وسهولة
+      </h1>
+
+      <p class="landing-hero-subtitle" data-i18n="landing_hero_subtitle">
+        نظام متكامل لإدارة المنتجات، المبيعات، الفواتير، والموردين. يعمل على الهاتف والحاسوب، بالعربية والفرنسية والإنجليزية.
+      </p>
+
+      <div class="landing-hero-cta">
+        <a href="/register.html" class="landing-btn landing-btn-primary">
+          <i class="fas fa-rocket"></i>
+          <span data-i18n="landing_hero_cta_start">ابدأ الآن مجاناً</span>
+        </a>
+        <a href="#features" class="landing-btn landing-btn-secondary">
+          <i class="fas fa-info-circle"></i>
+          <span data-i18n="landing_hero_cta_learn">اكتشف الميزات</span>
+        </a>
+      </div>
+
+      <div class="landing-hero-trust">
+        <div class="landing-trust-item">
+          <i class="fas fa-shield-alt"></i>
+          <span data-i18n="landing_trust_secure">آمن 100%</span>
+        </div>
+        <div class="landing-trust-item">
+          <i class="fas fa-globe"></i>
+          <span data-i18n="landing_trust_langs">3 لغات</span>
+        </div>
+        <div class="landing-trust-item">
+          <i class="fas fa-mobile-alt"></i>
+          <span data-i18n="landing_trust_mobile">يعمل على الهاتف</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════ Features ════════ -->
+  <section class="landing-section" id="features">
+    <div class="landing-section-header">
+      <h2 data-i18n="landing_features_title">كل ما تحتاجه لإدارة متجرك</h2>
+      <p data-i18n="landing_features_subtitle">أدوات بسيطة وقوية صُممت خصيصاً للمتاجر الصغيرة</p>
+    </div>
+
+    <div class="landing-features-grid">
+      <div class="landing-feature-card">
+        <div class="landing-feature-icon icon-blue">
+          <i class="fas fa-box"></i>
+        </div>
+        <h3 data-i18n="landing_feat_products">إدارة المنتجات</h3>
+        <p data-i18n="landing_feat_products_desc">أضف منتجاتك، صورها، أسعارها، ومعلوماتها بسهولة.</p>
+      </div>
+
+      <div class="landing-feature-card">
+        <div class="landing-feature-icon icon-green">
+          <i class="fas fa-right-left"></i>
+        </div>
+        <h3 data-i18n="landing_feat_stock">حركات المخزون</h3>
+        <p data-i18n="landing_feat_stock_desc">تتبع كل عملية إدخال وإخراج مع سجل كامل.</p>
+      </div>
+
+      <div class="landing-feature-card">
+        <div class="landing-feature-icon icon-orange">
+          <i class="fas fa-receipt"></i>
+        </div>
+        <h3 data-i18n="landing_feat_sales">إيصالات البيع</h3>
+        <p data-i18n="landing_feat_sales_desc">أنشئ إيصالات احترافية واطبعها بضغطة واحدة.</p>
+      </div>
+
+      <div class="landing-feature-card">
+        <div class="landing-feature-icon icon-purple">
+          <i class="fas fa-file-invoice"></i>
+        </div>
+        <h3 data-i18n="landing_feat_invoices">الفواتير</h3>
+        <p data-i18n="landing_feat_invoices_desc">فواتير تلقائية من الموردين مع حساب الإجماليات.</p>
+      </div>
+
+      <div class="landing-feature-card">
+        <div class="landing-feature-icon icon-red">
+          <i class="fas fa-chart-line"></i>
+        </div>
+        <h3 data-i18n="landing_feat_reports">التقارير</h3>
+        <p data-i18n="landing_feat_reports_desc">تقارير مفصلة عن المبيعات والأرباح والحركات.</p>
+      </div>
+
+      <div class="landing-feature-card">
+        <div class="landing-feature-icon icon-teal">
+          <i class="fas fa-users"></i>
+        </div>
+        <h3 data-i18n="landing_feat_team">إدارة الفريق</h3>
+        <p data-i18n="landing_feat_team_desc">أضف عمالاً، حدد أدوارهم، وتابع أنشطتهم.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════ Pricing ════════ -->
+  <section class="landing-section landing-section-gray" id="pricing">
+    <div class="landing-section-header">
+      <h2 data-i18n="landing_pricing_title">اختر الباقة المناسبة</h2>
+      <p data-i18n="landing_pricing_subtitle">يمكنك الترقية أو التخفيض في أي وقت</p>
+    </div>
+
+    <div class="landing-pricing-grid">
+      <div class="landing-price-card">
+        <h3 data-i18n="sub_plan_basic">الباقة الأساسية</h3>
+        <div class="landing-price">
+          <span class="landing-price-value">199</span>
+          <span class="landing-price-currency">MAD</span>
+          <span class="landing-price-period">/ {{شهر}}</span>
+        </div>
+        <ul class="landing-price-features">
+          <li data-i18n="sub_feat_users_10">10 مستخدمين</li>
+          <li data-i18n="sub_feat_products_500">500 منتج</li>
+          <li data-i18n="sub_feat_invoices_100">100 فاتورة/شهر</li>
+          <li data-i18n="sub_feat_export">تصدير التقارير</li>
+          <li data-i18n="sub_support_email">دعم بالبريد</li>
+        </ul>
+        <a href="/register.html" class="landing-btn landing-btn-secondary landing-btn-full" data-i18n="landing_choose">اختر</a>
+      </div>
+
+      <div class="landing-price-card featured">
+        <div class="landing-price-badge" data-i18n="sub_most_popular">الأكثر شيوعاً</div>
+        <h3 data-i18n="sub_plan_pro">الباقة الاحترافية</h3>
+        <div class="landing-price">
+          <span class="landing-price-value">299</span>
+          <span class="landing-price-currency">MAD</span>
+          <span class="landing-price-period">/ {{شهر}}</span>
+        </div>
+        <ul class="landing-price-features">
+          <li data-i18n="sub_feat_users_30">30 مستخدم</li>
+          <li data-i18n="sub_feat_products_5000">5,000 منتج</li>
+          <li data-i18n="sub_feat_invoices_500">500 فاتورة/شهر</li>
+          <li data-i18n="sub_feat_export">تصدير التقارير</li>
+          <li data-i18n="sub_support_email_wa">دعم بالبريد + واتساب</li>
+        </ul>
+        <a href="/register.html" class="landing-btn landing-btn-primary landing-btn-full" data-i18n="landing_choose">اختر</a>
+      </div>
+
+      <div class="landing-price-card">
+        <h3 data-i18n="sub_plan_advanced">الباقة المتقدمة</h3>
+        <div class="landing-price">
+          <span class="landing-price-value">499</span>
+          <span class="landing-price-currency">MAD</span>
+          <span class="landing-price-period">/ {{شهر}}</span>
+        </div>
+        <ul class="landing-price-features">
+          <li data-i18n="sub_feat_users_unlimited">مستخدمون غير محدودين</li>
+          <li data-i18n="sub_feat_products_unlimited">منتجات غير محدودة</li>
+          <li data-i18n="sub_feat_invoices_unlimited">فواتير غير محدودة</li>
+          <li data-i18n="sub_feat_export">تصدير التقارير</li>
+          <li data-i18n="sub_support_247">دعم 24/7</li>
+        </ul>
+        <a href="/register.html" class="landing-btn landing-btn-secondary landing-btn-full" data-i18n="landing_choose">اختر</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════ CTA ════════ -->
+  <section class="landing-cta-section">
+    <div class="landing-cta-box">
+      <h2 data-i18n="landing_cta_title">جاهز لإدارة متجرك بذكاء؟</h2>
+      <p data-i18n="landing_cta_subtitle">انضم إلى MyStock اليوم. لا تحتاج بطاقة بنكية للبدء.</p>
+      <a href="/register.html" class="landing-btn landing-btn-primary landing-btn-large">
+        <i class="fas fa-rocket"></i>
+        <span data-i18n="landing_cta_start">ابدأ الآن مجاناً</span>
+      </a>
+    </div>
+  </section>
+
+  <!-- ════════ Footer ════════ -->
+  <footer class="landing-footer">
+    <div class="landing-footer-inner">
+      <div class="landing-footer-brand">
+        <div class="landing-logo-icon small">
+          <i class="fas fa-boxes-stacked"></i>
+        </div>
+        <span>MyStock</span>
+      </div>
+
+      <div class="landing-footer-links">
+        <a href="/terms.html" data-i18n="legal_terms_title">شروط الخدمة</a>
+        <a href="/privacy.html" data-i18n="legal_privacy_title">سياسة الخصوصية</a>
+        <a href="/refund.html" data-i18n="legal_refund_title">سياسة الاسترجاع</a>
+      </div>
+
+      <div class="landing-footer-contact">
+        <a href="mailto:support@mystock.app">
+          <i class="fas fa-envelope"></i>
+          <span>support@mystock.app</span>
+        </a>
+      </div>
+
+      <p class="landing-footer-copy" data-i18n="legal_footer_copyright">© 2026 MyStock. جميع الحقوق محفوظة.</p>
+    </div>
+  </footer>
+
+  <script src="/js/core/i18n.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      if (window.applyLanguage) applyLanguage();
+
+      // ✅ استبدال {{شهر}} بـ ترجمة
+      document.querySelectorAll('.landing-price-period').forEach(el => {
+        if (el.textContent.includes('{{شهر}}')) {
+          el.textContent = '/ ' + (window.t ? window.t('sub_per_month').replace('/ ', '') : 'شهرياً');
+        }
+      });
+    });
+  </script>
 </body>
 </html>
