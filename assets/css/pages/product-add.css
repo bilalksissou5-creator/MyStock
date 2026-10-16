@@ -433,14 +433,32 @@
     border-radius: 0;
   }
 
-  /* ✅ القسم 1 (20%): كل بطاقات الإضافة */
-  .add-form > div:nth-child(1),
-  .add-form > div:nth-child(2) {
+  /* ✅ القسم 1 (20%) */
+  .card-supplier {
     grid-column: 1;
+    grid-row: 1;
   }
 
-  /* ✅ القسم 2 (50%): المنتجات المضافة */
-  .add-form > div:nth-child(3) {
+  .card-fields {
+    grid-column: 1;
+    grid-row: 2;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .card-fields .form-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+    margin-bottom: 0;
+  }
+
+  .card-fields .add-product-btn {
+    margin-top: 4px;
+  }
+
+  /* ✅ القسم 2 (50%) */
+  .card-added {
     grid-column: 2;
     grid-row: 1 / 5;
     position: sticky;
@@ -460,8 +478,8 @@
     border-radius: 4px;
   }
 
-  /* ✅ القسم 3 (30%): الملخص + الأزرار */
-  .add-form > div:nth-child(4) {
+  /* ✅ القسم 3 (30%) */
+  .card-summary {
     grid-column: 3;
     grid-row: 1;
     display: flex;
@@ -484,15 +502,15 @@
 
   .summary-row.highlight strong { font-size: 1.5rem; }
 
-  .add-form > div:nth-child(5) {
+  .card-actions {
     grid-column: 3;
     grid-row: 2;
     flex-direction: column;
     gap: 8px;
   }
 
-  .add-form > div:nth-child(5) .btn-primary,
-  .add-form > div:nth-child(5) .btn-secondary {
+  .card-actions .btn-primary,
+  .card-actions .btn-secondary {
     width: 100%;
     justify-content: center;
   }

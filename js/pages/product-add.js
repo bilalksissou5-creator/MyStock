@@ -1,8 +1,5 @@
 // ============================================
 // صفحة إضافة منتجات
-// ✅ يدعم اللمس + الفأرة + القلم (pointerdown)
-// ✅ ماسح باركود ذكي (نظامك → Open Food Facts)
-// ✅ يحفظ عناصر الفاتورة في invoice_items
 // ✅ دعم كامل للترجمة
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
@@ -40,7 +37,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     <div class="add-form">
 
-      <div class="product-input-card">
+      <div class="product-input-card card-supplier">
         <div class="form-group supplier-group">
           <label>${tr('prod_add_supplier')}</label>
           <input type="text" id="supplier-input" placeholder="${tr('prod_add_supplier_ph')}" autocomplete="off">
@@ -49,7 +46,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         </div>
       </div>
 
-      <div class="product-input-card">
+      <div class="product-input-card card-fields">
         <div class="form-grid">
           <div class="form-group">
             <label>${tr('prod_add_name')}</label>
@@ -81,7 +78,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         </button>
       </div>
 
-      <div class="added-products-section">
+      <div class="added-products-section card-added">
         <label class="section-label">${tr('prod_add_added')}</label>
         <div id="added-products" class="added-products">
           <div class="empty-added">
@@ -91,7 +88,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         </div>
       </div>
 
-      <div class="form-summary">
+      <div class="form-summary card-summary">
         <div class="summary-row">
           <span>${tr('prod_add_sum_count')}</span>
           <strong id="sum-rows">0</strong>
@@ -106,7 +103,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         </div>
       </div>
 
-      <div class="form-actions">
+      <div class="form-actions card-actions">
         <button type="button" class="btn-primary" id="save-all-btn">
           <i class="fas fa-save"></i>
           <span>${tr('prod_add_save')}</span>
