@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MyStock</title>
+
+  <script>
+    (function() {
+      var lang = localStorage.getItem('app_lang') || 'ar';
+      document.documentElement.lang = lang;
+      document.documentElement.dir = (lang === 'ar') ? 'rtl' : 'ltr';
+    })();
+  </script>
+
+  <link rel="stylesheet" href="/assets/css/common.css">
+  <link rel="stylesheet" href="/assets/css/pages/legal.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body class="legal-page">
+  <div class="legal-wrapper">
+
+    <div class="legal-header">
+      <a href="/welcome.html" class="legal-back">
+        <i class="fas fa-arrow-left"></i>
+      </a>
+      <h1 class="legal-title" data-i18n="legal_privacy_title">سياسة الخصوصية</h1>
+      <div class="legal-spacer"></div>
+    </div>
+
+    <div class="legal-meta">
+      <p data-i18n="legal_last_updated">آخر تحديث: 16 أكتوبر 2026</p>
+    </div>
+
+    <div class="legal-content">
+
+      <section class="legal-section">
+        <h2 data-i18n="legal_privacy_s1_title">1. مقدمة</h2>
+        <p data-i18n="legal_privacy_s1_body">نحن في MyStock نحترم خصوصيتك ونلتزم بحماية بياناتك الشخصية. توضح هذه السياسة كيفية جمعنا واستخدامنا وحمايتنا لمعلوماتك.</p>
+      </section>
+
+      <section class="legal-section">
+        <h2 data-i18n="legal_privacy_s2_title">2. المعلومات التي نجمعها</h2>
+        <p data-i18n="legal_privacy_s2_body">نجمع الأنواع التالية من المعلومات:</p>
+        <ul>
+          <li data-i18n="legal_privacy_s2_l1">معلومات الحساب: الاسم، البريد الإلكتروني، رقم الهاتف، البلد.</li>
+          <li data-i18n="legal_privacy_s2_l2">معلومات المنظمة: اسم المتجر، المنتجات، الموردين، الفواتير.</li>
+          <li data-i18n="legal_privacy_s2_l3">معلومات الدفع: تتم معالجتها من قبل Lemon Squeezy (لا نحتفظ ببيانات بطاقتك).</li>
+          <li data-i18n="legal_privacy_s2_l4">معلومات الاستخدام: عنوان IP، نوع الجهاز، المتصفح.</li>
+        </ul>
+      </section>
+
+      <section class="legal-section">
+        <h2 data-i18n="legal_privacy_s3_title">3. كيف نستخدم معلوماتك</h2>
+        <p data-i18n="legal_privacy_s3_body">نستخدم معلوماتك من أجل:</p>
+        <ul>
+          <li data-i18n="legal_privacy_s3_l1">توفير الخدمة وتحسينها.</li>
+          <li data-i18n="legal_privacy_s3_l2">إدارة حسابك واشتراكك.</li>
+          <li data-i18n="legal_privacy_s3_l3">إرسال إشعارات مهمة عن التطبيق.</li>
+          <li data-i18n="legal_privacy_s3_l4">الرد على استفساراتك ودعمك.</li>
+        </ul>
+      </section>
+
+      <section class="legal-section">
+        <h2 data-i18n="legal_privacy_s4_title">4. مشاركة المعلومات</h2>
+        <p data-i18n="legal_privacy_s4_body">لا نبيع أو نؤجر معلوماتك الشخصية لأي طرف ثالث. قد نشاركها فقط مع مزودي الخدمة الذين يساعدوننا في تشغيل التطبيق، مثل Supabase (قاعدة البيانات) و Lemon Squeezy (الدفع).</p>
+      </section>
+
+      <section class="legal-section">
+        <h2 data-i18n="legal_privacy_s5_title">5. أمان البيانات</h2>
+        <p data-i18n="legal_privacy_s5_body">نستخدم إجراءات أمنية معيارية لحماية بياناتك، بما في ذلك التشفير أثناء النقل (SSL/TLS) وكلمات المرور المشفرة. لكن لا يمكن ضمان أمان أي نظام بنسبة 100%.</p>
+      </section>
+
+      <section class="legal-section">
+        <h2 data-i18n="legal_privacy_s6_title">6. الاحتفاظ بالبيانات</h2>
+        <p data-i18n="legal_privacy_s6_body">نحتفظ ببياناتك طالما حسابك نشط. إذا قمت بحذف حسابك، سنحذف بياناتك من أنظمتنا خلال 30 يوماً، إلا إذا كان القانون يلزمنا بالاحتفاظ بها.</p>
+      </section>
+
+      <section class="legal-section">
+        <h2 data-i18n="legal_privacy_s7_title">7. ملفات تعريف الارتباط (Cookies)</h2>
+        <p data-i18n="legal_privacy_s7_body">نستخدم ملفات تعريف ارتباط أساسية للحفاظ على تسجيل دخولك وتفضيلاتك. لا نستخدم Cookies لتتبع سلوكك عبر المواقع الأخرى.</p>
+      </section>
+
+      <section class="legal-section">
+        <h2 data-i18n="legal_privacy_s8_title">8. حقوقك</h2>
+        <p data-i18n="legal_privacy_s8_body">لديك الحق في:</p>
+        <ul>
+          <li data-i18n="legal_privacy_s8_l1">الوصول إلى بياناتك الشخصية.</li>
+          <li data-i18n="legal_privacy_s8_l2">طلب تصحيح البيانات غير الصحيحة.</li>
+          <li data-i18n="legal_privacy_s8_l3">طلب حذف حسابك وبياناتك.</li>
+          <li data-i18n="legal_privacy_s8_l4">الاعتراض على استخدام بياناتك.</li>
+        </ul>
+      </section>
+
+      <section class="legal-section">
+        <h2 data-i18n="legal_privacy_s9_title">9. الأطفال</h2>
+        <p data-i18n="legal_privacy_s9_body">خدمتنا غير موجهة للأطفال تحت 13 عاماً. لا نجمع عن قصد معلومات من الأطفال. إذا اكتشفنا ذلك، سنحذفها فوراً.</p>
+      </section>
+
+      <section class="legal-section">
+        <h2 data-i18n="legal_privacy_s10_title">10. التعديلات</h2>
+        <p data-i18n="legal_privacy_s10_body">قد نحدّث سياسة الخصوصية من وقت لآخر. سنخطرك بأي تغييرات جوهرية عبر البريد الإلكتروني أو داخل التطبيق.</p>
+      </section>
+
+      <section class="legal-section">
+        <h2 data-i18n="legal_privacy_s11_title">11. التواصل</h2>
+        <p data-i18n="legal_privacy_s11_body">لأي استفسار بخصوص سياسة الخصوصية، تواصل معنا على: privacy@mystock.app</p>
+      </section>
+
+    </div>
+
+    <div class="legal-footer">
+      <p data-i18n="legal_footer_copyright">© 2026 MyStock. جميع الحقوق محفوظة.</p>
+    </div>
+
+  </div>
+
+  <script src="/js/core/i18n.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      if (window.applyLanguage) applyLanguage();
+      document.title = (window.t ? window.t('legal_privacy_title') : 'Privacy') + ' - MyStock';
+    });
+  </script>
+</body>
+</html>
