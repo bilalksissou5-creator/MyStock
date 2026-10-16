@@ -437,24 +437,23 @@
   .card-supplier {
     grid-column: 1;
     grid-row: 1;
+    margin-bottom: 12px;
   }
 
   .card-fields {
     grid-column: 1;
     grid-row: 2;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
   }
 
+  /* ⚠️ الحقول: نفس تخطيط الهاتف */
   .card-fields .form-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr 1fr;
     gap: 10px;
-    margin-bottom: 0;
+    margin-bottom: 12px;
   }
 
-  .card-fields .add-product-btn {
-    margin-top: 4px;
+  .card-fields .form-group:first-child {
+    grid-column: 1 / -1;
   }
 
   /* ✅ القسم 2 (50%) */
