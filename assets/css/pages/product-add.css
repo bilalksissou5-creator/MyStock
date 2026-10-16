@@ -422,39 +422,45 @@
     margin: 0;
   }
 
-  /* إزالة البطاقات */
-  .product-input-card,
-  .added-products-section,
-  .form-summary {
+  /* ✅ القسم 1 (20%): عمود واحد يشمل كل عناصر الإضافة */
+  .add-form > .product-input-card {
+    grid-column: 1;
+    grid-row: auto;
     background: transparent;
     border: none;
     box-shadow: none;
     padding: 0;
     border-radius: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
   }
 
-  /* ✅ القسم 1 (20%) */
-  .card-supplier {
-    grid-column: 1;
-    grid-row: 1;
-    margin-bottom: 16px;
+  .add-form > .product-input-card .form-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 0;
   }
 
-  .card-fields {
-    grid-column: 1;
-    grid-row: 2;
+  .add-form > .product-input-card .form-group:first-child {
+    grid-column: 1 / -1;
   }
 
   /* ✅ القسم 2 (50%) */
-  .card-added {
+  .add-form > .added-products-section {
     grid-column: 2;
     grid-row: 1 / 5;
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    padding: 0;
+    border-radius: 0;
     position: sticky;
     top: 20px;
     align-self: start;
   }
 
-  .added-products {
+  .add-form > .added-products-section .added-products {
     max-height: calc(100vh - 220px);
     overflow-y: auto;
     padding-inline-end: 4px;
@@ -467,9 +473,14 @@
   }
 
   /* ✅ القسم 3 (30%) */
-  .card-summary {
+  .add-form > .form-summary {
     grid-column: 3;
     grid-row: 1;
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    padding: 0;
+    border-radius: 0;
     display: flex;
     flex-direction: column;
     gap: 12px;
@@ -490,15 +501,15 @@
 
   .summary-row.highlight strong { font-size: 1.5rem; }
 
-  .card-actions {
+  .add-form > .form-actions {
     grid-column: 3;
     grid-row: 2;
     flex-direction: column;
     gap: 8px;
   }
 
-  .card-actions .btn-primary,
-  .card-actions .btn-secondary {
+  .add-form > .form-actions .btn-primary,
+  .add-form > .form-actions .btn-secondary {
     width: 100%;
     justify-content: center;
   }
