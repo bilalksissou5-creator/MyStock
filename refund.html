@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MyStock</title>
+
+  <script>
+    (function() {
+      var lang = localStorage.getItem('app_lang') || 'ar';
+      document.documentElement.lang = lang;
+      document.documentElement.dir = (lang === 'ar') ? 'rtl' : 'ltr';
+    })();
+  </script>
+
+  <link rel="stylesheet" href="/assets/css/common.css">
+  <link rel="stylesheet" href="/assets/css/pages/legal.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body class="legal-page">
+  <div class="legal-wrapper">
+
+    <div class="legal-header">
+      <a href="/welcome.html" class="legal-back">
+        <i class="fas fa-arrow-left"></i>
+      </a>
+      <h1 class="legal-title" data-i18n="legal_refund_title">سياسة الاسترجاع</h1>
+      <div class="legal-spacer"></div>
+    </div>
+
+    <div class="legal-meta">
+      <p data-i18n="legal_last_updated">آخر تحديث: 16 أكتوبر 2026</p>
+    </div>
+
+    <div class="legal-content">
+
+      <section class="legal-section">
+        <h2 data-i18n="legal_refund_s1_title">1. نظرة عامة</h2>
+        <p data-i18n="legal_refund_s1_body">نحن في MyStock نريدك أن تكون راضياً عن خدمتنا. توضح هذه السياسة شروط استرجاع المبالغ المدفوعة مقابل الاشتراكات الشهرية أو السنوية.</p>
+      </section>
+
+      <section class="legal-section">
+        <h2 data-i18n="legal_refund_s2_title">2. فترة الإلغاء المجاني</h2>
+        <p data-i18n="legal_refund_s2_body">يمكنك إلغاء اشتراكك واسترداد المبلغ كاملاً خلال 14 يوماً من تاريخ أول عملية دفع. لطلب الاسترجاع، تواصل معنا على refund@mystock.app خلال هذه الفترة.</p>
+      </section>
+
+      <section class="legal-section">
+        <h2 data-i18n="legal_refund_s3_title">3. بعد فترة الـ 14 يوماً</h2>
+        <p data-i18n="legal_refund_s3_body">بعد مرور 14 يوماً من الدفع الأول، لا يمكن استرجاع المبالغ المدفوعة. ومع ذلك، يمكنك:</p>
+        <ul>
+          <li data-i18n="legal_refund_s3_l1">إلغاء الاشتراك في أي وقت (لن يتم تجديده).</li>
+          <li data-i18n="legal_refund_s3_l2">الاحتفاظ بإمكانية الوصول حتى نهاية الفترة المدفوعة.</li>
+        </ul>
+      </section>
+
+      <section class="legal-section">
+        <h2 data-i18n="legal_refund_s4_title">4. حالات الاسترجاع الخاصة</h2>
+        <p data-i18n="legal_refund_s4_body">قد ننظر في طلبات الاسترجاع بعد الفترة المحددة في الحالات التالية:</p>
+        <ul>
+          <li data-i18n="legal_refund_s4_l1">خطأ في الفاتورة (دفع مزدوج، مبلغ خاطئ).</li>
+          <li data-i18n="legal_refund_s4_l2">عطل تقني خطير منع استخدام الخدمة لأكثر من 7 أيام.</li>
+          <li data-i18n="legal_refund_s4_l3">ظروف استثنائية (مرض، كارثة).</li>
+        </ul>
+      </section>
+
+      <section class="legal-section">
+        <h2 data-i18n="legal_refund_s5_title">5. كيفية طلب الاسترجاع</h2>
+        <p data-i18n="legal_refund_s5_body">لطلب استرجاع، أرسل بريداً إلكترونياً إلى refund@mystock.app يتضمن:</p>
+        <ul>
+          <li data-i18n="legal_refund_s5_l1">الاسم والبريد المسجل في التطبيق.</li>
+          <li data-i18n="legal_refund_s5_l2">رقم الفاتورة أو رقم العملية.</li>
+          <li data-i18n="legal_refund_s5_l3">سبب طلب الاسترجاع.</li>
+        </ul>
+      </section>
+
+      <section class="legal-section">
+        <h2 data-i18n="legal_refund_s6_title">6. مدة معالجة الطلب</h2>
+        <p data-i18n="legal_refund_s6_body">سنراجع طلبك خلال 3-5 أيام عمل. إذا تمت الموافقة، سيتم تحويل المبلغ إلى نفس وسيلة الدفع خلال 5-10 أيام عمل إضافية.</p>
+      </section>
+
+      <section class="legal-section">
+        <h2 data-i18n="legal_refund_s7_title">7. طريقة الاسترجاع</h2>
+        <p data-i18n="legal_refund_s7_body">تتم جميع عمليات الاسترجاع عبر Lemon Squeezy، وسيتم إرجاع المبلغ إلى نفس وسيلة الدفع التي استخدمتها (بطاقة بنكية، PayPal، إلخ).</p>
+      </section>
+
+      <section class="legal-section">
+        <h2 data-i18n="legal_refund_s8_title">8. الاشتراكات السنوية</h2>
+        <p data-i18n="legal_refund_s8_body">للاشتراكات السنوية، يمكنك استرداد المبلغ كاملاً خلال 14 يوماً من تاريخ الدفع. بعد ذلك، لا يمكن الاسترجاع، لكن الاشتراك يبقى نشطاً حتى نهاية السنة.</p>
+      </section>
+
+      <section class="legal-section">
+        <h2 data-i18n="legal_refund_s9_title">9. التواصل</h2>
+        <p data-i18n="legal_refund_s9_body">لأي استفسار بخصوص سياسة الاسترجاع، تواصل معنا على: refund@mystock.app</p>
+      </section>
+
+    </div>
+
+    <div class="legal-footer">
+      <p data-i18n="legal_footer_copyright">© 2026 MyStock. جميع الحقوق محفوظة.</p>
+    </div>
+
+  </div>
+
+  <script src="/js/core/i18n.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      if (window.applyLanguage) applyLanguage();
+      document.title = (window.t ? window.t('legal_refund_title') : 'Refund') + ' - MyStock';
+    });
+  </script>
+</body>
+</html>
