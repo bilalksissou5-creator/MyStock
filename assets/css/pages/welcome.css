@@ -80,7 +80,6 @@
   margin: 0 0 10px 0;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  /* ✅ محاذاة تتبع الاتجاه */
   text-align: start;
 }
 
@@ -130,7 +129,6 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  /* ✅ محاذاة تتبع الاتجاه */
   text-align: start;
 }
 
@@ -230,14 +228,46 @@
   opacity: 1;
 }
 
-/* ✅ في RTL: الأيقونة على اليسار (نهاية السطر)
-   ✅ في LTR: الأيقونة على اليمين (نهاية السطر) */
 [dir="rtl"] .picker-option {
   flex-direction: row;
 }
 
 [dir="ltr"] .picker-option {
   flex-direction: row;
+}
+
+/* ============================================
+   ✅ روابط الصفحات القانونية (Footer)
+   ============================================ */
+.welcome-legal {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding: 24px 8px 0;
+  margin-top: 16px;
+  font-size: 13px;
+  text-align: center;
+}
+
+.welcome-legal a {
+  color: #6b7280;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.15s;
+  padding: 4px 6px;
+  border-radius: 6px;
+}
+
+.welcome-legal a:hover {
+  color: #171717;
+  background: #f0f0f0;
+}
+
+.welcome-legal span {
+  color: #d4d4d4;
+  font-size: 10px;
 }
 
 /* ============================================
@@ -290,7 +320,6 @@
   box-shadow: none;
 }
 
-/* ✅ عكس سهم الزر في RTL */
 [dir="rtl"] .welcome-btn i {
   transform: scaleX(-1);
 }
@@ -328,6 +357,13 @@
 
   .picker-flag {
     font-size: 20px;
+  }
+
+  /* ✅ روابط قانونية على الموبايل */
+  .welcome-legal {
+    font-size: 12px;
+    padding: 20px 6px 0;
+    gap: 6px;
   }
 }
 
