@@ -670,6 +670,35 @@ const translations = {
 
     sub_change_plan: 'تغيير الباقة',
     sub_change_plan_desc: 'اختر باقة جديدة. سيتم استبدال بطاقتك الحالية.',
+
+    // Legal pages
+    legal_terms_title: 'شروط الخدمة',
+    legal_privacy_title: 'سياسة الخصوصية',
+    legal_refund_title: 'سياسة الاسترجاع',
+    legal_last_updated: 'آخر تحديث: 16 أكتوبر 2026',
+    legal_footer_copyright: '© 2026 MyStock. جميع الحقوق محفوظة.',
+    
+    // Terms
+    legal_terms_s1_title: '1. القبول بالشروط',
+    legal_terms_s1_body: 'باستخدامك لتطبيق MyStock ("الخدمة")، فإنك توافق على هذه الشروط والأحكام. إذا كنت لا توافق على أي جزء منها، يرجى عدم استخدام الخدمة.',
+    legal_terms_s2_title: '2. الوصف',
+    legal_terms_s2_body: 'MyStock هو نظام لإدارة المخزون والمبيعات للمتاجر الصغيرة. يوفر الميزات التالية: إدارة المنتجات، تسجيل حركات المخزون، إصدار الفواتير وإيصالات البيع، إدارة الموردين، وتقارير المبيعات والأرباح.',
+    legal_terms_s3_title: '3. الحساب',
+    legal_terms_s3_body: 'أنت مسؤول عن الحفاظ على سرية معلومات حسابك وكلمة المرور. أنت مسؤول عن جميع الأنشطة التي تحدث تحت حسابك.',
+    legal_terms_s4_title: '4. الاشتراك والدفع',
+    legal_terms_s4_body: 'يتم تقديم الخدمة عبر اشتراك شهري أو سنوي. تتم جميع المدفوعات عبر منصة Lemon Squeezy الآمنة. يتم تجديد الاشتراك تلقائياً في نهاية كل دورة ما لم تقم بإلغائه.',
+    legal_terms_s5_title: '5. الإلغاء والاسترجاع',
+    legal_terms_s5_body: 'يمكنك إلغاء الاشتراك في أي وقت من إعدادات التطبيق. لن يتم استرداد المبالغ المدفوعة عن الفترات السابقة، لكنك ستحتفظ بإمكانية الوصول حتى نهاية الفترة المدفوعة.',
+    legal_terms_s6_title: '6. الاستخدام المقبول',
+    legal_terms_s6_body: 'توافق على عدم استخدام الخدمة في أي نشاط غير قانوني أو احتيالي، أو محاولة الوصول غير المصرح به إلى أنظمتنا.',
+    legal_terms_s7_title: '7. الملكية الفكرية',
+    legal_terms_s7_body: 'جميع حقوق الملكية الفكرية في تطبيق MyStock مملوكة لنا. لا يحق لك نسخ أو تعديل أو توزيع أي جزء من التطبيق دون إذن مسبق.',
+    legal_terms_s8_title: '8. إخلاء المسؤولية',
+    legal_terms_s8_body: 'يتم تقديم الخدمة "كما هي" دون أي ضمانات. لا نتحمل مسؤولية أي خسائر ناتجة عن استخدام أو عدم القدرة على استخدام الخدمة.',
+    legal_terms_s9_title: '9. التعديلات',
+    legal_terms_s9_body: 'نحتفظ بالحق في تعديل هذه الشروط في أي وقت. سيتم إخطارك بأي تغييرات جوهرية عبر البريد الإلكتروني أو إشعار داخل التطبيق.',
+    legal_terms_s10_title: '10. التواصل',
+    legal_terms_s10_body: 'لأي استفسار بخصوص هذه الشروط، يمكنك التواصل معنا عبر البريد الإلكتروني: support@mystock.app',
   },
 
   fr: {
@@ -1331,6 +1360,35 @@ const translations = {
 
     sub_change_plan: 'Changer de forfait',
     sub_change_plan_desc: 'Choisissez un nouveau forfait. Votre carte actuelle sera remplacée.',
+
+    // Legal pages
+    legal_terms_title: "Conditions d'utilisation",
+    legal_privacy_title: 'Politique de confidentialité',
+    legal_refund_title: 'Politique de remboursement',
+    legal_last_updated: 'Dernière mise à jour : 16 octobre 2026',
+    legal_footer_copyright: '© 2026 MyStock. Tous droits réservés.',
+    
+    // Terms
+    legal_terms_s1_title: '1. Acceptation des conditions',
+    legal_terms_s1_body: "En utilisant MyStock (le « Service »), vous acceptez ces conditions. Si vous n'acceptez pas une partie de ces conditions, veuillez ne pas utiliser le Service.",
+    legal_terms_s2_title: '2. Description',
+    legal_terms_s2_body: "MyStock est un système de gestion de stock et de ventes pour les petits commerces. Il offre : gestion des produits, mouvements de stock, factures et reçus de vente, gestion des fournisseurs, et rapports de ventes et bénéfices.",
+    legal_terms_s3_title: '3. Compte',
+    legal_terms_s3_body: "Vous êtes responsable de la confidentialité de vos identifiants. Vous êtes responsable de toutes les activités effectuées sous votre compte.",
+    legal_terms_s4_title: '4. Abonnement et paiement',
+    legal_terms_s4_body: "Le service est proposé via un abonnement mensuel ou annuel. Tous les paiements sont traités par la plateforme sécurisée Lemon Squeezy. L'abonnement est renouvelé automatiquement sauf annulation.",
+    legal_terms_s5_title: '5. Annulation et remboursement',
+    legal_terms_s5_body: "Vous pouvez annuler à tout moment depuis les paramètres. Les paiements précédents ne sont pas remboursés, mais vous conservez l'accès jusqu'à la fin de la période payée.",
+    legal_terms_s6_title: '6. Utilisation acceptable',
+    legal_terms_s6_body: "Vous acceptez de ne pas utiliser le Service à des fins illégales ou frauduleuses, ni de tenter d'accéder sans autorisation à nos systèmes.",
+    legal_terms_s7_title: '7. Propriété intellectuelle',
+    legal_terms_s7_body: "Tous les droits de propriété intellectuelle de MyStock nous appartiennent. Vous ne pouvez pas copier, modifier ou distribuer l'application sans autorisation.",
+    legal_terms_s8_title: '8. Avis de non-responsabilité',
+    legal_terms_s8_body: "Le Service est fourni « tel quel » sans garanties. Nous ne sommes pas responsables des pertes résultant de l'utilisation ou de l'impossibilité d'utiliser le Service.",
+    legal_terms_s9_title: '9. Modifications',
+    legal_terms_s9_body: "Nous nous réservons le droit de modifier ces conditions à tout moment. Vous serez informé des changements majeurs par email ou notification dans l'application.",
+    legal_terms_s10_title: '10. Contact',
+    legal_terms_s10_body: "Pour toute question concernant ces conditions, contactez-nous à : support@mystock.app",
   },
 
   en: {
@@ -1992,6 +2050,35 @@ const translations = {
 
     sub_change_plan: 'Change Plan',
     sub_change_plan_desc: 'Choose a new plan. Your current card will be replaced.',
+
+    // Legal pages
+    legal_terms_title: 'Terms of Service',
+    legal_privacy_title: 'Privacy Policy',
+    legal_refund_title: 'Refund Policy',
+    legal_last_updated: 'Last updated: October 16, 2026',
+    legal_footer_copyright: '© 2026 MyStock. All rights reserved.',
+    
+    // Terms
+    legal_terms_s1_title: '1. Acceptance of Terms',
+    legal_terms_s1_body: 'By using MyStock (the "Service"), you agree to these terms and conditions. If you do not agree with any part, please do not use the Service.',
+    legal_terms_s2_title: '2. Description',
+    legal_terms_s2_body: 'MyStock is an inventory and sales management system for small businesses. It provides: product management, stock movements, invoices and sales receipts, supplier management, and sales/profit reports.',
+    legal_terms_s3_title: '3. Account',
+    legal_terms_s3_body: 'You are responsible for maintaining the confidentiality of your account information and password. You are responsible for all activities that occur under your account.',
+    legal_terms_s4_title: '4. Subscription and Payment',
+    legal_terms_s4_body: 'The Service is provided via monthly or annual subscription. All payments are processed through the secure Lemon Squeezy platform. Subscriptions renew automatically at the end of each cycle unless cancelled.',
+    legal_terms_s5_title: '5. Cancellation and Refund',
+    legal_terms_s5_body: 'You can cancel your subscription at any time from the app settings. Previous payments are not refunded, but you retain access until the end of the paid period.',
+    legal_terms_s6_title: '6. Acceptable Use',
+    legal_terms_s6_body: 'You agree not to use the Service for any illegal or fraudulent activity, or attempt unauthorized access to our systems.',
+    legal_terms_s7_title: '7. Intellectual Property',
+    legal_terms_s7_body: 'All intellectual property rights in MyStock belong to us. You may not copy, modify, or distribute any part of the application without prior permission.',
+    legal_terms_s8_title: '8. Disclaimer',
+    legal_terms_s8_body: 'The Service is provided "as is" without warranties. We are not responsible for any losses resulting from the use or inability to use the Service.',
+    legal_terms_s9_title: '9. Modifications',
+    legal_terms_s9_body: 'We reserve the right to modify these terms at any time. You will be notified of major changes via email or in-app notification.',
+    legal_terms_s10_title: '10. Contact',
+    legal_terms_s10_body: 'For any questions about these terms, contact us at: support@mystock.app',
   },
 
   
