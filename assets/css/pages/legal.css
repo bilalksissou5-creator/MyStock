@@ -3,13 +3,24 @@
    ✅ تصميم One UI أنيق + قابل للقراءة
    ============================================ */
 
-.legal-page {
+/* ✅ إصلاح ارتفاع الصفحة (تجاوز common.css) */
+html:has(body.legal-page) {
+  height: auto !important;
+  min-height: 100vh !important;
+  overflow-y: auto !important;
+}
+
+body.legal-page {
+  height: auto !important;
+  min-height: 100vh !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
   background: #f5f5f5;
-  min-height: 100vh;
-  min-height: 100dvh;
   padding: 20px 16px 40px;
   margin: 0;
   direction: inherit;
+  box-sizing: border-box;
+  display: block;
 }
 
 .legal-wrapper {
@@ -171,7 +182,7 @@
    Responsive
    ══════════════════════════════════════════ */
 @media (max-width: 480px) {
-  .legal-page {
+  body.legal-page {
     padding: 12px 8px 32px;
   }
 
