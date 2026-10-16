@@ -39,13 +39,9 @@ async function autoCheckPaymentBlock() {
 
     if (!profile) return;
 
-    // فقط المدير
     if (profile.role !== 'admin') return;
-
-    // ✅ لا يوجد حساب → لا شيء
     if (!profile.organization_id) return;
 
-    // ✅ 1. حالة: لديه بطاقة مضافة → تحقق من التفعيل
     if (profile.bank_card_last4) {
       if (profile.bank_card_active === false && profile.bank_card_deactivated_at) {
         const deactivatedAt = new Date(profile.bank_card_deactivated_at).getTime();
@@ -57,23 +53,19 @@ async function autoCheckPaymentBlock() {
 
         const currentWarning = profile.card_warning_sent ?? 0;
 
-        // ✅ بعد 3 أيام → قفل
         if (elapsed >= 3 * DAY_MS) {
           window.location.replace('/bank-card.html?blocked=1');
           return;
         }
 
-        // ✅ تحذير يوم 3 (آخر 12 ساعة)
         if (daysElapsed >= 2 && currentWarning < 3) {
           if (elapsed >= 2 * DAY_MS + 12 * 60 * 60 * 1000) {
             await sendWarning(user.id, 3);
           }
         }
-        // ✅ تحذير يوم 2
         else if (daysElapsed >= 1 && currentWarning < 2) {
           await sendWarning(user.id, 2);
         }
-        // ✅ تحذير يوم 1
         else if (daysElapsed >= 0 && currentWarning < 1) {
           await sendWarning(user.id, 1);
         }
@@ -81,14 +73,12 @@ async function autoCheckPaymentBlock() {
       return;
     }
 
-    // ✅ 2. حالة: ليس لديه بطاقة → تحقق من الاشتراك
     const { data: sub } = await db
       .from('subscriptions')
       .select('status, started_at')
       .eq('organization_id', profile.organization_id)
       .maybeSingle();
 
-    // ✅ إذا كان الاشتراك نشط + لا توجد بطاقة → القفل بعد 3 أيام من الاشتراك
     if (sub?.status === 'active' && sub.started_at) {
       const startedAt = new Date(sub.started_at).getTime();
       const now = Date.now();
@@ -96,13 +86,11 @@ async function autoCheckPaymentBlock() {
 
       const DAY_MS = 24 * 60 * 60 * 1000;
 
-      // بعد 3 أيام بدون بطاقة → قفل
       if (elapsed >= 3 * DAY_MS) {
         window.location.replace('/bank-card.html?blocked=1');
         return;
       }
     }
-    // ✅ إذا كان الاشتراك pending (جديد) → لا حجب، اتركه يستكشف
     return;
 
   } catch (err) {
@@ -221,7 +209,7 @@ function renderLayout(activePage) {
         await logout();
       } else {
         await db.auth.signOut();
-        window.location.href = '/login.html';
+        window.location.href = '/';
       }
     });
   });

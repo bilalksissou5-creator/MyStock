@@ -13,7 +13,6 @@ async function login(email, password) {
   const { data, error } = await db.auth.signInWithPassword({ email, password });
   if (error) return { ok: false, error: error.message };
 
-  // ✅ تحديث الحالة إلى online
   await setOnline(data.user.id);
 
   return { ok: true, user: data.user };
@@ -27,7 +26,7 @@ async function logout() {
   if (user) await setOffline(user.id);
 
   await db.auth.signOut();
-  window.location.href = '/login.html';
+  window.location.href = '/';
 }
 
 // ============================================
@@ -48,11 +47,9 @@ async function requireAuth() {
     return null;
   }
 
-  // ✅ تحديث الحالة عند فتح أي صفحة محمية
   await setOnline(user.id);
   startHeartbeat(user.id);
 
-  // ✅ فحص الاشتراك (استثناء صفحة الاشتراك نفسها)
   const currentPage = window.location.pathname;
   const isSubscriptionPage = currentPage.includes('subscription.html');
   const isRegisterPage = currentPage.includes('register');
@@ -60,24 +57,21 @@ async function requireAuth() {
   const isInvoicePage = currentPage.includes('invoice.html');
   const isReceiptPage = currentPage.includes('receipt');
   const isReceiptsPrintPage = currentPage.includes('receipts-print');
+  const isBankCardPage = currentPage.includes('bank-card');
 
-  // ✅ لا نُفحص في هذه الصفحات
-  if (isSubscriptionPage || isRegisterPage || isLoginPage) {
+  if (isSubscriptionPage || isRegisterPage || isLoginPage || isBankCardPage) {
     return user;
   }
 
-  // ✅ جلب الاشتراك
   const { data: subscription } = await db
     .from('subscriptions')
     .select('status, expires_at')
     .eq('owner_id', user.id)
     .maybeSingle();
 
-  // إذا كان المستخدم نائباً/عاملاً، نفحص اشتراك المدير
   let sub = subscription;
 
   if (!sub) {
-    // جلب منظمة المستخدم
     const { data: profile } = await db
       .from('profiles')
       .select('organization_id, role')
@@ -94,28 +88,22 @@ async function requireAuth() {
     }
   }
 
-  // ✅ فحص الحالة
   const status = sub?.status ?? 'none';
   const expiresAt = sub?.expires_at ? new Date(sub.expires_at) : null;
   const isExpired = expiresAt && expiresAt < new Date();
 
-  // ✅ الاشتراك النشط فقط
   if (status === 'active' && !isExpired) {
     return user;
   }
 
-  // ✅ إذا كان في صفحة الاشتراك → اسمح
   if (isSubscriptionPage) {
     return user;
   }
 
-  // ✅ إذا كان في صفحة الفاتورة/الإيصال → اسمح (مشاركة مع الآخرين)
   if (isInvoicePage || isReceiptPage || isReceiptsPrintPage) {
     return user;
   }
 
-  // ⚠️ غير مشترك → حوّل إلى subscription.html
-  // (إذا كان المستخدم مديراً، يرى الخطة، وإذا كان عاملاً يرى انتظار)
   window.location.href = '/subscription.html';
   return null;
 }
