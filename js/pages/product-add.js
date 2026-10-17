@@ -132,14 +132,14 @@ document.addEventListener('DOMContentLoaded', async () => {
   const detailIframe = document.getElementById('product-detail-iframe');
   const listIframe = document.getElementById('products-list-iframe');
 
-  // ✅ إخفاء زر الإضافة داخل الـ iframe (القسم الثاني)
+  // ✅ التعديل هنا: إخفاء زر الإضافة المحدد فقط دون المساس بأزرار التفاصيل
   listIframe.addEventListener('load', () => {
     try {
       const iframeDoc = listIframe.contentDocument || listIframe.contentWindow.document;
       if (iframeDoc) {
         const style = iframeDoc.createElement('style');
         style.innerHTML = `
-          .page-header .btn-primary { display: none !important; }
+          .page-header a[href="add.html"] { display: none !important; }
         `;
         iframeDoc.head.appendChild(style);
       }
