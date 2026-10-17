@@ -17,10 +17,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   const main = document.getElementById('main-content');
 
-  const { data: suppliers } = await db
-    .from('suppliers')
-    .select('*')
-    .order('name');
+  const { data: suppliers } = await db.from('suppliers').select('*').order('name');
 
   main.innerHTML = `
     <div class="workspace">
@@ -130,15 +127,44 @@ document.addEventListener('DOMContentLoaded', async () => {
   const detailIframe = document.getElementById('product-detail-iframe');
   const listIframe = document.getElementById('products-list-iframe');
 
-  // ✅ الحل الجذري: إخفاء الزر برمجياً فور تحميل القائمة
+  // ✅ الحل الجذري: توحيد المسافة العلوية لجميع الأقسام
   listIframe.addEventListener('load', () => {
     try {
       const iframeDoc = listIframe.contentDocument || listIframe.contentWindow.document;
       if (iframeDoc) {
-        const btn = iframeDoc.querySelector('.page-header a[href="add.html"]');
-        if (btn) {
-          btn.style.display = 'none';
-        }
+        const style = iframeDoc.createElement('style');
+        style.innerHTML = `
+          .page-header a[href="add.html"] { display: none !important; }
+          
+          @media (min-width: 1024px) {
+            /* إزالة أي مسافة علوية من الصفحة */
+            .main { padding-top: 0 !important; }
+            
+            /* جعل العنوان والبحث في سطر واحد وبدون أي هوامش علوية */
+            .page-header {
+              display: flex !important;
+              flex-direction: row !important;
+              align-items: center !important;
+              justify-content: flex-start !important;
+              margin-top: 0 !important;
+              margin-bottom: 16px !important;
+              width: 100% !important;
+              gap: 20px !important;
+            }
+            .page-header h2 {
+              margin: 0 !important;
+              font-size: 1.5rem !important;
+              font-weight: 700 !important;
+              white-space: nowrap !important;
+            }
+            .search-bar {
+              margin: 0 !important;
+              flex: 1 !important;
+              max-width: 100% !important;
+            }
+          }
+        `;
+        iframeDoc.head.appendChild(style);
       }
     } catch (e) { console.warn('iframe access error', e); }
   });
