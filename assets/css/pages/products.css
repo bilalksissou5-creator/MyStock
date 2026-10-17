@@ -105,15 +105,15 @@
    ✅ التنسيق الخاص بالقسم الثاني فقط (داخل iframe)
    ============================================ */
 
-/* عندما تكون الشاشة كبيرة وتكون الصفحة داخل إطار */
+/* في الشاشات الكبيرة فقط (الحاسوب والتابلت الأفقي) */
 @media (min-width: 1024px) {
   
-  /* إخفاء زر الإضافة */
-  .page-header a[href="add.html"] {
+  /* 1. إخفاء زر إضافة المنتج */
+  html.in-iframe .page-header a[href="add.html"] {
     display: none !important;
   }
 
-  /* تحويل الـ page-header ليكون مرناً (Flex) */
+  /* 2. تحويل الحاوية لتصبح مرنة لوضع العناصر بجانب بعضها */
   html.in-iframe .page-header {
     display: flex !important;
     flex-direction: row !important;
@@ -124,13 +124,14 @@
     gap: 20px !important;
   }
 
+  /* 3. تنسيق العنوان */
   html.in-iframe .page-header h2 {
     margin: 0 !important;
     font-size: 1.5rem !important;
     white-space: nowrap !important;
   }
 
-  /* تنسيق شريط البحث ليمتد ويأخذ المساحة المتبقية */
+  /* 4. تنسيق شريط البحث ليمتد بجانب العنوان */
   html.in-iframe .page-header .search-bar {
     margin: 0 !important;
     flex: 1 !important;
