@@ -2,7 +2,6 @@
 // صفحة إضافة منتجات
 // ✅ دعم كامل للترجمة
 // ✅ دعم Workspace (تقسيم 3 أقسام + تفاصيل المنتج)
-// ✅ عرض آخر منتج تم إضافته حتى بعد إعادة التحميل
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   if (window.__productAddLoaded) return;
@@ -166,10 +165,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     detailIframe.src = `/products/detail.html?id=${encodeURIComponent(productId)}`;
   }
 
-  // ✅ استرجاع آخر منتج تم إضافته من الذاكرة المحلية عند تحميل الصفحة
+  // ✅ الحل: تأخير طلب عرض التفاصيل لمدة 500 مللي ثانية لضمان جاهزية الـ iframe
   const lastAddedProductId = localStorage.getItem('last_added_product_id');
   if (lastAddedProductId) {
-    showProductDetails(lastAddedProductId);
+    setTimeout(() => {
+      showProductDetails(lastAddedProductId);
+    }, 500);
   }
 
   window.addEventListener('message', (event) => {
@@ -364,7 +365,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       successBox.textContent = `${tr('prod_add_new_count')} ${insertedCount} | ${tr('prod_add_upd_count')} ${updatedCount} | ${tr('prod_add_invoice_count')} ${invoiceNumber}`;
       successBox.style.display = 'block';
       
-      // ✅ حفظ ID آخر منتج في الذاكرة المحلية ليبقى ظاهراً بعد إعادة التحميل
       if (lastSavedProductId) {
         localStorage.setItem('last_added_product_id', lastSavedProductId);
         showProductDetails(lastSavedProductId);
