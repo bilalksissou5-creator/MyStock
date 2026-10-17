@@ -132,15 +132,13 @@ document.addEventListener('DOMContentLoaded', async () => {
   const detailIframe = document.getElementById('product-detail-iframe');
   const listIframe = document.getElementById('products-list-iframe');
 
-  // ✅ الحل: إخفاء زر الإضافة فقط، والسماح للعنوان "Products" بالظهور طبيعياً
+  // ✅ إخفاء زر الإضافة فقط، والسماح للعنوان "Products" بالظهور طبيعياً
   listIframe.addEventListener('load', () => {
     try {
       const iframeDoc = listIframe.contentDocument || listIframe.contentWindow.document;
       if (iframeDoc) {
         const style = iframeDoc.createElement('style');
-        style.innerHTML = `
-          .page-header a[href="add.html"] { display: none !important; }
-        `;
+        style.innerHTML = `.page-header a[href="add.html"] { display: none !important; }`;
         iframeDoc.head.appendChild(style);
       }
     } catch (e) { console.warn('iframe access error', e); }
