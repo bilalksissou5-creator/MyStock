@@ -71,12 +71,12 @@
   
   .workspace-panel-left { grid-column: 1; height: 100%; overflow-y: auto !important; overflow-x: hidden; padding-inline-end: 6px; padding-bottom: 60px; }
   
-  /* ✅ الحل السحري: سحب الـ iframe بالكامل للأعلى ليتخطى مسافة الهيدر الداخلية */
+  /* ✅ الحل: سحب الـ iframe للأعلى ليتخطى المسافات الداخلية */
   .workspace-panel-center { 
     grid-column: 2; 
     overflow: hidden; 
-    padding-top: 16px; /* مسافة تعويضية داخلية */
-    margin-top: -16px; /* سحب الحاوية للأعلى */
+    padding-top: 16px; 
+    margin-top: -16px; 
   }
   
   .workspace-panel-right { grid-column: 3; overflow: hidden; position: relative; border-radius: 10px; display: flex; align-items: stretch; }
