@@ -446,11 +446,10 @@
 @media (min-width: 769px) and (orientation: landscape),
        (min-width: 1024px) {
 
-  /* الحل العسكري: إجبار الـ main على أن يكون flex ليعطي المساحة المتبقية للأبناء */
   .main {
     padding: 16px !important;
-    height: calc(100vh - 60px) !important; /* نستخدمه كبداية */
-    max-height: calc(100dvh - 60px) !important; /* الحل لمشكلة شريط التصفح في التابلت */
+    height: calc(100vh - 60px) !important; 
+    max-height: calc(100dvh - 60px) !important; 
     overflow: hidden !important; 
     display: flex !important;
     flex-direction: column !important;
@@ -461,7 +460,7 @@
     display: grid;
     grid-template-columns: 20% 50% 30%;
     gap: 16px;
-    flex: 1; /* يملأ المساحة المتبقية */
+    flex: 1; 
     min-height: 0; 
     width: 100%;
     height: 100%;
@@ -478,10 +477,10 @@
   .workspace-panel-left {
     grid-column: 1;
     height: 100%;
-    overflow-y: auto !important; /* إجبار التمرير */
+    overflow-y: auto !important; 
     overflow-x: hidden;
     padding-inline-end: 6px;
-    padding-bottom: 60px; /* مساحة أمان كبيرة جداً للأزرار */
+    padding-bottom: 60px; 
   }
 
   .workspace-panel-center {
@@ -494,16 +493,22 @@
     grid-column: 3;
     overflow: hidden;
     position: relative;
+    border-radius: 10px;
   }
 
   .workspace-iframe {
     width: 100% !important;
-    max-width: 100% !important;
     height: 100% !important;
-    min-height: 0 !important;
-    /* الحيلة: نعطي الـ iframe عرضاً أكبر قليلاً ليعوض الـ padding المقطوع من الداخل */
-    transform: scale(0.96);
-    transform-origin: top right; /* لأن الاتجاه RTL */
+    border: none;
+    display: block;
+  }
+
+  /* ✅ الحل الجذري للقسم الثالث: تصغير محتوى الـ iframe ليتناسب مع الإطار */
+  .workspace-iframe-detail {
+    width: 110% !important; 
+    transform: scale(0.9); 
+    transform-origin: top right; 
+    height: 111% !important; 
   }
 
   .workspace-panel-left::-webkit-scrollbar { width: 6px; }
