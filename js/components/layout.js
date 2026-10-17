@@ -2,6 +2,7 @@
 // الهيكل المشترك (Header + Sidebar)
 // ✅ فحص تلقائي + تحذيرات + ترجمة كاملة
 // ✅ لا يحجب المستخدم الجديد بدون بطاقة
+// ✅ دعم iframe (وضع Embed)
 // ============================================
 
 const ALLOWED_PAGES = [
@@ -141,6 +142,16 @@ if (document.readyState === 'loading') {
 // renderLayout
 // ============================================
 function renderLayout(activePage) {
+  // ✅✅✅ التعديل الجديد: إذا كانت الصفحة داخل iframe → اعرض Main فقط
+  if (window.self !== window.top) {
+    const app = document.querySelector('.app');
+    if (app) {
+      app.innerHTML = `<main class="main" id="main-content"></main>`;
+    }
+    return;
+  }
+  // ✅✅✅ نهاية التعديل
+
   const tr = (key) => (window.t ? window.t(key) : key);
 
   const navItems = [

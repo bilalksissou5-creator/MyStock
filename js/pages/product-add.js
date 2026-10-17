@@ -1,6 +1,7 @@
 // ============================================
 // صفحة إضافة منتجات
 // ✅ دعم كامل للترجمة
+// ✅ دعم Workspace (تقسيم 3 أقسام)
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   if (window.__productAddLoaded) return;
@@ -112,6 +113,22 @@ document.addEventListener('DOMContentLoaded', async () => {
       </div>
 
     </div>
+
+    <!-- ✅✅✅ القسم الثاني: قائمة المنتجات (iframe) - التعديل الجديد -->
+    <div class="workspace-panel workspace-panel-center">
+      <iframe 
+        src="/products/list.html" 
+        class="workspace-iframe" 
+        title="Products List"
+        loading="lazy"
+      ></iframe>
+    </div>
+
+    <!-- ✅✅✅ القسم الثالث: تفاصيل المنتج (فارغ مؤقتًا) - التعديل الجديد -->
+    <div class="workspace-panel workspace-panel-right">
+      <!-- سيتم إضافة iframe التفاصيل لاحقًا -->
+    </div>
+    <!-- ✅✅✅ نهاية التعديل -->
 
     <div class="scanner-modal" id="scanner-modal" style="display:none;">
       <div class="scanner-box">
