@@ -130,29 +130,33 @@ document.addEventListener('DOMContentLoaded', async () => {
   const detailIframe = document.getElementById('product-detail-iframe');
   const listIframe = document.getElementById('products-list-iframe');
 
-  // ✅ الحل الجذري: نقل حقل البحث ليكون بجوار العنوان في الشاشات الكبيرة
+  // ✅ الحل الجذري: تعديل العناصر برمجياً باستخدام Inline Styles
   listIframe.addEventListener('load', () => {
     try {
       const iframeDoc = listIframe.contentDocument || listIframe.contentWindow.document;
       if (iframeDoc) {
         // 1. إخفاء زر الإضافة
-        const style = iframeDoc.createElement('style');
-        style.innerHTML = `.page-header a[href="add.html"] { display: none !important; }`;
-        iframeDoc.head.appendChild(style);
+        const btn = iframeDoc.querySelector('.page-header a[href="add.html"]');
+        if (btn) btn.style.display = 'none';
 
-        // 2. نقل حقل البحث داخل الـ page-header (برمجياً) ليكون متقابلاً مع العنوان
+        // 2. جعل العنوان والبحث في سطر واحد (للشاشات الكبيرة فقط)
         if (window.innerWidth >= 1024) {
           const pageHeader = iframeDoc.querySelector('.page-header');
           const searchBar = iframeDoc.querySelector('.search-bar');
           
           if (pageHeader && searchBar) {
-            // إزالة حقل البحث من مكانه الأصلي ونقله داخل الـ page-header
+            // جلب حقل البحث ووضعه داخل رأس الصفحة
             pageHeader.appendChild(searchBar);
+            
+            // إجبار الحاوية على الترتيب الأفقي
             pageHeader.style.display = 'flex';
+            pageHeader.style.flexDirection = 'row';
             pageHeader.style.alignItems = 'center';
             pageHeader.style.justifyContent = 'space-between';
             pageHeader.style.gap = '20px';
-            
+            pageHeader.style.marginBottom = '16px';
+
+            // تنسيق شريط البحث ليمتد بجانب العنوان
             searchBar.style.margin = '0';
             searchBar.style.flex = '1';
             searchBar.style.maxWidth = '400px';
