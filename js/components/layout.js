@@ -213,22 +213,22 @@ function renderLayout(activePage) {
   const app = document.querySelector('.app');
   if (app) app.innerHTML = layout;
 
-  // ✅ التعديل: جعل التنقل بين "إضافة منتج" و "إخراج منتج" لا يُعيد تحميل الصفحة
+  // ✅ التعديل الجديد: اعتراض النقر بين الإضافة والإخراج
   document.querySelectorAll('.nav-item[data-nav]').forEach(link => {
     link.addEventListener('click', (e) => {
       const target = link.dataset.nav;
       
-      // إذا كنا في صفحة الإضافة ونقرنا على الإخراج (والعكس صحيح)
+      const isAddPage = activePage === '/products/add.html' || activePage === '/products/add-embed.html';
+      const isOutPage = activePage === '/movements/out.html' || activePage === '/movements/out-embed.html';
+
+      // إذا كنا في الإضافة ونقرنا على الإخراج (أو العكس)
       if (
-        (activePage === '/products/add.html' && target === '/movements/out.html') ||
-        (activePage === '/movements/out.html' && target === '/products/add.html')
+        (isAddPage && target === '/movements/out.html') ||
+        (isOutPage && target === '/products/add.html')
       ) {
         e.preventDefault();
-        // إرسال حدث للـ JS الخاص بالصفحة الحالية لتغيير القسم الأول
-        window.dispatchEvent(new CustomEvent('changeWorkspacePanel', { detail: target }));
-      } else {
-        // إذا نقرنا على زر آخر (مثل لوحة التحكم)، نسمح بالانتقال العادي
-        // لا نحتاج لإضافة preventDefault هنا، المتصفح سينتقل تلقائياً
+        // إرسال رسالة إلى iframe القسم الأول لتغيير الصفحة
+        window.postMessage({ type: 'SWITCH_PANEL', target: target }, '*');
       }
     });
   });
