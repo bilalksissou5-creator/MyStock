@@ -456,10 +456,10 @@
     box-sizing: border-box !important;
   }
 
-  /* المسافة موحدة هنا gap: 16px */
+  /* ✅ التقسيم الجديد: 25% | 50% | 25% */
   .workspace {
     display: grid;
-    grid-template-columns: 20% 50% 30%;
+    grid-template-columns: 25% 50% 25%;
     gap: 16px; 
     flex: 1; 
     min-height: 0; 
@@ -506,8 +506,7 @@
     display: block;
   }
 
-  /* ✅ الحل الجذري بدون تخريب المسافة: تصغير عرض الإطار بنسبة 1% فقط 
-     ليتناسب مع الـ padding الداخلي لصفحة التفاصيل دون التأثير على المسافة بين الأقسام */
+  /* تصغير بسيط جداً لـ iframe التفاصيل لكي لا يُقطع زر الحذف */
   .workspace-iframe-detail {
     width: 99% !important; 
     height: 100% !important;
@@ -526,14 +525,14 @@
 /* التابلت الأفقي */
 @media (min-width: 769px) and (max-width: 1023px) and (orientation: landscape) {
   .workspace {
-    grid-template-columns: 25% 45% 30%;
+    grid-template-columns: 25% 50% 25%; /* تم توحيد النسب هنا أيضاً */
   }
 }
 
 /* الشاشة الكبيرة */
 @media (min-width: 1536px) {
   .workspace {
-    grid-template-columns: 18% 50% 32%;
+    grid-template-columns: 25% 50% 25%; /* تم توحيد النسب للشاشات الكبيرة */
     gap: 20px;
   }
 }
