@@ -245,6 +245,16 @@ button { font-family: inherit; }
 }
 
 /* ============================================
+   ✅ عند العمل داخل iframe → إزالة padding
+   ============================================ */
+html.in-iframe .main {
+  padding: 0 !important;
+  padding-bottom: 0 !important;
+  height: 100% !important;
+  overflow-y: auto !important;
+}
+
+/* ============================================
    ✅ صفحة الرأس (موحّدة لكل الصفحات)
    ============================================ */
 .page-header {

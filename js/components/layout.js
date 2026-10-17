@@ -142,8 +142,9 @@ if (document.readyState === 'loading') {
 // renderLayout
 // ============================================
 function renderLayout(activePage) {
-  // ✅✅✅ التعديل الجديد: إذا كانت الصفحة داخل iframe → اعرض Main فقط
+  // ✅✅✅ إذا كانت الصفحة داخل iframe → اعرض Main فقط + أضف كلاس in-iframe
   if (window.self !== window.top) {
+    document.documentElement.classList.add('in-iframe');
     const app = document.querySelector('.app');
     if (app) {
       app.innerHTML = `<main class="main" id="main-content"></main>`;
