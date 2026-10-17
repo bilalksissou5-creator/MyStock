@@ -105,36 +105,39 @@
    ✅ التنسيق الخاص بالقسم الثاني فقط (داخل iframe)
    ============================================ */
 
-/* في الشاشات الكبيرة فقط (الحاسوب والتابلت الأفقي) */
 @media (min-width: 1024px) {
   
-  /* 1. إخفاء زر إضافة المنتج */
+  /* إخفاء زر الإضافة */
   html.in-iframe .page-header a[href="add.html"] {
     display: none !important;
   }
 
-  /* 2. تحويل الحاوية لتصبح مرنة لوضع العناصر بجانب بعضها */
+  /* إلغاء الـ flex القديم من page-header */
   html.in-iframe .page-header {
+    display: block !important; 
+  }
+
+  /* تنسيق الصف الجديد الذي يحتوي على العنوان والبحث */
+  html.in-iframe .header-row {
     display: flex !important;
     flex-direction: row !important;
     align-items: center !important;
-    justify-content: space-between !important;
-    margin-bottom: 16px !important;
+    justify-content: flex-start !important; /* البدء من اليمين لليسار */
     width: 100% !important;
     gap: 20px !important;
+    margin-bottom: 16px !important;
   }
 
-  /* 3. تنسيق العنوان */
-  html.in-iframe .page-header h2 {
+  html.in-iframe .header-row h2 {
     margin: 0 !important;
     font-size: 1.5rem !important;
     white-space: nowrap !important;
   }
 
-  /* 4. تنسيق شريط البحث ليمتد ويأخذ كل المساحة المتبقية */
-  html.in-iframe .page-header .search-bar {
+  /* شريط البحث يأخذ كل المساحة المتبقية */
+  html.in-iframe .header-row .search-bar {
     margin: 0 !important;
-    flex: 1 !important; /* يتمدد ليملأ كل المساحة */
-    max-width: 100% !important; /* إزالة الحد الأقصى للعرض */
+    flex: 1 !important; /* يتمدد لملء المساحة */
+    max-width: 100% !important;
   }
 }
