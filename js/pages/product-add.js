@@ -132,41 +132,13 @@ document.addEventListener('DOMContentLoaded', async () => {
   const detailIframe = document.getElementById('product-detail-iframe');
   const listIframe = document.getElementById('products-list-iframe');
 
-  // ✅ الحل: وضع العنوان والبحث في سطر واحد (متقابلين)
+  // ✅ إخفاء زر الإضافة فقط، وترك التصميم الأصلي كما هو
   listIframe.addEventListener('load', () => {
     try {
       const iframeDoc = listIframe.contentDocument || listIframe.contentWindow.document;
       if (iframeDoc) {
         const style = iframeDoc.createElement('style');
-        style.innerHTML = `
-          .page-header a[href="add.html"] { display: none !important; }
-          
-          /* في الشاشات الكبيرة فقط: العنوان والبحث في صف واحد */
-          @media (min-width: 1024px) {
-            .main {
-              display: flex !important;
-              flex-direction: column !important;
-            }
-            .page-header {
-              display: flex !important;
-              flex-direction: row !important;
-              align-items: center !important;
-              justify-content: space-between !important;
-              margin-bottom: 16px !important;
-              width: 100% !important;
-            }
-            .page-header h2 {
-              margin: 0 !important;
-              font-size: 1.75rem !important;
-            }
-            .search-bar {
-              margin: 0 !important;
-              flex: 1 !important;
-              max-width: 400px !important;
-              margin-inline-start: 20px !important;
-            }
-          }
-        `;
+        style.innerHTML = `.page-header a[href="add.html"] { display: none !important; }`;
         iframeDoc.head.appendChild(style);
       }
     } catch (e) { console.warn('iframe access error', e); }

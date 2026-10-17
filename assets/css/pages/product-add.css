@@ -73,22 +73,7 @@
   .workspace { display: grid; grid-template-columns: 320px minmax(0, 1fr) 380px; gap: 16px; flex: 1; min-height: 0; width: 100%; height: 100%; }
   .workspace-panel-center, .workspace-panel-right { display: flex; min-width: 0; height: 100%; }
   .workspace-panel-left { grid-column: 1; height: 100%; overflow-y: auto !important; overflow-x: hidden; padding-inline-end: 6px; padding-bottom: 60px; }
-  
-  /* ✅ السحر هنا: رفع الـ iframe لأعلى ليتخطى حدود المسافة، فيظهر شريط البحث بمحاذاة عنوان القسم الأول */
-  .workspace-panel-center { 
-    grid-column: 2; 
-    overflow: hidden; 
-    position: relative;
-    display: flex;
-    flex-direction: column;
-  }
-  
-  /* رفع شريط البحث للأعلى في الشاشات الكبيرة */
-  .workspace-panel-center .workspace-iframe {
-    margin-top: -40px; /* رفع الإطار بالكامل لأعلى */
-    height: calc(100% + 40px) !important; /* تعويض المسافة المرفوعة */
-  }
-  
+  .workspace-panel-center { grid-column: 2; overflow: hidden; }
   .workspace-panel-right { grid-column: 3; overflow: hidden; position: relative; border-radius: 10px; display: flex; align-items: stretch; }
   .workspace-iframe { width: 100% !important; height: 100% !important; border: none; display: block; }
   .workspace-iframe-detail { width: 99% !important; height: 100% !important; }
