@@ -1,5 +1,6 @@
 // ============================================
-// الهيكل المشترك + محرك التنقل (SPA Router)
+// الهيكل المشترك (Header + Sidebar)
+// ✅ محرك تبديل الأقسام (Panel Switcher)
 // ============================================
 
 const ALLOWED_PAGES = [
@@ -85,68 +86,23 @@ function renderLayout(activePage) {
   const app = document.querySelector('.app');
   if (app) app.innerHTML = layout;
 
-  // ✅ محرك التنقل القوي (SPA Router)
+  // ✅ محرك التنقل السريع: تغيير iframe القسم الأول فقط
   document.querySelectorAll('.nav-item[data-nav]').forEach(link => {
-    link.addEventListener('click', async (e) => {
+    link.addEventListener('click', (e) => {
       const target = link.dataset.nav;
-      
-      // نتحقق: هل نحن في صفحة إضافة/إخراج ونريد الانتقال للآخر؟
       const isAdd = activePage === '/products/add.html';
       const isOut = activePage === '/movements/out.html';
       const goingToOut = target === '/movements/out.html';
       const goingToAdd = target === '/products/add.html';
 
-      // إذا كنا في الإضافة أو الإخراج، والهدف هو الآخر
       if ((isAdd || isOut) && (goingToOut || goingToAdd)) {
         e.preventDefault();
-        const panelLeft = document.querySelector('.workspace-panel-left');
-        if (!panelLeft) return;
-
-        // 1. إظهار مؤشر تحميل خفيف
-        panelLeft.style.opacity = '0.5';
-
-        try {
-          // 2. جلب الصفحة الجديدة
-          const res = await fetch(target);
-          const html = await res.text();
-          const parser = new DOMParser();
-          const doc = parser.parseFromString(html, 'text/html');
-
-          // 3. استخراج القسم الأول فقط (تجاهل الهيدر والسايدبار)
-          // افتراض أن القسم الأول دائماً يحتوي على class="workspace-panel-left"
-          const newPanel = doc.querySelector('.workspace-panel-left');
-          
-          if (newPanel) {
-            // 4. استبدال محتوى القسم الأول (مع إبقاء الـ iframes سليمة)
-            panelLeft.innerHTML = newPanel.innerHTML;
-
-            // 5. تشغيل سكريبتات الصفحة الجديدة
-            const scripts = doc.querySelectorAll('script');
-            for (const oldScript of scripts) {
-              if (oldScript.src) {
-                const newScript = document.createElement('script');
-                newScript.src = oldScript.src;
-                document.body.appendChild(newScript);
-              } else if (oldScript.innerHTML) {
-                const newScript = document.createElement('script');
-                newScript.innerHTML = oldScript.innerHTML;
-                document.body.appendChild(newScript);
-              }
-            }
-
-            // 6. تحديث الرابط في المتصفح
-            window.history.pushState({}, '', target);
-            
-            // 7. تحديث الحالة النشطة في القائمة الجانبية
-            document.querySelectorAll('.nav-item[data-nav]').forEach(l => l.classList.remove('active'));
-            link.classList.add('active');
-          }
-        } catch (err) {
-          console.error('Navigation error:', err);
-          // في حال فشل التحميل، نعود للطريقة التقليدية
-          window.location.href = target;
-        } finally {
-          panelLeft.style.opacity = '1';
+        const panelIframe = document.getElementById('panel-left-iframe');
+        if (panelIframe) {
+          panelIframe.src = target;
+          window.history.pushState({}, '', target);
+          document.querySelectorAll('.nav-item[data-nav]').forEach(l => l.classList.remove('active'));
+          link.classList.add('active');
         }
       }
     });
@@ -162,7 +118,6 @@ function renderLayout(activePage) {
 
   const toggleBtn = document.getElementById('sidebar-toggle');
   const bodyEl = document.getElementById('app-body');
-  const sidebar = document.getElementById('app-sidebar');
   const isMobile = () => window.matchMedia('(max-width: 768px)').matches;
 
   if (toggleBtn) toggleBtn.addEventListener('click', (e) => { e.stopPropagation(); if(isMobile()) bodyEl.classList.toggle('sidebar-hidden-mobile'); else bodyEl.classList.toggle('sidebar-closed'); });
