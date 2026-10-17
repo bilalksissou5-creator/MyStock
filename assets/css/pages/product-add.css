@@ -456,10 +456,11 @@
     box-sizing: border-box !important;
   }
 
+  /* المسافة موحدة هنا gap: 16px */
   .workspace {
     display: grid;
     grid-template-columns: 20% 50% 30%;
-    gap: 16px;
+    gap: 16px; 
     flex: 1; 
     min-height: 0; 
     width: 100%;
@@ -494,6 +495,8 @@
     overflow: hidden;
     position: relative;
     border-radius: 10px;
+    display: flex;
+    align-items: stretch;
   }
 
   .workspace-iframe {
@@ -503,12 +506,11 @@
     display: block;
   }
 
-  /* ✅ الحل الجذري للقسم الثالث: تصغير محتوى الـ iframe ليتناسب مع الإطار */
+  /* ✅ الحل الجذري بدون تخريب المسافة: تصغير عرض الإطار بنسبة 1% فقط 
+     ليتناسب مع الـ padding الداخلي لصفحة التفاصيل دون التأثير على المسافة بين الأقسام */
   .workspace-iframe-detail {
-    width: 112% !important; 
-    height: 112% !important; 
-    transform: scale(0.89); 
-    transform-origin: top right; 
+    width: 99% !important; 
+    height: 100% !important;
   }
 
   .workspace-panel-left::-webkit-scrollbar { width: 6px; }
