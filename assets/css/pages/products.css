@@ -131,10 +131,10 @@
     white-space: nowrap !important;
   }
 
-  /* 4. تنسيق شريط البحث ليمتد بجانب العنوان */
+  /* 4. تنسيق شريط البحث ليمتد ويأخذ كل المساحة المتبقية */
   html.in-iframe .page-header .search-bar {
     margin: 0 !important;
-    flex: 1 !important;
-    max-width: 600px !important;
+    flex: 1 !important; /* يتمدد ليملأ كل المساحة */
+    max-width: 100% !important; /* إزالة الحد الأقصى للعرض */
   }
 }
