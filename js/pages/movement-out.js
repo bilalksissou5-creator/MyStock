@@ -355,7 +355,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     errBox.style.display = 'none'; successBox.style.display = 'none';
     if (addedProducts.length === 0) { errBox.textContent = tr('prod_add_err_empty'); errBox.style.display = 'block'; isSaving = false; saveBtn.disabled = false; return; }
     
-    // ✅ حفظ معرف أول منتج لفتح تفاصيله في القسم الثالث
+    // ✅ التعديل الحاسم: حفظ معرف أول منتج لفتح تفاصيله في القسم الثالث
     const firstProductId = addedProducts[0].id;
     
     saveBtn.querySelector('span').textContent = tr('prod_add_saving');
