@@ -342,16 +342,8 @@
   .main { padding: 16px !important; height: calc(100vh - 60px) !important; max-height: calc(100dvh - 60px) !important; overflow: hidden !important; display: flex !important; flex-direction: column !important; box-sizing: border-box !important; }
   .workspace { display: grid; grid-template-columns: 320px minmax(0, 1fr) 380px; gap: 16px; flex: 1; min-height: 0; width: 100%; height: 100%; align-items: start; }
   .workspace-panel-center, .workspace-panel-right { display: flex; min-width: 0; height: 100%; }
-  
   .workspace-panel-left { grid-column: 1; height: 100%; overflow-y: auto !important; overflow-x: hidden; padding-inline-end: 6px; padding-bottom: 60px; }
-  
-  .workspace-panel-center { 
-    grid-column: 2; 
-    overflow: hidden; 
-    padding-top: 16px; 
-    margin-top: -16px; 
-  }
-  
+  .workspace-panel-center { grid-column: 2; overflow: hidden; }
   .workspace-panel-right { grid-column: 3; overflow: hidden; position: relative; border-radius: 10px; display: flex; align-items: stretch; }
   .workspace-iframe { width: 100% !important; height: 100% !important; border: none; display: block; }
   .workspace-iframe-detail { width: 99% !important; height: 100% !important; }
