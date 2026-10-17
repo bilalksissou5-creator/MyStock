@@ -28,7 +28,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     <div class="workspace">
 
       <!-- ═══════════════════════════════════════
-           القسم الأول (20%): جميع عناصر إضافة المنتج
+           القسم الأول (25%): جميع عناصر إضافة المنتج
            ═══════════════════════════════════════ -->
       <div class="workspace-panel workspace-panel-left">
 
@@ -133,11 +133,12 @@ document.addEventListener('DOMContentLoaded', async () => {
           id="products-list-iframe"
           title="Products List"
           loading="lazy"
+          scrolling="yes"
         ></iframe>
       </div>
 
       <!-- ═══════════════════════════════════════
-           القسم الثالث (30%): تفاصيل المنتج (iframe)
+           القسم الثالث (25%): تفاصيل المنتج (iframe)
            ═══════════════════════════════════════ -->
       <div class="workspace-panel workspace-panel-right">
         <iframe
@@ -145,6 +146,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           class="workspace-iframe workspace-iframe-detail"
           id="product-detail-iframe"
           title="Product Details"
+          scrolling="yes"
         ></iframe>
       </div>
 
