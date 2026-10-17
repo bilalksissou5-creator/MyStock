@@ -14,14 +14,18 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   const main = document.getElementById('main-content');
   
-  // ✅ بناء الهيكل: وضع شريط البحث داخل حاوية العنوان لضمان تقابلهما
+  // ✅ الحل الذكي: التحقق مما إذا كانت الصفحة داخل iframe أم لا
+  const isInIframe = window.self !== window.top;
+
+  // إذا كنا داخل iframe (القسم الثاني)، لا نبني زر الإضافة
+  const addButtonHTML = isInIframe 
+    ? '' 
+    : `<a href="add.html" class="btn-primary"><i class="fas fa-plus"></i><span>${tr('products_add')}</span></a>`;
+
   main.innerHTML = `
     <div class="page-header">
       <h2>${tr('products_title')}</h2>
-      <a href="add.html" class="btn-primary">
-        <i class="fas fa-plus"></i>
-        <span>${tr('products_add')}</span>
-      </a>
+      ${addButtonHTML}
       <div class="search-bar">
         <i class="fas fa-search"></i>
         <input type="text" id="search-products" placeholder="${tr('products_search_ph')}">
