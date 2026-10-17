@@ -456,10 +456,8 @@
     box-sizing: border-box !important;
   }
 
-  /* ✅ الحل: استخدام 24% للقسم الأول، و flex للباقي لتجنب التداخل مع الـ sidebar */
   .workspace {
     display: grid;
-    /* نعطي القسم الأول 24%، القسم الثاني مساحة مرنة (1fr)، والقسم الثالث 24% */
     grid-template-columns: 24% minmax(0, 1fr) 24%;
     gap: 16px; 
     flex: 1; 
@@ -507,10 +505,11 @@
     display: block;
   }
 
-  /* تصغير بسيط جداً لـ iframe التفاصيل لكي لا يُقطع */
+  /* ✅ الحل الجذري: إعطاء إطار التفاصيل هامش سفلي بسيط جداً لتفعيل السكرول داخله */
   .workspace-iframe-detail {
     width: 99% !important; 
     height: 100% !important;
+    padding-bottom: 5px; /* مساحة أمان صغيرة */
   }
 
   .workspace-panel-left::-webkit-scrollbar { width: 6px; }
