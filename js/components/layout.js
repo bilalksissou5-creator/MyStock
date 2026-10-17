@@ -1,6 +1,5 @@
 // ============================================
-// الهيكل المشترك (Header + Sidebar)
-// ✅ دعم التبديل الديناميكي (Micro-Frontend)
+// الهيكل المشترك + محرك التنقل (SPA Router)
 // ============================================
 
 const ALLOWED_PAGES = [
@@ -21,33 +20,16 @@ async function autoCheckPaymentBlock() {
     
     if (profile.bank_card_last4) {
       if (profile.bank_card_active === false && profile.bank_card_deactivated_at) {
-        const deactivatedAt = new Date(profile.bank_card_deactivated_at).getTime();
-        const elapsed = Date.now() - deactivatedAt;
-        const DAY_MS = 24 * 60 * 60 * 1000;
-        const daysElapsed = Math.floor(elapsed / DAY_MS);
-        const currentWarning = profile.card_warning_sent ?? 0;
-
-        if (elapsed >= 3 * DAY_MS) { window.location.replace('/bank-card.html?blocked=1'); return; }
-        if (daysElapsed >= 2 && currentWarning < 3) { if (elapsed >= 2 * DAY_MS + 12 * 60 * 60 * 1000) await sendWarning(user.id, 3); }
-        else if (daysElapsed >= 1 && currentWarning < 2) { await sendWarning(user.id, 2); }
-        else if (daysElapsed >= 0 && currentWarning < 1) { await sendWarning(user.id, 1); }
+        const elapsed = Date.now() - new Date(profile.bank_card_deactivated_at).getTime();
+        if (elapsed >= 3 * 24 * 60 * 60 * 1000) window.location.replace('/bank-card.html?blocked=1');
       }
       return;
     }
     const { data: sub } = await db.from('subscriptions').select('status, started_at').eq('organization_id', profile.organization_id).maybeSingle();
     if (sub?.status === 'active' && sub.started_at) {
-      const elapsed = Date.now() - new Date(sub.started_at).getTime();
-      if (elapsed >= 3 * 24 * 60 * 60 * 1000) window.location.replace('/bank-card.html?blocked=1');
+      if (Date.now() - new Date(sub.started_at).getTime() >= 3 * 24 * 60 * 60 * 1000) window.location.replace('/bank-card.html?blocked=1');
     }
-  } catch (err) { console.error('❌ autoCheckPaymentBlock error:', err); }
-}
-
-async function sendWarning(userId, level) {
-  const tr = (key) => (window.t ? window.t(key) : key);
-  const titles = { 1: tr('warn_title_1'), 2: tr('warn_title_2'), 3: tr('warn_title_3') };
-  const messages = { 1: tr('warn_msg_1'), 2: tr('warn_msg_2'), 3: tr('warn_msg_3') };
-  await db.from('notifications').insert({ user_id: userId, title: titles[level], message: messages[level], type: level === 3 ? 'danger' : 'warning', link: '/bank-card.html' });
-  await db.from('profiles').update({ card_warning_sent: level }).eq('id', userId);
+  } catch (err) { console.error(err); }
 }
 
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', autoCheckPaymentBlock);
@@ -83,8 +65,8 @@ function renderLayout(activePage) {
 
   const layout = `
     <header class="header">
-      <button type="button" class="sidebar-toggle" id="sidebar-toggle" title="${tr('nav_menu')}"><i class="fas fa-bars"></i></button>
-      <a href="/notifications.html" class="notif" id="notif-btn" title="${tr('nav_notifications')}"><i class="fas fa-bell"></i><span class="notif-count" id="notif-count">0</span></a>
+      <button type="button" class="sidebar-toggle" id="sidebar-toggle"><i class="fas fa-bars"></i></button>
+      <a href="/notifications.html" class="notif" id="notif-btn"><i class="fas fa-bell"></i><span class="notif-count" id="notif-count">0</span></a>
       <div class="search"><i class="fas fa-search"></i><input type="text" placeholder="${tr('nav_search')}"></div>
       <h1 class="logo">MyStock</h1>
     </header>
@@ -103,17 +85,69 @@ function renderLayout(activePage) {
   const app = document.querySelector('.app');
   if (app) app.innerHTML = layout;
 
-  // ✅ اعتراض النقر بين الإضافة والإخراج
+  // ✅ محرك التنقل القوي (SPA Router)
   document.querySelectorAll('.nav-item[data-nav]').forEach(link => {
-    link.addEventListener('click', (e) => {
+    link.addEventListener('click', async (e) => {
       const target = link.dataset.nav;
-      const isAddPage = activePage === '/products/add.html';
-      const isOutPage = activePage === '/movements/out.html';
+      
+      // نتحقق: هل نحن في صفحة إضافة/إخراج ونريد الانتقال للآخر؟
+      const isAdd = activePage === '/products/add.html';
+      const isOut = activePage === '/movements/out.html';
+      const goingToOut = target === '/movements/out.html';
+      const goingToAdd = target === '/products/add.html';
 
-      if ((isAddPage && target === '/movements/out.html') || (isOutPage && target === '/products/add.html')) {
+      // إذا كنا في الإضافة أو الإخراج، والهدف هو الآخر
+      if ((isAdd || isOut) && (goingToOut || goingToAdd)) {
         e.preventDefault();
-        // إرسال حدث مخصص للصفحة الحالية
-        window.dispatchEvent(new CustomEvent('SWITCH_PANEL_REQUEST', { detail: target }));
+        const panelLeft = document.querySelector('.workspace-panel-left');
+        if (!panelLeft) return;
+
+        // 1. إظهار مؤشر تحميل خفيف
+        panelLeft.style.opacity = '0.5';
+
+        try {
+          // 2. جلب الصفحة الجديدة
+          const res = await fetch(target);
+          const html = await res.text();
+          const parser = new DOMParser();
+          const doc = parser.parseFromString(html, 'text/html');
+
+          // 3. استخراج القسم الأول فقط (تجاهل الهيدر والسايدبار)
+          // افتراض أن القسم الأول دائماً يحتوي على class="workspace-panel-left"
+          const newPanel = doc.querySelector('.workspace-panel-left');
+          
+          if (newPanel) {
+            // 4. استبدال محتوى القسم الأول (مع إبقاء الـ iframes سليمة)
+            panelLeft.innerHTML = newPanel.innerHTML;
+
+            // 5. تشغيل سكريبتات الصفحة الجديدة
+            const scripts = doc.querySelectorAll('script');
+            for (const oldScript of scripts) {
+              if (oldScript.src) {
+                const newScript = document.createElement('script');
+                newScript.src = oldScript.src;
+                document.body.appendChild(newScript);
+              } else if (oldScript.innerHTML) {
+                const newScript = document.createElement('script');
+                newScript.innerHTML = oldScript.innerHTML;
+                document.body.appendChild(newScript);
+              }
+            }
+
+            // 6. تحديث الرابط في المتصفح
+            window.history.pushState({}, '', target);
+            
+            // 7. تحديث الحالة النشطة في القائمة الجانبية
+            document.querySelectorAll('.nav-item[data-nav]').forEach(l => l.classList.remove('active'));
+            link.classList.add('active');
+          }
+        } catch (err) {
+          console.error('Navigation error:', err);
+          // في حال فشل التحميل، نعود للطريقة التقليدية
+          window.location.href = target;
+        } finally {
+          panelLeft.style.opacity = '1';
+        }
       }
     });
   });
@@ -131,41 +165,9 @@ function renderLayout(activePage) {
   const sidebar = document.getElementById('app-sidebar');
   const isMobile = () => window.matchMedia('(max-width: 768px)').matches;
 
-  function toggleSidebar() {
-    if (isMobile()) bodyEl.classList.toggle('sidebar-hidden-mobile');
-    else {
-      bodyEl.classList.toggle('sidebar-closed');
-      localStorage.setItem('sidebar_closed', bodyEl.classList.contains('sidebar-closed') ? 'true' : 'false');
-    }
-  }
-
-  function closeSidebarMobile() { if (isMobile()) bodyEl.classList.add('sidebar-hidden-mobile'); }
-
-  if (toggleBtn) toggleBtn.addEventListener('click', (e) => { e.stopPropagation(); toggleSidebar(); });
+  if (toggleBtn) toggleBtn.addEventListener('click', (e) => { e.stopPropagation(); if(isMobile()) bodyEl.classList.toggle('sidebar-hidden-mobile'); else bodyEl.classList.toggle('sidebar-closed'); });
   if (!isMobile()) { if (localStorage.getItem('sidebar_closed') === 'true') bodyEl.classList.add('sidebar-closed'); }
   else bodyEl.classList.add('sidebar-hidden-mobile');
-
-  if (sidebar) {
-    sidebar.querySelectorAll('a.nav-item').forEach(link => { link.addEventListener('click', () => { if (isMobile()) closeSidebarMobile(); }); });
-  }
-
-  document.addEventListener('click', (e) => {
-    if (!isMobile() || bodyEl.classList.contains('sidebar-hidden-mobile')) return;
-    if (sidebar && sidebar.contains(e.target)) return;
-    if (toggleBtn && toggleBtn.contains(e.target)) return;
-    closeSidebarMobile();
-  });
-
-  if (sidebar) {
-    let touchStartX = 0;
-    sidebar.addEventListener('touchstart', (e) => { touchStartX = e.changedTouches[0].screenX; }, { passive: true });
-    sidebar.addEventListener('touchend', (e) => { if (!isMobile()) return; if (e.changedTouches[0].screenX - touchStartX < -30) closeSidebarMobile(); }, { passive: true });
-  }
-
-  window.addEventListener('resize', () => {
-    if (!isMobile()) bodyEl.classList.remove('sidebar-hidden-mobile');
-    else bodyEl.classList.add('sidebar-hidden-mobile');
-  });
 
   if (typeof startNotifPolling === 'function') startNotifPolling();
 }

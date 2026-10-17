@@ -2,6 +2,7 @@
 // صفحة إضافة منتجات
 // ✅ دعم كامل للترجمة
 // ✅ دعم Workspace (تقسيم 3 أقسام + تفاصيل المنتج)
+// ✅ متوافق مع محرك التنقل السريع (SPA)
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   if (window.__productAddLoaded) return;
@@ -27,6 +28,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   main.innerHTML = `
     <div class="workspace">
 
+      <!-- ✅ القسم الأول (الحاوية التي سيتم استبدالها ديناميكياً) -->
       <div class="workspace-panel workspace-panel-left">
         <div class="page-header">
           <h2>${tr('prod_add_title')}</h2>
@@ -116,10 +118,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         </div>
       </div>
 
+      <!-- ✅ القسم الثاني: قائمة المنتجات (يبقى ثابتاً) -->
       <div class="workspace-panel workspace-panel-center">
         <iframe src="/products/list.html" class="workspace-iframe" id="products-list-iframe" title="Products List" loading="lazy" scrolling="yes"></iframe>
       </div>
 
+      <!-- ✅ القسم الثالث: تفاصيل المنتج (يبقى ثابتاً) -->
       <div class="workspace-panel workspace-panel-right">
         <iframe src="about:blank" class="workspace-iframe workspace-iframe-detail" id="product-detail-iframe" title="Product Details" scrolling="yes"></iframe>
       </div>
