@@ -26,7 +26,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   main.innerHTML = `
     <div class="workspace">
-
       <div class="workspace-panel workspace-panel-left">
         <div class="page-header">
           <h2>${tr('prod_add_title')}</h2>
@@ -35,10 +34,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             <span>${tr('prod_add_scan')}</span>
           </button>
         </div>
-
         <div class="alert alert-error" id="form-error" style="display:none;"></div>
         <div class="alert alert-success" id="form-success" style="display:none;"></div>
-
         <div class="add-form">
           <div class="product-input-card card-supplier">
             <div class="form-group supplier-group">
@@ -48,7 +45,6 @@ document.addEventListener('DOMContentLoaded', async () => {
               <input type="hidden" id="supplier_id">
             </div>
           </div>
-
           <div class="product-input-card card-fields">
             <div class="form-grid">
               <div class="form-group">
@@ -64,23 +60,19 @@ document.addEventListener('DOMContentLoaded', async () => {
                 <input type="number" id="product-price" value="0" min="0" step="0.01">
               </div>
             </div>
-
             <div class="form-group">
               <label>${tr('prod_add_category')}</label>
               <input type="text" id="product-category" placeholder="${tr('prod_add_category_ph')}">
             </div>
-
             <div class="form-group">
               <label>${tr('prod_add_barcode')}</label>
               <input type="text" id="product-sku" placeholder="${tr('prod_add_barcode_ph')}" dir="ltr">
             </div>
-
             <button type="button" class="btn-primary add-product-btn" id="done-btn">
               <i class="fas fa-check"></i>
               <span>${tr('prod_add_done')}</span>
             </button>
           </div>
-
           <div class="added-products-section card-added">
             <label class="section-label">${tr('prod_add_added')}</label>
             <div id="added-products" class="added-products">
@@ -90,22 +82,11 @@ document.addEventListener('DOMContentLoaded', async () => {
               </div>
             </div>
           </div>
-
           <div class="form-summary card-summary">
-            <div class="summary-row">
-              <span>${tr('prod_add_sum_count')}</span>
-              <strong id="sum-rows">0</strong>
-            </div>
-            <div class="summary-row">
-              <span>${tr('prod_add_sum_qty')}</span>
-              <strong id="sum-qty">0</strong>
-            </div>
-            <div class="summary-row highlight">
-              <span>${tr('prod_add_sum_total')}</span>
-              <strong id="sum-total">0.00</strong>
-            </div>
+            <div class="summary-row"><span>${tr('prod_add_sum_count')}</span><strong id="sum-rows">0</strong></div>
+            <div class="summary-row"><span>${tr('prod_add_sum_qty')}</span><strong id="sum-qty">0</strong></div>
+            <div class="summary-row highlight"><span>${tr('prod_add_sum_total')}</span><strong id="sum-total">0.00</strong></div>
           </div>
-
           <div class="form-actions card-actions">
             <button type="button" class="btn-primary" id="save-all-btn">
               <i class="fas fa-save"></i>
@@ -115,25 +96,16 @@ document.addEventListener('DOMContentLoaded', async () => {
           </div>
         </div>
       </div>
-
       <div class="workspace-panel workspace-panel-center">
         <iframe src="/products/list.html" class="workspace-iframe" id="products-list-iframe" title="Products List" loading="lazy" scrolling="yes"></iframe>
       </div>
-
       <div class="workspace-panel workspace-panel-right">
         <iframe src="about:blank" class="workspace-iframe workspace-iframe-detail" id="product-detail-iframe" title="Product Details" scrolling="yes"></iframe>
       </div>
-
     </div>
-
     <div class="scanner-modal" id="scanner-modal" style="display:none;">
       <div class="scanner-box">
-        <div class="scanner-header">
-          <h3>${tr('prod_add_scan_title')}</h3>
-          <button type="button" class="scanner-close" id="scanner-close">
-            <i class="fas fa-xmark"></i>
-          </button>
-        </div>
+        <div class="scanner-header"><h3>${tr('prod_add_scan_title')}</h3><button type="button" class="scanner-close" id="scanner-close"><i class="fas fa-xmark"></i></button></div>
         <div id="scanner-reader" class="scanner-reader"></div>
         <p class="scanner-hint" id="scanner-hint">${tr('prod_add_scan_hint')}</p>
       </div>
@@ -160,17 +132,26 @@ document.addEventListener('DOMContentLoaded', async () => {
   const detailIframe = document.getElementById('product-detail-iframe');
   const listIframe = document.getElementById('products-list-iframe');
 
+  // ✅ إخفاء زر الإضافة داخل الـ iframe (القسم الثاني)
+  listIframe.addEventListener('load', () => {
+    try {
+      const iframeDoc = listIframe.contentDocument || listIframe.contentWindow.document;
+      if (iframeDoc) {
+        const style = iframeDoc.createElement('style');
+        style.innerHTML = `
+          .page-header .btn-primary { display: none !important; }
+        `;
+        iframeDoc.head.appendChild(style);
+      }
+    } catch (e) { console.warn('iframe access error', e); }
+  });
+
   detailIframe.addEventListener('load', () => {
     try {
       const iframeDoc = detailIframe.contentDocument || detailIframe.contentWindow.document;
       if (iframeDoc) {
         const style = iframeDoc.createElement('style');
-        style.innerHTML = `
-          html, body { height: 100% !important; overflow: hidden !important; }
-          .app { height: 100vh !important; overflow: hidden !important; }
-          .body { height: calc(100vh - 60px) !important; overflow: hidden !important; }
-          .main { height: 100% !important; overflow-y: auto !important; padding-bottom: 60px !important; }
-        `;
+        style.innerHTML = `html, body { height: 100% !important; overflow: hidden !important; } .app { height: 100vh !important; overflow: hidden !important; } .body { height: calc(100vh - 60px) !important; overflow: hidden !important; } .main { height: 100% !important; overflow-y: auto !important; padding-bottom: 60px !important; }`;
         iframeDoc.head.appendChild(style);
       }
     } catch (e) { console.warn('iframe access error', e); }
@@ -187,16 +168,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     detailIframe.src = `/products/detail.html?id=${encodeURIComponent(productId)}`;
   }
 
-  async function loadLatestProductInDetail() {
-    try {
-      const { data: profile } = await db.from('profiles').select('organization_id').eq('id', user.id).single();
-      if (profile?.organization_id) {
-        const { data: latest } = await db.from('products').select('id').eq('organization_id', profile.organization_id).order('created_at', { ascending: false }).limit(1).maybeSingle();
-        if (latest?.id) showProductDetails(latest.id);
-      }
-    } catch (e) { console.error(e); }
+  const lastAddedProductId = localStorage.getItem('last_added_product_id');
+  if (lastAddedProductId) {
+    showProductDetails(lastAddedProductId);
   }
-  setTimeout(loadLatestProductInDetail, 500);
 
   window.addEventListener('message', (event) => {
     const data = event.data;
@@ -213,47 +188,22 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (q.length < 1) { suggestions.innerHTML = ''; suggestions.style.display = 'none'; return; }
     const filtered = (suppliers ?? []).filter(s => (s.name ?? '').toLowerCase().includes(q)).slice(0, 5);
     const exactMatch = (suppliers ?? []).some(s => (s.name ?? '').toLowerCase() === q);
-    let html = filtered.map(s => `
-      <div class="suggestion-card" data-id="${s.id}" data-name="${s.name}" data-specialty="${s.specialty ?? ''}">
-        <div class="suggestion-image"><i class="fas fa-truck"></i></div>
-        <div class="suggestion-info"><strong>${s.name}</strong>${s.specialty ? `<span class="suggestion-sku">${s.specialty}</span>` : ''}</div>
-      </div>
-    `).join('');
-    if (!exactMatch && filter.trim()) {
-      html += `
-        <div class="suggestion-card new-supplier" data-new="true" data-name="${filter.trim()}">
-          <div class="suggestion-image" style="background:#dcfce7; color:#16a34a;"><i class="fas fa-plus"></i></div>
-          <div class="suggestion-info"><strong>${tr('prod_add_new_supplier')}</strong><span class="suggestion-sku">"${filter.trim()}"</span></div>
-        </div>
-      `;
-    }
+    let html = filtered.map(s => `<div class="suggestion-card" data-id="${s.id}" data-name="${s.name}" data-specialty="${s.specialty ?? ''}"><div class="suggestion-image"><i class="fas fa-truck"></i></div><div class="suggestion-info"><strong>${s.name}</strong>${s.specialty ? `<span class="suggestion-sku">${s.specialty}</span>` : ''}</div></div>`).join('');
+    if (!exactMatch && filter.trim()) { html += `<div class="suggestion-card new-supplier" data-new="true" data-name="${filter.trim()}"><div class="suggestion-image" style="background:#dcfce7; color:#16a34a;"><i class="fas fa-plus"></i></div><div class="suggestion-info"><strong>${tr('prod_add_new_supplier')}</strong><span class="suggestion-sku">"${filter.trim()}"</span></div></div>`; }
     suggestions.innerHTML = html || `<div class="suggestion-empty">${tr('prod_add_no_results')}</div>`;
     suggestions.style.display = 'block';
     suggestions.querySelectorAll('.suggestion-card').forEach(card => {
       card.addEventListener('pointerdown', (e) => {
         e.preventDefault(); e.stopPropagation();
-        if (card.dataset.new === 'true') {
-          selectedSupplier = null; supplierInput.value = card.dataset.name; supplierIdInput.value = '';
-          supplierInput.dataset.isNew = 'true'; supplierInput.dataset.newName = card.dataset.name; categoryInput.value = '';
-        } else {
-          selectedSupplier = suppliers.find(s => s.id === card.dataset.id);
-          supplierInput.value = card.dataset.name; supplierIdInput.value = card.dataset.id;
-          supplierInput.dataset.isNew = 'false'; supplierInput.dataset.newName = '';
-          if (selectedSupplier?.specialty) categoryInput.value = selectedSupplier.specialty;
-        }
+        if (card.dataset.new === 'true') { selectedSupplier = null; supplierInput.value = card.dataset.name; supplierIdInput.value = ''; supplierInput.dataset.isNew = 'true'; supplierInput.dataset.newName = card.dataset.name; categoryInput.value = ''; }
+        else { selectedSupplier = suppliers.find(s => s.id === card.dataset.id); supplierInput.value = card.dataset.name; supplierIdInput.value = card.dataset.id; supplierInput.dataset.isNew = 'false'; supplierInput.dataset.newName = ''; if (selectedSupplier?.specialty) categoryInput.value = selectedSupplier.specialty; }
         suggestions.style.display = 'none';
       });
     });
   }
 
-  supplierInput.addEventListener('input', () => {
-    selectedSupplier = null; supplierIdInput.value = ''; supplierInput.dataset.isNew = 'false'; supplierInput.dataset.newName = '';
-    showSuggestions(supplierInput.value);
-  });
-
-  document.addEventListener('pointerdown', (e) => {
-    if (!e.target.closest('.supplier-group')) suggestions.style.display = 'none';
-  });
+  supplierInput.addEventListener('input', () => { selectedSupplier = null; supplierIdInput.value = ''; supplierInput.dataset.isNew = 'false'; supplierInput.dataset.newName = ''; showSuggestions(supplierInput.value); });
+  document.addEventListener('pointerdown', (e) => { if (!e.target.closest('.supplier-group')) suggestions.style.display = 'none'; });
 
   async function startScanner() {
     if (typeof Html5Qrcode === 'undefined') { alert(tr('prod_add_scanner_err')); return; }
@@ -303,10 +253,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   scannerModal.addEventListener('click', (e) => { if (e.target === scannerModal) stopScanner(); });
 
   function renderAddedProducts() {
-    if (addedProducts.length === 0) {
-      addedContainer.innerHTML = `<div class="empty-added"><i class="fas fa-box-open"></i><p>${tr('prod_add_empty')}</p></div>`;
-      updateSummary(); return;
-    }
+    if (addedProducts.length === 0) { addedContainer.innerHTML = `<div class="empty-added"><i class="fas fa-box-open"></i><p>${tr('prod_add_empty')}</p></div>`; updateSummary(); return; }
     addedContainer.innerHTML = addedProducts.map((p, index) => `
       <div class="added-product-card">
         <div class="added-product-image">${p.image_url ? `<img src="${p.image_url}" alt="${p.name}">` : `<i class="fas fa-box-open"></i>`}</div>
@@ -320,10 +267,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       </div>
     `).join('');
     addedContainer.querySelectorAll('.added-product-delete').forEach(btn => {
-      btn.addEventListener('pointerdown', (e) => {
-        e.preventDefault(); e.stopPropagation();
-        addedProducts.splice(Number(btn.dataset.index), 1); renderAddedProducts();
-      });
+      btn.addEventListener('pointerdown', (e) => { e.preventDefault(); e.stopPropagation(); addedProducts.splice(Number(btn.dataset.index), 1); renderAddedProducts(); });
     });
     updateSummary();
   }
@@ -359,6 +303,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     const errBox = document.getElementById('form-error'); const successBox = document.getElementById('form-success');
     errBox.style.display = 'none'; successBox.style.display = 'none';
     if (addedProducts.length === 0) { errBox.textContent = tr('prod_add_err_empty'); errBox.style.display = 'block'; isSaving = false; saveAllBtn.disabled = false; return; }
+    
+    let lastSavedProductId = null; 
+
     saveAllBtn.querySelector('span').textContent = tr('prod_add_saving');
     try {
       const { data: { user: authUser } } = await db.auth.getUser();
@@ -399,6 +346,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           productId = newProduct.id; insertedCount++;
         }
         await db.from('stock_movements').insert({ organization_id: profile.organization_id, product_id: productId, type: 'in', method: 'manual', quantity: Number(p.qty), performed_by: authUser.id });
+        lastSavedProductId = productId;
       }
       const totalQty = addedProducts.reduce((s, p) => s + Number(p.qty), 0);
       const totalValue = addedProducts.reduce((s, p) => s + Number(p.qty) * Number(p.price), 0);
@@ -408,15 +356,19 @@ document.addEventListener('DOMContentLoaded', async () => {
       const { error: itemsErr } = await db.from('invoice_items').insert(invoiceItems);
       if (itemsErr) console.error('❌ invoice_items error:', itemsErr);
       if (typeof notifyOrganization === 'function') {
-        try {
-          await notifyOrganization({ orgId: profile.organization_id, title: tr('prod_add_notif_title'), message: `${profile.full_name || tr('prod_detail_user')} ${tr('prod_add_notif_msg')} ${invoiceNumber} (${totalQty} - ${totalValue.toFixed(2)})`, type: 'success', link: `/invoice.html?id=${encodeURIComponent(invoiceNumber)}`, userName: profile.full_name || null });
-        } catch (notifErr) { console.error('❌ Notification error:', notifErr); }
+        try { await notifyOrganization({ orgId: profile.organization_id, title: tr('prod_add_notif_title'), message: `${profile.full_name || tr('prod_detail_user')} ${tr('prod_add_notif_msg')} ${invoiceNumber} (${totalQty} - ${totalValue.toFixed(2)})`, type: 'success', link: `/invoice.html?id=${encodeURIComponent(invoiceNumber)}`, userName: profile.full_name || null }); } catch (notifErr) { console.error('❌ Notification error:', notifErr); }
       }
       addedProducts.length = 0; renderAddedProducts();
       supplierInput.dataset.newName = ''; supplierInput.dataset.isNew = 'false'; supplierIdInput.value = finalSupplierId || '';
       if (listIframe) listIframe.src = listIframe.src;
       successBox.textContent = `${tr('prod_add_new_count')} ${insertedCount} | ${tr('prod_add_upd_count')} ${updatedCount} | ${tr('prod_add_invoice_count')} ${invoiceNumber}`;
       successBox.style.display = 'block';
+      
+      if (lastSavedProductId) {
+        localStorage.setItem('last_added_product_id', lastSavedProductId);
+        showProductDetails(lastSavedProductId);
+      }
+      
     } catch (error) {
       errBox.textContent = error.message; errBox.style.display = 'block';
       saveAllBtn.disabled = false; saveAllBtn.querySelector('span').textContent = tr('prod_add_save'); isSaving = false;

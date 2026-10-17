@@ -130,7 +130,21 @@ document.addEventListener('DOMContentLoaded', async () => {
   let isSaving = false;
   let html5QrCode = null;
 
-  // ✅ استرجاع آخر منتج تم إخراجه من الذاكرة المحلية عند تحميل الصفحة
+  // ✅ إخفاء زر الإضافة داخل الـ iframe (القسم الثاني)
+  listIframe.addEventListener('load', () => {
+    try {
+      const iframeDoc = listIframe.contentDocument || listIframe.contentWindow.document;
+      if (iframeDoc) {
+        const style = iframeDoc.createElement('style');
+        style.innerHTML = `
+          .page-header .btn-primary { display: none !important; }
+        `;
+        iframeDoc.head.appendChild(style);
+      }
+    } catch (e) { console.warn('iframe access error', e); }
+  });
+
+  // ✅ استرجاع آخر منتج تم إخراجه
   const lastOutProductId = localStorage.getItem('last_out_product_id');
   if (lastOutProductId) {
     detailIframe.src = `/products/detail.html?id=${encodeURIComponent(lastOutProductId)}`;
@@ -287,7 +301,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     errBox.style.display = 'none'; successBox.style.display = 'none';
     if (addedProducts.length === 0) { errBox.textContent = tr('prod_add_err_empty'); errBox.style.display = 'block'; isSaving = false; saveBtn.disabled = false; return; }
     
-    const firstProductId = addedProducts[0].id; // حفظ الـ ID قبل المسح
+    const firstProductId = addedProducts[0].id; 
     
     saveBtn.querySelector('span').textContent = tr('prod_add_saving');
     try {
@@ -318,7 +332,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       renderAddedProducts(); 
       document.getElementById('note').value = '';
       
-      // ✅ حفظ الـ ID وعرض التفاصيل
       if (firstProductId) {
           localStorage.setItem('last_out_product_id', firstProductId);
           detailIframe.src = `/products/detail.html?id=${encodeURIComponent(firstProductId)}`;
