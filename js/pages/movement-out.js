@@ -2,7 +2,6 @@
 // صفحة إخراج منتجات (متعددة) + إيصال بيع
 // ✅ دعم كامل للترجمة
 // ✅ دعم Workspace (تقسيم 3 أقسام)
-// ✅ متوافق مع محرك التنقل السريع (SPA)
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   if (window.__movementOutLoaded) return;
@@ -47,7 +46,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   main.innerHTML = `
     <div class="workspace">
 
-      <!-- ✅ القسم الأول (الحاوية التي سيتم استبدالها ديناميكياً) -->
       <div class="workspace-panel workspace-panel-left">
         <div class="page-header">
           <h2>${tr('mout_title')}</h2>
@@ -132,12 +130,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         </div>
       </div>
 
-      <!-- ✅ القسم الثاني: قائمة المنتجات -->
       <div class="workspace-panel workspace-panel-center">
         <iframe src="/products/list.html" class="workspace-iframe" id="products-list-iframe" title="Products List" loading="lazy" scrolling="yes"></iframe>
       </div>
 
-      <!-- ✅ القسم الثالث: تفاصيل المنتج -->
       <div class="workspace-panel workspace-panel-right">
         <iframe src="about:blank" class="workspace-iframe workspace-iframe-detail" id="product-detail-iframe" title="Product Details" scrolling="yes"></iframe>
       </div>
@@ -358,6 +354,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     const errBox = document.getElementById('form-error'); const successBox = document.getElementById('form-success');
     errBox.style.display = 'none'; successBox.style.display = 'none';
     if (addedProducts.length === 0) { errBox.textContent = tr('prod_add_err_empty'); errBox.style.display = 'block'; isSaving = false; saveBtn.disabled = false; return; }
+    
+    // ✅ حفظ معرف أول منتج لفتح تفاصيله في القسم الثالث
+    const firstProductId = addedProducts[0].id;
+    
     saveBtn.querySelector('span').textContent = tr('prod_add_saving');
     try {
       const { data: { user: authUser } } = await db.auth.getUser();
@@ -384,8 +384,18 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
       successBox.textContent = `${tr('mout_success')} ${receiptNumber}`;
       successBox.style.display = 'block';
-      addedProducts.length = 0; renderAddedProducts(); document.getElementById('note').value = '';
-      setTimeout(() => { window.location.href = `/receipt.html?id=${newReceipt.id}`; }, 1200);
+      
+      addedProducts.length = 0; 
+      renderAddedProducts(); 
+      document.getElementById('note').value = '';
+      
+      // ✅ التعديل: عرض تفاصيل أول منتج تم إخراجه في القسم الثالث فوراً
+      if (firstProductId) {
+          detailIframe.src = `/products/detail.html?id=${encodeURIComponent(firstProductId)}`;
+      }
+      
+      // تم إلغاء الانتقال التلقائي للإيصال ليبقى المستخدم في الشاشة الحالية
+
     } catch (error) {
       errBox.textContent = error.message; errBox.style.display = 'block';
       saveBtn.disabled = false; saveBtn.querySelector('span').textContent = tr('mout_save'); isSaving = false;
