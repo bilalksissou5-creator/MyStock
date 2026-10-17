@@ -132,7 +132,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const detailIframe = document.getElementById('product-detail-iframe');
   const listIframe = document.getElementById('products-list-iframe');
 
-  // ✅ التعديل الجديد: إخفاء الزر وضبط المسافات في الشاشات الكبيرة فقط
+  // ✅ الحل: رفع شريط البحث فقط في الشاشات الكبيرة
   listIframe.addEventListener('load', () => {
     try {
       const iframeDoc = listIframe.contentDocument || listIframe.contentWindow.document;
@@ -141,10 +141,17 @@ document.addEventListener('DOMContentLoaded', async () => {
         style.innerHTML = `
           .page-header a[href="add.html"] { display: none !important; }
           
-          /* تطبيق رفع شريط البحث فقط على الشاشات الكبيرة */
+          /* في الشاشات الكبيرة فقط: رفع شريط البحث ليحاذي العنوان */
           @media (min-width: 1024px) {
             .main { padding-top: 0 !important; }
-            .page-header { margin-top: 0 !important; padding-top: 0 !important; }
+            .search-bar { 
+              margin-top: -48px !important; 
+              position: relative;
+              z-index: 10;
+            }
+            .page-header { 
+              margin-bottom: 48px !important; 
+            }
           }
         `;
         iframeDoc.head.appendChild(style);
