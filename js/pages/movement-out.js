@@ -1,8 +1,5 @@
 // ============================================
 // صفحة إخراج منتجات (متعددة) + إيصال بيع
-// ✅ دعم كامل للترجمة
-// ✅ دعم Workspace (تقسيم 3 أقسام)
-// ✅ عرض آخر منتج تم إخراجه حتى بعد إعادة التحميل
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   if (window.__movementOutLoaded) return;
@@ -20,11 +17,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   const main = document.getElementById('main-content');
 
-  const { data: profile } = await db
-    .from('profiles')
-    .select('organization_id')
-    .eq('id', user.id)
-    .single();
+  const { data: profile } = await db.from('profiles').select('organization_id').eq('id', user.id).single();
 
   function getSellingPrice(product) {
     const sellPrice = Number(product.sell_price ?? 0);
@@ -34,10 +27,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     return basePrice;
   }
 
-  const { data: products, error: productsError } = await db
-    .from('products')
-    .select('*')
-    .order('name');
+  const { data: products, error: productsError } = await db.from('products').select('*').order('name');
 
   if (productsError) {
     main.innerHTML = `<div class="alert alert-error"><strong>${tr('mout_load_err')}</strong><br><small>${productsError.message}</small></div>`;
@@ -136,9 +126,19 @@ document.addEventListener('DOMContentLoaded', async () => {
       const iframeDoc = listIframe.contentDocument || listIframe.contentWindow.document;
       if (iframeDoc) {
         const style = iframeDoc.createElement('style');
-        style.innerHTML = `
-          .page-header .btn-primary { display: none !important; }
-        `;
+        style.innerHTML = `.page-header a[href="add.html"] { display: none !important; }`;
+        iframeDoc.head.appendChild(style);
+      }
+    } catch (e) { console.warn('iframe access error', e); }
+  });
+
+  // ✅ تنسيق iframe التفاصيل (القسم الثالث)
+  detailIframe.addEventListener('load', () => {
+    try {
+      const iframeDoc = detailIframe.contentDocument || detailIframe.contentWindow.document;
+      if (iframeDoc) {
+        const style = iframeDoc.createElement('style');
+        style.innerHTML = `html, body { height: 100% !important; overflow: hidden !important; } .app { height: 100vh !important; overflow: hidden !important; } .body { height: calc(100vh - 60px) !important; overflow: hidden !important; } .main { height: 100% !important; overflow-y: auto !important; padding: 16px !important; padding-bottom: 60px !important; }`;
         iframeDoc.head.appendChild(style);
       }
     } catch (e) { console.warn('iframe access error', e); }
@@ -149,17 +149,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (lastOutProductId) {
     detailIframe.src = `/products/detail.html?id=${encodeURIComponent(lastOutProductId)}`;
   }
-
-  detailIframe.addEventListener('load', () => {
-    try {
-      const iframeDoc = detailIframe.contentDocument || detailIframe.contentWindow.document;
-      if (iframeDoc) {
-        const style = iframeDoc.createElement('style');
-        style.innerHTML = `html, body { height: 100% !important; overflow: hidden !important; } .app { height: 100vh !important; overflow: hidden !important; } .body { height: calc(100vh - 60px) !important; overflow: hidden !important; } .main { height: 100% !important; overflow-y: auto !important; padding-bottom: 60px !important; }`;
-        iframeDoc.head.appendChild(style);
-      }
-    } catch (e) { console.warn('iframe access error', e); }
-  });
 
   window.addEventListener('message', (event) => {
     const data = event.data;

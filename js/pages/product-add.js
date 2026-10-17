@@ -127,15 +127,13 @@ document.addEventListener('DOMContentLoaded', async () => {
   const detailIframe = document.getElementById('product-detail-iframe');
   const listIframe = document.getElementById('products-list-iframe');
 
-  // ✅ كود بسيط: إخفاء زر الإضافة وتوحيد العناوين
+  // ✅ كود بسيط: إخفاء زر الإضافة فقط
   listIframe.addEventListener('load', () => {
     try {
       const iframeDoc = listIframe.contentDocument || listIframe.contentWindow.document;
       if (iframeDoc) {
         const style = iframeDoc.createElement('style');
-        style.innerHTML = `
-          .page-header a[href="add.html"] { display: none !important; }
-        `;
+        style.innerHTML = `.page-header a[href="add.html"] { display: none !important; }`;
         iframeDoc.head.appendChild(style);
       }
     } catch (e) { console.warn('iframe access error', e); }

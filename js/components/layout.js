@@ -1,6 +1,5 @@
 // ============================================
 // الهيكل المشترك (Header + Sidebar)
-// ✅ محرك تبديل الأقسام (Panel Switcher)
 // ============================================
 
 const ALLOWED_PAGES = [
@@ -37,6 +36,7 @@ if (document.readyState === 'loading') document.addEventListener('DOMContentLoad
 else autoCheckPaymentBlock();
 
 function renderLayout(activePage) {
+  // ✅ إذا كنا داخل iframe، لا نبني الهيدر والسايدبار ونضيف كلاس in-iframe
   if (window.self !== window.top) {
     document.documentElement.classList.add('in-iframe');
     const app = document.querySelector('.app');
@@ -58,7 +58,7 @@ function renderLayout(activePage) {
   ];
 
   const navHTML = navItems.map(item => `
-    <a href="${item.href}" class="nav-item ${activePage === item.href ? 'active' : ''}" data-nav="${item.href}">
+    <a href="${item.href}" class="nav-item ${activePage === item.href ? 'active' : ''}">
       <i class="fas ${item.icon}"></i>
       <span>${item.label}</span>
     </a>
@@ -75,7 +75,7 @@ function renderLayout(activePage) {
       <aside class="sidebar" id="app-sidebar">
         <nav class="nav">${navHTML}</nav>
         <div class="sidebar-footer">
-          <a href="/profile.html" class="nav-item ${activePage === '/profile.html' ? 'active' : ''}" data-nav="/profile.html"><i class="fas fa-user"></i><span>${tr('nav_profile')}</span></a>
+          <a href="/profile.html" class="nav-item ${activePage === '/profile.html' ? 'active' : ''}"><i class="fas fa-user"></i><span>${tr('nav_profile')}</span></a>
           <button class="nav-item logout" id="logout-btn"><i class="fas fa-right-from-bracket"></i><span>${tr('nav_logout')}</span></button>
         </div>
       </aside>
@@ -85,28 +85,6 @@ function renderLayout(activePage) {
 
   const app = document.querySelector('.app');
   if (app) app.innerHTML = layout;
-
-  // ✅ محرك التنقل السريع: تغيير iframe القسم الأول فقط
-  document.querySelectorAll('.nav-item[data-nav]').forEach(link => {
-    link.addEventListener('click', (e) => {
-      const target = link.dataset.nav;
-      const isAdd = activePage === '/products/add.html';
-      const isOut = activePage === '/movements/out.html';
-      const goingToOut = target === '/movements/out.html';
-      const goingToAdd = target === '/products/add.html';
-
-      if ((isAdd || isOut) && (goingToOut || goingToAdd)) {
-        e.preventDefault();
-        const panelIframe = document.getElementById('panel-left-iframe');
-        if (panelIframe) {
-          panelIframe.src = target;
-          window.history.pushState({}, '', target);
-          document.querySelectorAll('.nav-item[data-nav]').forEach(l => l.classList.remove('active'));
-          link.classList.add('active');
-        }
-      }
-    });
-  });
 
   document.querySelectorAll('.logout').forEach(b => {
     b.addEventListener('click', async (e) => {

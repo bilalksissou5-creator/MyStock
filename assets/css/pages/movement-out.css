@@ -1,15 +1,6 @@
-
 /* ============================================
    صفحة إخراج منتجات (متعددة)
    ============================================ */
-
-/* ✅ السر هنا: إجبار كل العناصر على البقاء داخل حدودها */
-.workspace-panel-left, 
-.workspace-panel-left * {
-  max-width: 100% !important;
-  box-sizing: border-box !important;
-  min-width: 0 !important;
-}
 
 .out-form { max-width: 800px; margin: 0 auto; display: flex; flex-direction: column; gap: 16px; }
 .product-input-card { background: white; border-radius: 10px; padding: 16px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06); }
@@ -67,10 +58,6 @@
 .scanner-reader video { border-radius: 12px; width: 100% !important; height: auto !important; }
 .scanner-hint { color: #a3a3a3; font-size: 13px; text-align: center; margin: 0; }
 
-/* ============================================
-   ✅ Workspace
-   ============================================ */
-
 .workspace { display: flex; flex-direction: column; gap: 16px; }
 .workspace-panel { min-width: 0; display: flex; flex-direction: column; }
 .workspace-panel-center, .workspace-panel-right { display: none; }
@@ -78,8 +65,7 @@
 
 @media (min-width: 769px) and (orientation: landscape), (min-width: 1024px) {
   .main { padding: 16px !important; height: calc(100vh - 60px) !important; max-height: calc(100dvh - 60px) !important; overflow: hidden !important; display: flex !important; flex-direction: column !important; box-sizing: border-box !important; }
-  /* ✅ تثبيت عرض القسم الأول بـ 320 بكسل فقط */
-  .workspace { display: grid; grid-template-columns: 320px minmax(0, 1fr) 380px; gap: 16px; flex: 1; min-height: 0; width: 100%; height: 100%; }
+  .workspace { display: grid; grid-template-columns: 320px minmax(0, 1fr) 380px; gap: 16px; flex: 1; min-height: 0; width: 100%; height: 100%; align-items: start; }
   .workspace-panel-center, .workspace-panel-right { display: flex; min-width: 0; height: 100%; }
   .workspace-panel-left { grid-column: 1; height: 100%; overflow-y: auto !important; overflow-x: hidden; padding-inline-end: 6px; padding-bottom: 60px; }
   .workspace-panel-center { grid-column: 2; overflow: hidden; }
@@ -90,6 +76,14 @@
   .workspace-panel-left::-webkit-scrollbar-thumb { background: #d4d4d4; border-radius: 4px; }
 }
 
+@media (min-width: 769px) and (max-width: 1023px) and (orientation: landscape) {
+  .workspace { grid-template-columns: 28% minmax(0, 1fr) 28%; }
+}
+
+@media (min-width: 1536px) {
+  .workspace { grid-template-columns: 22% minmax(0, 1fr) 22%; gap: 20px; }
+}
+
 html.in-iframe .main { padding: 0 !important; height: 100% !important; overflow-y: auto !important; }
 
 @media (max-width: 1023px) {
@@ -97,8 +91,4 @@ html.in-iframe .main { padding: 0 !important; height: 100% !important; overflow-
   .workspace-panel-left { display: block !important; width: 100%; }
   .main { padding: 12px !important; height: auto !important; overflow-y: auto !important; }
   .workspace { display: flex; flex-direction: column; }
-}
-/* ✅ إخفاء زر إضافة منتج في القسم الثاني */
-.workspace-panel-center .btn-primary {
-  display: none !important;
 }
