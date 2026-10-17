@@ -112,27 +112,30 @@
     display: none !important;
   }
 
-  /* جعل العنوان والبحث في سطر واحد */
+  /* تحويل الحاوية إلى flex */
   html.in-iframe .page-header {
     display: flex !important;
     flex-direction: row !important;
     align-items: center !important;
-    justify-content: space-between !important;
+    /* ✅ التعديل: البدء من البداية بدلاً من space-between لجعل العنوان في أقصى اليمين/اليسار */
+    justify-content: flex-start !important; 
     margin-bottom: 16px !important;
     width: 100% !important;
     gap: 20px !important;
   }
 
+  /* تنسيق العنوان ليتطابق مع العناوين الأخرى */
   html.in-iframe .page-header h2 {
     margin: 0 !important;
-    font-size: 1.5rem !important;
+    font-size: 1.5rem !important; /* نفس حجم عناوين الأقسام الأخرى */
+    font-weight: 700 !important;
     white-space: nowrap !important;
   }
 
-  /* ✅ التعديل: جعل شريط البحث يأخذ عرضاً أكبر (أو 100%) */
+  /* شريط البحث يأخذ المساحة المتبقية */
   html.in-iframe .page-header .search-bar {
     margin: 0 !important;
-    flex: 1 !important;
-    max-width: 100% !important; /* هنا نزيل الحد الأقصى ليأخذ كل المساحة */
+    flex: 1 !important; 
+    max-width: 100% !important; 
   }
 }
