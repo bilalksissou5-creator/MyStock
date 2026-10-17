@@ -42,7 +42,8 @@
     justify-content: flex-start !important; 
     width: 100% !important;
     gap: 20px !important;
-    margin-top: 0 !important; 
+    /* ✅ التعديل الوحيد: سحب العنوان للأعلى ليتوازى مع القسم الأول */
+    margin-top: -15px !important; 
     margin-bottom: 16px !important;
     padding-top: 0 !important;
   }
