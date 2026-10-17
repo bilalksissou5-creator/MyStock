@@ -236,7 +236,7 @@ button { font-family: inherit; }
   flex: 1 1 auto;
   overflow-y: auto;
   overflow-x: hidden;
-  padding: 24px;
+  padding: 16px; /* ✅ تعديل: توحيد المسافة العلوية لكل الصفحات */
   padding-bottom: 80px;
   min-height: 0;
   min-width: 0;
@@ -248,8 +248,8 @@ button { font-family: inherit; }
    ✅ عند العمل داخل iframe → إزالة padding
    ============================================ */
 html.in-iframe .main {
-  padding: 0 !important;
-  padding-bottom: 0 !important;
+  padding: 16px !important; /* ✅ الحفاظ على مسافة موحدة داخل الإطار */
+  padding-bottom: 16px !important;
   height: 100% !important;
   overflow-y: auto !important;
 }
@@ -517,12 +517,4 @@ html.in-iframe .main {
   .sidebar-footer .nav-item { padding: 6px 10px; font-size: 12px; }
   .sidebar-footer .nav-item i { font-size: 14px; }
   .main { padding: 12px; padding-bottom: 40px; }
-}
-
-/* ============================================
-   ✅ منع تمدد الحقول (إصلاح مشكلة المسح)
-   ============================================ */
-input, select, textarea {
-  max-width: 100% !important;
-  box-sizing: border-box !important;
 }

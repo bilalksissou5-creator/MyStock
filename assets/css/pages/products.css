@@ -1,24 +1,141 @@
-.products { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; }
-.product-card { background: white; border-radius: 10px; padding: 12px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06); display: block; text-decoration: none; color: inherit; overflow: hidden; transition: box-shadow 0.15s; }
-.product-card:hover { box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); }
-.product-card-image { width: 100%; height: 140px; background: #fafafa; border-radius: 8px; display: flex; align-items: center; justify-content: center; overflow: hidden; margin-bottom: 12px; }
-.product-card-image img { width: 100%; height: 100%; object-fit: cover; display: block; }
-.product-card-image i { font-size: 2.5rem; color: #d4d4d4; }
-.product-card h3 { font-size: 1rem; font-weight: 600; margin-bottom: 6px; }
-.product-card .sku { font-size: 12px; color: #737373; margin-bottom: 12px; }
-.product-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; text-align: center; }
-.stat { background: #fafafa; border-radius: 6px; padding: 8px 4px; }
-.stat-label { font-size: 11px; color: #737373; margin-bottom: 4px; }
-.stat-value { font-size: 14px; font-weight: 600; }
-.stat-value.low { color: #dc2626; }
-@media (max-width: 768px) { .products { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; } .product-card { padding: 10px; } .product-card-image { height: 110px; } .product-card h3 { font-size: 0.9rem; } .stat { padding: 6px 2px; } .stat-label { font-size: 10px; } .stat-value { font-size: 12px; } }
+/* ============================================
+   صفحة المنتجات
+   ============================================ */
+
+.products {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+.product-card {
+  background: white;
+  border-radius: 10px;
+  padding: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  overflow: hidden;
+  transition: box-shadow 0.15s;
+}
+
+.product-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.product-card-image {
+  width: 100%;
+  height: 140px;
+  background: #fafafa;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  margin-bottom: 12px;
+}
+
+.product-card-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.product-card-image i {
+  font-size: 2.5rem;
+  color: #d4d4d4;
+}
+
+.product-card h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.product-card .sku {
+  font-size: 12px;
+  color: #737373;
+  margin-bottom: 12px;
+}
+
+.product-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+  text-align: center;
+}
+
+.stat {
+  background: #fafafa;
+  border-radius: 6px;
+  padding: 8px 4px;
+}
+
+.stat-label {
+  font-size: 11px;
+  color: #737373;
+  margin-bottom: 4px;
+}
+
+.stat-value {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.stat-value.low {
+  color: #dc2626;
+}
+
+@media (max-width: 768px) {
+  .products {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 10px;
+  }
+  .product-card { padding: 10px; }
+  .product-card-image { height: 110px; }
+  .product-card h3 { font-size: 0.9rem; }
+  .stat { padding: 6px 2px; }
+  .stat-label { font-size: 10px; }
+  .stat-value { font-size: 12px; }
+}
+
+/* ============================================
+   ✅ التنسيق الخاص بالقسم الثاني فقط (داخل iframe)
+   ============================================ */
 
 @media (min-width: 1024px) {
-  /* ✅ إلغاء المسافة العلوية داخل iframe ليتوازى مع القسم الأول */
-  html.in-iframe .main { padding-top: 0 !important; }
+  
+  /* إخفاء زر الإضافة */
+  html.in-iframe .page-header a[href="add.html"] {
+    display: none !important;
+  }
 
-  html.in-iframe .page-header a[href="add.html"] { display: none !important; }
-  html.in-iframe .page-header { display: flex !important; flex-direction: row !important; align-items: center !important; justify-content: flex-start !important; width: 100% !important; gap: 20px !important; margin-top: 0 !important; margin-bottom: 16px !important; }
-  html.in-iframe .page-header h2 { margin: 0 !important; font-size: 1.5rem !important; font-weight: 700 !important; white-space: nowrap !important; }
-  html.in-iframe .page-header .search-bar { margin: 0 !important; flex: 1 !important; max-width: 100% !important; }
+  /* جعل العنوان والبحث في سطر واحد وبنفس مستوى القسم الأول */
+  html.in-iframe .page-header {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: flex-start !important; 
+    width: 100% !important;
+    gap: 20px !important;
+    margin-top: 0 !important; 
+    margin-bottom: 16px !important;
+  }
+
+  /* تنسيق العنوان ليتطابق مع العناوين الأخرى */
+  html.in-iframe .page-header h2 {
+    margin: 0 !important;
+    font-size: 1.75rem !important; /* نفس حجم عنوان القسم الأول */
+    font-weight: 700 !important;
+    white-space: nowrap !important;
+  }
+
+  /* شريط البحث يأخذ المساحة المتبقية */
+  html.in-iframe .page-header .search-bar {
+    margin: 0 !important;
+    flex: 1 !important; 
+    max-width: 100% !important; 
+  }
 }
