@@ -1,7 +1,7 @@
 // ============================================
 // صفحة إضافة منتجات
 // ✅ دعم كامل للترجمة
-// ✅ دعم Workspace (تقسيم 3 أقسام)
+// ✅ دعم Workspace (تقسيم 3 أقسام + تفاصيل المنتج)
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   if (window.__productAddLoaded) return;
@@ -130,16 +130,22 @@ document.addEventListener('DOMContentLoaded', async () => {
         <iframe
           src="/products/list.html"
           class="workspace-iframe"
+          id="products-list-iframe"
           title="Products List"
           loading="lazy"
         ></iframe>
       </div>
 
       <!-- ═══════════════════════════════════════
-           القسم الثالث (30%): تفاصيل المنتج (فارغ مؤقتًا)
+           القسم الثالث (30%): تفاصيل المنتج (iframe)
            ═══════════════════════════════════════ -->
       <div class="workspace-panel workspace-panel-right">
-        <!-- سيتم إضافة iframe التفاصيل لاحقًا -->
+        <iframe
+          src="about:blank"
+          class="workspace-iframe workspace-iframe-detail"
+          id="product-detail-iframe"
+          title="Product Details"
+        ></iframe>
       </div>
 
     </div>
@@ -175,12 +181,36 @@ document.addEventListener('DOMContentLoaded', async () => {
   const scannerReader = document.getElementById('scanner-reader');
   const scannerClose = document.getElementById('scanner-close');
   const scannerHint = document.getElementById('scanner-hint');
+  const detailIframe = document.getElementById('product-detail-iframe');
+  const listIframe = document.getElementById('products-list-iframe');
 
   let selectedSupplier = null;
   let isAddingProduct = false;
   let isSaving = false;
   let html5QrCode = null;
   let scannedImageUrl = null;
+
+  // ✅✅✅ Workspace: تغيير iframe التفاصيل
+  function showProductDetails(productId) {
+    if (!productId) return;
+    detailIframe.src = `/products/detail.html?id=${encodeURIComponent(productId)}`;
+  }
+
+  // ✅✅✅ Workspace: الاستماع لرسائل iframe القائمة
+  window.addEventListener('message', (event) => {
+    const data = event.data;
+    if (!data || typeof data !== 'object') return;
+
+    if (data.type === 'PRODUCT_SELECTED' && data.productId) {
+      showProductDetails(data.productId);
+    }
+
+    if (data.type === 'PRODUCT_DELETED') {
+      // إعادة تحميل iframe القائمة + تفريغ iframe التفاصيل
+      if (listIframe) listIframe.src = listIframe.src;
+      detailIframe.src = 'about:blank';
+    }
+  });
 
   // ============================================
   // اقتراحات المورد
@@ -526,6 +556,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     renderAddedProducts();
 
+    // ✅✅✅ عرض التفاصيل في القسم الثالث (بعد الحفظ فقط)
+    // ملاحظة: المنتج الجديد ليس له ID بعد، لذا لا يمكن عرض تفاصيله مباشرة
+    // سيظهر بعد الحفظ في القائمة
+
     setTimeout(() => {
       isAddingProduct = false;
       doneBtn.disabled = false;
@@ -746,12 +780,16 @@ document.addEventListener('DOMContentLoaded', async () => {
       supplierInput.dataset.isNew = 'false';
       supplierIdInput.value = finalSupplierId || '';
 
+      // ✅✅✅ إعادة تحميل iframe القائمة بعد الحفظ
+      if (listIframe) listIframe.src = listIframe.src;
+
       successBox.textContent = `${tr('prod_add_new_count')} ${insertedCount} | ${tr('prod_add_upd_count')} ${updatedCount} | ${tr('prod_add_invoice_count')} ${invoiceNumber}`;
       successBox.style.display = 'block';
 
-      setTimeout(() => {
-        window.location.replace(`/invoice.html?id=${encodeURIComponent(invoiceNumber)}`);
-      }, 1500);
+      // ❌ تم إلغاء الانتقال التلقائي إلى الفاتورة (حتى لا يفسد Workspace)
+      // setTimeout(() => {
+      //   window.location.replace(`/invoice.html?id=${encodeURIComponent(invoiceNumber)}`);
+      // }, 1500);
 
     } catch (error) {
       errBox.textContent = error.message;

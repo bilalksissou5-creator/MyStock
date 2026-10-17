@@ -1,6 +1,7 @@
 // ============================================
 // صفحة المنتجات
 // ✅ دعم كامل للترجمة
+// ✅ دعم Workspace (postMessage)
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   const user = await requireAuth();
@@ -11,7 +12,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (window.applyLanguage) window.applyLanguage();
   const tr = (key) => (window.t ? window.t(key) : key);
 
-  // ✅ تحديث عنوان الصفحة
   document.title = tr('products_title_full');
 
   const main = document.getElementById('main-content');
@@ -95,7 +95,7 @@ async function loadProducts() {
     const lowClass = (p.qty ?? 0) < 10 ? 'low' : '';
 
     return `
-      <a href="detail.html?id=${p.id}" class="product-card">
+      <a href="detail.html?id=${p.id}" class="product-card" data-product-id="${p.id}">
         <div class="product-card-image">
           ${p.image_url
             ? `<img src="${p.image_url}" alt="${p.name}">`
@@ -120,4 +120,19 @@ async function loadProducts() {
       </a>
     `;
   }).join('');
+
+  // ✅ إذا كنا داخل iframe → اعترض النقر وأرسل رسالة للأم
+  if (window.self !== window.top) {
+    document.querySelectorAll('.product-card').forEach(card => {
+      card.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const productId = card.dataset.productId;
+        window.parent.postMessage({
+          type: 'PRODUCT_SELECTED',
+          productId: productId
+        }, '*');
+      });
+    });
+  }
 }

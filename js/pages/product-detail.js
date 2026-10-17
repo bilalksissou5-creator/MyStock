@@ -2,6 +2,7 @@
 // صفحة تفاصيل المنتج
 // ✅ قسم سعر البيع (Switch + قيمة)
 // ✅ دعم كامل للترجمة
+// ✅ دعم Workspace (iframe mode)
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   const user = await requireAuth();
@@ -13,6 +14,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   const tr = (key) => (window.t ? window.t(key) : key);
 
   document.title = tr('prod_detail_title_full');
+
+  const isInIframe = window.self !== window.top;
 
   const params = new URLSearchParams(window.location.search);
   const productId = params.get('id');
@@ -54,13 +57,18 @@ document.addEventListener('DOMContentLoaded', async () => {
   const sellPrice = Number(product.sell_price ?? 0);
   const sellPriceEnabled = product.sell_price_enabled === true;
 
+  // ✅ إخفاء زر "رجوع" عند العمل داخل iframe
+  const backButtonHTML = isInIframe
+    ? ''
+    : `<a href="list.html" class="btn-secondary">
+         <i class="fas fa-arrow-right"></i>
+         <span>${tr('prod_detail_back')}</span>
+       </a>`;
+
   main.innerHTML = `
     <div class="page-header">
       <h2>${tr('prod_detail_title')}</h2>
-      <a href="list.html" class="btn-secondary">
-        <i class="fas fa-arrow-right"></i>
-        <span>${tr('prod_detail_back')}</span>
-      </a>
+      ${backButtonHTML}
     </div>
 
     <div class="product-card-detail">
@@ -302,6 +310,11 @@ document.addEventListener('DOMContentLoaded', async () => {
       });
     }
 
-    window.location.href = 'list.html';
+    // ✅ إذا كنا داخل iframe → أخبر الأم ليحدّث القائمة
+    if (isInIframe) {
+      window.parent.postMessage({ type: 'PRODUCT_DELETED' }, '*');
+    } else {
+      window.location.href = 'list.html';
+    }
   });
 });
