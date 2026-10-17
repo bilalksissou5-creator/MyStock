@@ -216,15 +216,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   });
 
-  // ✅ الاستماع لتغيير الصفحة في القسم الأول (من layout.js)
-  window.addEventListener('changeWorkspacePanel', (e) => {
-    if (e.detail === '/products/add.html') {
-      window.location.href = '/products/add.html';
-    } else if (e.detail === '/movements/out.html') {
-      window.location.href = '/movements/out.html';
-    }
-  });
-
   function showSuggestions(filter) {
     const q = filter.trim().toLowerCase();
     if (q.length < 1) {
