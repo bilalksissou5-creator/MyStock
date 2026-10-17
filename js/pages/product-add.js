@@ -1,5 +1,5 @@
 // ============================================
-// صفحة إضافة منتجات
+// صفحة إضافة منتجات (النسخة القاطعة)
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   if (window.__productAddLoaded) return;
@@ -16,7 +16,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   document.title = tr('prod_add_title_full') || 'Add Products';
 
   const main = document.getElementById('main-content');
-
   const { data: suppliers } = await db.from('suppliers').select('*').order('name');
 
   main.innerHTML = `
@@ -127,7 +126,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const detailIframe = document.getElementById('product-detail-iframe');
   const listIframe = document.getElementById('products-list-iframe');
 
-  // ✅ الحل الجذري: حقن CSS لإلغاء المسافات العلوية وإخفاء الزر
+  // ✅ الحل القاطع: إلغاء كل المسافات وفرض الاصطفاف
   listIframe.addEventListener('load', () => {
     try {
       const iframeDoc = listIframe.contentDocument || listIframe.contentWindow.document;
@@ -137,30 +136,34 @@ document.addEventListener('DOMContentLoaded', async () => {
           /* إخفاء زر الإضافة */
           .page-header a[href="add.html"] { display: none !important; }
 
-          /* في الشاشات الكبيرة فقط: توحيد المسافة وجعل العناصر في سطر واحد */
+          /* في الشاشات الكبيرة فقط */
           @media (min-width: 1024px) {
-            /* إلغاء أي مسافة علوية من الحاوية الرئيسية */
-            .main { 
-              padding-top: 0 !important; 
+            /* تصفير كل المسافات العلوية */
+            html, body, .app, .body, .main, .page-header {
+              margin-top: 0 !important;
+              padding-top: 0 !important;
             }
 
-            /* جعل العنوان والبحث في سطر واحد */
+            .main {
+              padding: 16px !important; /* مسافة موحدة */
+            }
+
             .page-header {
               display: flex !important;
               flex-direction: row !important;
               align-items: center !important;
               justify-content: flex-start !important;
-              margin-top: 0 !important;
-              margin-bottom: 16px !important;
-              padding-top: 0 !important;
-              width: 100% !important;
               gap: 20px !important;
+              width: 100% !important;
+              height: 44px !important; /* ارتفاع ثابت ليتساوى مع القسم الأول */
+              margin-bottom: 16px !important;
             }
 
             .page-header h2 {
               margin: 0 !important;
-              font-size: 1.5rem !important;
+              font-size: 1.75rem !important;
               font-weight: 700 !important;
+              line-height: 1 !important;
               white-space: nowrap !important;
             }
 
@@ -181,7 +184,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       const iframeDoc = detailIframe.contentDocument || detailIframe.contentWindow.document;
       if (iframeDoc) {
         const style = iframeDoc.createElement('style');
-        style.innerHTML = `html, body { height: 100% !important; overflow: hidden !important; } .app { height: 100vh !important; overflow: hidden !important; } .body { height: calc(100vh - 60px) !important; overflow: hidden !important; } .main { height: 100% !important; overflow-y: auto !important; padding-bottom: 60px !important; }`;
+        style.innerHTML = `html, body { height: 100% !important; overflow: hidden !important; } .app { height: 100vh !important; overflow: hidden !important; } .body { height: calc(100vh - 60px) !important; overflow: hidden !important; } .main { height: 100% !important; overflow-y: auto !important; padding: 16px !important; padding-bottom: 60px !important; }`;
         iframeDoc.head.appendChild(style);
       }
     } catch (e) { console.warn('iframe access error', e); }
