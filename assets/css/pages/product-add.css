@@ -1,7 +1,3 @@
-/* ============================================
-   صفحة إضافة منتجات
-   ============================================ */
-
 .add-form { max-width: 800px; margin: 0 auto; display: flex; flex-direction: column; gap: 16px; }
 .product-input-card { background: white; border-radius: 10px; padding: 16px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06); }
 .product-input-card .form-grid { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 12px; margin-bottom: 12px; }
@@ -68,15 +64,8 @@
   .main { padding: 16px !important; height: calc(100vh - 60px) !important; max-height: calc(100dvh - 60px) !important; overflow: hidden !important; display: flex !important; flex-direction: column !important; box-sizing: border-box !important; }
   .workspace { display: grid; grid-template-columns: 320px minmax(0, 1fr) 380px; gap: 16px; flex: 1; min-height: 0; width: 100%; height: 100%; align-items: start; }
   .workspace-panel-center, .workspace-panel-right { display: flex; min-width: 0; height: 100%; }
-  .workspace-panel-left { grid-column: 1; height: 100%; overflow-y: auto !important; overflow-x: hidden; padding-inline-end: 6px; padding-bottom: 60px; }
-  
-  /* ✅ الحل الجذري: سحب القسم الثاني للأعلى ليتساوى مع القسم الأول */
-  .workspace-panel-center { 
-    grid-column: 2; 
-    overflow: hidden; 
-    margin-top: -16px; /* سحب الـ iframe للأعلى */
-  }
-  
+  .workspace-panel-left { grid-column: 1; height: 100%; overflow-y: auto !important; overflow-x: hidden; padding-inline-end: 6px; padding-bottom: 60px; padding-top: 0 !important; }
+  .workspace-panel-center { grid-column: 2; overflow: hidden; }
   .workspace-panel-right { grid-column: 3; overflow: hidden; position: relative; border-radius: 10px; display: flex; align-items: stretch; }
   .workspace-iframe { width: 100% !important; height: 100% !important; border: none; display: block; }
   .workspace-iframe-detail { width: 99% !important; height: 100% !important; }
