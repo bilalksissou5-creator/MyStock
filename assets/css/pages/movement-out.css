@@ -1,3 +1,4 @@
+
 /* ============================================
    صفحة إخراج منتجات (متعددة)
    ============================================ */
@@ -96,4 +97,8 @@ html.in-iframe .main { padding: 0 !important; height: 100% !important; overflow-
   .workspace-panel-left { display: block !important; width: 100%; }
   .main { padding: 12px !important; height: auto !important; overflow-y: auto !important; }
   .workspace { display: flex; flex-direction: column; }
+}
+/* ✅ إخفاء زر إضافة منتج في القسم الثاني */
+.workspace-panel-center .btn-primary {
+  display: none !important;
 }

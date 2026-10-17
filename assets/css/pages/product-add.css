@@ -395,3 +395,7 @@ html.in-iframe .main { padding: 0 !important; height: 100% !important; overflow-
   .scanner-box { padding: 16px; }
   .scanner-reader { min-height: 250px; }
 }
+/* ✅ إخفاء زر إضافة منتج في القسم الثاني */
+.workspace-panel-center .btn-primary {
+  display: none !important;
+}
