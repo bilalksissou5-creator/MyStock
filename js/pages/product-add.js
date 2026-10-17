@@ -132,7 +132,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const detailIframe = document.getElementById('product-detail-iframe');
   const listIframe = document.getElementById('products-list-iframe');
 
-  // ✅ الحل: جعل العنوان وحقل البحث في سطر واحد في الشاشات الكبيرة
+  // ✅ الحل: إخفاء زر الإضافة، وجعل العنوان وحقل البحث في سطر واحد (العنوان يمين والبحث يسار)
   listIframe.addEventListener('load', () => {
     try {
       const iframeDoc = listIframe.contentDocument || listIframe.contentWindow.document;
@@ -141,13 +141,17 @@ document.addEventListener('DOMContentLoaded', async () => {
         style.innerHTML = `
           .page-header a[href="add.html"] { display: none !important; }
           
-          /* في الشاشات الكبيرة فقط: العنوان والبحث في صف واحد */
+          /* في الشاشات الكبيرة فقط: العنوان والبحث في سطر واحد */
           @media (min-width: 1024px) {
             .page-header {
               display: flex !important;
               align-items: center !important;
               justify-content: space-between !important;
               margin-bottom: 16px !important;
+            }
+            .page-header h2 {
+              margin: 0 !important;
+              font-size: 1.75rem !important;
             }
             .search-bar {
               margin: 0 !important;
