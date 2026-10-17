@@ -142,7 +142,7 @@ if (document.readyState === 'loading') {
 // renderLayout
 // ============================================
 function renderLayout(activePage) {
-  // ✅✅✅ إذا كانت الصفحة داخل iframe → اعرض Main فقط + أضف كلاس in-iframe
+  // ✅ إذا كانت الصفحة داخل iframe → اعرض Main فقط + أضف كلاس in-iframe
   if (window.self !== window.top) {
     document.documentElement.classList.add('in-iframe');
     const app = document.querySelector('.app');
@@ -151,7 +151,6 @@ function renderLayout(activePage) {
     }
     return;
   }
-  // ✅✅✅ نهاية التعديل
 
   const tr = (key) => (window.t ? window.t(key) : key);
 
@@ -168,7 +167,7 @@ function renderLayout(activePage) {
   ];
 
   const navHTML = navItems.map(item => `
-    <a href="${item.href}" class="nav-item ${activePage === item.href ? 'active' : ''}">
+    <a href="${item.href}" class="nav-item ${activePage === item.href ? 'active' : ''}" data-nav="${item.href}">
       <i class="fas ${item.icon}"></i>
       <span>${item.label}</span>
     </a>
@@ -197,7 +196,7 @@ function renderLayout(activePage) {
         </nav>
 
         <div class="sidebar-footer">
-          <a href="/profile.html" class="nav-item ${activePage === '/profile.html' ? 'active' : ''}">
+          <a href="/profile.html" class="nav-item ${activePage === '/profile.html' ? 'active' : ''}" data-nav="/profile.html">
             <i class="fas fa-user"></i>
             <span>${tr('nav_profile')}</span>
           </a>
@@ -213,6 +212,26 @@ function renderLayout(activePage) {
 
   const app = document.querySelector('.app');
   if (app) app.innerHTML = layout;
+
+  // ✅ التعديل: جعل التنقل بين "إضافة منتج" و "إخراج منتج" لا يُعيد تحميل الصفحة
+  document.querySelectorAll('.nav-item[data-nav]').forEach(link => {
+    link.addEventListener('click', (e) => {
+      const target = link.dataset.nav;
+      
+      // إذا كنا في صفحة الإضافة ونقرنا على الإخراج (والعكس صحيح)
+      if (
+        (activePage === '/products/add.html' && target === '/movements/out.html') ||
+        (activePage === '/movements/out.html' && target === '/products/add.html')
+      ) {
+        e.preventDefault();
+        // إرسال حدث للـ JS الخاص بالصفحة الحالية لتغيير القسم الأول
+        window.dispatchEvent(new CustomEvent('changeWorkspacePanel', { detail: target }));
+      } else {
+        // إذا نقرنا على زر آخر (مثل لوحة التحكم)، نسمح بالانتقال العادي
+        // لا نحتاج لإضافة preventDefault هنا، المتصفح سينتقل تلقائياً
+      }
+    });
+  });
 
   document.querySelectorAll('.logout').forEach(b => {
     b.addEventListener('click', async (e) => {
