@@ -14,25 +14,21 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   const main = document.getElementById('main-content');
   
-  // ✅ الحل: التحقق مما إذا كانت الصفحة داخل iframe
   const isInIframe = window.self !== window.top;
 
-  // زر الإضافة يظهر فقط في الصفحة العادية
   const addButtonHTML = isInIframe 
     ? '' 
     : `<a href="add.html" class="btn-primary"><i class="fas fa-plus"></i><span>${tr('products_add')}</span></a>`;
 
-  // بناء الهيكل: نضع البحث بجانب العنوان داخل حاوية مرنة
+  // ✅ الهيكل السابق الناجح (بدون تغييرات في الترتيب)
   main.innerHTML = `
     <div class="page-header">
-      <div class="header-row">
-        <h2>${tr('products_title')}</h2>
-        <div class="search-bar">
-          <i class="fas fa-search"></i>
-          <input type="text" id="search-products" placeholder="${tr('products_search_ph')}">
-        </div>
-      </div>
+      <h2>${tr('products_title')}</h2>
       ${addButtonHTML}
+      <div class="search-bar">
+        <i class="fas fa-search"></i>
+        <input type="text" id="search-products" placeholder="${tr('products_search_ph')}">
+      </div>
     </div>
 
     <div id="products" class="products">${tr('loading')}</div>

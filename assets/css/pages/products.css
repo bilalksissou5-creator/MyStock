@@ -112,32 +112,27 @@
     display: none !important;
   }
 
-  /* إلغاء الـ flex القديم من page-header */
+  /* جعل العنوان والبحث في سطر واحد */
   html.in-iframe .page-header {
-    display: block !important; 
-  }
-
-  /* تنسيق الصف الجديد الذي يحتوي على العنوان والبحث */
-  html.in-iframe .header-row {
     display: flex !important;
     flex-direction: row !important;
     align-items: center !important;
-    justify-content: flex-start !important; /* البدء من اليمين لليسار */
+    justify-content: space-between !important;
+    margin-bottom: 16px !important;
     width: 100% !important;
     gap: 20px !important;
-    margin-bottom: 16px !important;
   }
 
-  html.in-iframe .header-row h2 {
+  html.in-iframe .page-header h2 {
     margin: 0 !important;
     font-size: 1.5rem !important;
     white-space: nowrap !important;
   }
 
-  /* شريط البحث يأخذ كل المساحة المتبقية */
-  html.in-iframe .header-row .search-bar {
+  /* ✅ التعديل: جعل شريط البحث يأخذ عرضاً أكبر (أو 100%) */
+  html.in-iframe .page-header .search-bar {
     margin: 0 !important;
-    flex: 1 !important; /* يتمدد لملء المساحة */
-    max-width: 90% !important;
+    flex: 1 !important;
+    max-width: 100% !important; /* هنا نزيل الحد الأقصى ليأخذ كل المساحة */
   }
 }
