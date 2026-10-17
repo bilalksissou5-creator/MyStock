@@ -132,12 +132,17 @@ document.addEventListener('DOMContentLoaded', async () => {
   const detailIframe = document.getElementById('product-detail-iframe');
   const listIframe = document.getElementById('products-list-iframe');
 
+  // ✅ التعديل: إخفاء زر الإضافة وضبط المسافات العلوية لرفع شريط البحث
   listIframe.addEventListener('load', () => {
     try {
       const iframeDoc = listIframe.contentDocument || listIframe.contentWindow.document;
       if (iframeDoc) {
         const style = iframeDoc.createElement('style');
-        style.innerHTML = `.page-header a[href="add.html"] { display: none !important; }`;
+        style.innerHTML = `
+          .page-header a[href="add.html"] { display: none !important; }
+          .main { padding-top: 0 !important; }
+          .page-header { margin-top: 0 !important; padding-top: 0 !important; }
+        `;
         iframeDoc.head.appendChild(style);
       }
     } catch (e) { console.warn('iframe access error', e); }
@@ -165,12 +170,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     detailIframe.src = `/products/detail.html?id=${encodeURIComponent(productId)}`;
   }
 
-  // ✅ الحل: تأخير طلب عرض التفاصيل لمدة 500 مللي ثانية لضمان جاهزية الـ iframe
   const lastAddedProductId = localStorage.getItem('last_added_product_id');
   if (lastAddedProductId) {
-    setTimeout(() => {
-      showProductDetails(lastAddedProductId);
-    }, 500);
+    setTimeout(() => { showProductDetails(lastAddedProductId); }, 500);
   }
 
   window.addEventListener('message', (event) => {
