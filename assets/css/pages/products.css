@@ -107,6 +107,11 @@
 
 @media (min-width: 1024px) {
   
+  /* ✅ إلغاء المسافة العلوية الافتراضية للصفحة لتبدأ من نفس مستوى القسم الأول */
+  html.in-iframe .main {
+    padding-top: 0 !important;
+  }
+
   /* إخفاء زر الإضافة */
   html.in-iframe .page-header a[href="add.html"] {
     display: none !important;
@@ -120,12 +125,10 @@
     justify-content: flex-start !important; 
     width: 100% !important;
     gap: 20px !important;
-    /* ✅ الحل السحري: رفع شريط العنوان قليلاً للأعلى ليتوازى مع القسم الأول */
-    margin-top: -4px !important; 
+    margin-top: 0 !important; 
     margin-bottom: 16px !important;
   }
 
-  /* تنسيق العنوان ليتطابق مع العناوين الأخرى */
   html.in-iframe .page-header h2 {
     margin: 0 !important;
     font-size: 1.5rem !important; 
@@ -133,7 +136,6 @@
     white-space: nowrap !important;
   }
 
-  /* شريط البحث يأخذ المساحة المتبقية */
   html.in-iframe .page-header .search-bar {
     margin: 0 !important;
     flex: 1 !important; 
