@@ -132,7 +132,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const detailIframe = document.getElementById('product-detail-iframe');
   const listIframe = document.getElementById('products-list-iframe');
 
-  // ✅ الحل: رفع شريط البحث فقط في الشاشات الكبيرة
+  // ✅ الحل: جعل العنوان وحقل البحث في سطر واحد في الشاشات الكبيرة
   listIframe.addEventListener('load', () => {
     try {
       const iframeDoc = listIframe.contentDocument || listIframe.contentWindow.document;
@@ -141,16 +141,19 @@ document.addEventListener('DOMContentLoaded', async () => {
         style.innerHTML = `
           .page-header a[href="add.html"] { display: none !important; }
           
-          /* في الشاشات الكبيرة فقط: رفع شريط البحث ليحاذي العنوان */
+          /* في الشاشات الكبيرة فقط: العنوان والبحث في صف واحد */
           @media (min-width: 1024px) {
-            .main { padding-top: 0 !important; }
-            .search-bar { 
-              margin-top: -48px !important; 
-              position: relative;
-              z-index: 10;
+            .page-header {
+              display: flex !important;
+              align-items: center !important;
+              justify-content: space-between !important;
+              margin-bottom: 16px !important;
             }
-            .page-header { 
-              margin-bottom: 48px !important; 
+            .search-bar {
+              margin: 0 !important;
+              flex: 1 !important;
+              max-width: 400px !important;
+              margin-inline-start: 20px !important;
             }
           }
         `;
