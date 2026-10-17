@@ -1,5 +1,8 @@
 // ============================================
 // صفحة إخراج منتجات (متعددة) + إيصال بيع
+// ✅ دعم كامل للترجمة
+// ✅ دعم Workspace (تقسيم 3 أقسام)
+// ✅ عرض آخر منتج تم إخراجه حتى بعد إعادة التحميل
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   if (window.__movementOutLoaded) return;
@@ -17,7 +20,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   const main = document.getElementById('main-content');
 
-  const { data: profile } = await db.from('profiles').select('organization_id').eq('id', user.id).single();
+  const { data: profile } = await db
+    .from('profiles')
+    .select('organization_id')
+    .eq('id', user.id)
+    .single();
 
   function getSellingPrice(product) {
     const sellPrice = Number(product.sell_price ?? 0);
@@ -27,7 +34,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     return basePrice;
   }
 
-  const { data: products, error: productsError } = await db.from('products').select('*').order('name');
+  const { data: products, error: productsError } = await db
+    .from('products')
+    .select('*')
+    .order('name');
 
   if (productsError) {
     main.innerHTML = `<div class="alert alert-error"><strong>${tr('mout_load_err')}</strong><br><small>${productsError.message}</small></div>`;
@@ -277,7 +287,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     errBox.style.display = 'none'; successBox.style.display = 'none';
     if (addedProducts.length === 0) { errBox.textContent = tr('prod_add_err_empty'); errBox.style.display = 'block'; isSaving = false; saveBtn.disabled = false; return; }
     
-    const firstProductId = addedProducts[0].id;
+    const firstProductId = addedProducts[0].id; // حفظ الـ ID قبل المسح
     
     saveBtn.querySelector('span').textContent = tr('prod_add_saving');
     try {
@@ -308,12 +318,12 @@ document.addEventListener('DOMContentLoaded', async () => {
       renderAddedProducts(); 
       document.getElementById('note').value = '';
       
-      // ✅ حفظ ID آخر منتج في الذاكرة المحلية ليبقى ظاهراً بعد إعادة التحميل
+      // ✅ حفظ الـ ID وعرض التفاصيل
       if (firstProductId) {
           localStorage.setItem('last_out_product_id', firstProductId);
           detailIframe.src = `/products/detail.html?id=${encodeURIComponent(firstProductId)}`;
       }
-
+      
     } catch (error) {
       errBox.textContent = error.message; errBox.style.display = 'block';
       saveBtn.disabled = false; saveBtn.querySelector('span').textContent = tr('mout_save'); isSaving = false;
