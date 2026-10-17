@@ -444,18 +444,21 @@
 @media (min-width: 769px) and (orientation: landscape),
        (min-width: 1024px) {
 
-  /* نجعل الـ main يملأ الشاشة تحت الهيدر تماماً */
+  /* إصلاح 1: إزالة القيود عن main ليسمح بالتمرير */
   .main {
     padding: 16px !important;
-    padding-bottom: 16px !important;
     height: calc(100vh - 60px) !important;
-    overflow: hidden !important;
+    overflow-y: auto !important; /* يسمح بالتمرير */
+    overflow-x: hidden !important;
   }
 
   .workspace {
     display: grid;
-    height: 100%;
+    grid-template-columns: 20% 50% 30%;
     gap: 16px;
+    /* استخدام height: 100% لملء المساحة المتاحة بدقة */
+    height: 100%; 
+    min-height: calc(100vh - 92px); /* 60px header + 32px padding */
     align-items: stretch;
   }
 
@@ -464,12 +467,15 @@
     display: flex;
   }
 
+  /* إصلاح 2: التمرير المستقل للقسم الأول */
   .workspace-panel-left {
     grid-column: 1;
     height: 100%;
-    overflow-y: auto;
+    overflow-y: auto; 
     overflow-x: hidden;
     padding-inline-end: 6px;
+    /* إضافة padding سفلي حتى لا تختفي الأزرار */
+    padding-bottom: 24px; 
   }
 
   .workspace-panel-center {
@@ -478,12 +484,13 @@
     overflow: hidden;
   }
 
+  /* إصلاح 3: منع القسم الثالث من الخروج عن الشاشة */
   .workspace-panel-right {
     grid-column: 3;
     height: 100%;
-    overflow: hidden;
-    background: transparent;
-    border: none;
+    overflow: hidden; /* إخفاء أي فيضان */
+    width: 100%;      /* التأكد من العرض */
+    min-width: 0;     /* إلغاء أي حد أدنى للعرض */
   }
 
   .workspace-panel-left::-webkit-scrollbar { width: 6px; }
@@ -500,13 +507,6 @@
 @media (min-width: 769px) and (max-width: 1023px) and (orientation: landscape) {
   .workspace {
     grid-template-columns: 25% 45% 30%;
-  }
-}
-
-/* الحاسوب */
-@media (min-width: 1024px) {
-  .workspace {
-    grid-template-columns: 20% 50% 30%;
   }
 }
 
