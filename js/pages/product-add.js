@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (window.applyLanguage) window.applyLanguage();
   const tr = (key) => (window.t ? window.t(key) : key);
 
-  document.title = tr('prod_add_title_full');
+  document.title = tr('prod_add_title_full') || 'Add Products';
 
   const main = document.getElementById('main-content');
 
@@ -29,10 +29,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       <div class="workspace-panel workspace-panel-left">
         <div class="page-header">
-          <h2>${tr('prod_add_title')}</h2>
+          <h2>${tr('prod_add_title') || 'Add Products'}</h2>
           <button type="button" class="btn-primary scan-btn" id="scan-btn">
             <i class="fas fa-barcode"></i>
-            <span>${tr('prod_add_scan')}</span>
+            <span>${tr('prod_add_scan') || 'Scan'}</span>
           </button>
         </div>
 
@@ -42,8 +42,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         <div class="add-form">
           <div class="product-input-card card-supplier">
             <div class="form-group supplier-group">
-              <label>${tr('prod_add_supplier')}</label>
-              <input type="text" id="supplier-input" placeholder="${tr('prod_add_supplier_ph')}" autocomplete="off">
+              <label>${tr('prod_add_supplier') || 'Supplier'}</label>
+              <input type="text" id="supplier-input" placeholder="${tr('prod_add_supplier_ph') || 'Type supplier name...'}" autocomplete="off">
               <div id="supplier-suggestions" class="suggestions-box"></div>
               <input type="hidden" id="supplier_id">
             </div>
@@ -52,56 +52,56 @@ document.addEventListener('DOMContentLoaded', async () => {
           <div class="product-input-card card-fields">
             <div class="form-grid">
               <div class="form-group">
-                <label>${tr('prod_add_name')}</label>
-                <input type="text" id="product-name" placeholder="${tr('prod_add_name_ph')}">
+                <label>${tr('prod_add_name') || 'Product Name'}</label>
+                <input type="text" id="product-name" placeholder="${tr('prod_add_name_ph') || 'Product name...'}">
               </div>
               <div class="form-group">
-                <label>${tr('prod_add_qty')}</label>
+                <label>${tr('prod_add_qty') || 'Quantity'}</label>
                 <input type="number" id="product-qty" value="1" min="1">
               </div>
               <div class="form-group">
-                <label>${tr('prod_add_price')}</label>
+                <label>${tr('prod_add_price') || 'Price'}</label>
                 <input type="number" id="product-price" value="0" min="0" step="0.01">
               </div>
             </div>
 
             <div class="form-group">
-              <label>${tr('prod_add_category')}</label>
-              <input type="text" id="product-category" placeholder="${tr('prod_add_category_ph')}">
+              <label>${tr('prod_add_category') || 'Category'}</label>
+              <input type="text" id="product-category" placeholder="${tr('prod_add_category_ph') || 'Category...'}">
             </div>
 
             <div class="form-group">
-              <label>${tr('prod_add_barcode')}</label>
-              <input type="text" id="product-sku" placeholder="${tr('prod_add_barcode_ph')}" dir="ltr">
+              <label>${tr('prod_add_barcode') || 'Barcode (SKU)'}</label>
+              <input type="text" id="product-sku" placeholder="${tr('prod_add_barcode_ph') || 'Scan or type barcode...'}" dir="ltr">
             </div>
 
             <button type="button" class="btn-primary add-product-btn" id="done-btn">
               <i class="fas fa-check"></i>
-              <span>${tr('prod_add_done')}</span>
+              <span>${tr('prod_add_done') || 'Done'}</span>
             </button>
           </div>
 
           <div class="added-products-section card-added">
-            <label class="section-label">${tr('prod_add_added')}</label>
+            <label class="section-label">${tr('prod_add_added') || 'Added Products'}</label>
             <div id="added-products" class="added-products">
               <div class="empty-added">
                 <i class="fas fa-box-open"></i>
-                <p>${tr('prod_add_empty')}</p>
+                <p>${tr('prod_add_empty') || 'No products added yet'}</p>
               </div>
             </div>
           </div>
 
           <div class="form-summary card-summary">
             <div class="summary-row">
-              <span>${tr('prod_add_sum_count')}</span>
+              <span>${tr('prod_add_sum_count') || 'Products count'}</span>
               <strong id="sum-rows">0</strong>
             </div>
             <div class="summary-row">
-              <span>${tr('prod_add_sum_qty')}</span>
+              <span>${tr('prod_add_sum_qty') || 'Total quantity'}</span>
               <strong id="sum-qty">0</strong>
             </div>
             <div class="summary-row highlight">
-              <span>${tr('prod_add_sum_total')}</span>
+              <span>${tr('prod_add_sum_total') || 'Total value'}</span>
               <strong id="sum-total">0.00</strong>
             </div>
           </div>
@@ -109,9 +109,9 @@ document.addEventListener('DOMContentLoaded', async () => {
           <div class="form-actions card-actions">
             <button type="button" class="btn-primary" id="save-all-btn">
               <i class="fas fa-save"></i>
-              <span>${tr('prod_add_save')}</span>
+              <span>${tr('prod_add_save') || 'Save Products'}</span>
             </button>
-            <a href="/products/list.html" class="btn-secondary">${tr('prod_add_cancel')}</a>
+            <a href="/products/list.html" class="btn-secondary">${tr('prod_add_cancel') || 'Cancel'}</a>
           </div>
         </div>
       </div>
@@ -129,13 +129,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     <div class="scanner-modal" id="scanner-modal" style="display:none;">
       <div class="scanner-box">
         <div class="scanner-header">
-          <h3>${tr('prod_add_scan_title')}</h3>
+          <h3>${tr('prod_add_scan_title') || 'Scan Barcode'}</h3>
           <button type="button" class="scanner-close" id="scanner-close">
             <i class="fas fa-xmark"></i>
           </button>
         </div>
         <div id="scanner-reader" class="scanner-reader"></div>
-        <p class="scanner-hint" id="scanner-hint">${tr('prod_add_scan_hint')}</p>
+        <p class="scanner-hint" id="scanner-hint">${tr('prod_add_scan_hint') || 'Point camera at barcode'}</p>
       </div>
     </div>
   `;
@@ -160,7 +160,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   const detailIframe = document.getElementById('product-detail-iframe');
   const listIframe = document.getElementById('products-list-iframe');
 
-  // ✅ حقن CSS داخل iframe التفاصيل لتفعيل التمرير فور تحميله
   detailIframe.addEventListener('load', () => {
     try {
       const iframeDoc = detailIframe.contentDocument || detailIframe.contentWindow.document;
@@ -197,6 +196,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
     } catch (e) { console.error(e); }
   }
+  
   setTimeout(loadLatestProductInDetail, 500);
 
   window.addEventListener('message', (event) => {
@@ -224,11 +224,11 @@ document.addEventListener('DOMContentLoaded', async () => {
       html += `
         <div class="suggestion-card new-supplier" data-new="true" data-name="${filter.trim()}">
           <div class="suggestion-image" style="background:#dcfce7; color:#16a34a;"><i class="fas fa-plus"></i></div>
-          <div class="suggestion-info"><strong>${tr('prod_add_new_supplier')}</strong><span class="suggestion-sku">"${filter.trim()}"</span></div>
+          <div class="suggestion-info"><strong>${tr('prod_add_new_supplier') || 'New Supplier'}</strong><span class="suggestion-sku">"${filter.trim()}"</span></div>
         </div>
       `;
     }
-    suggestions.innerHTML = html || `<div class="suggestion-empty">${tr('prod_add_no_results')}</div>`;
+    suggestions.innerHTML = html || `<div class="suggestion-empty">${tr('prod_add_no_results') || 'No results'}</div>`;
     suggestions.style.display = 'block';
     suggestions.querySelectorAll('.suggestion-card').forEach(card => {
       card.addEventListener('pointerdown', (e) => {
@@ -257,13 +257,13 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
 
   async function startScanner() {
-    if (typeof Html5Qrcode === 'undefined') { alert(tr('prod_add_scanner_err')); return; }
-    scannerModal.style.display = 'flex'; scannerReader.innerHTML = ''; scannerHint.textContent = tr('prod_add_scan_hint');
+    if (typeof Html5Qrcode === 'undefined') { alert(tr('prod_add_scanner_err') || 'Scanner not found'); return; }
+    scannerModal.style.display = 'flex'; scannerReader.innerHTML = ''; scannerHint.textContent = tr('prod_add_scan_hint') || 'Point camera';
     try {
       html5QrCode = new Html5Qrcode("scanner-reader");
       const config = { fps: 10, qrbox: { width: 250, height: 250 }, aspectRatio: 1.0 };
       await html5QrCode.start({ facingMode: "environment" }, config, async (decodedText) => { await handleScan(decodedText); await stopScanner(); }, () => { });
-    } catch (err) { alert(tr('prod_add_camera_err') + ' ' + err.message); scannerModal.style.display = 'none'; }
+    } catch (err) { alert((tr('prod_add_camera_err') || 'Camera error') + ' ' + err.message); scannerModal.style.display = 'none'; }
   }
 
   async function stopScanner() {
@@ -281,7 +281,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       scannedImageUrl = localProduct.image_url || null;
       nameInput.focus(); nameInput.scrollIntoView({ behavior: 'smooth', block: 'center' }); return;
     }
-    scannerHint.textContent = tr('prod_add_searching');
+    scannerHint.textContent = tr('prod_add_searching') || 'Searching...';
     try {
       const res = await fetch(`https://world.openfoodfacts.org/api/v2/product/${encodeURIComponent(value)}.json`);
       const json = await res.json();
@@ -305,7 +305,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   function renderAddedProducts() {
     if (addedProducts.length === 0) {
-      addedContainer.innerHTML = `<div class="empty-added"><i class="fas fa-box-open"></i><p>${tr('prod_add_empty')}</p></div>`;
+      addedContainer.innerHTML = `<div class="empty-added"><i class="fas fa-box-open"></i><p>${tr('prod_add_empty') || 'No products added yet'}</p></div>`;
       updateSummary(); return;
     }
     addedContainer.innerHTML = addedProducts.map((p, index) => `
@@ -313,11 +313,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         <div class="added-product-image">${p.image_url ? `<img src="${p.image_url}" alt="${p.name}">` : `<i class="fas fa-box-open"></i>`}</div>
         <div class="added-product-info"><strong>${p.name}</strong><span>${p.category ? p.category + ' • ' : ''}${p.sku}</span></div>
         <div class="added-product-stats">
-          <div class="stat-mini"><span>${tr('products_qty')}</span><b>${p.qty}</b></div>
-          <div class="stat-mini"><span>${tr('products_price')}</span><b>${Number(p.price).toFixed(2)}</b></div>
-          <div class="stat-mini highlight"><span>${tr('products_total')}</span><b>${(Number(p.qty) * Number(p.price)).toFixed(2)}</b></div>
+          <div class="stat-mini"><span>${tr('products_qty') || 'Qty'}</span><b>${p.qty}</b></div>
+          <div class="stat-mini"><span>${tr('products_price') || 'Price'}</span><b>${Number(p.price).toFixed(2)}</b></div>
+          <div class="stat-mini highlight"><span>${tr('products_total') || 'Total'}</span><b>${(Number(p.qty) * Number(p.price)).toFixed(2)}</b></div>
         </div>
-        <button type="button" class="added-product-delete" data-index="${index}" title="${tr('prod_add_delete')}"><i class="fas fa-xmark"></i></button>
+        <button type="button" class="added-product-delete" data-index="${index}" title="${tr('prod_add_delete') || 'Delete'}"><i class="fas fa-xmark"></i></button>
       </div>
     `).join('');
     addedContainer.querySelectorAll('.added-product-delete').forEach(btn => {
@@ -343,8 +343,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     const errBox = document.getElementById('form-error'); errBox.style.display = 'none';
     const name = nameInput.value.trim(); const qty = Number(qtyInput.value) || 0; const price = Number(priceInput.value) || 0;
     const category = categoryInput.value.trim(); const sku = skuInput.value.trim() || ('SKU-' + Date.now() + '-' + Math.floor(Math.random() * 10000));
-    if (!name) { errBox.textContent = tr('prod_add_err_name'); errBox.style.display = 'block'; nameInput.focus(); isAddingProduct = false; doneBtn.disabled = false; return; }
-    if (qty <= 0) { errBox.textContent = tr('prod_add_err_qty'); errBox.style.display = 'block'; qtyInput.focus(); isAddingProduct = false; doneBtn.disabled = false; return; }
+    if (!name) { errBox.textContent = tr('prod_add_err_name') || 'Name required'; errBox.style.display = 'block'; nameInput.focus(); isAddingProduct = false; doneBtn.disabled = false; return; }
+    if (qty <= 0) { errBox.textContent = tr('prod_add_err_qty') || 'Qty required'; errBox.style.display = 'block'; qtyInput.focus(); isAddingProduct = false; doneBtn.disabled = false; return; }
     addedProducts.push({ name, qty, price, category, sku, image_url: scannedImageUrl });
     nameInput.value = ''; qtyInput.value = '1'; priceInput.value = '0'; skuInput.value = ''; scannedImageUrl = null; nameInput.focus();
     renderAddedProducts();
@@ -359,12 +359,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     isSaving = true; saveAllBtn.disabled = true;
     const errBox = document.getElementById('form-error'); const successBox = document.getElementById('form-success');
     errBox.style.display = 'none'; successBox.style.display = 'none';
-    if (addedProducts.length === 0) { errBox.textContent = tr('prod_add_err_empty'); errBox.style.display = 'block'; isSaving = false; saveAllBtn.disabled = false; return; }
-    saveAllBtn.querySelector('span').textContent = tr('prod_add_saving');
+    if (addedProducts.length === 0) { errBox.textContent = tr('prod_add_err_empty') || 'Empty'; errBox.style.display = 'block'; isSaving = false; saveAllBtn.disabled = false; return; }
+    saveAllBtn.querySelector('span').textContent = tr('prod_add_saving') || 'Saving...';
     try {
       const { data: { user: authUser } } = await db.auth.getUser();
       const { data: profile } = await db.from('profiles').select('organization_id, full_name').eq('id', authUser.id).single();
-      if (!profile?.organization_id) throw new Error(tr('prod_add_err_org'));
+      if (!profile?.organization_id) throw new Error(tr('prod_add_err_org') || 'Org Error');
       let finalSupplierId = supplierIdInput.value || null;
       const isNewSupplier = supplierInput.dataset.isNew === 'true';
       const newSupplierName = isNewSupplier ? (supplierInput.dataset.newName || supplierInput.value.trim()) : '';
