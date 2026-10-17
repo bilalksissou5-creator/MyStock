@@ -505,10 +505,10 @@
 
   /* ✅ الحل الجذري للقسم الثالث: تصغير محتوى الـ iframe ليتناسب مع الإطار */
   .workspace-iframe-detail {
-    width: 110% !important; 
-    transform: scale(0.9); 
+    width: 112% !important; 
+    height: 112% !important; 
+    transform: scale(0.89); 
     transform-origin: top right; 
-    height: 111% !important; 
   }
 
   .workspace-panel-left::-webkit-scrollbar { width: 6px; }
