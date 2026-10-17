@@ -518,3 +518,11 @@ html.in-iframe .main {
   .sidebar-footer .nav-item i { font-size: 14px; }
   .main { padding: 12px; padding-bottom: 40px; }
 }
+
+/* ============================================
+   ✅ منع تمدد الحقول (إصلاح مشكلة المسح)
+   ============================================ */
+input, select, textarea {
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+}
