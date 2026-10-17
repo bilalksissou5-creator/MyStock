@@ -1,6 +1,7 @@
 // ============================================
 // صفحة إخراج منتجات (متعددة) + إيصال بيع
 // ✅ دعم كامل للترجمة
+// ✅ دعم Workspace (تقسيم 3 أقسام)
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   if (window.__movementOutLoaded) return;
@@ -14,7 +15,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (window.applyLanguage) window.applyLanguage();
   const tr = (key) => (window.t ? window.t(key) : key);
 
-  document.title = tr('mout_title_full');
+  document.title = tr('mout_title_full') || 'MyStock - Output';
 
   const main = document.getElementById('main-content');
 
@@ -52,86 +53,103 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   main.innerHTML = `
-    <div class="page-header">
-      <h2>${tr('mout_title')}</h2>
-      <button type="button" class="btn-primary scan-btn" id="scan-btn">
-        <i class="fas fa-barcode"></i>
-        <span>${tr('mout_scan')}</span>
-      </button>
-    </div>
+    <div class="workspace">
 
-    <div class="alert alert-error" id="form-error" style="display:none;"></div>
-    <div class="alert alert-success" id="form-success" style="display:none;"></div>
+      <!-- القسم الأول: نموذج الإخراج -->
+      <div class="workspace-panel workspace-panel-left">
+        <div class="page-header">
+          <h2>${tr('mout_title')}</h2>
+          <button type="button" class="btn-primary scan-btn" id="scan-btn">
+            <i class="fas fa-barcode"></i>
+            <span>${tr('mout_scan')}</span>
+          </button>
+        </div>
 
-    <div class="out-form">
+        <div class="alert alert-error" id="form-error" style="display:none;"></div>
+        <div class="alert alert-success" id="form-success" style="display:none;"></div>
 
-      <div class="product-input-card">
-        <div class="form-group">
-          <label>${tr('mout_note')}</label>
-          <input type="text" id="note" placeholder="${tr('mout_note_ph')}">
+        <div class="out-form">
+
+          <div class="product-input-card">
+            <div class="form-group">
+              <label>${tr('mout_note')}</label>
+              <input type="text" id="note" placeholder="${tr('mout_note_ph')}">
+            </div>
+          </div>
+
+          <div class="product-input-card">
+            <div class="form-group" style="position:relative;margin-bottom:12px;">
+              <label>${tr('mout_product')}</label>
+              <input type="text" id="product-input" placeholder="${tr('mout_product_ph')}" autocomplete="off">
+              <div id="product-suggestions" class="suggestions-box"></div>
+              <input type="hidden" id="product_id">
+            </div>
+
+            <div class="form-grid">
+              <div class="form-group">
+                <label>${tr('mout_qty')}</label>
+                <input type="number" id="quantity" value="1" min="0.01" step="0.01">
+              </div>
+              <div class="form-group">
+                <label>${tr('mout_price')}</label>
+                <input type="number" id="price" value="0" min="0" step="0.01">
+              </div>
+              <div class="form-group">
+                <label>${tr('mout_available')}</label>
+                <input type="text" id="available-qty" value="—" disabled>
+              </div>
+            </div>
+
+            <button type="button" class="btn-primary add-product-btn" id="add-product-btn">
+              <i class="fas fa-plus"></i>
+              <span>${tr('mout_add_product')}</span>
+            </button>
+          </div>
+
+          <div class="added-products-section">
+            <label class="section-label">${tr('mout_added')}</label>
+            <div id="added-products" class="added-products">
+              <div class="empty-added">
+                <i class="fas fa-box-open"></i>
+                <p>${tr('mout_empty')}</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-summary">
+            <div class="summary-row">
+              <span>${tr('mout_sum_count')}</span>
+              <strong id="sum-rows">0</strong>
+            </div>
+            <div class="summary-row">
+              <span>${tr('mout_sum_qty')}</span>
+              <strong id="sum-qty">0</strong>
+            </div>
+            <div class="summary-row highlight">
+              <span>${tr('mout_sum_total')}</span>
+              <strong id="sum-total">0.00</strong>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button type="button" class="btn-primary" id="save-btn">
+              <i class="fas fa-save"></i>
+              <span>${tr('mout_save')}</span>
+            </button>
+            <a href="/movements/list.html" class="btn-secondary">${tr('mout_cancel')}</a>
+          </div>
+
         </div>
       </div>
 
-      <div class="product-input-card">
-        <div class="form-group" style="position:relative;margin-bottom:12px;">
-          <label>${tr('mout_product')}</label>
-          <input type="text" id="product-input" placeholder="${tr('mout_product_ph')}" autocomplete="off">
-          <div id="product-suggestions" class="suggestions-box"></div>
-          <input type="hidden" id="product_id">
-        </div>
-
-        <div class="form-grid">
-          <div class="form-group">
-            <label>${tr('mout_qty')}</label>
-            <input type="number" id="quantity" value="1" min="0.01" step="0.01">
-          </div>
-          <div class="form-group">
-            <label>${tr('mout_price')}</label>
-            <input type="number" id="price" value="0" min="0" step="0.01">
-          </div>
-          <div class="form-group">
-            <label>${tr('mout_available')}</label>
-            <input type="text" id="available-qty" value="—" disabled>
-          </div>
-        </div>
-
-        <button type="button" class="btn-primary add-product-btn" id="add-product-btn">
-          <i class="fas fa-plus"></i>
-          <span>${tr('mout_add_product')}</span>
-        </button>
+      <!-- القسم الثاني: قائمة المنتجات -->
+      <div class="workspace-panel workspace-panel-center">
+        <iframe src="/products/list.html" class="workspace-iframe" id="products-list-iframe" title="Products List" loading="lazy" scrolling="yes"></iframe>
       </div>
 
-      <div class="added-products-section">
-        <label class="section-label">${tr('mout_added')}</label>
-        <div id="added-products" class="added-products">
-          <div class="empty-added">
-            <i class="fas fa-box-open"></i>
-            <p>${tr('mout_empty')}</p>
-          </div>
-        </div>
-      </div>
-
-      <div class="form-summary">
-        <div class="summary-row">
-          <span>${tr('mout_sum_count')}</span>
-          <strong id="sum-rows">0</strong>
-        </div>
-        <div class="summary-row">
-          <span>${tr('mout_sum_qty')}</span>
-          <strong id="sum-qty">0</strong>
-        </div>
-        <div class="summary-row highlight">
-          <span>${tr('mout_sum_total')}</span>
-          <strong id="sum-total">0.00</strong>
-        </div>
-      </div>
-
-      <div class="form-actions">
-        <button type="button" class="btn-primary" id="save-btn">
-          <i class="fas fa-save"></i>
-          <span>${tr('mout_save')}</span>
-        </button>
-        <a href="/movements/list.html" class="btn-secondary">${tr('mout_cancel')}</a>
+      <!-- القسم الثالث: تفاصيل المنتج -->
+      <div class="workspace-panel workspace-panel-right">
+        <iframe src="about:blank" class="workspace-iframe workspace-iframe-detail" id="product-detail-iframe" title="Product Details" scrolling="yes"></iframe>
       </div>
 
     </div>
@@ -164,11 +182,39 @@ document.addEventListener('DOMContentLoaded', async () => {
   const scannerModal = document.getElementById('scanner-modal');
   const scannerReader = document.getElementById('scanner-reader');
   const scannerClose = document.getElementById('scanner-close');
+  const detailIframe = document.getElementById('product-detail-iframe');
+  const listIframe = document.getElementById('products-list-iframe');
 
   let selectedProduct = null;
   let isAdding = false;
   let isSaving = false;
   let html5QrCode = null;
+
+  // ✅ حقن التمرير في iframe التفاصيل
+  detailIframe.addEventListener('load', () => {
+    try {
+      const iframeDoc = detailIframe.contentDocument || detailIframe.contentWindow.document;
+      if (iframeDoc) {
+        const style = iframeDoc.createElement('style');
+        style.innerHTML = `
+          html, body { height: 100% !important; overflow: hidden !important; }
+          .app { height: 100vh !important; overflow: hidden !important; }
+          .body { height: calc(100vh - 60px) !important; overflow: hidden !important; }
+          .main { height: 100% !important; overflow-y: auto !important; padding-bottom: 60px !important; }
+        `;
+        iframeDoc.head.appendChild(style);
+      }
+    } catch (e) { console.warn('iframe access error', e); }
+  });
+
+  // ✅ الاستماع لنقرات القائمة
+  window.addEventListener('message', (event) => {
+    const data = event.data;
+    if (!data || typeof data !== 'object') return;
+    if (data.type === 'PRODUCT_SELECTED' && data.productId) {
+      detailIframe.src = `/products/detail.html?id=${encodeURIComponent(data.productId)}`;
+    }
+  });
 
   function showSuggestions(filter) {
     const q = filter.trim().toLowerCase();

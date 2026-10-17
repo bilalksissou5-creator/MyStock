@@ -1,5 +1,5 @@
 /* ============================================
-   صفحة إخراج منتجات — بنمط product-add
+   صفحة إخراج منتجات (متعددة)
    ============================================ */
 
 .out-form {
@@ -26,11 +26,6 @@
 
 .product-input-card .form-group {
   margin-bottom: 0;
-}
-
-.product-input-card .form-group:has(#available-qty) input {
-  background: #f5f5f5;
-  cursor: not-allowed;
 }
 
 .add-product-btn {
@@ -121,16 +116,14 @@
 }
 
 .suggestion-stats {
-  display: flex;
-  gap: 10px;
   font-size: 11px;
   color: #737373;
   white-space: nowrap;
-  flex-shrink: 0;
 }
 
-.suggestion-stats b { color: #171717; font-weight: 700; }
-.suggestion-stats b.low { color: #dc2626; }
+.suggestion-stats .low {
+  color: #dc2626;
+}
 
 .suggestion-empty {
   padding: 16px;
@@ -208,7 +201,10 @@
   object-fit: cover;
 }
 
-.added-product-image i { color: #a3a3a3; font-size: 20px; }
+.added-product-image i {
+  color: #a3a3a3;
+  font-size: 20px;
+}
 
 .added-product-info {
   display: flex;
@@ -324,9 +320,15 @@
 
 .summary-row.highlight span { color: #d4d4d4; }
 
-.summary-row.highlight strong { color: white; font-size: 1.4rem; }
+.summary-row.highlight strong {
+  color: white;
+  font-size: 1.4rem;
+}
 
-.summary-row span { font-size: 12px; color: #737373; }
+.summary-row span {
+  font-size: 12px;
+  color: #737373;
+}
 
 .summary-row strong {
   font-size: 1.1rem;
@@ -339,12 +341,7 @@
   gap: 10px;
 }
 
-.form-actions .btn-primary,
-.form-actions .btn-secondary {
-  flex: 1;
-  justify-content: center;
-}
-
+/* الماسح */
 .scanner-modal {
   position: fixed;
   inset: 0;
@@ -424,115 +421,154 @@
 }
 
 /* ══════════════════════════════════════════
-   ✅ الحاسوب (> 1024px)
-   3 أعمدة: 20% | 50% | 30%
+   ✅ Workspace (التقسيم الجديد)
    ══════════════════════════════════════════ */
-@media (min-width: 1024px) {
 
-  .out-form {
-    max-width: 100%;
-    display: grid;
-    grid-template-columns: 20% 50% 30%;
-    gap: 20px;
-    align-items: start;
-    margin: 0;
-  }
+.workspace {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
 
-  /* إزالة البطاقات */
-  .product-input-card,
-  .added-products-section,
-  .form-summary {
-    background: transparent;
-    border: none;
-    box-shadow: none;
-    padding: 0;
-    border-radius: 0;
-  }
+.workspace-panel {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
 
-  /* ✅ القسم 1 (20%): بطاقات الإخراج */
-  .out-form > .product-input-card:nth-of-type(1),
-  .out-form > .product-input-card:nth-of-type(2) {
-    grid-column: 1;
-  }
+.workspace-panel-center,
+.workspace-panel-right {
+  display: none;
+}
 
-  .out-form > .product-input-card:nth-of-type(1) { grid-row: 1; }
-  .out-form > .product-input-card:nth-of-type(2) { grid-row: 2; }
-
-  /* ✅ القسم 2 (50%): المنتجات المُخرَجة */
-  .added-products-section {
-    grid-column: 2;
-    grid-row: 1 / 5;
-    position: sticky;
-    top: 20px;
-    align-self: start;
-  }
-
-  .added-products {
-    max-height: calc(100vh - 220px);
-    overflow-y: auto;
-    padding-inline-end: 4px;
-  }
-
-  .added-products::-webkit-scrollbar { width: 4px; }
-  .added-products::-webkit-scrollbar-thumb {
-    background: #d4d4d4;
-    border-radius: 4px;
-  }
-
-  /* ✅ القسم 3 (30%): الملخص + الأزرار */
-  .form-summary {
-    grid-column: 3;
-    grid-row: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    position: sticky;
-    top: 20px;
-    align-self: start;
-  }
-
-  .summary-row {
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
-    text-align: start;
-    padding: 12px 16px;
-  }
-
-  .summary-row strong { font-size: 1.2rem; }
-
-  .summary-row.highlight strong { font-size: 1.5rem; }
-
-  .form-actions {
-    grid-column: 3;
-    grid-row: 2;
-    flex-direction: column;
-    gap: 8px;
-  }
-
-  .form-actions .btn-primary,
-  .form-actions .btn-secondary {
-    width: 100%;
-    justify-content: center;
-  }
+.workspace-iframe {
+  width: 100%;
+  max-width: 100%;
+  height: 100%;
+  min-height: 100%;
+  border: none;
+  display: block;
+  background: transparent;
+  border-radius: 10px;
+  box-sizing: border-box;
 }
 
 /* ══════════════════════════════════════════
-   التابلت (768px - 1023px)
+   ✅ التابلت الأفقي + الحاسوب + الشاشة الكبيرة
    ══════════════════════════════════════════ */
-@media (min-width: 768px) and (max-width: 1023px) {
+@media (min-width: 769px) and (orientation: landscape),
+       (min-width: 1024px) {
+
+  .main {
+    padding: 16px !important;
+    height: calc(100vh - 60px) !important; 
+    max-height: calc(100dvh - 60px) !important; 
+    overflow: hidden !important; 
+    display: flex !important;
+    flex-direction: column !important;
+    box-sizing: border-box !important;
+  }
+
+  .workspace {
+    display: grid;
+    grid-template-columns: 24% minmax(0, 1fr) 24%;
+    gap: 16px; 
+    flex: 1; 
+    min-height: 0; 
+    width: 100%;
+    height: 100%;
+  }
+
+  .workspace-panel-center,
+  .workspace-panel-right {
+    display: flex;
+    min-width: 0;
+    height: 100%;
+  }
+
+  .workspace-panel-left {
+    grid-column: 1;
+    height: 100%;
+    overflow-y: auto !important; 
+    overflow-x: hidden;
+    padding-inline-end: 6px;
+    padding-bottom: 60px; 
+  }
+
+  .workspace-panel-center {
+    grid-column: 2;
+    overflow: hidden;
+  }
+
+  .workspace-panel-right {
+    grid-column: 3;
+    overflow: hidden;
+    position: relative;
+    border-radius: 10px;
+    display: flex;
+    align-items: stretch;
+  }
+
+  .workspace-iframe {
+    width: 100% !important;
+    height: 100% !important;
+    border: none;
+    display: block;
+  }
+
+  .workspace-iframe-detail {
+    width: 99% !important; 
+    height: 100% !important;
+  }
+
+  .workspace-panel-left::-webkit-scrollbar { width: 6px; }
+  .workspace-panel-left::-webkit-scrollbar-thumb {
+    background: #d4d4d4;
+    border-radius: 4px;
+  }
+  .workspace-panel-left::-webkit-scrollbar-track {
+    background: transparent;
+  }
+}
+
+/* التابلت الأفقي */
+@media (min-width: 769px) and (max-width: 1023px) and (orientation: landscape) {
+  .workspace {
+    grid-template-columns: 28% minmax(0, 1fr) 28%;
+  }
+}
+
+/* الشاشة الكبيرة */
+@media (min-width: 1536px) {
+  .workspace {
+    grid-template-columns: 22% minmax(0, 1fr) 22%;
+    gap: 20px;
+  }
+}
+
+/* تصفير المسافات داخل iframes */
+html.in-iframe .main {
+  padding: 0 !important;
+  height: 100% !important;
+  overflow-y: auto !important;
+}
+
+/* ══════════════════════════════════════════
+   التابلت العمودي (Portrait)
+   ══════════════════════════════════════════ */
+@media (min-width: 768px) and (max-width: 1023px) and (orientation: portrait) {
   .product-input-card .form-grid {
     grid-template-columns: 1fr 1fr;
     gap: 10px;
   }
 
-  .product-input-card .form-group:nth-child(3) {
+  .product-input-card .form-group:first-child {
     grid-column: 1 / -1;
   }
 }
 
 /* ══════════════════════════════════════════
-   الهاتف (< 768px)
+   الهاتف
    ══════════════════════════════════════════ */
 @media (max-width: 768px) {
   .product-input-card .form-grid {
@@ -540,7 +576,7 @@
     gap: 10px;
   }
 
-  .product-input-card .form-group:nth-child(3) {
+  .product-input-card .form-group:first-child {
     grid-column: 1 / -1;
   }
 
@@ -621,6 +657,7 @@
   .form-actions .btn-primary,
   .form-actions .btn-secondary {
     width: 100%;
+    justify-content: center;
   }
 
   .scanner-box { padding: 16px; }
