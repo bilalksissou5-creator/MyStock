@@ -3,8 +3,25 @@
    ============================================ */
 .out-form { max-width: 800px; margin: 0 auto; display: flex; flex-direction: column; gap: 16px; }
 .product-input-card { background: white; border-radius: 10px; padding: 16px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06); }
-.product-input-card .form-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 12px; }
-.product-input-card .form-group { margin-bottom: 0; }
+
+/* ✅ الحل الجذري: تثبيت عرض الحقول الثلاثة ومنع التمدد */
+.product-input-card .form-grid { 
+  display: grid; 
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr); 
+  gap: 12px; 
+  margin-bottom: 12px; 
+}
+.product-input-card .form-group { 
+  margin-bottom: 0; 
+  min-width: 0; /* منع تمدد الحاوية */
+}
+.product-input-card .form-group input { 
+  width: 100% !important; 
+  max-width: 100% !important; 
+  box-sizing: border-box !important; 
+  min-width: 0 !important; /* منع تمدد الحقل */
+}
+
 .add-product-btn { width: 100%; justify-content: center; margin-top: 12px; }
 .scan-btn { display: inline-flex; align-items: center; gap: 8px; }
 .suggestions-box { position: absolute; top: 100%; right: 0; left: 0; background: white; border: 1px solid #e5e5e5; border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); margin-top: 4px; z-index: 9999; max-height: 320px; overflow-y: auto; display: none; }
@@ -82,18 +99,4 @@ html.in-iframe .main { padding: 0 !important; height: 100% !important; overflow-
   .workspace-panel-left { display: block !important; width: 100%; }
   .main { padding: 12px !important; height: auto !important; overflow-y: auto !important; }
   .workspace { display: flex; flex-direction: column; }
-}
-
-/* ============================================
-   ✅ إصلاح تمدد الحقول في صفحة الإخراج (السر هنا)
-   ============================================ */
-.out-form .form-grid {
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) !important;
-}
-
-.out-form input {
-  width: 100% !important;
-  max-width: 100% !important;
-  box-sizing: border-box !important;
-  min-width: 0 !important;
 }
