@@ -13,13 +13,14 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (window.applyLanguage) window.applyLanguage();
   const tr = (key) => (window.t ? window.t(key) : key);
 
-  document.title = tr('dash_title_full');
+  // ✅ التعديل هنا: إضافة عنوان افتراضي في حال فشل الترجمة
+  document.title = tr('dash_title_full') || 'Dashboard';
 
   const main = document.getElementById('main-content');
 
   main.innerHTML = `
     <div class="page-header">
-      <h2>${tr('dash_title')}</h2>
+      <h2>${tr('dash_title') || 'Dashboard'}</h2>
     </div>
 
     <!-- ══════════════════════════════════════
@@ -33,8 +34,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
           <div class="stock-title-section">
             <div class="stock-title-text">
-              <h3 id="chart-title">${tr('dash_stock_moves')}</h3>
-              <p id="stock-subtitle">${tr('dash_last_30')}</p>
+              <h3 id="chart-title">${tr('dash_stock_moves') || 'Stock Movements'}</h3>
+              <p id="stock-subtitle">${tr('dash_last_30') || 'Last 30 days'}</p>
             </div>
             <div class="stock-title-icon">
               <i class="fas fa-chart-line"></i>
@@ -43,21 +44,21 @@ document.addEventListener('DOMContentLoaded', async () => {
 
           <div class="stock-stats-row">
             <div class="stock-stat-card">
-              <div class="stat-mini-label">${tr('dash_in_qty')}</div>
+              <div class="stat-mini-label">${tr('dash_in_qty') || 'In Qty'}</div>
               <div class="stat-mini-value" id="stat-min-value">—</div>
               <div class="stat-mini-icon up">
                 <i class="fas fa-arrow-up"></i>
               </div>
             </div>
             <div class="stock-stat-card">
-              <div class="stat-mini-label">${tr('dash_total_moves')}</div>
+              <div class="stat-mini-label">${tr('dash_total_moves') || 'Total Moves'}</div>
               <div class="stat-mini-value" id="stat-avg-value">—</div>
               <div class="stat-mini-icon chart">
                 <i class="fas fa-chart-line"></i>
               </div>
             </div>
             <div class="stock-stat-card">
-              <div class="stat-mini-label">${tr('dash_out_qty')}</div>
+              <div class="stat-mini-label">${tr('dash_out_qty') || 'Out Qty'}</div>
               <div class="stat-mini-value" id="stat-max-value">—</div>
               <div class="stat-mini-icon down">
                 <i class="fas fa-arrow-down"></i>
@@ -72,7 +73,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             <i class="fas fa-database"></i>
           </div>
           <div class="stock-hero-info">
-            <div class="stock-hero-label" id="hero-label">${tr('dash_total_moves')}</div>
+            <div class="stock-hero-label" id="hero-label">${tr('dash_total_moves') || 'Total Moves'}</div>
             <div class="stock-hero-value">
               <span id="hero-value">—</span>
             </div>
@@ -87,20 +88,20 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       <div class="stock-chart-section">
         <div class="stock-chart-header">
-          <h3 id="chart-section-title">${tr('dash_stock_moves')}</h3>
+          <h3 id="chart-section-title">${tr('dash_stock_moves') || 'Stock Movements'}</h3>
           <span class="stock-chart-badge" id="chart-badge">
-            <i class="fas fa-circle" style="color:#2563eb;"></i> ${tr('dash_in')} &nbsp;&nbsp;
-            <i class="fas fa-circle" style="color:#f97316;"></i> ${tr('dash_out')}
+            <i class="fas fa-circle" style="color:#2563eb;"></i> ${tr('dash_in') || 'In'} &nbsp;&nbsp;
+            <i class="fas fa-circle" style="color:#f97316;"></i> ${tr('dash_out') || 'Out'}
           </span>
         </div>
         <div id="stock-chart"></div>
 
         <div class="stock-chart-filters">
           <div class="filters-left">
-            <button type="button" class="filter-btn" data-days="1">${tr('dash_day')}</button>
-            <button type="button" class="filter-btn" data-days="7">${tr('dash_7days')}</button>
-            <button type="button" class="filter-btn active" data-days="30">${tr('dash_30days')}</button>
-            <button type="button" class="filter-btn" data-days="365">${tr('dash_year')}</button>
+            <button type="button" class="filter-btn" data-days="1">${tr('dash_day') || 'Day'}</button>
+            <button type="button" class="filter-btn" data-days="7">${tr('dash_7days') || '7 Days'}</button>
+            <button type="button" class="filter-btn active" data-days="30">${tr('dash_30days') || '30 Days'}</button>
+            <button type="button" class="filter-btn" data-days="365">${tr('dash_year') || 'Year'}</button>
           </div>
         </div>
       </div>
@@ -118,8 +119,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
           <div class="stock-title-section">
             <div class="stock-title-text">
-              <h3>${tr('dash_profit')}</h3>
-              <p id="profit-subtitle">${tr('dash_last_30')}</p>
+              <h3>${tr('dash_profit') || 'Profit'}</h3>
+              <p id="profit-subtitle">${tr('dash_last_30') || 'Last 30 days'}</p>
             </div>
             <div class="stock-title-icon" style="color:#16a34a;">
               <i class="fas fa-coins"></i>
@@ -128,21 +129,21 @@ document.addEventListener('DOMContentLoaded', async () => {
 
           <div class="stock-stats-row">
             <div class="stock-stat-card">
-              <div class="stat-mini-label">${tr('dash_min_period')}</div>
+              <div class="stat-mini-label">${tr('dash_min_period') || 'Min'}</div>
               <div class="stat-mini-value" id="profit-min">—</div>
               <div class="stat-mini-icon down">
                 <i class="fas fa-arrow-down"></i>
               </div>
             </div>
             <div class="stock-stat-card">
-              <div class="stat-mini-label">${tr('dash_avg_period')}</div>
+              <div class="stat-mini-label">${tr('dash_avg_period') || 'Avg'}</div>
               <div class="stat-mini-value" id="profit-avg">—</div>
               <div class="stat-mini-icon chart">
                 <i class="fas fa-chart-line"></i>
               </div>
             </div>
             <div class="stock-stat-card">
-              <div class="stat-mini-label">${tr('dash_max_period')}</div>
+              <div class="stat-mini-label">${tr('dash_max_period') || 'Max'}</div>
               <div class="stat-mini-value" id="profit-max">—</div>
               <div class="stat-mini-icon up">
                 <i class="fas fa-arrow-up"></i>
@@ -157,7 +158,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             <i class="fas fa-coins"></i>
           </div>
           <div class="stock-hero-info">
-            <div class="stock-hero-label">${tr('dash_total_profit')}</div>
+            <div class="stock-hero-label">${tr('dash_total_profit') || 'Total Profit'}</div>
             <div class="stock-hero-value">
               <span id="profit-total">—</span>
             </div>
@@ -172,19 +173,19 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       <div class="stock-chart-section">
         <div class="stock-chart-header">
-          <h3>${tr('dash_profit_evolution')}</h3>
+          <h3>${tr('dash_profit_evolution') || 'Profit Evolution'}</h3>
           <span class="stock-chart-badge profit-badge">
-            <i class="fas fa-circle" style="color:#16a34a;"></i> ${tr('dash_profit')}
+            <i class="fas fa-circle" style="color:#16a34a;"></i> ${tr('dash_profit') || 'Profit'}
           </span>
         </div>
         <div id="profit-chart"></div>
 
         <div class="stock-chart-filters">
           <div class="filters-left">
-            <button type="button" class="profit-filter-btn" data-days="1">${tr('dash_day')}</button>
-            <button type="button" class="profit-filter-btn" data-days="7">${tr('dash_7days')}</button>
-            <button type="button" class="profit-filter-btn active" data-days="30">${tr('dash_30days')}</button>
-            <button type="button" class="profit-filter-btn" data-days="365">${tr('dash_year')}</button>
+            <button type="button" class="profit-filter-btn" data-days="1">${tr('dash_day') || 'Day'}</button>
+            <button type="button" class="profit-filter-btn" data-days="7">${tr('dash_7days') || '7 Days'}</button>
+            <button type="button" class="profit-filter-btn active" data-days="30">${tr('dash_30days') || '30 Days'}</button>
+            <button type="button" class="profit-filter-btn" data-days="365">${tr('dash_year') || 'Year'}</button>
           </div>
         </div>
       </div>
@@ -196,23 +197,23 @@ document.addEventListener('DOMContentLoaded', async () => {
          ══════════════════════════════════════ -->
     <div class="stats-grid">
       <div class="stat-card">
-        <div class="stat-label">${tr('dash_products')}</div>
+        <div class="stat-label">${tr('dash_products') || 'Products'}</div>
         <div class="stat-value" id="stat-products">—</div>
       </div>
       <div class="stat-card">
-        <div class="stat-label">${tr('dash_movements')}</div>
+        <div class="stat-label">${tr('dash_movements') || 'Movements'}</div>
         <div class="stat-value" id="stat-movements">—</div>
       </div>
       <div class="stat-card">
-        <div class="stat-label">${tr('dash_users')}</div>
+        <div class="stat-label">${tr('dash_users') || 'Users'}</div>
         <div class="stat-value" id="stat-users">—</div>
       </div>
       <div class="stat-card">
-        <div class="stat-label">${tr('dash_low_stock')}</div>
+        <div class="stat-label">${tr('dash_low_stock') || 'Low Stock'}</div>
         <div class="stat-value" id="stat-low">—</div>
       </div>
       <div class="stat-card">
-        <div class="stat-label">${tr('dash_today_moves')}</div>
+        <div class="stat-label">${tr('dash_today_moves') || 'Today Moves'}</div>
         <div class="stat-value" id="stat-today">—</div>
       </div>
     </div>
