@@ -102,43 +102,38 @@
 }
 
 /* ============================================
-   ✅ التعديل الجذري: وضع العنوان والبحث في سطر واحد
+   ✅ التنسيق الخاص بالقسم الثاني فقط (داخل iframe)
    ============================================ */
 
-/* في الشاشات الكبيرة فقط (الحاسوب والتابلت الأفقي) */
+/* عندما تكون الشاشة كبيرة وتكون الصفحة داخل إطار */
 @media (min-width: 1024px) {
+  
   /* إخفاء زر الإضافة */
   .page-header a[href="add.html"] {
     display: none !important;
   }
 
-  /* تحويل الحاوية الرئيسية إلى flex */
-  .main {
-    display: flex;
-    flex-direction: column;
-  }
-
-  /* جعل العنوان والبحث في سطر واحد */
-  .page-header {
+  /* تحويل الـ page-header ليكون مرناً (Flex) */
+  html.in-iframe .page-header {
     display: flex !important;
     flex-direction: row !important;
     align-items: center !important;
     justify-content: space-between !important;
     margin-bottom: 16px !important;
     width: 100% !important;
+    gap: 20px !important;
   }
 
-  .page-header h2 {
+  html.in-iframe .page-header h2 {
     margin: 0 !important;
     font-size: 1.5rem !important;
     white-space: nowrap !important;
   }
 
-  /* دفع حقل البحث ليكون بجوار العنوان */
-  .search-bar {
+  /* تنسيق شريط البحث ليمتد ويأخذ المساحة المتبقية */
+  html.in-iframe .page-header .search-bar {
     margin: 0 !important;
     flex: 1 !important;
     max-width: 400px !important;
-    margin-inline-start: 20px !important;
   }
 }

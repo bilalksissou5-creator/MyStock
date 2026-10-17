@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   const main = document.getElementById('main-content');
   
-  // ✅ بناء الهيكل: نضع شريط البحث داخل حاوية العنوان ليكونان متقابلين
+  // ✅ بناء الهيكل: وضع شريط البحث داخل حاوية العنوان لضمان تقابلهما
   main.innerHTML = `
     <div class="page-header">
       <h2>${tr('products_title')}</h2>
@@ -22,11 +22,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         <i class="fas fa-plus"></i>
         <span>${tr('products_add')}</span>
       </a>
-    </div>
-
-    <div class="search-bar">
-      <i class="fas fa-search"></i>
-      <input type="text" id="search-products" placeholder="${tr('products_search_ph')}">
+      <div class="search-bar">
+        <i class="fas fa-search"></i>
+        <input type="text" id="search-products" placeholder="${tr('products_search_ph')}">
+      </div>
     </div>
 
     <div id="products" class="products">${tr('loading')}</div>
