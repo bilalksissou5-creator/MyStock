@@ -127,20 +127,24 @@ document.addEventListener('DOMContentLoaded', async () => {
   const detailIframe = document.getElementById('product-detail-iframe');
   const listIframe = document.getElementById('products-list-iframe');
 
-  // ✅ الحل الجذري: توحيد المسافة العلوية لجميع الأقسام
+  // ✅ الحل الجذري: حقن CSS لإلغاء المسافات العلوية وإخفاء الزر
   listIframe.addEventListener('load', () => {
     try {
       const iframeDoc = listIframe.contentDocument || listIframe.contentWindow.document;
       if (iframeDoc) {
         const style = iframeDoc.createElement('style');
         style.innerHTML = `
+          /* إخفاء زر الإضافة */
           .page-header a[href="add.html"] { display: none !important; }
-          
+
+          /* في الشاشات الكبيرة فقط: توحيد المسافة وجعل العناصر في سطر واحد */
           @media (min-width: 1024px) {
-            /* إزالة أي مسافة علوية من الصفحة */
-            .main { padding-top: 0 !important; }
-            
-            /* جعل العنوان والبحث في سطر واحد وبدون أي هوامش علوية */
+            /* إلغاء أي مسافة علوية من الحاوية الرئيسية */
+            .main { 
+              padding-top: 0 !important; 
+            }
+
+            /* جعل العنوان والبحث في سطر واحد */
             .page-header {
               display: flex !important;
               flex-direction: row !important;
@@ -148,15 +152,18 @@ document.addEventListener('DOMContentLoaded', async () => {
               justify-content: flex-start !important;
               margin-top: 0 !important;
               margin-bottom: 16px !important;
+              padding-top: 0 !important;
               width: 100% !important;
               gap: 20px !important;
             }
+
             .page-header h2 {
               margin: 0 !important;
               font-size: 1.5rem !important;
               font-weight: 700 !important;
               white-space: nowrap !important;
             }
+
             .search-bar {
               margin: 0 !important;
               flex: 1 !important;
