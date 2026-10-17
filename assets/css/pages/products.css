@@ -107,17 +107,21 @@
 
 @media (min-width: 1024px) {
   
+  /* ✅ الحل: إلغاء المسافة العلوية لصفحة القائمة لتتماشى مع العناوين الأخرى */
+  html.in-iframe .main {
+    padding-top: 16px !important; /* تعديل هذه القيمة لضبط المسافة بدقة */
+  }
+
   /* إخفاء زر الإضافة */
   html.in-iframe .page-header a[href="add.html"] {
     display: none !important;
   }
 
-  /* تحويل الحاوية إلى flex */
+  /* تحويل الحاوية إلى flex لجعل العنوان والبحث في سطر واحد */
   html.in-iframe .page-header {
     display: flex !important;
     flex-direction: row !important;
     align-items: center !important;
-    /* ✅ التعديل: البدء من البداية بدلاً من space-between لجعل العنوان في أقصى اليمين/اليسار */
     justify-content: flex-start !important; 
     margin-bottom: 16px !important;
     width: 100% !important;
@@ -127,7 +131,7 @@
   /* تنسيق العنوان ليتطابق مع العناوين الأخرى */
   html.in-iframe .page-header h2 {
     margin: 0 !important;
-    font-size: 1.5rem !important; /* نفس حجم عناوين الأقسام الأخرى */
+    font-size: 1.5rem !important; 
     font-weight: 700 !important;
     white-space: nowrap !important;
   }
