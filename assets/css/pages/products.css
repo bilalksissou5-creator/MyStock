@@ -93,28 +93,52 @@
     grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
     gap: 10px;
   }
+  .product-card { padding: 10px; }
+  .product-card-image { height: 110px; }
+  .product-card h3 { font-size: 0.9rem; }
+  .stat { padding: 6px 2px; }
+  .stat-label { font-size: 10px; }
+  .stat-value { font-size: 12px; }
+}
 
-  .product-card {
-    padding: 10px;
+/* ============================================
+   ✅ التعديل الجذري: وضع العنوان والبحث في سطر واحد
+   ============================================ */
+
+/* في الشاشات الكبيرة فقط (الحاسوب والتابلت الأفقي) */
+@media (min-width: 1024px) {
+  /* إخفاء زر الإضافة */
+  .page-header a[href="add.html"] {
+    display: none !important;
   }
 
-  .product-card-image {
-    height: 110px;
+  /* تحويل الحاوية الرئيسية إلى flex */
+  .main {
+    display: flex;
+    flex-direction: column;
   }
 
-  .product-card h3 {
-    font-size: 0.9rem;
+  /* جعل العنوان والبحث في سطر واحد */
+  .page-header {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    margin-bottom: 16px !important;
+    width: 100% !important;
   }
 
-  .stat {
-    padding: 6px 2px;
+  .page-header h2 {
+    margin: 0 !important;
+    font-size: 1.5rem !important;
+    white-space: nowrap !important;
   }
 
-  .stat-label {
-    font-size: 10px;
-  }
-
-  .stat-value {
-    font-size: 12px;
+  /* دفع حقل البحث ليكون بجوار العنوان */
+  .search-bar {
+    margin: 0 !important;
+    flex: 1 !important;
+    max-width: 400px !important;
+    margin-inline-start: 20px !important;
   }
 }

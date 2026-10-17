@@ -1,7 +1,5 @@
 // ============================================
 // صفحة المنتجات
-// ✅ دعم كامل للترجمة
-// ✅ دعم Workspace (postMessage)
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   const user = await requireAuth();
@@ -15,6 +13,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   document.title = tr('products_title_full');
 
   const main = document.getElementById('main-content');
+  
+  // ✅ بناء الهيكل: نضع شريط البحث داخل حاوية العنوان ليكونان متقابلين
   main.innerHTML = `
     <div class="page-header">
       <h2>${tr('products_title')}</h2>
@@ -43,9 +43,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
 });
 
-// ============================================
-// جلب المنتجات وتجميعها
-// ============================================
 async function loadProducts() {
   const tr = (key) => (window.t ? window.t(key) : key);
 
@@ -72,7 +69,6 @@ async function loadProducts() {
     return;
   }
 
-  // تجميع: نفس (اسم + مورد + سعر)
   const groupedMap = new Map();
   const grouped = [];
 
@@ -121,7 +117,6 @@ async function loadProducts() {
     `;
   }).join('');
 
-  // ✅ إذا كنا داخل iframe → اعترض النقر وأرسل رسالة للأم
   if (window.self !== window.top) {
     document.querySelectorAll('.product-card').forEach(card => {
       card.addEventListener('click', (e) => {
