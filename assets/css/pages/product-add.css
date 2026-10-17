@@ -488,10 +488,11 @@
     overflow: hidden;
   }
 
-  /* إصلاح 2: منع قطع القسم الثالث */
+  /* إصلاح 2: السماح بالتمرير في القسم الثالث */
   .workspace-panel-right {
     grid-column: 3;
-    overflow: hidden;
+    overflow-y: auto !important; /* تم التغيير لـ auto */
+    overflow-x: hidden;
     position: relative;
     border-radius: 10px;
     display: flex;
@@ -505,11 +506,10 @@
     display: block;
   }
 
-  /* ✅ الحل الجذري: إعطاء إطار التفاصيل هامش سفلي بسيط جداً لتفعيل السكرول داخله */
+  /* تصغير بسيط جداً لـ iframe التفاصيل لكي لا يُقطع */
   .workspace-iframe-detail {
     width: 99% !important; 
     height: 100% !important;
-    padding-bottom: 5px; /* مساحة أمان صغيرة */
   }
 
   .workspace-panel-left::-webkit-scrollbar { width: 6px; }
