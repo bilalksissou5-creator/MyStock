@@ -196,6 +196,36 @@ document.addEventListener('DOMContentLoaded', async () => {
     detailIframe.src = `/products/detail.html?id=${encodeURIComponent(productId)}`;
   }
 
+  // ✅✅✅ جلب وعرض آخر منتج عند تحميل الصفحة
+  async function loadLatestProductInDetail() {
+    try {
+      const { data: profile } = await db
+        .from('profiles')
+        .select('organization_id')
+        .eq('id', user.id)
+        .single();
+
+      if (profile?.organization_id) {
+        const { data: latest } = await db
+          .from('products')
+          .select('id')
+          .eq('organization_id', profile.organization_id)
+          .order('created_at', { ascending: false })
+          .limit(1)
+          .maybeSingle();
+
+        if (latest?.id) {
+          showProductDetails(latest.id);
+        }
+      }
+    } catch (e) {
+      console.error('خطأ في جلب آخر منتج:', e);
+    }
+  }
+
+  // تشغيل جلب آخر منتج بعد تحميل الصفحة
+  setTimeout(loadLatestProductInDetail, 500);
+
   // ✅✅✅ Workspace: الاستماع لرسائل iframe القائمة
   window.addEventListener('message', (event) => {
     const data = event.data;
@@ -206,7 +236,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     if (data.type === 'PRODUCT_DELETED') {
-      // إعادة تحميل iframe القائمة + تفريغ iframe التفاصيل
       if (listIframe) listIframe.src = listIframe.src;
       detailIframe.src = 'about:blank';
     }
@@ -556,10 +585,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     renderAddedProducts();
 
-    // ✅✅✅ عرض التفاصيل في القسم الثالث (بعد الحفظ فقط)
-    // ملاحظة: المنتج الجديد ليس له ID بعد، لذا لا يمكن عرض تفاصيله مباشرة
-    // سيظهر بعد الحفظ في القائمة
-
     setTimeout(() => {
       isAddingProduct = false;
       doneBtn.disabled = false;
@@ -785,11 +810,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       successBox.textContent = `${tr('prod_add_new_count')} ${insertedCount} | ${tr('prod_add_upd_count')} ${updatedCount} | ${tr('prod_add_invoice_count')} ${invoiceNumber}`;
       successBox.style.display = 'block';
-
-      // ❌ تم إلغاء الانتقال التلقائي إلى الفاتورة (حتى لا يفسد Workspace)
-      // setTimeout(() => {
-      //   window.location.replace(`/invoice.html?id=${encodeURIComponent(invoiceNumber)}`);
-      // }, 1500);
 
     } catch (error) {
       errBox.textContent = error.message;
