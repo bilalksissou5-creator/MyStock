@@ -408,122 +408,121 @@
 }
 
 /* ══════════════════════════════════════════
-   ✅ Workspace Panels (التقسيم الجديد)
+   ✅ Workspace (التقسيم الجديد)
    ══════════════════════════════════════════ */
 
+.workspace {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
 .workspace-panel {
+  min-width: 0;
+}
+
+.workspace-panel-center,
+.workspace-panel-right {
   display: none;
-  background: transparent;
-  border-radius: 10px;
-  overflow: hidden;
 }
 
 .workspace-iframe {
   width: 100%;
-  height: 100%;
+  min-height: 600px;
   border: none;
   display: block;
   background: #ffffff;
+  border-radius: 10px;
 }
 
 /* ══════════════════════════════════════════
-   ✅ التابلت الأفقي (Landscape) + الحاسوب + الشاشة الكبيرة
-   التقسيم الثلاثي: 20% | 50% | 30%
+   ✅ التابلت الأفقي (Landscape)
    ══════════════════════════════════════════ */
-
-/* التابلت الأفقي فقط */
 @media (min-width: 769px) and (max-width: 1023px) and (orientation: landscape) {
 
-  /* إخفاء عناصر الصفحة الأصلية */
-  .page-header,
-  .add-form > .product-input-card.card-supplier,
-  .add-form > .product-input-card.card-fields,
-  .add-form > .added-products-section.card-added,
-  .add-form > .form-summary.card-summary,
-  .add-form > .form-actions.card-actions {
-    display: none;
-  }
-
-  /* تحويل .add-form إلى grid */
-  .add-form {
-    max-width: 100%;
-    margin: 0;
+  .workspace {
     display: grid;
     grid-template-columns: 25% 45% 30%;
     gap: 12px;
     align-items: start;
   }
 
-  /* الأقسام الثلاثة */
-  .workspace-panel {
+  .workspace-panel-center,
+  .workspace-panel-right {
     display: block;
   }
 
+  .workspace-panel-left {
+    grid-column: 1;
+  }
+
   .workspace-panel-center {
-    grid-column: 1 / 3;
-    min-height: calc(100vh - 80px);
+    grid-column: 2;
   }
 
   .workspace-panel-right {
     grid-column: 3;
-    min-height: calc(100vh - 80px);
+    min-height: 400px;
     background: #f9f9f9;
     border: 1px dashed #d4d4d4;
+    border-radius: 10px;
+  }
+
+  .workspace-iframe {
+    min-height: calc(100vh - 140px);
   }
 }
 
-/* الحاسوب والشاشة الكبيرة */
+/* ══════════════════════════════════════════
+   ✅ الحاسوب
+   ══════════════════════════════════════════ */
 @media (min-width: 1024px) {
 
-  /* إخفاء عناصر الصفحة الأصلية */
-  .page-header,
-  .add-form > .product-input-card.card-supplier,
-  .add-form > .product-input-card.card-fields,
-  .add-form > .added-products-section.card-added,
-  .add-form > .form-summary.card-summary,
-  .add-form > .form-actions.card-actions {
-    display: none;
-  }
-
-  /* تحويل .add-form إلى grid */
-  .add-form {
-    max-width: 100%;
-    margin: 0;
+  .workspace {
     display: grid;
-    grid-template-columns: 
-      minmax(240px, 20%) 
-      minmax(400px, 1fr) 
-      minmax(280px, 30%);
+    grid-template-columns: 20% 50% 30%;
     gap: 16px;
     align-items: start;
   }
 
-  /* الأقسام الثلاثة */
-  .workspace-panel {
+  .workspace-panel-center,
+  .workspace-panel-right {
     display: block;
   }
 
+  .workspace-panel-left {
+    grid-column: 1;
+  }
+
   .workspace-panel-center {
-    grid-column: 1 / 3;
-    min-height: calc(100vh - 100px);
+    grid-column: 2;
   }
 
   .workspace-panel-right {
     grid-column: 3;
-    min-height: calc(100vh - 100px);
+    min-height: 400px;
     background: #f9f9f9;
     border: 1px dashed #d4d4d4;
+    border-radius: 10px;
+  }
+
+  .workspace-iframe {
+    min-height: calc(100vh - 140px);
   }
 }
 
-/* الشاشة الكبيرة جدًا */
+/* ══════════════════════════════════════════
+   ✅ الشاشة الكبيرة
+   ══════════════════════════════════════════ */
 @media (min-width: 1536px) {
-  .add-form {
-    grid-template-columns: 
-      minmax(280px, 18%) 
-      minmax(500px, 1fr) 
-      minmax(320px, 30%);
+
+  .workspace {
+    grid-template-columns: 18% 50% 32%;
     gap: 20px;
+  }
+
+  .workspace-iframe {
+    min-height: calc(100vh - 140px);
   }
 }
 
@@ -636,9 +635,4 @@
 
   .scanner-box { padding: 16px; }
   .scanner-reader { min-height: 250px; }
-
-  /* ✅ إخفاء Workspace على الهاتف */
-  .workspace-panel {
-    display: none !important;
-  }
 }
