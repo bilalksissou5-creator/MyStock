@@ -1,7 +1,5 @@
 // ============================================
-// صفحة إضافة منتجات
-// ✅ دعم كامل للترجمة
-// ✅ دعم Workspace (تقسيم 3 أقسام)
+// صفحة إضافة منتجات (نموذج فقط - بدون قائمة أو تفاصيل)
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   if (window.__productAddLoaded) return;
@@ -21,109 +19,93 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   const { data: suppliers } = await db.from('suppliers').select('*').order('name');
 
+  // ✅ بناء نموذج الإضافة فقط (بدون Workspace داخلي وبدون قائمة أو تفاصيل)
   main.innerHTML = `
-    <div class="workspace">
-      
-      <!-- القسم الأول: النموذج الأصلي -->
-      <div class="workspace-panel-left">
-        <div class="page-header">
-          <h2>${tr('prod_add_title')}</h2>
-          <button type="button" class="btn-primary scan-btn" id="scan-btn">
-            <i class="fas fa-barcode"></i>
-            <span>${tr('prod_add_scan')}</span>
-          </button>
+    <div class="page-header">
+      <h2>${tr('prod_add_title')}</h2>
+      <button type="button" class="btn-primary scan-btn" id="scan-btn">
+        <i class="fas fa-barcode"></i>
+        <span>${tr('prod_add_scan')}</span>
+      </button>
+    </div>
+
+    <div class="alert alert-error" id="form-error" style="display:none;"></div>
+    <div class="alert alert-success" id="form-success" style="display:none;"></div>
+
+    <div class="add-form">
+      <div class="product-input-card card-supplier">
+        <div class="form-group supplier-group">
+          <label>${tr('prod_add_supplier')}</label>
+          <input type="text" id="supplier-input" placeholder="${tr('prod_add_supplier_ph')}" autocomplete="off">
+          <div id="supplier-suggestions" class="suggestions-box"></div>
+          <input type="hidden" id="supplier_id">
+        </div>
+      </div>
+
+      <div class="product-input-card card-fields">
+        <div class="form-grid">
+          <div class="form-group">
+            <label>${tr('prod_add_name')}</label>
+            <input type="text" id="product-name" placeholder="${tr('prod_add_name_ph')}">
+          </div>
+          <div class="form-group">
+            <label>${tr('prod_add_qty')}</label>
+            <input type="number" id="product-qty" value="1" min="1">
+          </div>
+          <div class="form-group">
+            <label>${tr('prod_add_price')}</label>
+            <input type="number" id="product-price" value="0" min="0" step="0.01">
+          </div>
         </div>
 
-        <div class="alert alert-error" id="form-error" style="display:none;"></div>
-        <div class="alert alert-success" id="form-success" style="display:none;"></div>
+        <div class="form-group">
+          <label>${tr('prod_add_category')}</label>
+          <input type="text" id="product-category" placeholder="${tr('prod_add_category_ph')}">
+        </div>
 
-        <div class="add-form">
-          <div class="product-input-card card-supplier">
-            <div class="form-group supplier-group">
-              <label>${tr('prod_add_supplier')}</label>
-              <input type="text" id="supplier-input" placeholder="${tr('prod_add_supplier_ph')}" autocomplete="off">
-              <div id="supplier-suggestions" class="suggestions-box"></div>
-              <input type="hidden" id="supplier_id">
-            </div>
-          </div>
+        <div class="form-group">
+          <label>${tr('prod_add_barcode')}</label>
+          <input type="text" id="product-sku" placeholder="${tr('prod_add_barcode_ph')}" dir="ltr">
+        </div>
 
-          <div class="product-input-card card-fields">
-            <div class="form-grid">
-              <div class="form-group">
-                <label>${tr('prod_add_name')}</label>
-                <input type="text" id="product-name" placeholder="${tr('prod_add_name_ph')}">
-              </div>
-              <div class="form-group">
-                <label>${tr('prod_add_qty')}</label>
-                <input type="number" id="product-qty" value="1" min="1">
-              </div>
-              <div class="form-group">
-                <label>${tr('prod_add_price')}</label>
-                <input type="number" id="product-price" value="0" min="0" step="0.01">
-              </div>
-            </div>
+        <button type="button" class="btn-primary add-product-btn" id="done-btn">
+          <i class="fas fa-check"></i>
+          <span>${tr('prod_add_done')}</span>
+        </button>
+      </div>
 
-            <div class="form-group">
-              <label>${tr('prod_add_category')}</label>
-              <input type="text" id="product-category" placeholder="${tr('prod_add_category_ph')}">
-            </div>
-
-            <div class="form-group">
-              <label>${tr('prod_add_barcode')}</label>
-              <input type="text" id="product-sku" placeholder="${tr('prod_add_barcode_ph')}" dir="ltr">
-            </div>
-
-            <button type="button" class="btn-primary add-product-btn" id="done-btn">
-              <i class="fas fa-check"></i>
-              <span>${tr('prod_add_done')}</span>
-            </button>
-          </div>
-
-          <div class="added-products-section card-added">
-            <label class="section-label">${tr('prod_add_added')}</label>
-            <div id="added-products" class="added-products">
-              <div class="empty-added">
-                <i class="fas fa-box-open"></i>
-                <p>${tr('prod_add_empty')}</p>
-              </div>
-            </div>
-          </div>
-
-          <div class="form-summary card-summary">
-            <div class="summary-row">
-              <span>${tr('prod_add_sum_count')}</span>
-              <strong id="sum-rows">0</strong>
-            </div>
-            <div class="summary-row">
-              <span>${tr('prod_add_sum_qty')}</span>
-              <strong id="sum-qty">0</strong>
-            </div>
-            <div class="summary-row highlight">
-              <span>${tr('prod_add_sum_total')}</span>
-              <strong id="sum-total">0.00</strong>
-            </div>
-          </div>
-
-          <div class="form-actions card-actions">
-            <button type="button" class="btn-primary" id="save-all-btn">
-              <i class="fas fa-save"></i>
-              <span>${tr('prod_add_save')}</span>
-            </button>
-            <a href="/products/list.html" class="btn-secondary">${tr('prod_add_cancel')}</a>
+      <div class="added-products-section card-added">
+        <label class="section-label">${tr('prod_add_added')}</label>
+        <div id="added-products" class="added-products">
+          <div class="empty-added">
+            <i class="fas fa-box-open"></i>
+            <p>${tr('prod_add_empty')}</p>
           </div>
         </div>
       </div>
 
-      <!-- القسم الثاني: قائمة المنتجات (iframe) -->
-      <div class="workspace-panel-center">
-        <iframe src="/products/list.html" class="workspace-iframe" id="list-iframe" loading="lazy"></iframe>
+      <div class="form-summary card-summary">
+        <div class="summary-row">
+          <span>${tr('prod_add_sum_count')}</span>
+          <strong id="sum-rows">0</strong>
+        </div>
+        <div class="summary-row">
+          <span>${tr('prod_add_sum_qty')}</span>
+          <strong id="sum-qty">0</strong>
+        </div>
+        <div class="summary-row highlight">
+          <span>${tr('prod_add_sum_total')}</span>
+          <strong id="sum-total">0.00</strong>
+        </div>
       </div>
 
-      <!-- القسم الثالث: تفاصيل المنتج (iframe) -->
-      <div class="workspace-panel-right">
-        <iframe src="about:blank" class="workspace-iframe" id="detail-iframe"></iframe>
+      <div class="form-actions card-actions">
+        <button type="button" class="btn-primary" id="save-all-btn">
+          <i class="fas fa-save"></i>
+          <span>${tr('prod_add_save')}</span>
+        </button>
+        <a href="/products/list.html" class="btn-secondary">${tr('prod_add_cancel')}</a>
       </div>
-
     </div>
 
     <div class="scanner-modal" id="scanner-modal" style="display:none;">
@@ -157,9 +139,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   const scannerReader = document.getElementById('scanner-reader');
   const scannerClose = document.getElementById('scanner-close');
   const scannerHint = document.getElementById('scanner-hint');
-  
-  const listIframe = document.getElementById('list-iframe');
-  const detailIframe = document.getElementById('detail-iframe');
 
   let selectedSupplier = null;
   let isAddingProduct = false;
@@ -347,7 +326,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       successBox.textContent = `${tr('prod_add_new_count')} ${insertedCount} | ${tr('prod_add_upd_count')} ${updatedCount} | ${tr('prod_add_invoice_count')} ${invoiceNumber}`;
       successBox.style.display = 'block';
       
-      // ✅✅✅ التعديل الجديد: إرسال إشارة للأم لتحديث القائمة وفتح آخر منتج
+      // ✅✅✅ إرسال إشارة للأم لتحديث القائمة وفتح آخر منتج
       if (window.self !== window.top && lastProductId) {
         window.parent.postMessage({
           type: 'NEW_PRODUCT_SAVED',
@@ -362,25 +341,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   });
 
-  // ✅ استقبال النقرات من القائمة وعرضها في القسم الثالث
+  // ✅ استقبال النقرات من القائمة وعرضها في القسم الثالث (من الصفحة الأم)
   window.addEventListener('message', (event) => {
     const data = event.data;
     if (!data || typeof data !== 'object') return;
     if (data.type === 'PRODUCT_SELECTED' && data.productId) {
-      detailIframe.src = `/products/detail.html?id=${encodeURIComponent(data.productId)}`;
-    }
-  });
-
-  // ✅ إخفاء زر الإضافة داخل القائمة
-  listIframe.addEventListener('load', () => {
-    try {
-      const iframeDoc = listIframe.contentDocument || listIframe.contentWindow.document;
-      if (iframeDoc) {
-        const style = iframeDoc.createElement('style');
-        style.innerHTML = `.page-header a[href="add.html"] { display: none !important; }`;
-        iframeDoc.head.appendChild(style);
+      const detailIframe = document.getElementById('detail-iframe');
+      if (detailIframe) {
+        detailIframe.src = `/products/detail.html?id=${encodeURIComponent(data.productId)}`;
       }
-    } catch (e) { console.warn('iframe access error', e); }
+    }
   });
 
   renderAddedProducts();
