@@ -1,5 +1,5 @@
 // ============================================
-// صفحة إضافة منتجات (نموذج فقط - بدون قائمة أو تفاصيل)
+// صفحة إضافة منتجات
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   if (window.__productAddLoaded) return;
@@ -19,7 +19,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   const { data: suppliers } = await db.from('suppliers').select('*').order('name');
 
-  // ✅ بناء نموذج الإضافة فقط (بدون Workspace داخلي وبدون قائمة أو تفاصيل)
   main.innerHTML = `
     <div class="page-header">
       <h2>${tr('prod_add_title')}</h2>
@@ -285,7 +284,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
       const invoiceNumber = 'INV-' + Date.now() + '-' + Math.floor(Math.random() * 1000);
       let insertedCount = 0; let updatedCount = 0; const processedKeys = new Set();
-      let lastProductId = null; // ✅ متغير لتخزين آخر معرف منتج
+      let lastProductId = null;
 
       for (const p of addedProducts) {
         const key = `${p.name}__${p.price}__${finalSupplierId ?? 'null'}`;
@@ -307,7 +306,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           if (insertError) throw new Error(tr('prod_add_err_insert') + ' ' + insertError.message);
           productId = newProduct.id; insertedCount++;
         }
-        lastProductId = productId; // ✅ تحديث آخر معرف منتج
+        lastProductId = productId;
         await db.from('stock_movements').insert({ organization_id: profile.organization_id, product_id: productId, type: 'in', method: 'manual', quantity: Number(p.qty), performed_by: authUser.id });
       }
       const totalQty = addedProducts.reduce((s, p) => s + Number(p.qty), 0);
@@ -326,7 +325,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       successBox.textContent = `${tr('prod_add_new_count')} ${insertedCount} | ${tr('prod_add_upd_count')} ${updatedCount} | ${tr('prod_add_invoice_count')} ${invoiceNumber}`;
       successBox.style.display = 'block';
       
-      // ✅✅✅ إرسال إشارة للأم لتحديث القائمة وفتح آخر منتج
       if (window.self !== window.top && lastProductId) {
         window.parent.postMessage({
           type: 'NEW_PRODUCT_SAVED',
@@ -341,7 +339,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   });
 
-  // ✅ استقبال النقرات من القائمة وعرضها في القسم الثالث (من الصفحة الأم)
   window.addEventListener('message', (event) => {
     const data = event.data;
     if (!data || typeof data !== 'object') return;

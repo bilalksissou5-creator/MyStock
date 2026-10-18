@@ -2,6 +2,12 @@
 // Workspace (تقسيم صفحة الإضافة)
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
+  // ✅ 1. إذا كان المستخدم على هاتف أو شاشة صغيرة، حوله فوراً لصفحة الإضافة العادية
+  if (window.innerWidth <= 1024) {
+    window.location.replace('/products/add.html');
+    return;
+  }
+
   const user = await requireAuth();
   if (!user) return;
 
@@ -34,45 +40,59 @@ document.addEventListener('DOMContentLoaded', async () => {
   const listIframe = document.getElementById('list-iframe');
   const detailIframe = document.getElementById('detail-iframe');
 
-  // ✅ 1. تفعيل التمرير للقسم الأول
-  addIframe.addEventListener('load', () => {
-    try {
-      const iframeDoc = addIframe.contentDocument || addIframe.contentWindow.document;
-      if (iframeDoc) {
-        iframeDoc.documentElement.style.overflowY = 'auto';
-        iframeDoc.body.style.overflowY = 'auto';
-        iframeDoc.body.style.paddingBottom = '80px';
-      }
-    } catch (e) { console.warn('add iframe error:', e); }
-  });
-
-  // ✅ 2. تفعيل التمرير للقسم الثاني وإخفاء زر الإضافة فقط
+  // ✅ تفعيل التمرير وإخفاء الزر وتنسيق العنوان والبحث داخل القائمة
   listIframe.addEventListener('load', () => {
     try {
       const iframeDoc = listIframe.contentDocument || listIframe.contentWindow.document;
       if (iframeDoc) {
+        // تفعيل التمرير
         iframeDoc.documentElement.style.overflowY = 'auto';
         iframeDoc.body.style.overflowY = 'auto';
-        iframeDoc.body.style.paddingBottom = '80px';
         
-        // إخفاء زر الإضافة
+        // ✅ السحر: نقل خانة البحث لتكون بجانب العنوان
+        const header = iframeDoc.querySelector('.page-header');
+        const searchBar = iframeDoc.querySelector('.search-bar');
+        
+        if (header && searchBar && !header.contains(searchBar)) {
+          header.appendChild(searchBar); // ننقل البحث ليكون داخل الـ header
+        }
+
+        // ✅ حقن CSS لجعلهما في سطر واحد
         const style = iframeDoc.createElement('style');
-        style.innerHTML = `.page-header a[href="add.html"] { display: none !important; }`;
+        style.innerHTML = `
+          /* إخفاء زر الإضافة */
+          .page-header a[href="add.html"] { display: none !important; }
+          
+          /* تنسيق السطر الواحد */
+          .page-header {
+            display: flex !important;
+            flex-direction: row !important;
+            align-items: center !important;
+            justify-content: space-between !important;
+            gap: 16px !important;
+            margin-bottom: 16px !important;
+          }
+          
+          .page-header h2 {
+            margin: 0 !important;
+            white-space: nowrap !important;
+            flex-shrink: 0 !important;
+          }
+          
+          /* البحث يأخذ المساحة المتبقية */
+          .search-bar {
+            flex: 1 !important;
+            max-width: 100% !important;
+            margin-bottom: 0 !important;
+          }
+          
+          .search-bar input {
+            width: 100% !important;
+          }
+        `;
         iframeDoc.head.appendChild(style);
       }
     } catch (e) { console.warn('list iframe error:', e); }
-  });
-
-  // ✅ 3. تفعيل التمرير للقسم الثالث
-  detailIframe.addEventListener('load', () => {
-    try {
-      const iframeDoc = detailIframe.contentDocument || detailIframe.contentWindow.document;
-      if (iframeDoc) {
-        iframeDoc.documentElement.style.overflowY = 'auto';
-        iframeDoc.body.style.overflowY = 'auto';
-        iframeDoc.body.style.paddingBottom = '80px';
-      }
-    } catch (e) { console.warn('detail iframe error:', e); }
   });
 
   // ✅ استرجاع آخر منتج
