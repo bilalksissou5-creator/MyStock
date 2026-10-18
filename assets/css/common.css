@@ -236,8 +236,8 @@ button { font-family: inherit; }
   flex: 1 1 auto;
   overflow-y: auto;
   overflow-x: hidden;
-  padding: 0 24px 24px 24px; /* ✅ إلغاء المسافة العلوية */
-  padding-bottom: 80px;
+  /* ✅ إلغاء المسافة العلوية تماماً (0) وترك مسافة جانبية وسفلية فقط */
+  padding: 0 24px 24px 24px; 
   min-height: 0;
   min-width: 0;
   height: 100%;
@@ -248,7 +248,7 @@ button { font-family: inherit; }
    ✅ عند العمل داخل iframe
    ============================================ */
 html.in-iframe .main {
-  padding: 0 24px 24px 24px !important; /* ✅ إلغاء المسافة العلوية */
+  padding: 0 24px 24px 24px !important; /* ✅ إلغاء المسافة العلوية تماماً */
   height: 100% !important;
   overflow-y: auto !important;
 }
@@ -260,9 +260,9 @@ html.in-iframe .main {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-top: 0;
+  margin-top: 0 !important;
   margin-bottom: 16px;
-  padding-top: 0;
+  padding-top: 0 !important;
   gap: 12px;
   flex-wrap: wrap;
 }
