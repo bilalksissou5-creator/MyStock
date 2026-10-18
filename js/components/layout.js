@@ -1,5 +1,7 @@
 // ============================================
 // الهيكل المشترك (Header + Sidebar)
+// ✅ فحص تلقائي + تحذيرات + ترجمة كاملة
+// ✅ دعم iframe (وضع Embed)
 // ============================================
 
 const ALLOWED_PAGES = [
@@ -36,13 +38,16 @@ if (document.readyState === 'loading') document.addEventListener('DOMContentLoad
 else autoCheckPaymentBlock();
 
 function renderLayout(activePage) {
-  // ✅ إذا كنا داخل iframe، لا نبني الهيدر والسايدبار ونضيف كلاس in-iframe
+  // ✅✅✅ التعديل الجديد: إذا كانت الصفحة داخل iframe → اعرض Main فقط
   if (window.self !== window.top) {
     document.documentElement.classList.add('in-iframe');
     const app = document.querySelector('.app');
-    if (app) app.innerHTML = `<main class="main" id="main-content"></main>`;
+    if (app) {
+      app.innerHTML = `<main class="main" id="main-content"></main>`;
+    }
     return;
   }
+  // ✅✅✅ نهاية التعديل
 
   const tr = (key) => (window.t ? window.t(key) : key);
   const navItems = [
@@ -66,17 +71,35 @@ function renderLayout(activePage) {
 
   const layout = `
     <header class="header">
-      <button type="button" class="sidebar-toggle" id="sidebar-toggle"><i class="fas fa-bars"></i></button>
-      <a href="/notifications.html" class="notif" id="notif-btn"><i class="fas fa-bell"></i><span class="notif-count" id="notif-count">0</span></a>
-      <div class="search"><i class="fas fa-search"></i><input type="text" placeholder="${tr('nav_search')}"></div>
+      <button type="button" class="sidebar-toggle" id="sidebar-toggle" title="${tr('nav_menu')}">
+        <i class="fas fa-bars"></i>
+      </button>
+      <a href="/notifications.html" class="notif" id="notif-btn" title="${tr('nav_notifications')}">
+        <i class="fas fa-bell"></i>
+        <span class="notif-count" id="notif-count">0</span>
+      </a>
+      <div class="search">
+        <i class="fas fa-search"></i>
+        <input type="text" placeholder="${tr('nav_search')}">
+      </div>
       <h1 class="logo">MyStock</h1>
     </header>
+
     <div class="body" id="app-body">
       <aside class="sidebar" id="app-sidebar">
-        <nav class="nav">${navHTML}</nav>
+        <nav class="nav">
+          ${navHTML}
+        </nav>
+
         <div class="sidebar-footer">
-          <a href="/profile.html" class="nav-item ${activePage === '/profile.html' ? 'active' : ''}"><i class="fas fa-user"></i><span>${tr('nav_profile')}</span></a>
-          <button class="nav-item logout" id="logout-btn"><i class="fas fa-right-from-bracket"></i><span>${tr('nav_logout')}</span></button>
+          <a href="/profile.html" class="nav-item ${activePage === '/profile.html' ? 'active' : ''}">
+            <i class="fas fa-user"></i>
+            <span>${tr('nav_profile')}</span>
+          </a>
+          <button class="nav-item logout" id="logout-btn">
+            <i class="fas fa-right-from-bracket"></i>
+            <span>${tr('nav_logout')}</span>
+          </button>
         </div>
       </aside>
       <main class="main" id="main-content"></main>
@@ -96,11 +119,44 @@ function renderLayout(activePage) {
 
   const toggleBtn = document.getElementById('sidebar-toggle');
   const bodyEl = document.getElementById('app-body');
+  const sidebar = document.getElementById('app-sidebar');
   const isMobile = () => window.matchMedia('(max-width: 768px)').matches;
 
-  if (toggleBtn) toggleBtn.addEventListener('click', (e) => { e.stopPropagation(); if(isMobile()) bodyEl.classList.toggle('sidebar-hidden-mobile'); else bodyEl.classList.toggle('sidebar-closed'); });
+  function toggleSidebar() {
+    if (isMobile()) bodyEl.classList.toggle('sidebar-hidden-mobile');
+    else {
+      bodyEl.classList.toggle('sidebar-closed');
+      localStorage.setItem('sidebar_closed', bodyEl.classList.contains('sidebar-closed') ? 'true' : 'false');
+    }
+  }
+
+  function closeSidebarMobile() { if (isMobile()) bodyEl.classList.add('sidebar-hidden-mobile'); }
+
+  if (toggleBtn) toggleBtn.addEventListener('click', (e) => { e.stopPropagation(); toggleSidebar(); });
   if (!isMobile()) { if (localStorage.getItem('sidebar_closed') === 'true') bodyEl.classList.add('sidebar-closed'); }
   else bodyEl.classList.add('sidebar-hidden-mobile');
+
+  if (sidebar) {
+    sidebar.querySelectorAll('a.nav-item').forEach(link => { link.addEventListener('click', () => { if (isMobile()) closeSidebarMobile(); }); });
+  }
+
+  document.addEventListener('click', (e) => {
+    if (!isMobile() || bodyEl.classList.contains('sidebar-hidden-mobile')) return;
+    if (sidebar && sidebar.contains(e.target)) return;
+    if (toggleBtn && toggleBtn.contains(e.target)) return;
+    closeSidebarMobile();
+  });
+
+  if (sidebar) {
+    let touchStartX = 0;
+    sidebar.addEventListener('touchstart', (e) => { touchStartX = e.changedTouches[0].screenX; }, { passive: true });
+    sidebar.addEventListener('touchend', (e) => { if (!isMobile()) return; if (e.changedTouches[0].screenX - touchStartX < -30) closeSidebarMobile(); }, { passive: true });
+  }
+
+  window.addEventListener('resize', () => {
+    if (!isMobile()) bodyEl.classList.remove('sidebar-hidden-mobile');
+    else bodyEl.classList.add('sidebar-hidden-mobile');
+  });
 
   if (typeof startNotifPolling === 'function') startNotifPolling();
 }

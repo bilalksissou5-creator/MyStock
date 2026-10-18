@@ -1,6 +1,7 @@
 // ============================================
 // صفحة المنتجات
 // ✅ دعم كامل للترجمة
+// ✅ توجيه ذكي (Workspace للحاسوب، Detail للهاتف)
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   const user = await requireAuth();
@@ -85,12 +86,18 @@ async function loadProducts() {
     }
   }
 
+  // ✅ التعديل الوحيد: التوجيه الذكي
+  const isDesktop = window.innerWidth >= 1024;
+
   container.innerHTML = grouped.map(p => {
     const total = ((p.qty ?? 0) * (p.price ?? 0)).toFixed(2);
     const lowClass = (p.qty ?? 0) < 10 ? 'low' : '';
+    
+    // إذا كان على شاشة كبيرة، يذهب إلى workspace.html، وإلا إلى detail.html
+    const targetUrl = isDesktop ? `workspace.html?id=${p.id}` : `detail.html?id=${p.id}`;
 
     return `
-      <a href="detail.html?id=${p.id}" class="product-card" data-product-id="${p.id}">
+      <a href="${targetUrl}" class="product-card" data-product-id="${p.id}">
         <div class="product-card-image">
           ${p.image_url
             ? `<img src="${p.image_url}" alt="${p.name}">`
@@ -116,6 +123,7 @@ async function loadProducts() {
     `;
   }).join('');
 
+  // ✅ دعم iframe
   if (window.self !== window.top) {
     document.querySelectorAll('.product-card').forEach(card => {
       card.addEventListener('click', (e) => {
