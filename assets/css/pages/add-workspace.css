@@ -1,0 +1,77 @@
+/* ============================================
+   Workspace (تقسيم صفحة الإضافة)
+   ============================================ */
+
+/* في الهاتف والتابلت: يظهر القسم الأول فقط (صفحة الإضافة الأصلية) */
+.workspace-panel-left {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.workspace-panel-center,
+.workspace-panel-right {
+  display: none;
+}
+
+.workspace-iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+  display: block;
+  background: transparent;
+}
+
+/* ============================================
+   ✅ الحاسوب والشاشات الكبيرة (أكبر من 1024px)
+   ============================================ */
+@media (min-width: 1024px) {
+  /* الحاوية الرئيسية */
+  .workspace {
+    display: grid;
+    grid-template-columns: 320px minmax(0, 1fr) 380px;
+    gap: 16px;
+    height: calc(100vh - 60px); /* 60px = ارتفاع الهيدر */
+    padding: 16px;
+    box-sizing: border-box;
+  }
+
+  /* إظهار جميع الأقسام */
+  .workspace-panel-left,
+  .workspace-panel-center,
+  .workspace-panel-right {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
+    background: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  }
+
+  /* القسم الأول (20%) */
+  .workspace-panel-left {
+    grid-column: 1;
+  }
+
+  /* القسم الثاني (50%) */
+  .workspace-panel-center {
+    grid-column: 2;
+  }
+
+  /* القسم الثالث (30%) */
+  .workspace-panel-right {
+    grid-column: 3;
+  }
+
+  /* تنسيق الـ iframe */
+  .workspace-iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+    display: block;
+    background: #ffffff;
+    border-radius: 10px;
+    box-sizing: border-box;
+  }
+}
