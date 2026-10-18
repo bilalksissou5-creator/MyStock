@@ -2,6 +2,13 @@
 // Workspace (تقسيم صفحة الإضافة)
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
+  
+  // ✅✅✅ هذا هو السطر الذي يصلح الهاتف: تحويل فوري لصفحة الإضافة الأصلية
+  if (window.innerWidth <= 1024) {
+    window.location.replace('/products/add.html');
+    return; // الخروج وعدم تحميل التقسيمات
+  }
+
   const user = await requireAuth();
   if (!user) return;
 
@@ -51,12 +58,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     try {
       const iframeDoc = listIframe.contentDocument || listIframe.contentWindow.document;
       if (iframeDoc) {
-        // تفعيل التمرير
         iframeDoc.documentElement.style.overflowY = 'auto';
         iframeDoc.body.style.overflowY = 'auto';
-        iframeDoc.body.style.paddingBottom = '80px'; // مساحة سفلية للعناصر
+        iframeDoc.body.style.paddingBottom = '80px';
         
-        // إخفاء زر الإضافة
         const style = iframeDoc.createElement('style');
         style.innerHTML = `.page-header a[href="add.html"] { display: none !important; }`;
         iframeDoc.head.appendChild(style);
