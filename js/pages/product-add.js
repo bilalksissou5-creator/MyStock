@@ -1,5 +1,7 @@
 // ============================================
 // صفحة إضافة منتجات
+// ✅ دعم كامل للترجمة
+// ✅ دعم Workspace (تقسيم 3 أقسام)
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   if (window.__productAddLoaded) return;
@@ -137,14 +139,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       </div>
     </div>
   `;
-
-  // ✅✅✅ إخفاء القائمة والبحث من الصفحة إذا كنا على الهاتف
-  if (window.innerWidth <= 1024) {
-    const centerPanel = document.querySelector('.workspace-panel-center');
-    const rightPanel = document.querySelector('.workspace-panel-right');
-    if (centerPanel) centerPanel.style.display = 'none';
-    if (rightPanel) rightPanel.style.display = 'none';
-  }
 
   const addedProducts = [];
   const supplierInput = document.getElementById('supplier-input');
@@ -355,7 +349,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       
       // ✅✅✅ التعديل الجديد: إرسال إشارة للأم لتحديث القائمة وفتح آخر منتج
       if (window.self !== window.top && lastProductId) {
-        sessionStorage.setItem('last_viewed_product_id', lastProductId);
         window.parent.postMessage({
           type: 'NEW_PRODUCT_SAVED',
           productId: lastProductId
