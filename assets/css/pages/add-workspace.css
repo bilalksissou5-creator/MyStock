@@ -2,7 +2,7 @@
    Workspace (تقسيم صفحة الإضافة)
    ============================================ */
 
-/* في الهاتف والتابلت: يظهر القسم الأول فقط (صفحة الإضافة الأصلية) */
+/* في الهاتف والتابلت: يظهر القسم الأول فقط */
 .workspace-panel-left {
   display: block;
   width: 100%;
@@ -27,48 +27,48 @@
    ============================================ */
 @media (min-width: 1024px) {
   
-  /* ✅ إجبار الحاوية الرئيسية (main) على عدم التمرير وتثبيت الارتفاع */
+  /* 1. تثبيت الحاوية الرئيسية main ومنع تمريرها */
   body:has(.workspace) .main {
     overflow: hidden !important;
-    padding: 0 !important; /* إزالة البيدينج ليعطي المساحة للـ workspace */
-    height: 100% !important;
+    padding: 0 !important;
+    height: 100vh !important;
   }
 
-  /* الحاوية الرئيسية للـ Workspace */
+  /* 2. الحاوية الرئيسية Workspace */
   .workspace {
     display: grid;
     grid-template-columns: 320px minmax(0, 1fr) 380px;
     gap: 16px;
-    /* ✅ ارتفاع دقيق: طول الشاشة ناقص الهيدر (60px) والبيدينج (32px) */
-    height: calc(100vh - 60px - 32px); 
+    /* الارتفاع: طول الشاشة ناقص الهيدر (60px) */
+    height: calc(100vh - 60px);
     padding: 16px;
     box-sizing: border-box;
     overflow: hidden; /* منع تمرير الصفحة ككل */
   }
 
-  /* إظهار جميع الأقسام */
+  /* 3. الأقسام الثلاثة: كل قسم يتحرك لوحده */
   .workspace-panel-left,
   .workspace-panel-center,
   .workspace-panel-right {
     display: flex;
     flex-direction: column;
     height: 100%;
-    overflow: hidden; /* القسم نفسه لا يتمدد */
     background: #ffffff;
     border-radius: 10px;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+    overflow-y: auto; /* ✅ التمرير الداخلي المستقل لكل قسم */
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
   }
 
-  /* تنسيق الـ iframe - ✅ تفعيل التمرير الداخلي لكل قسم */
+  /* 4. الـ iframe داخل كل قسم */
   .workspace-iframe {
     width: 100%;
-    height: 100%;
+    min-height: 100%; /* ✅ ضمان ظهور المحتوى كاملاً مع التمرير */
     border: none;
     display: block;
     background: #ffffff;
     border-radius: 10px;
     box-sizing: border-box;
-    overflow-y: auto; /* ✅ تفعيل التمرير داخل الإطار */
-    -webkit-overflow-scrolling: touch; /* ✅ تحسين التمرير */
   }
 }
