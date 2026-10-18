@@ -324,9 +324,19 @@
   color: #171717;
 }
 
+/* ✅ تنسيق الأزرار السفلية (Save & Cancel) */
 .form-actions {
   display: flex;
   gap: 10px;
+  /* ✅ إضافة مساحة سفلية لضمان ظهورها داخل الـ iframe */
+  margin-bottom: 40px; 
+  padding-bottom: 20px;
+}
+
+/* ✅ ضمان أن الأزرار لا تختفي داخل الـ iframe */
+.workspace-iframe .form-actions {
+  position: relative;
+  z-index: 10;
 }
 
 .scanner-modal {
