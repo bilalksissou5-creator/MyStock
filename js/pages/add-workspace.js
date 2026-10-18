@@ -34,7 +34,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const listIframe = document.getElementById('list-iframe');
   const detailIframe = document.getElementById('detail-iframe');
 
-  // ✅ 1. تفعيل التمرير للقسم الأول (إضافة المنتج)
+  // ✅ 1. تفعيل التمرير للقسم الأول
   addIframe.addEventListener('load', () => {
     try {
       const iframeDoc = addIframe.contentDocument || addIframe.contentWindow.document;
@@ -46,57 +46,24 @@ document.addEventListener('DOMContentLoaded', async () => {
     } catch (e) { console.warn('add iframe error:', e); }
   });
 
-  // ✅ 2. تنسيق القسم الثاني (قائمة المنتجات): إخفاء الزر + وضع البحث والعنوان بجانب بعضهما
+  // ✅ 2. تفعيل التمرير للقسم الثاني وإخفاء زر الإضافة فقط
   listIframe.addEventListener('load', () => {
     try {
       const iframeDoc = listIframe.contentDocument || listIframe.contentWindow.document;
       if (iframeDoc) {
-        // تفعيل التمرير
         iframeDoc.documentElement.style.overflowY = 'auto';
         iframeDoc.body.style.overflowY = 'auto';
         iframeDoc.body.style.paddingBottom = '80px';
         
-        // حقن CSS لإصلاح التصميم
+        // إخفاء زر الإضافة
         const style = iframeDoc.createElement('style');
-        style.innerHTML = `
-          /* إخفاء زر الإضافة */
-          .page-header a[href="add.html"] { display: none !important; }
-          
-          /* جعل العنوان والبحث في سطر واحد */
-          .page-header {
-            display: flex !important;
-            flex-direction: row !important;
-            align-items: center !important;
-            justify-content: space-between !important;
-            gap: 16px !important;
-            margin-bottom: 16px !important;
-          }
-          
-          /* تثبيت حجم العنوان */
-          .page-header h2 {
-            margin: 0 !important;
-            font-size: 1.5rem !important;
-            white-space: nowrap !important;
-            flex-shrink: 0 !important;
-          }
-          
-          /* جعل البحث يأخذ المساحة المتبقية بشكل أنيق */
-          .search-bar {
-            flex: 1 !important;
-            max-width: 500px !important; /* لا تتركها تتمدد أكثر من اللازم */
-            margin-bottom: 0 !important;
-          }
-          
-          .search-bar input {
-            width: 100% !important;
-          }
-        `;
+        style.innerHTML = `.page-header a[href="add.html"] { display: none !important; }`;
         iframeDoc.head.appendChild(style);
       }
     } catch (e) { console.warn('list iframe error:', e); }
   });
 
-  // ✅ 3. تفعيل التمرير للقسم الثالث (تفاصيل المنتج)
+  // ✅ 3. تفعيل التمرير للقسم الثالث
   detailIframe.addEventListener('load', () => {
     try {
       const iframeDoc = detailIframe.contentDocument || detailIframe.contentWindow.document;
@@ -108,13 +75,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     } catch (e) { console.warn('detail iframe error:', e); }
   });
 
-  // ✅ استرجاع آخر منتج تم عرضه
+  // ✅ استرجاع آخر منتج
   const lastViewedProductId = sessionStorage.getItem('last_viewed_product_id');
   if (lastViewedProductId) {
     detailIframe.src = `/products/detail.html?id=${encodeURIComponent(lastViewedProductId)}`;
   }
 
-  // ✅ استقبال النقرات من القائمة وعرضها في القسم الثالث
+  // ✅ استقبال النقرات
   window.addEventListener('message', (event) => {
     const data = event.data;
     if (!data || typeof data !== 'object') return;

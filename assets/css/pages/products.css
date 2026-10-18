@@ -118,3 +118,43 @@
     font-size: 12px;
   }
 }
+
+/* ============================================
+   ✅ التعديل الجديد: تنسيق العنوان والبحث ليكونان في سطر واحد
+   ============================================ */
+.page-header {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 16px !important;
+  margin-bottom: 16px !important;
+}
+
+.page-header h2 {
+  margin: 0 !important;
+  white-space: nowrap !important;
+  flex-shrink: 0 !important;
+}
+
+.search-bar {
+  flex: 1 !important;
+  max-width: 100% !important;
+  margin-bottom: 0 !important;
+}
+
+.search-bar input {
+  width: 100% !important;
+}
+
+/* في الهاتف: نسمح للبحث بالنزول لسطر جديد إذا ضاقت المساحة */
+@media (max-width: 768px) {
+  .page-header {
+    flex-wrap: wrap !important;
+  }
+  
+  .search-bar {
+    min-width: 100% !important;
+    margin-top: 8px !important;
+  }
+}
