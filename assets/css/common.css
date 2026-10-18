@@ -236,8 +236,8 @@ button { font-family: inherit; }
   flex: 1 1 auto;
   overflow-y: auto;
   overflow-x: hidden;
-  /* ✅ إلغاء المسافة العلوية تماماً (0) وترك مسافة جانبية وسفلية فقط */
-  padding: 0 24px 24px 24px; 
+  padding: 16px; /* ✅ مسافة 16px */
+  padding-bottom: 80px;
   min-height: 0;
   min-width: 0;
   height: 100%;
@@ -248,21 +248,20 @@ button { font-family: inherit; }
    ✅ عند العمل داخل iframe
    ============================================ */
 html.in-iframe .main {
-  padding: 0 24px 24px 24px !important; /* ✅ إلغاء المسافة العلوية تماماً */
+  padding: 16px !important; /* ✅ مسافة 16px */
+  padding-bottom: 16px !important;
   height: 100% !important;
   overflow-y: auto !important;
 }
 
 /* ============================================
-   ✅ صفحة الرأس (إلغاء المسافة العلوية)
+   ✅ صفحة الرأس (موحّدة لكل الصفحات)
    ============================================ */
 .page-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-top: 0 !important;
   margin-bottom: 16px;
-  padding-top: 0 !important;
   gap: 12px;
   flex-wrap: wrap;
 }
@@ -327,7 +326,6 @@ html.in-iframe .main {
    ============================================ */
 .search-bar {
   position: relative;
-  margin-top: 0;
   margin-bottom: 20px;
   max-width: 400px;
 }

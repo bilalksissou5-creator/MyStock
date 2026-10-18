@@ -34,7 +34,7 @@
   /* إخفاء زر الإضافة */
   html.in-iframe .page-header a[href="add.html"] { display: none !important; }
 
-  /* جعل العنوان والبحث في سطر واحد وبدون أي مسافات علوية */
+  /* جعل العنوان والبحث في سطر واحد */
   html.in-iframe .page-header {
     display: flex !important;
     flex-direction: row !important;
@@ -43,7 +43,7 @@
     width: 100% !important;
     gap: 20px !important;
     
-    /* ✅ تصفير كل المسافات تماماً ليتساوى مع القسم الأول */
+    /* ✅ مسافة طبيعية، لا يوجد سحب */
     margin-top: 0 !important; 
     margin-bottom: 16px !important;
     padding-top: 0 !important;
