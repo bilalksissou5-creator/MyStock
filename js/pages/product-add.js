@@ -138,6 +138,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     </div>
   `;
 
+  // ✅✅✅ إخفاء القائمة والبحث من الصفحة إذا كنا على الهاتف
+  if (window.innerWidth <= 1024) {
+    const centerPanel = document.querySelector('.workspace-panel-center');
+    const rightPanel = document.querySelector('.workspace-panel-right');
+    if (centerPanel) centerPanel.style.display = 'none';
+    if (rightPanel) rightPanel.style.display = 'none';
+  }
+
   const addedProducts = [];
   const supplierInput = document.getElementById('supplier-input');
   const supplierIdInput = document.getElementById('supplier_id');
