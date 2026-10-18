@@ -1,7 +1,5 @@
 // ============================================
 // صفحة إضافة منتجات
-// ✅ دعم كامل للترجمة
-// ✅ دعم Workspace (تقسيم 3 أقسام)
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   if (window.__productAddLoaded) return;
@@ -349,9 +347,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       
       // ✅✅✅ التعديل الجديد: إرسال إشارة للأم لتحديث القائمة وفتح آخر منتج
       if (window.self !== window.top && lastProductId) {
-        // ✅ حفظ آخر منتج في sessionStorage ليبقى بعد إعادة التحميل
         sessionStorage.setItem('last_viewed_product_id', lastProductId);
-        
         window.parent.postMessage({
           type: 'NEW_PRODUCT_SAVED',
           productId: lastProductId

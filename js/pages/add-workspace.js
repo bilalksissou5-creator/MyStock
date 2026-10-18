@@ -1,7 +1,15 @@
 // ============================================
 // Workspace (تقسيم صفحة الإضافة)
+// ✅ يعمل فقط على شاشات الحاسوب (أكبر من 1024px)
+// ✅ على الهاتف: يحول المستخدم إلى صفحة الإضافة الأصلية
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
+  // ✅ إذا كانت الشاشة صغيرة (هاتف أو تابلت)، قم بتحويل المستخدم إلى صفحة الإضافة الأصلية
+  if (window.innerWidth <= 1024) {
+    window.location.replace('/products/add.html');
+    return;
+  }
+
   const user = await requireAuth();
   if (!user) return;
 
@@ -51,14 +59,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     const data = event.data;
     if (!data || typeof data !== 'object') return;
     if (data.type === 'PRODUCT_SELECTED' && data.productId) {
-      // ✅ حفظ المنتج المختار ليبقى بعد إعادة التحميل
       sessionStorage.setItem('last_viewed_product_id', data.productId);
-      
       detailIframe.src = `/products/detail.html?id=${encodeURIComponent(data.productId)}`;
     }
   });
 
-  // ✅ إخفاء زر الإضافة داخل القائمة (لأننا في صفحة الإضافة بالفعل)
+  // ✅ إخفاء زر الإضافة داخل القائمة
   listIframe.addEventListener('load', () => {
     try {
       const iframeDoc = listIframe.contentDocument || listIframe.contentWindow.document;
