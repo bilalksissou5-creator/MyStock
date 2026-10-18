@@ -39,7 +39,6 @@
     display: grid;
     grid-template-columns: 320px minmax(0, 1fr) 380px;
     gap: 16px;
-    /* الارتفاع الكامل للشاشة ناقص الهيدر */
     height: calc(100vh - 60px);
     padding: 16px;
     box-sizing: border-box;
@@ -56,7 +55,9 @@
     background: #ffffff;
     border-radius: 10px;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
-    overflow: hidden; /* يمنع التمرير في الحاوية نفسها */
+    overflow-y: auto; /* ✅ التمرير الداخلي المستقل لكل قسم */
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
   }
 
   /* 4. الـ iframe: التمرير يحدث داخله */
@@ -68,7 +69,22 @@
     background: #ffffff;
     border-radius: 10px;
     box-sizing: border-box;
-    overflow-y: auto; /* التمرير داخل الإطار */
+    overflow-y: auto;
     -webkit-overflow-scrolling: touch;
+  }
+
+  /* ✅✅✅ التعديل الجديد: تنسيق محتوى الـ iframe الأول لضمان ظهور الأزرار السفلية */
+  .workspace-panel-left .workspace-iframe {
+    overflow-y: visible; /* لإظهار المحتوى كاملاً داخل الإطار */
+  }
+
+  /* ✅ إضافة مساحة سفلية داخل الـ iframe الأول لضمان ظهور أزرار الحفظ والإلغاء */
+  .workspace-panel-left .workspace-iframe body {
+    padding-bottom: 80px; /* مساحة إضافية في الأسفل */
+  }
+
+  /* ✅ تنسيق الأزرار السفلية لتبقى ثابتة أو ظاهرة */
+  .workspace-panel-left .form-actions {
+    margin-bottom: 24px;
   }
 }
