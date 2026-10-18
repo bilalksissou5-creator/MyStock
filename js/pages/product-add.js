@@ -1,5 +1,5 @@
 // ============================================
-// صفحة إضافة منتجات
+// صفحة إضافة منتجات (نموذج فقط - بدون Workspace داخلي)
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   if (window.__productAddLoaded) return;
@@ -19,6 +19,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   const { data: suppliers } = await db.from('suppliers').select('*').order('name');
 
+  // ✅ بناء نموذج الإضافة فقط (بدون Workspace داخلي)
   main.innerHTML = `
     <div class="page-header">
       <h2>${tr('prod_add_title')}</h2>
