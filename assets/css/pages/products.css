@@ -34,7 +34,7 @@
   /* إخفاء زر الإضافة */
   html.in-iframe .page-header a[href="add.html"] { display: none !important; }
 
-  /* جعل العنوان والبحث في سطر واحد ورفع العنوان للأعلى */
+  /* جعل العنوان والبحث في سطر واحد */
   html.in-iframe .page-header {
     display: flex !important;
     flex-direction: row !important;
@@ -43,8 +43,8 @@
     width: 100% !important;
     gap: 20px !important;
     
-    /* ✅ الحل: سحب شريط العنوان للأعلى بقوة ليتساوى مع القسم الأول */
-    margin-top: -25px !important; 
+    /* إعادة المسافة الطبيعية */
+    margin-top: 0 !important; 
     margin-bottom: 16px !important;
     padding-top: 0 !important;
   }
@@ -56,8 +56,10 @@
     white-space: nowrap !important;
   }
 
+  /* ✅ الحل السحري: نرفع حقل البحث قليلاً ليتحرر العنوان من النزول معه */
   html.in-iframe .page-header .search-bar {
     margin: 0 !important;
+    margin-top: -5px !important; /* رفع البحث للأعلى */
     flex: 1 !important; 
     max-width: 100% !important; 
   }
