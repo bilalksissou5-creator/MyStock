@@ -27,7 +27,7 @@
    ============================================ */
 @media (min-width: 1024px) {
   
-  /* 1. تثبيت الحاوية الرئيسية main ومنع تمريرها */
+  /* 1. تثبيت الحاوية الرئيسية main */
   body:has(.workspace) .main {
     overflow: hidden !important;
     padding: 0 !important;
@@ -39,14 +39,14 @@
     display: grid;
     grid-template-columns: 320px minmax(0, 1fr) 380px;
     gap: 16px;
-    /* الارتفاع: طول الشاشة ناقص الهيدر (60px) */
+    /* الارتفاع الكامل للشاشة ناقص الهيدر */
     height: calc(100vh - 60px);
     padding: 16px;
     box-sizing: border-box;
-    overflow: hidden; /* منع تمرير الصفحة ككل */
+    overflow: hidden;
   }
 
-  /* 3. الأقسام الثلاثة: كل قسم يتحرك لوحده */
+  /* 3. الأقسام الثلاثة */
   .workspace-panel-left,
   .workspace-panel-center,
   .workspace-panel-right {
@@ -56,19 +56,19 @@
     background: #ffffff;
     border-radius: 10px;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
-    overflow-y: auto; /* ✅ التمرير الداخلي المستقل لكل قسم */
-    overflow-x: hidden;
-    -webkit-overflow-scrolling: touch;
+    overflow: hidden; /* يمنع التمرير في الحاوية نفسها */
   }
 
-  /* 4. الـ iframe داخل كل قسم */
+  /* 4. الـ iframe: التمرير يحدث داخله */
   .workspace-iframe {
     width: 100%;
-    min-height: 100%; /* ✅ ضمان ظهور المحتوى كاملاً مع التمرير */
+    height: 100%;
     border: none;
     display: block;
     background: #ffffff;
     border-radius: 10px;
     box-sizing: border-box;
+    overflow-y: auto; /* التمرير داخل الإطار */
+    -webkit-overflow-scrolling: touch;
   }
 }
