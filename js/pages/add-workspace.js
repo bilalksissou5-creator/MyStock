@@ -40,7 +40,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const listIframe = document.getElementById('list-iframe');
   const detailIframe = document.getElementById('detail-iframe');
 
-  // ✅✅✅ التعديل الجديد 1: استرجاع آخر منتج تم عرضه بعد إعادة تحميل الصفحة
+  // ✅ استرجاع آخر منتج تم عرضه بعد إعادة تحميل الصفحة
   const lastViewedProductId = sessionStorage.getItem('last_viewed_product_id');
   if (lastViewedProductId) {
     detailIframe.src = `/products/detail.html?id=${encodeURIComponent(lastViewedProductId)}`;
@@ -51,7 +51,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const data = event.data;
     if (!data || typeof data !== 'object') return;
     if (data.type === 'PRODUCT_SELECTED' && data.productId) {
-      // ✅✅✅ التعديل الجديد 2: حفظ المنتج المختار ليبقى بعد إعادة التحميل
+      // ✅ حفظ المنتج المختار ليبقى بعد إعادة التحميل
       sessionStorage.setItem('last_viewed_product_id', data.productId);
       
       detailIframe.src = `/products/detail.html?id=${encodeURIComponent(data.productId)}`;
@@ -68,29 +68,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         iframeDoc.head.appendChild(style);
       }
     } catch (e) { console.warn('list iframe access error', e); }
-  });
-
-  // ✅✅✅ التعديل الجديد 3: إخفاء العناصر الزائدة داخل القسم الأول فقط
-  addIframe.addEventListener('load', () => {
-    try {
-      const iframeDoc = addIframe.contentDocument || addIframe.contentWindow.document;
-      if (iframeDoc) {
-        const style = iframeDoc.createElement('style');
-        // إخفاء القائمة والتفاصيل والبحث والملخص، مع إبقاء النموذج وزر الماسح
-        style.innerHTML = `
-          .workspace-panel-center,
-          .workspace-panel-right,
-          .page-header .scan-btn ~ .search,
-          .page-header .search,
-          #list-container,
-          .added-products-section,
-          .form-summary {
-            display: none !important;
-          }
-        `;
-        iframeDoc.head.appendChild(style);
-      }
-    } catch (e) { console.warn('add iframe access error', e); }
   });
 
 });
