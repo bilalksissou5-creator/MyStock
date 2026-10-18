@@ -46,7 +46,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     } catch (e) { console.warn('add iframe error:', e); }
   });
 
-  // ✅ 2. إجبار القسم الثاني (قائمة المنتجات) على تفعيل التمرير الداخلي
+  // ✅ 2. إجبار القسم الثاني (قائمة المنتجات) على تفعيل التمرير + تنسيق العنوان والبحث
   listIframe.addEventListener('load', () => {
     try {
       const iframeDoc = listIframe.contentDocument || listIframe.contentWindow.document;
@@ -54,11 +54,37 @@ document.addEventListener('DOMContentLoaded', async () => {
         // تفعيل التمرير
         iframeDoc.documentElement.style.overflowY = 'auto';
         iframeDoc.body.style.overflowY = 'auto';
-        iframeDoc.body.style.paddingBottom = '80px'; // مساحة سفلية للعناصر
+        iframeDoc.body.style.paddingBottom = '80px';
         
-        // إخفاء زر الإضافة
+        // إخفاء زر الإضافة + تنسيق العنوان والبحث ليكونان في سطر واحد
         const style = iframeDoc.createElement('style');
-        style.innerHTML = `.page-header a[href="add.html"] { display: none !important; }`;
+        style.innerHTML = `
+          /* إخفاء زر الإضافة */
+          .page-header a[href="add.html"] { display: none !important; }
+          
+          /* ✅ جعل العنوان والبحث في سطر واحد */
+          .page-header {
+            display: flex !important;
+            flex-direction: row !important;
+            align-items: center !important;
+            justify-content: space-between !important;
+            gap: 16px !important;
+            margin-bottom: 16px !important;
+          }
+          
+          /* ✅ خانة البحث تأخذ المساحة المتبقية */
+          .search-bar {
+            flex: 1 !important;
+            max-width: 100% !important;
+            margin-bottom: 0 !important;
+          }
+          
+          /* ✅ تصفير هوامش العنوان */
+          .page-header h2 {
+            margin: 0 !important;
+            white-space: nowrap;
+          }
+        `;
         iframeDoc.head.appendChild(style);
       }
     } catch (e) { console.warn('list iframe error:', e); }
