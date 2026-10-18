@@ -70,17 +70,21 @@ document.addEventListener('DOMContentLoaded', async () => {
     } catch (e) { console.warn('list iframe access error', e); }
   });
 
-  // ✅✅✅ التعديل الجديد 3: إخفاء العناصر الزائدة داخل القسم الأول (صفحة الإضافة)
+  // ✅✅✅ التعديل الجديد 3: إخفاء العناصر الزائدة داخل القسم الأول فقط
   addIframe.addEventListener('load', () => {
     try {
       const iframeDoc = addIframe.contentDocument || addIframe.contentWindow.document;
       if (iframeDoc) {
         const style = iframeDoc.createElement('style');
-        // إخفاء الأقسام الزائدة التي لا تخص نموذج الإضافة فقط
+        // إخفاء القائمة والتفاصيل والبحث والملخص، مع إبقاء النموذج وزر الماسح
         style.innerHTML = `
           .workspace-panel-center,
           .workspace-panel-right,
-          .page-header .scan-btn {
+          .page-header .scan-btn ~ .search,
+          .page-header .search,
+          #list-container,
+          .added-products-section,
+          .form-summary {
             display: none !important;
           }
         `;
