@@ -43,7 +43,7 @@
     width: 100% !important;
     gap: 20px !important;
     
-    /* ✅ مسافة طبيعية، لا يوجد سحب */
+    /* ✅ مسافة طبيعية (0) */
     margin-top: 0 !important; 
     margin-bottom: 16px !important;
     padding-top: 0 !important;

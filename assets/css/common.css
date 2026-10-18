@@ -236,8 +236,7 @@ button { font-family: inherit; }
   flex: 1 1 auto;
   overflow-y: auto;
   overflow-x: hidden;
-  padding: 16px; /* ✅ مسافة 16px */
-  padding-bottom: 80px;
+  padding: 0 16px 80px 16px; /* ✅ إلغاء المسافة العلوية تماماً (0) */
   min-height: 0;
   min-width: 0;
   height: 100%;
@@ -248,20 +247,21 @@ button { font-family: inherit; }
    ✅ عند العمل داخل iframe
    ============================================ */
 html.in-iframe .main {
-  padding: 16px !important; /* ✅ مسافة 16px */
-  padding-bottom: 16px !important;
+  padding: 0 16px 16px 16px !important; /* ✅ إلغاء المسافة العلوية تماماً (0) */
   height: 100% !important;
   overflow-y: auto !important;
 }
 
 /* ============================================
-   ✅ صفحة الرأس (موحّدة لكل الصفحات)
+   ✅ صفحة الرأس (إلغاء المسافة العلوية)
    ============================================ */
 .page-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  margin-top: 0 !important;
   margin-bottom: 16px;
+  padding-top: 0 !important;
   gap: 12px;
   flex-wrap: wrap;
 }
@@ -326,6 +326,7 @@ html.in-iframe .main {
    ============================================ */
 .search-bar {
   position: relative;
+  margin-top: 0;
   margin-bottom: 20px;
   max-width: 400px;
 }
@@ -496,7 +497,7 @@ html.in-iframe .main {
   .sidebar-footer .nav-item { padding: 12px 4px; justify-content: center; }
   .sidebar-footer .nav-item i { font-size: 18px; }
 
-  .main { padding: 12px; padding-bottom: 80px; }
+  .main { padding: 0 12px 80px 12px; }
 
   .body.sidebar-hidden-mobile .sidebar { display: none; }
 }
@@ -516,5 +517,5 @@ html.in-iframe .main {
   .sidebar-footer { padding: 6px 8px; gap: 2px; }
   .sidebar-footer .nav-item { padding: 6px 10px; font-size: 12px; }
   .sidebar-footer .nav-item i { font-size: 14px; }
-  .main { padding: 12px; padding-bottom: 40px; }
+  .main { padding: 0 12px 40px 12px; }
 }
