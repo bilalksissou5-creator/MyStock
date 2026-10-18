@@ -140,6 +140,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     </div>
   `;
 
+  // ✅✅✅ التعديل المطلوب: إلغاء ظهور القسم الثاني والثالث (القائمة والبحث) على الهاتف فقط
+  if (window.innerWidth <= 1024) {
+    const centerPanel = document.querySelector('.workspace-panel-center');
+    const rightPanel = document.querySelector('.workspace-panel-right');
+    if (centerPanel) centerPanel.style.display = 'none';
+    if (rightPanel) rightPanel.style.display = 'none';
+  }
+
   const addedProducts = [];
   const supplierInput = document.getElementById('supplier-input');
   const supplierIdInput = document.getElementById('supplier_id');
