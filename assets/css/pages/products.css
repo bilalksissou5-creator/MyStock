@@ -34,7 +34,7 @@
   /* إخفاء زر الإضافة */
   html.in-iframe .page-header a[href="add.html"] { display: none !important; }
 
-  /* جعل العنوان والبحث في سطر واحد */
+  /* جعل العنوان والبحث في سطر واحد ورفع العنوان للأعلى */
   html.in-iframe .page-header {
     display: flex !important;
     flex-direction: row !important;
@@ -42,8 +42,9 @@
     justify-content: flex-start !important; 
     width: 100% !important;
     gap: 20px !important;
-    /* ✅ التعديل الوحيد: سحب العنوان للأعلى ليتوازى مع القسم الأول */
-    margin-top: -15px !important; 
+    
+    /* ✅ الحل: سحب شريط العنوان للأعلى بقوة ليتساوى مع القسم الأول */
+    margin-top: -25px !important; 
     margin-bottom: 16px !important;
     padding-top: 0 !important;
   }
