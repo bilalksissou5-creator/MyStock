@@ -26,6 +26,13 @@
    ✅ الحاسوب والشاشات الكبيرة (أكبر من 1024px)
    ============================================ */
 @media (min-width: 1024px) {
+  
+  /* ✅ إجبار الـ main على عدم التمرير عندما يحتوي على الـ Workspace */
+  body:has(.workspace) .main {
+    overflow: hidden !important;
+    padding: 0 !important; /* إزالة البيدينج من main ليعطي المساحة للـ workspace */
+  }
+
   /* الحاوية الرئيسية */
   .workspace {
     display: grid;
@@ -34,7 +41,7 @@
     height: calc(100vh - 60px); /* 60px = ارتفاع الهيدر */
     padding: 16px;
     box-sizing: border-box;
-    overflow: hidden; /* ✅ منع تمرير الصفحة بأكملها */
+    overflow: hidden; /* منع تمرير الصفحة ككل */
   }
 
   /* إظهار جميع الأقسام */
@@ -44,28 +51,15 @@
     display: flex;
     flex-direction: column;
     height: 100%;
-    overflow: hidden; /* ✅ الحاوية لا تتحرك */
+    overflow-y: auto; /* ✅ التمرير الداخلي لكل قسم */
+    overflow-x: hidden;
     background: #ffffff;
     border-radius: 10px;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+    -webkit-overflow-scrolling: touch;
   }
 
-  /* القسم الأول (20%) */
-  .workspace-panel-left {
-    grid-column: 1;
-  }
-
-  /* القسم الثاني (50%) */
-  .workspace-panel-center {
-    grid-column: 2;
-  }
-
-  /* القسم الثالث (30%) */
-  .workspace-panel-right {
-    grid-column: 3;
-  }
-
-  /* تنسيق الـ iframe - ✅ التمرير الداخلي لكل قسم */
+  /* تنسيق الـ iframe */
   .workspace-iframe {
     width: 100%;
     height: 100%;
@@ -74,6 +68,7 @@
     background: #ffffff;
     border-radius: 10px;
     box-sizing: border-box;
-    overflow-y: auto; /* ✅ تفعيل التمرير داخل الإطار */
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
   }
 }
