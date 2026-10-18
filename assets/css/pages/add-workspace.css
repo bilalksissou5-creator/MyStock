@@ -3,38 +3,23 @@
    ============================================ */
 
 /* في الهاتف والتابلت: يظهر القسم الأول فقط */
-.workspace-panel-left {
-  display: block;
-  width: 100%;
-  height: 100%;
-}
-
-.workspace-panel-center,
-.workspace-panel-right {
-  display: none;
-}
-
-.workspace-iframe {
-  width: 100%;
-  height: 100%;
-  border: none;
-  display: block;
-  background: transparent;
-}
+.workspace-panel-left { display: block; width: 100%; height: 100%; }
+.workspace-panel-center, .workspace-panel-right { display: none; }
+.workspace-iframe { width: 100%; height: 100%; border: none; display: block; background: transparent; }
 
 /* ============================================
    ✅ الحاسوب والشاشات الكبيرة (أكبر من 1024px)
    ============================================ */
 @media (min-width: 1024px) {
   
-  /* 1. تثبيت الحاوية الرئيسية main */
+  /* تثبيت الحاوية الرئيسية main */
   body:has(.workspace) .main {
     overflow: hidden !important;
     padding: 0 !important;
     height: 100vh !important;
   }
 
-  /* 2. الحاوية الرئيسية Workspace */
+  /* الحاوية الرئيسية Workspace */
   .workspace {
     display: grid;
     grid-template-columns: 320px minmax(0, 1fr) 380px;
@@ -45,7 +30,7 @@
     overflow: hidden;
   }
 
-  /* 3. الأقسام الثلاثة */
+  /* الأقسام الثلاثة */
   .workspace-panel-left,
   .workspace-panel-center,
   .workspace-panel-right {
@@ -60,7 +45,7 @@
     -webkit-overflow-scrolling: touch;
   }
 
-  /* 4. الـ iframe: التمرير يحدث داخله */
+  /* الـ iframe داخل كل قسم */
   .workspace-iframe {
     width: 100%;
     height: 100%;
@@ -69,21 +54,18 @@
     background: #ffffff;
     border-radius: 10px;
     box-sizing: border-box;
-    overflow-y: auto;
+    overflow-y: auto; /* التمرير داخل الإطار */
     -webkit-overflow-scrolling: touch;
   }
 
-  /* ✅✅✅ التعديل الجديد: تنسيق محتوى الـ iframe الأول لضمان ظهور الأزرار السفلية */
+  /* ✅ ضمان ظهور الأزرار في القسم الأول */
   .workspace-panel-left .workspace-iframe {
-    overflow-y: visible; /* لإظهار المحتوى كاملاً داخل الإطار */
+    min-height: 100%; 
+    overflow-y: visible;
   }
-
-  /* ✅ إضافة مساحة سفلية داخل الـ iframe الأول لضمان ظهور أزرار الحفظ والإلغاء */
   .workspace-panel-left .workspace-iframe body {
-    padding-bottom: 80px; /* مساحة إضافية في الأسفل */
+    padding-bottom: 80px;
   }
-
-  /* ✅ تنسيق الأزرار السفلية لتبقى ثابتة أو ظاهرة */
   .workspace-panel-left .form-actions {
     margin-bottom: 24px;
   }
