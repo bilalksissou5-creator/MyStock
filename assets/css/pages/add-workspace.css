@@ -34,6 +34,7 @@
     height: calc(100vh - 60px); /* 60px = ارتفاع الهيدر */
     padding: 16px;
     box-sizing: border-box;
+    overflow: hidden; /* ✅ منع تمرير الصفحة بأكملها */
   }
 
   /* إظهار جميع الأقسام */
@@ -43,7 +44,7 @@
     display: flex;
     flex-direction: column;
     height: 100%;
-    overflow: hidden;
+    overflow: hidden; /* ✅ الحاوية لا تتحرك */
     background: #ffffff;
     border-radius: 10px;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
@@ -64,7 +65,7 @@
     grid-column: 3;
   }
 
-  /* تنسيق الـ iframe */
+  /* تنسيق الـ iframe - ✅ التمرير الداخلي لكل قسم */
   .workspace-iframe {
     width: 100%;
     height: 100%;
@@ -73,5 +74,6 @@
     background: #ffffff;
     border-radius: 10px;
     box-sizing: border-box;
+    overflow-y: auto; /* ✅ تفعيل التمرير داخل الإطار */
   }
 }
