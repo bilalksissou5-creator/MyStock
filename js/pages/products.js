@@ -14,18 +14,16 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   const main = document.getElementById('main-content');
   
+  // ✅ إذا كنا داخل iframe، لا نبني زر الإضافة
   const isInIframe = window.self !== window.top;
+  const addButtonHTML = isInIframe ? '' : `<a href="add.html" class="btn-primary"><i class="fas fa-plus"></i><span>${tr('products_add')}</span></a>`;
 
-  const addButtonHTML = isInIframe 
-    ? '' 
-    : `<a href="add.html" class="btn-primary"><i class="fas fa-plus"></i><span>${tr('products_add')}</span></a>`;
-
-  // ✅ الهيكل السابق الناجح (بدون تغييرات في الترتيب)
+  // ✅ التعديل الحاسم: إضافة style مضمّن لإلغاء أي مسافة علوية من الحاوية والعنوان
   main.innerHTML = `
-    <div class="page-header">
-      <h2>${tr('products_title')}</h2>
+    <div class="page-header" style="margin-top: 0 !important; padding-top: 0 !important; display: flex; align-items: center; gap: 20px; width: 100%; margin-bottom: 16px;">
+      <h2 style="margin: 0 !important; padding: 0 !important; font-size: 1.75rem; font-weight: 700; white-space: nowrap;">${tr('products_title')}</h2>
       ${addButtonHTML}
-      <div class="search-bar">
+      <div class="search-bar" style="margin: 0 !important; flex: 1; max-width: 100%;">
         <i class="fas fa-search"></i>
         <input type="text" id="search-products" placeholder="${tr('products_search_ph')}">
       </div>
@@ -76,7 +74,6 @@ async function loadProducts() {
 
   for (const p of data) {
     const key = `${(p.name ?? '').trim()}|${p.supplier_id ?? ''}|${p.price ?? 0}`;
-
     if (groupedMap.has(key)) {
       const existing = groupedMap.get(key);
       existing.qty = (existing.qty ?? 0) + (p.qty ?? 0);
@@ -95,9 +92,7 @@ async function loadProducts() {
     return `
       <a href="detail.html?id=${p.id}" class="product-card" data-product-id="${p.id}">
         <div class="product-card-image">
-          ${p.image_url
-            ? `<img src="${p.image_url}" alt="${p.name}">`
-            : `<i class="fas fa-box-open"></i>`}
+          ${p.image_url ? `<img src="${p.image_url}" alt="${p.name}">` : `<i class="fas fa-box-open"></i>`}
         </div>
         <h3>${p.name ?? tr('products_no_name')}</h3>
         <p class="sku">${p.sku ?? '—'}</p>
@@ -124,11 +119,7 @@ async function loadProducts() {
       card.addEventListener('click', (e) => {
         e.preventDefault();
         e.stopPropagation();
-        const productId = card.dataset.productId;
-        window.parent.postMessage({
-          type: 'PRODUCT_SELECTED',
-          productId: productId
-        }, '*');
+        window.parent.postMessage({ type: 'PRODUCT_SELECTED', productId: card.dataset.productId }, '*');
       });
     });
   }
