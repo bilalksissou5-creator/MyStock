@@ -17,7 +17,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   main.innerHTML = `
     <div class="workspace">
       <div class="workspace-panel-left">
-        <!-- ✅ تم إضافة scrolling="yes" وإزالة أي قيود على الارتفاع -->
         <iframe src="/products/add.html" class="workspace-iframe" id="add-iframe" scrolling="yes"></iframe>
       </div>
 
@@ -35,27 +34,37 @@ document.addEventListener('DOMContentLoaded', async () => {
   const listIframe = document.getElementById('list-iframe');
   const detailIframe = document.getElementById('detail-iframe');
 
-  // ✅✅✅ إجبار الـ iframe الأول على تفعيل التمرير الداخلي
+  // ✅✅✅ 1. إجبار القسم الأول (إضافة المنتج) على تفعيل التمرير الداخلي
   addIframe.addEventListener('load', () => {
     try {
       const iframeDoc = addIframe.contentDocument || addIframe.contentWindow.document;
       if (iframeDoc) {
-        // إجبار الصفحة الداخلية على إظهار شريط التمرير
         iframeDoc.documentElement.style.overflowY = 'auto';
         iframeDoc.body.style.overflowY = 'auto';
-        // إضافة مساحة سفلية للأزرار
-        iframeDoc.body.style.paddingBottom = '80px';
+        iframeDoc.body.style.paddingBottom = '80px'; // مساحة سفلية للأزرار
       }
     } catch (e) { console.warn('add iframe error:', e); }
   });
 
-  // ✅ استرجاع آخر منتج
+  // ✅✅✅ 2. إجبار القسم الثالث (تفاصيل المنتج) على تفعيل التمرير الداخلي
+  detailIframe.addEventListener('load', () => {
+    try {
+      const iframeDoc = detailIframe.contentDocument || detailIframe.contentWindow.document;
+      if (iframeDoc) {
+        iframeDoc.documentElement.style.overflowY = 'auto';
+        iframeDoc.body.style.overflowY = 'auto';
+        iframeDoc.body.style.paddingBottom = '80px'; // مساحة سفلية لزر الحذف
+      }
+    } catch (e) { console.warn('detail iframe error:', e); }
+  });
+
+  // ✅ استرجاع آخر منتج تم عرضه
   const lastViewedProductId = sessionStorage.getItem('last_viewed_product_id');
   if (lastViewedProductId) {
     detailIframe.src = `/products/detail.html?id=${encodeURIComponent(lastViewedProductId)}`;
   }
 
-  // ✅ استقبال النقرات من القائمة
+  // ✅ استقبال النقرات من القائمة وعرضها في القسم الثالث
   window.addEventListener('message', (event) => {
     const data = event.data;
     if (!data || typeof data !== 'object') return;
