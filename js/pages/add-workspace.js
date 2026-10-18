@@ -40,11 +40,20 @@ document.addEventListener('DOMContentLoaded', async () => {
   const listIframe = document.getElementById('list-iframe');
   const detailIframe = document.getElementById('detail-iframe');
 
+  // ✅✅✅ التعديل الجديد 1: استرجاع آخر منتج تم عرضه بعد إعادة تحميل الصفحة
+  const lastViewedProductId = sessionStorage.getItem('last_viewed_product_id');
+  if (lastViewedProductId) {
+    detailIframe.src = `/products/detail.html?id=${encodeURIComponent(lastViewedProductId)}`;
+  }
+
   // ✅ استقبال حدث النقر على منتج من القائمة
   window.addEventListener('message', (event) => {
     const data = event.data;
     if (!data || typeof data !== 'object') return;
     if (data.type === 'PRODUCT_SELECTED' && data.productId) {
+      // ✅✅✅ التعديل الجديد 2: حفظ المنتج المختار ليبقى بعد إعادة التحميل
+      sessionStorage.setItem('last_viewed_product_id', data.productId);
+      
       detailIframe.src = `/products/detail.html?id=${encodeURIComponent(data.productId)}`;
     }
   });
