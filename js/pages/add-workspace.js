@@ -34,26 +34,44 @@ document.addEventListener('DOMContentLoaded', async () => {
   const listIframe = document.getElementById('list-iframe');
   const detailIframe = document.getElementById('detail-iframe');
 
-  // ✅✅✅ 1. إجبار القسم الأول (إضافة المنتج) على تفعيل التمرير الداخلي
+  // ✅ 1. إجبار القسم الأول (إضافة المنتج) على تفعيل التمرير الداخلي
   addIframe.addEventListener('load', () => {
     try {
       const iframeDoc = addIframe.contentDocument || addIframe.contentWindow.document;
       if (iframeDoc) {
         iframeDoc.documentElement.style.overflowY = 'auto';
         iframeDoc.body.style.overflowY = 'auto';
-        iframeDoc.body.style.paddingBottom = '80px'; // مساحة سفلية للأزرار
+        iframeDoc.body.style.paddingBottom = '80px';
       }
     } catch (e) { console.warn('add iframe error:', e); }
   });
 
-  // ✅✅✅ 2. إجبار القسم الثالث (تفاصيل المنتج) على تفعيل التمرير الداخلي
+  // ✅ 2. إجبار القسم الثاني (قائمة المنتجات) على تفعيل التمرير الداخلي
+  listIframe.addEventListener('load', () => {
+    try {
+      const iframeDoc = listIframe.contentDocument || listIframe.contentWindow.document;
+      if (iframeDoc) {
+        // تفعيل التمرير
+        iframeDoc.documentElement.style.overflowY = 'auto';
+        iframeDoc.body.style.overflowY = 'auto';
+        iframeDoc.body.style.paddingBottom = '80px'; // مساحة سفلية للعناصر
+        
+        // إخفاء زر الإضافة
+        const style = iframeDoc.createElement('style');
+        style.innerHTML = `.page-header a[href="add.html"] { display: none !important; }`;
+        iframeDoc.head.appendChild(style);
+      }
+    } catch (e) { console.warn('list iframe error:', e); }
+  });
+
+  // ✅ 3. إجبار القسم الثالث (تفاصيل المنتج) على تفعيل التمرير الداخلي
   detailIframe.addEventListener('load', () => {
     try {
       const iframeDoc = detailIframe.contentDocument || detailIframe.contentWindow.document;
       if (iframeDoc) {
         iframeDoc.documentElement.style.overflowY = 'auto';
         iframeDoc.body.style.overflowY = 'auto';
-        iframeDoc.body.style.paddingBottom = '80px'; // مساحة سفلية لزر الحذف
+        iframeDoc.body.style.paddingBottom = '80px';
       }
     } catch (e) { console.warn('detail iframe error:', e); }
   });
@@ -72,17 +90,5 @@ document.addEventListener('DOMContentLoaded', async () => {
       sessionStorage.setItem('last_viewed_product_id', data.productId);
       detailIframe.src = `/products/detail.html?id=${encodeURIComponent(data.productId)}`;
     }
-  });
-
-  // ✅ إخفاء زر الإضافة داخل القائمة
-  listIframe.addEventListener('load', () => {
-    try {
-      const iframeDoc = listIframe.contentDocument || listIframe.contentWindow.document;
-      if (iframeDoc) {
-        const style = iframeDoc.createElement('style');
-        style.innerHTML = `.page-header a[href="add.html"] { display: none !important; }`;
-        iframeDoc.head.appendChild(style);
-      }
-    } catch (e) { console.warn('list iframe error:', e); }
   });
 });
