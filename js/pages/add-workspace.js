@@ -1,15 +1,7 @@
 // ============================================
 // Workspace (تقسيم صفحة الإضافة)
-// ✅ يعمل فقط على شاشات الحاسوب (أكبر من 1024px)
-// ✅ على الهاتف: يحول المستخدم إلى صفحة الإضافة الأصلية
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
-  // ✅ إذا كانت الشاشة صغيرة (هاتف أو تابلت)، قم بتحويل المستخدم إلى صفحة الإضافة الأصلية
-  if (window.innerWidth <= 1024) {
-    window.location.replace('/products/add.html');
-    return;
-  }
-
   const user = await requireAuth();
   if (!user) return;
 
@@ -22,25 +14,20 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   const main = document.getElementById('main-content');
 
-  // ✅ بناء 3 أقسام (القسم الأول هو صفحة الإضافة الأصلية داخل iframe)
   main.innerHTML = `
     <div class="workspace">
-      
-      <!-- القسم الأول: صفحة الإضافة الأصلية -->
       <div class="workspace-panel-left">
+        <!-- ✅ تم إضافة scrolling="yes" وإزالة أي قيود على الارتفاع -->
         <iframe src="/products/add.html" class="workspace-iframe" id="add-iframe" scrolling="yes"></iframe>
       </div>
 
-      <!-- القسم الثاني: قائمة المنتجات -->
       <div class="workspace-panel-center">
         <iframe src="/products/list.html" class="workspace-iframe" id="list-iframe" scrolling="yes"></iframe>
       </div>
 
-      <!-- القسم الثالث: تفاصيل المنتج -->
       <div class="workspace-panel-right">
         <iframe src="about:blank" class="workspace-iframe" id="detail-iframe" scrolling="yes"></iframe>
       </div>
-
     </div>
   `;
 
@@ -48,13 +35,27 @@ document.addEventListener('DOMContentLoaded', async () => {
   const listIframe = document.getElementById('list-iframe');
   const detailIframe = document.getElementById('detail-iframe');
 
-  // ✅ استرجاع آخر منتج تم عرضه بعد إعادة تحميل الصفحة
+  // ✅✅✅ إجبار الـ iframe الأول على تفعيل التمرير الداخلي
+  addIframe.addEventListener('load', () => {
+    try {
+      const iframeDoc = addIframe.contentDocument || addIframe.contentWindow.document;
+      if (iframeDoc) {
+        // إجبار الصفحة الداخلية على إظهار شريط التمرير
+        iframeDoc.documentElement.style.overflowY = 'auto';
+        iframeDoc.body.style.overflowY = 'auto';
+        // إضافة مساحة سفلية للأزرار
+        iframeDoc.body.style.paddingBottom = '80px';
+      }
+    } catch (e) { console.warn('add iframe error:', e); }
+  });
+
+  // ✅ استرجاع آخر منتج
   const lastViewedProductId = sessionStorage.getItem('last_viewed_product_id');
   if (lastViewedProductId) {
     detailIframe.src = `/products/detail.html?id=${encodeURIComponent(lastViewedProductId)}`;
   }
 
-  // ✅ استقبال حدث النقر على منتج من القائمة
+  // ✅ استقبال النقرات من القائمة
   window.addEventListener('message', (event) => {
     const data = event.data;
     if (!data || typeof data !== 'object') return;
@@ -73,7 +74,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         style.innerHTML = `.page-header a[href="add.html"] { display: none !important; }`;
         iframeDoc.head.appendChild(style);
       }
-    } catch (e) { console.warn('list iframe access error', e); }
+    } catch (e) { console.warn('list iframe error:', e); }
   });
-
 });

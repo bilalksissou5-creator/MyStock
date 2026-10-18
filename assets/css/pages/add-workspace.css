@@ -40,10 +40,10 @@
     background: #ffffff;
     border-radius: 10px;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
-    overflow: hidden; /* ✅ نمنع التمرير هنا، ونتركه للـ iframe */
+    overflow: hidden; /* ✅ يمنع التمرير في الحاوية */
   }
 
-  /* تنسيق الـ iframe داخل كل قسم */
+  /* تنسيق الـ iframe: التمرير يحدث داخله */
   .workspace-iframe {
     width: 100%;
     height: 100%;
@@ -52,14 +52,7 @@
     background: #ffffff;
     border-radius: 10px;
     box-sizing: border-box;
-    /* ✅ التمرير يحدث داخل الإطار نفسه */
-    overflow-y: auto !important; 
-    -webkit-overflow-scrolling: touch;
-  }
-
-  /* ✅ ضمان أن صفحة add.html (داخل الإطار الأول) تعرض كل محتواها */
-  .workspace-panel-left .workspace-iframe {
-    /* هذا يضمن أن الإطار يأخذ المساحة كاملة ويسمح بالتمرير */
-    min-height: 100%;
+    /* ✅ إظهار شريط التمرير داخل الإطار */
+    overflow-y: scroll; 
   }
 }
