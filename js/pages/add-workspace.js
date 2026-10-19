@@ -32,7 +32,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const listIframe = document.getElementById('list-iframe');
   const detailIframe = document.getElementById('detail-iframe');
 
-  // ✅ 1. القسم الأول (تنسيق صريح لكي لا يتحرك العنوان)
+  // ✅ 1. القسم الأول (هذا هو الكود الذي نجح تماماً، ولم يتغير أي حرف فيه)
   addIframe.addEventListener('load', () => {
     try {
       const iframeDoc = addIframe.contentDocument || addIframe.contentWindow.document;
@@ -49,7 +49,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     } catch (e) {}
   });
 
-  // ✅ 2. القسم الثاني (تنسيق صريح بـ Grid لتثبيت العنوان والبحث)
+  // ✅ 2. القسم الثاني (تثبيت العنوان والبحث باستخدام Grid)
   listIframe.addEventListener('load', () => {
     try {
       const iframeDoc = listIframe.contentDocument || listIframe.contentWindow.document;
@@ -57,14 +57,53 @@ document.addEventListener('DOMContentLoaded', async () => {
         const style = iframeDoc.createElement('style');
         style.innerHTML = `
           html, body { overflow: hidden !important; height: 100% !important; margin: 0 !important; padding: 0 !important; background: #f5f5f5 !important; }
-          .main { display: grid !important; grid-template-columns: auto 1fr !important; grid-template-rows: auto 1fr !important; gap: 16px !important; height: 100% !important; padding: 24px !important; box-sizing: border-box !important; overflow: hidden !important; }
-          .page-header { grid-column: 1 !important; grid-row: 1 !important; margin: 0 !important; padding: 0 !important; align-self: center !important; display: flex !important; align-items: center !important; }
+          
+          .main {
+            display: grid !important;
+            grid-template-columns: auto 1fr !important; 
+            grid-template-rows: auto 1fr !important; 
+            gap: 16px !important;
+            height: 100vh !important; 
+            padding: 24px !important;
+            box-sizing: border-box !important;
+            overflow: hidden !important; 
+          }
+
+          .page-header {
+            grid-column: 1 !important;
+            grid-row: 1 !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            align-self: center !important;
+            display: flex !important;
+            align-items: center !important;
+          }
           .page-header h2 { margin: 0 !important; font-size: 1.2rem !important; }
           .page-header a[href="add.html"] { display: none !important; }
-          .search-bar { grid-column: 2 !important; grid-row: 1 !important; margin: 0 !important; padding: 0 !important; max-width: none !important; width: 100% !important; align-self: center !important; }
+
+          .search-bar {
+            grid-column: 2 !important;
+            grid-row: 1 !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            max-width: none !important;
+            width: 100% !important;
+            align-self: center !important;
+          }
           .search-bar input { width: 100% !important; }
           .search-bar i { inset-inline-end: 12px !important; }
-          .products { grid-column: 1 / -1 !important; grid-row: 2 !important; margin: 0 !important; padding: 0 8px 24px 0 !important; overflow-y: auto !important; overflow-x: hidden !important; align-content: start !important; min-height: 0 !important; -webkit-overflow-scrolling: touch !important; }
+
+          .products {
+            grid-column: 1 / -1 !important;
+            grid-row: 2 !important;
+            margin: 0 !important;
+            padding: 0 8px 24px 0 !important; 
+            overflow-y: auto !important; 
+            overflow-x: hidden !important;
+            align-content: start !important; 
+            min-height: 0 !important; 
+            -webkit-overflow-scrolling: touch !important;
+          }
         `;
         iframeDoc.head.appendChild(style);
       }

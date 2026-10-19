@@ -31,9 +31,6 @@ button { font-family: inherit; }
   overflow: hidden;
 }
 
-/* ============================================
-   Header
-   ============================================ */
 .header {
   background: #fff;
   border-bottom: 1px solid #e5e5e5;
@@ -47,18 +44,9 @@ button { font-family: inherit; }
   z-index: 100;
 }
 
-.logo {
-  font-size: 1.4rem;
-  font-weight: 700;
-  margin: 0;
-  flex-shrink: 0;
-}
+.logo { font-size: 1.4rem; font-weight: 700; margin: 0; flex-shrink: 0; }
 
-.search {
-  flex: 1;
-  max-width: 500px;
-  position: relative;
-}
+.search { flex: 1; max-width: 500px; position: relative; }
 
 .search i {
   position: absolute;
@@ -83,9 +71,6 @@ button { font-family: inherit; }
 
 .search input:focus { border-color: #171717; }
 
-/* ============================================
-   زر فتح/إغلاق Sidebar
-   ============================================ */
 .sidebar-toggle {
   background: none;
   border: none;
@@ -106,9 +91,6 @@ button { font-family: inherit; }
 .sidebar-toggle:hover { background: #f5f5f5; }
 .sidebar-toggle i { font-size: 18px; line-height: 1; display: block; }
 
-/* ============================================
-   زر الإشعارات
-   ============================================ */
 .notif {
   position: relative;
   background: none;
@@ -155,9 +137,6 @@ button { font-family: inherit; }
 
 .notif-count.has-count { display: flex; }
 
-/* ============================================
-   Body
-   ============================================ */
 .body {
   display: flex;
   flex: 1 1 auto;
@@ -169,9 +148,6 @@ button { font-family: inherit; }
 
 .body.sidebar-closed .sidebar { display: none; }
 
-/* ============================================
-   Sidebar
-   ============================================ */
 .sidebar {
   width: 240px;
   background: #fff;
@@ -229,9 +205,6 @@ button { font-family: inherit; }
   flex-shrink: 0;
 }
 
-/* ============================================
-   Main
-   ============================================ */
 .main {
   flex: 1 1 auto;
   overflow-y: auto;
@@ -244,9 +217,6 @@ button { font-family: inherit; }
   box-sizing: border-box;
 }
 
-/* ============================================
-   ✅ صفحة الرأس (موحّدة لكل الصفحات)
-   ============================================ */
 .page-header {
   display: flex;
   align-items: center;
@@ -256,15 +226,8 @@ button { font-family: inherit; }
   flex-wrap: wrap;
 }
 
-.page-header h2 {
-  margin: 0;
-  font-size: 1.75rem;
-  font-weight: 700;
-}
+.page-header h2 { margin: 0; font-size: 1.75rem; font-weight: 700; }
 
-/* ============================================
-   أزرار
-   ============================================ */
 .btn-primary {
   display: inline-flex;
   align-items: center;
@@ -311,14 +274,7 @@ button { font-family: inherit; }
 }
 .btn-danger:hover { background: #b91c1c; }
 
-/* ============================================
-   البحث
-   ============================================ */
-.search-bar {
-  position: relative;
-  margin-bottom: 20px;
-  max-width: 400px;
-}
+.search-bar { position: relative; margin-bottom: 20px; max-width: 400px; }
 .search-bar i {
   position: absolute;
   inset-inline-end: 12px;
@@ -339,21 +295,9 @@ button { font-family: inherit; }
   box-sizing: border-box;
 }
 
-/* ============================================
-   النماذج
-   ============================================ */
 .form-group { margin-bottom: 16px; }
-
-.form-group label {
-  display: block;
-  font-size: 14px;
-  color: #404040;
-  margin-bottom: 6px;
-}
-
-.form-group input,
-.form-group select,
-.form-group textarea {
+.form-group label { display: block; font-size: 14px; color: #404040; margin-bottom: 6px; }
+.form-group input, .form-group select, .form-group textarea {
   width: 100%;
   padding: 10px 12px;
   border: 1px solid #d4d4d4;
@@ -364,141 +308,44 @@ button { font-family: inherit; }
   font-family: inherit;
   box-sizing: border-box;
 }
+.form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: #171717; }
 
-.form-group input:focus,
-.form-group select:focus,
-.form-group textarea:focus { border-color: #171717; }
+.form-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; }
 
-.form-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 16px;
-}
-
-/* ============================================
-   التنبيهات
-   ============================================ */
-.alert {
-  padding: 12px 16px;
-  border-radius: 8px;
-  margin-bottom: 16px;
-  font-size: 14px;
-}
+.alert { padding: 12px 16px; border-radius: 8px; margin-bottom: 16px; font-size: 14px; }
 .alert-error { background: #fee2e2; color: #991b1b; }
 .alert-success { background: #dcfce7; color: #166534; }
 
-/* ============================================
-   الحالات الفارغة
-   ============================================ */
-.empty-state {
-  background: white;
-  padding: 48px 24px;
-  border-radius: 10px;
-  text-align: center;
-  color: #737373;
-}
-.empty-state i {
-  font-size: 3rem;
-  color: #d4d4d4;
-  margin-bottom: 12px;
-}
+.empty-state { background: white; padding: 48px 24px; border-radius: 10px; text-align: center; color: #737373; }
+.empty-state i { font-size: 3rem; color: #d4d4d4; margin-bottom: 12px; }
 
-/* ============================================
-   ✅ دعم تلقائي للاتجاه
-   ============================================ */
-[dir="ltr"] .form-group label,
-[dir="ltr"] .section-title,
-[dir="ltr"] .sub-text,
-[dir="ltr"] .plan-features li,
-[dir="ltr"] .pending-row,
-[dir="ltr"] .page-header h2,
-[dir="ltr"] .empty-state p,
-[dir="ltr"] .alert,
-[dir="ltr"] .plan-card {
-  text-align: left;
-}
+[dir="ltr"] .form-group label, [dir="ltr"] .section-title, [dir="ltr"] .sub-text, [dir="ltr"] .plan-features li, [dir="ltr"] .pending-row, [dir="ltr"] .page-header h2, [dir="ltr"] .empty-state p, [dir="ltr"] .alert, [dir="ltr"] .plan-card { text-align: left; }
+[dir="rtl"] .form-group label, [dir="rtl"] .section-title, [dir="rtl"] .sub-text, [dir="rtl"] .plan-features li, [dir="rtl"] .pending-row, [dir="rtl"] .page-header h2, [dir="rtl"] .empty-state p, [dir="rtl"] .alert, [dir="rtl"] .plan-card { text-align: right; }
+[dir="rtl"] .btn-primary i.fa-arrow-left, [dir="rtl"] .btn-secondary i.fa-arrow-left, [dir="rtl"] .btn-primary i.fa-arrow-right, [dir="rtl"] .btn-secondary i.fa-arrow-right, [dir="rtl"] .welcome-btn i.fa-arrow-left, [dir="rtl"] .welcome-btn i.fa-arrow-right { transform: scaleX(-1); }
+[dir="ltr"] .password-wrapper .toggle-password { right: 12px; left: auto; }
+[dir="rtl"] .password-wrapper .toggle-password { left: 12px; right: auto; }
+[dir="ltr"] .picker-check { margin-left: auto; margin-right: 0; }
+[dir="rtl"] .picker-check { margin-right: auto; margin-left: 0; }
 
-[dir="rtl"] .form-group label,
-[dir="rtl"] .section-title,
-[dir="rtl"] .sub-text,
-[dir="rtl"] .plan-features li,
-[dir="rtl"] .pending-row,
-[dir="rtl"] .page-header h2,
-[dir="rtl"] .empty-state p,
-[dir="rtl"] .alert,
-[dir="rtl"] .plan-card {
-  text-align: right;
-}
-
-[dir="rtl"] .btn-primary i.fa-arrow-left,
-[dir="rtl"] .btn-secondary i.fa-arrow-left,
-[dir="rtl"] .btn-primary i.fa-arrow-right,
-[dir="rtl"] .btn-secondary i.fa-arrow-right,
-[dir="rtl"] .welcome-btn i.fa-arrow-left,
-[dir="rtl"] .welcome-btn i.fa-arrow-right {
-  transform: scaleX(-1);
-}
-
-[dir="ltr"] .password-wrapper .toggle-password {
-  right: 12px;
-  left: auto;
-}
-
-[dir="rtl"] .password-wrapper .toggle-password {
-  left: 12px;
-  right: auto;
-}
-
-[dir="ltr"] .picker-check {
-  margin-left: auto;
-  margin-right: 0;
-}
-
-[dir="rtl"] .picker-check {
-  margin-right: auto;
-  margin-left: 0;
-}
-
-/* ============================================
-   ✅ الموبايل
-   ============================================ */
 @media (max-width: 768px) {
   .header { padding: 0 12px; gap: 10px; }
   .logo { font-size: 1.1rem; }
-
-  .sidebar {
-    width: 65px;
-    min-width: 65px;
-    max-width: 65px;
-  }
-
+  .sidebar { width: 65px; min-width: 65px; max-width: 65px; }
   .nav { padding: 8px 4px; }
-  .nav-item {
-    padding: 12px 4px;
-    justify-content: center;
-    gap: 0;
-    font-size: 0;
-  }
+  .nav-item { padding: 12px 4px; justify-content: center; gap: 0; font-size: 0; }
   .nav-item span { display: none; }
   .nav-item i { font-size: 18px; width: auto; }
-
   .sidebar-footer { padding: 8px 4px; }
   .sidebar-footer .nav-item { padding: 12px 4px; justify-content: center; }
   .sidebar-footer .nav-item i { font-size: 18px; }
-
   .main { padding: 12px; padding-bottom: 80px; }
-
   .body.sidebar-hidden-mobile .sidebar { display: none; }
 }
 
-/* ============================================
-   Landscape
-   ============================================ */
 @media (orientation: landscape) and (max-height: 500px) {
   .header { height: 45px; padding: 0 12px; gap: 10px; }
   .logo { font-size: 1rem; }
   .search input { padding-block: 6px; padding-inline: 10px 32px; font-size: 12px; }
-
   .sidebar { width: 200px; min-width: 200px; max-width: 200px; }
   .nav { padding: 6px 8px; gap: 2px; }
   .nav-item { padding: 6px 10px; font-size: 12px; gap: 8px; }
@@ -507,16 +354,4 @@ button { font-family: inherit; }
   .sidebar-footer .nav-item { padding: 6px 10px; font-size: 12px; }
   .sidebar-footer .nav-item i { font-size: 14px; }
   .main { padding: 12px; padding-bottom: 40px; }
-}
-
-/* ============================================
-   ✅ إصلاح جذري لصفحات الـ Workspace (iframe)
-   ============================================ */
-.in-iframe .main {
-  display: flex !important;
-  flex-direction: column !important;
-  overflow: hidden !important;
-  padding: 0 !important;
-  height: 100% !important;
-  padding-bottom: 0 !important;
 }
