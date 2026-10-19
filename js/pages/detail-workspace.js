@@ -60,7 +60,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         iframeDoc.body.style.paddingBottom = '30px';
         const style = iframeDoc.createElement('style');
         style.innerHTML = `
-          .main { padding-top: 0 !important; padding-bottom: 80px !important; }
+          .main { padding-top: 16px !important; padding-bottom: 80px !important; }
           .page-header { padding-top: 16px !important; }
         `;
         iframeDoc.head.appendChild(style);
