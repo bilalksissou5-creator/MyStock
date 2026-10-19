@@ -49,84 +49,109 @@ document.addEventListener('DOMContentLoaded', async () => {
     } catch (e) {}
   });
 
-  // ✅ 2. القسم الثاني (مع إضافة min-height: 0)
+  // ✅ 2. القسم الثاني - الحل القوي بإعادة الهيكلة
   listIframe.addEventListener('load', () => {
     try {
       const iframeDoc = listIframe.contentDocument || listIframe.contentWindow.document;
-      if (iframeDoc) {
-        const style = iframeDoc.createElement('style');
-        style.innerHTML = `
-          /* ✅ منع تمرير الصفحة بالكامل */
-          html, body { 
-            overflow: hidden !important; 
-            height: 100% !important; 
-            margin: 0 !important; 
-            padding: 0 !important; 
-            background: #f5f5f5 !important; 
-          }
-          
-          .main { 
-            height: 100% !important; 
-            padding: 24px !important; 
-            box-sizing: border-box !important; 
-            overflow: hidden !important; 
-          }
-
-          /* ✅ تقسيم إلى شبكة */
-          #main-content {
-            display: grid !important;
-            grid-template-columns: auto 1fr !important; 
-            grid-template-rows: auto 1fr !important; 
-            gap: 16px !important;
-            height: 100% !important;
-            overflow: hidden !important; 
-          }
-
-          /* ✅ تثبيت العنوان */
-          .page-header {
-            grid-column: 1 !important;
-            grid-row: 1 !important;
-            margin: 0 !important;
-            padding: 0 !important;
-            align-self: center !important;
-            position: relative !important; 
-            z-index: 10 !important; 
-            background: #f5f5f5 !important; 
-          }
-          .page-header h2 { margin: 0 !important; font-size: 1.2rem !important; }
-          .page-header a[href="add.html"] { display: none !important; }
-
-          /* ✅ تثبيت البحث */
-          .search-bar {
-            grid-column: 2 !important;
-            grid-row: 1 !important;
-            margin: 0 !important;
-            padding: 0 !important;
-            max-width: none !important;
-            width: 100% !important;
-            align-self: center !important;
-            position: relative !important; 
-            z-index: 10 !important; 
-            background: #f5f5f5 !important; 
-          }
-          .search-bar input { width: 100% !important; }
-
-          /* ✅ المنتجات فقط هي التي تتحرك */
-          .products {
-            grid-column: 1 / -1 !important;
-            grid-row: 2 !important;
-            margin: 0 !important;
-            padding: 0 0 24px 0 !important;
-            overflow-y: auto !important; 
-            overflow-x: hidden !important;
-            align-content: start !important;
-            -webkit-overflow-scrolling: touch !important;
-            min-height: 0 !important; /* ✅✅✅ السطر السحري لحل مشكلة التمرير */
-          }
-        `;
-        iframeDoc.head.appendChild(style);
+      if (!iframeDoc) return;
+      
+      const mainEl = iframeDoc.querySelector('.main');
+      const mainContent = iframeDoc.getElementById('main-content');
+      const pageHeader = iframeDoc.querySelector('.page-header');
+      const searchBar = iframeDoc.querySelector('.search-bar');
+      
+      // ✅✅✅ إعادة الهيكلة: نقل العنوان والبحث خارج #main-content
+      if (mainEl && mainContent && pageHeader && searchBar) {
+        if (!iframeDoc.querySelector('.top-fixed-bar')) {
+          const topBar = iframeDoc.createElement('div');
+          topBar.className = 'top-fixed-bar';
+          // نضع الشريط العلوي قبل #main-content
+          mainEl.insertBefore(topBar, mainContent);
+          // ننقل العنوان والبحث إلى الشريط العلوي
+          topBar.appendChild(pageHeader);
+          topBar.appendChild(searchBar);
+        }
       }
-    } catch (e) {}
+      
+      // ✅ تطبيق CSS الحاسم
+      const style = iframeDoc.createElement('style');
+      style.innerHTML = `
+        /* ✅ إيقاف التمرير على مستوى الصفحة */
+        html, body { 
+          overflow: hidden !important; 
+          height: 100% !important; 
+          margin: 0 !important; 
+          padding: 0 !important;
+        }
+        
+        /* ✅ .main يصبح حاوية Flex عمودية */
+        .main { 
+          display: flex !important;
+          flex-direction: column !important;
+          height: 100% !important;
+          padding: 0 !important;
+          overflow: hidden !important;
+        }
+        
+        /* ✅ الشريط العلوي الثابت (العنوان + البحث) */
+        .top-fixed-bar {
+          flex: 0 0 auto !important; /* ✅ ثابت، لا ينكمش ولا يتمدد */
+          display: flex !important;
+          align-items: center !important;
+          gap: 16px !important;
+          padding: 16px 24px !important;
+          background: #f5f5f5 !important;
+          border-bottom: 1px solid #e5e5e5 !important;
+          z-index: 10 !important;
+          position: relative !important;
+        }
+        
+        .top-fixed-bar .page-header {
+          margin: 0 !important;
+          padding: 0 !important;
+          flex-shrink: 0 !important;
+        }
+        
+        .top-fixed-bar .page-header h2 {
+          margin: 0 !important;
+          font-size: 1.2rem !important;
+        }
+        
+        .top-fixed-bar .page-header a[href="add.html"] {
+          display: none !important;
+        }
+        
+        .top-fixed-bar .search-bar {
+          flex: 1 !important;
+          margin: 0 !important;
+          padding: 0 !important;
+          max-width: none !important;
+        }
+        
+        .top-fixed-bar .search-bar input {
+          width: 100% !important;
+        }
+        
+        /* ✅ #main-content يصبح الحاوية الوحيدة القابلة للتمرير */
+        #main-content {
+          display: block !important;
+          flex: 1 1 auto !important; /* ✅ يأخذ باقي المساحة */
+          overflow-y: auto !important;
+          overflow-x: hidden !important;
+          padding: 24px !important;
+          min-height: 0 !important; /* ✅✅✅ حرج جداً لتفعيل التمرير */
+          -webkit-overflow-scrolling: touch !important;
+          height: auto !important;
+        }
+        
+        .products {
+          margin: 0 !important;
+          padding: 0 !important;
+        }
+      `;
+      iframeDoc.head.appendChild(style);
+      
+    } catch (e) { console.warn('list iframe error:', e); }
   });
 
   // ✅ 3. القسم الثالث
