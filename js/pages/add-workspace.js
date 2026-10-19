@@ -49,7 +49,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     } catch (e) {}
   });
 
-  // ✅ 2. القسم الثاني (التثبيت والتمرير السلس)
+  // ✅ 2. القسم الثاني (مع إضافة z-index و position المطلوبة)
   listIframe.addEventListener('load', () => {
     try {
       const iframeDoc = listIframe.contentDocument || listIframe.contentWindow.document;
@@ -84,7 +84,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             overflow: hidden !important; /* إخفاء التمرير الخارجي */
           }
 
-          /* ✅ تثبيت العنوان */
+          /* ✅ تثبيت العنوان مع z-index */
           .page-header {
             grid-column: 1 !important;
             grid-row: 1 !important;
@@ -93,11 +93,14 @@ document.addEventListener('DOMContentLoaded', async () => {
             align-self: center !important;
             display: flex !important;
             align-items: center !important;
+            position: relative !important; /* ✅ مطلوب ليعمل z-index */
+            z-index: 10 !important; /* ✅ فوق المنتجات */
+            background: #f5f5f5 !important; /* ✅ لون الخلفية لمنع الشفافية */
           }
           .page-header h2 { margin: 0 !important; font-size: 1.2rem !important; }
           .page-header a[href="add.html"] { display: none !important; }
 
-          /* ✅ تثبيت البحث */
+          /* ✅ تثبيت البحث مع z-index */
           .search-bar {
             grid-column: 2 !important;
             grid-row: 1 !important;
@@ -106,6 +109,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             max-width: none !important;
             width: 100% !important;
             align-self: center !important;
+            position: relative !important; /* ✅ مطلوب ليعمل z-index */
+            z-index: 10 !important; /* ✅ فوق المنتجات */
+            background: #f5f5f5 !important; /* ✅ لون الخلفية */
           }
           .search-bar input { width: 100% !important; }
 
@@ -114,11 +120,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             grid-column: 1 / -1 !important;
             grid-row: 2 !important;
             margin: 0 !important;
-            padding: 0 0 24px 0 !important; /* مسافة سفلية للجمالية */
+            padding: 0 0 24px 0 !important;
             overflow-y: auto !important; /* ✅ التمرير هنا فقط */
             overflow-x: hidden !important;
             align-content: start !important;
-            -webkit-overflow-scrolling: touch !important; /* سلاسة */
+            -webkit-overflow-scrolling: touch !important;
           }
         `;
         iframeDoc.head.appendChild(style);
