@@ -3,10 +3,10 @@
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   
-  // ✅✅✅ هذا هو السطر الذي يصلح الهاتف: تحويل فوري لصفحة الإضافة الأصلية
+  // ✅ تحويل الهاتف لصفحة الإضافة الأصلية
   if (window.innerWidth <= 1024) {
     window.location.replace('/products/add.html');
-    return; // الخروج وعدم تحميل التقسيمات
+    return; 
   }
 
   const user = await requireAuth();
@@ -41,7 +41,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const listIframe = document.getElementById('list-iframe');
   const detailIframe = document.getElementById('detail-iframe');
 
-  // ✅ 1. إجبار القسم الأول (إضافة المنتج) على تفعيل التمرير الداخلي
+  // ✅ 1. القسم الأول (إضافة المنتج)
   addIframe.addEventListener('load', () => {
     try {
       const iframeDoc = addIframe.contentDocument || addIframe.contentWindow.document;
@@ -53,23 +53,55 @@ document.addEventListener('DOMContentLoaded', async () => {
     } catch (e) { console.warn('add iframe error:', e); }
   });
 
-  // ✅ 2. إجبار القسم الثاني (قائمة المنتجات) على تفعيل التمرير الداخلي
+  // ✅ 2. القسم الثاني (قائمة المنتجات) - التنسيق المباشر
   listIframe.addEventListener('load', () => {
     try {
       const iframeDoc = listIframe.contentDocument || listIframe.contentWindow.document;
       if (iframeDoc) {
+        // تفعيل التمرير
         iframeDoc.documentElement.style.overflowY = 'auto';
         iframeDoc.body.style.overflowY = 'auto';
         iframeDoc.body.style.paddingBottom = '80px';
         
+        // ✅ حقن CSS مباشر داخل الـ iframe لجعل العنوان والبحث في سطر واحد
         const style = iframeDoc.createElement('style');
-        style.innerHTML = `.page-header a[href="add.html"] { display: none !important; }`;
+        style.innerHTML = `
+          /* إخفاء زر الإضافة */
+          .page-header a[href="add.html"] { display: none !important; }
+          
+          /* إجبار الحاوية الرئيسية على الترتيب الأفقي */
+          #main-content {
+            display: flex !important;
+            flex-wrap: wrap !important;
+            align-items: center !important;
+            gap: 12px !important;
+          }
+          
+          /* العنوان */
+          .page-header {
+            flex: 0 0 auto !important;
+            margin-bottom: 0 !important;
+          }
+          
+          /* البحث يأخذ المساحة المتبقية */
+          .search-bar {
+            flex: 1 1 auto !important;
+            margin-bottom: 0 !important;
+            max-width: none !important;
+          }
+          
+          /* المنتجات تنزل لسطر جديد */
+          .products {
+            flex: 0 0 100% !important;
+            margin-top: 16px !important;
+          }
+        `;
         iframeDoc.head.appendChild(style);
       }
     } catch (e) { console.warn('list iframe error:', e); }
   });
 
-  // ✅ 3. إجبار القسم الثالث (تفاصيل المنتج) على تفعيل التمرير الداخلي
+  // ✅ 3. القسم الثالث (تفاصيل المنتج)
   detailIframe.addEventListener('load', () => {
     try {
       const iframeDoc = detailIframe.contentDocument || detailIframe.contentWindow.document;
