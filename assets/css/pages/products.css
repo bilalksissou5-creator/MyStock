@@ -8,6 +8,28 @@
   gap: 16px;
 }
 
+/* ============================================
+   ✅ تثبيت العنوان والبحث في أعلى الصفحة
+   ============================================ */
+.page-header {
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 100 !important;
+  background: #f5f5f5 !important; /* لون خلفية الصفحة ليغطي المنتجات */
+  padding-top: 16px !important;
+  padding-bottom: 12px !important;
+  margin-top: -16px !important; /* لتعويض مسافة main */
+}
+
+.search-bar {
+  position: sticky !important;
+  top: 60px !important; /* ارتفاع الهيدر التقريبي */
+  z-index: 99 !important;
+  background: #f5f5f5 !important;
+  padding-bottom: 12px !important;
+  margin-bottom: 16px !important;
+}
+
 .product-card {
   background: white;
   border-radius: 10px;
