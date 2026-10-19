@@ -508,3 +508,15 @@ button { font-family: inherit; }
   .sidebar-footer .nav-item i { font-size: 14px; }
   .main { padding: 12px; padding-bottom: 40px; }
 }
+
+/* ============================================
+   ✅ إصلاح جذري لصفحات الـ Workspace (iframe)
+   ============================================ */
+.in-iframe .main {
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+  padding: 0 !important;
+  height: 100% !important;
+  padding-bottom: 0 !important;
+}

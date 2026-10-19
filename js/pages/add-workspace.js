@@ -39,8 +39,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (iframeDoc) {
         const style = iframeDoc.createElement('style');
         style.innerHTML = `
-          html, body { overflow: hidden !important; height: 100% !important; margin: 0 !important; }
-          .main { display: flex !important; flex-direction: column !important; height: 100% !important; padding: 0 !important; overflow: hidden !important; }
           .page-header { flex: 0 0 auto !important; padding: 16px !important; margin: 0 !important; background: #f5f5f5 !important; border-bottom: 1px solid #e5e5e5 !important; z-index: 10 !important; }
           .add-form { flex: 1 1 auto !important; overflow-y: auto !important; padding: 16px !important; padding-bottom: 80px !important; -webkit-overflow-scrolling: touch !important; }
         `;
@@ -49,35 +47,25 @@ document.addEventListener('DOMContentLoaded', async () => {
     } catch (e) {}
   });
 
-  // ✅ 2. القسم الثاني - الحل القاطع (الشبكة على العنصر نفسه)
+  // ✅ 2. القسم الثاني - تثبيت مثالي باستخدام Grid
   listIframe.addEventListener('load', () => {
     try {
       const iframeDoc = listIframe.contentDocument || listIframe.contentWindow.document;
       if (iframeDoc) {
         const style = iframeDoc.createElement('style');
         style.innerHTML = `
-          /* ✅ منع تمرير الصفحة بالكامل */
-          html, body { 
-            overflow: hidden !important; 
-            height: 100% !important; 
-            margin: 0 !important; 
-            padding: 0 !important; 
-            background: #f5f5f5 !important; 
-          }
-          
-          /* ✅ الحاوية الرئيسية (هي نفسها #main-content) */
-          .main, #main-content { 
+          /* ✅ تجاوز flex column الموجود في common.css إلى Grid */
+          .main {
             display: grid !important;
-            grid-template-columns: auto 1fr !important; /* عمود للعنوان، وعمود للبحث */
-            grid-template-rows: auto 1fr !important; /* صف للعنوان والبحث، وصف للمنتجات */
+            grid-template-columns: auto 1fr !important; 
+            grid-template-rows: auto 1fr !important; 
             gap: 16px !important;
-            height: 100vh !important; /* تأخذ طول الشاشة بالكامل */
-            padding: 24px !important; 
-            box-sizing: border-box !important; 
-            overflow: hidden !important; /* منع التمرير الخارجي */
+            height: 100% !important;
+            padding: 24px !important;
+            box-sizing: border-box !important;
+            overflow: hidden !important; 
           }
 
-          /* ✅ 1. العنوان (ثابت في الصف الأول) */
           .page-header {
             grid-column: 1 !important;
             grid-row: 1 !important;
@@ -90,7 +78,6 @@ document.addEventListener('DOMContentLoaded', async () => {
           .page-header h2 { margin: 0 !important; font-size: 1.2rem !important; }
           .page-header a[href="add.html"] { display: none !important; }
 
-          /* ✅ 2. البحث (ثابت في الصف الأول) */
           .search-bar {
             grid-column: 2 !important;
             grid-row: 1 !important;
@@ -101,17 +88,17 @@ document.addEventListener('DOMContentLoaded', async () => {
             align-self: center !important;
           }
           .search-bar input { width: 100% !important; }
+          .search-bar i { inset-inline-end: 12px !important; }
 
-          /* ✅ 3. المنتجات (في الصف الثاني، وهي الوحيدة التي تتمرر) */
           .products {
             grid-column: 1 / -1 !important;
             grid-row: 2 !important;
             margin: 0 !important;
-            padding: 0 8px 24px 0 !important; /* مساحة لشريط التمرير */
-            overflow-y: auto !important; /* التمرير هنا فقط */
+            padding: 0 8px 24px 0 !important; 
+            overflow-y: auto !important; 
             overflow-x: hidden !important;
-            align-content: start !important; /* منع تمدد البطاقات عمودياً */
-            min-height: 0 !important; /* ✅✅✅ السر لتفعيل التمرير داخل الشبكة */
+            align-content: start !important; 
+            min-height: 0 !important; 
             -webkit-overflow-scrolling: touch !important;
           }
         `;
@@ -127,7 +114,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (iframeDoc) {
         const style = iframeDoc.createElement('style');
         style.innerHTML = `
-          .main { padding-top: 0 !important; padding-bottom: 80px !important; }
           .page-header { padding-top: 16px !important; }
         `;
         iframeDoc.head.appendChild(style);
