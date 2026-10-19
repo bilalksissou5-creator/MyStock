@@ -49,7 +49,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     } catch (e) {}
   });
 
-  // ✅ 2. القسم الثاني (مع إضافة z-index و position المطلوبة)
+  // ✅ 2. القسم الثاني (مع إضافة min-height: 0)
   listIframe.addEventListener('load', () => {
     try {
       const iframeDoc = listIframe.contentDocument || listIframe.contentWindow.document;
@@ -70,37 +70,33 @@ document.addEventListener('DOMContentLoaded', async () => {
             padding: 24px !important; 
             box-sizing: border-box !important; 
             overflow: hidden !important; 
-            display: flex !important;
-            flex-direction: column !important;
           }
 
-          /* ✅ تقسيم إلى شبكة: صف للعنوان والبحث، وصف للمنتجات */
+          /* ✅ تقسيم إلى شبكة */
           #main-content {
             display: grid !important;
             grid-template-columns: auto 1fr !important; 
-            grid-template-rows: auto 1fr !important; /* ✅ 1fr تأخذ باقي المساحة */
+            grid-template-rows: auto 1fr !important; 
             gap: 16px !important;
             height: 100% !important;
-            overflow: hidden !important; /* إخفاء التمرير الخارجي */
+            overflow: hidden !important; 
           }
 
-          /* ✅ تثبيت العنوان مع z-index */
+          /* ✅ تثبيت العنوان */
           .page-header {
             grid-column: 1 !important;
             grid-row: 1 !important;
             margin: 0 !important;
             padding: 0 !important;
             align-self: center !important;
-            display: flex !important;
-            align-items: center !important;
-            position: relative !important; /* ✅ مطلوب ليعمل z-index */
-            z-index: 10 !important; /* ✅ فوق المنتجات */
-            background: #f5f5f5 !important; /* ✅ لون الخلفية لمنع الشفافية */
+            position: relative !important; 
+            z-index: 10 !important; 
+            background: #f5f5f5 !important; 
           }
           .page-header h2 { margin: 0 !important; font-size: 1.2rem !important; }
           .page-header a[href="add.html"] { display: none !important; }
 
-          /* ✅ تثبيت البحث مع z-index */
+          /* ✅ تثبيت البحث */
           .search-bar {
             grid-column: 2 !important;
             grid-row: 1 !important;
@@ -109,9 +105,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             max-width: none !important;
             width: 100% !important;
             align-self: center !important;
-            position: relative !important; /* ✅ مطلوب ليعمل z-index */
-            z-index: 10 !important; /* ✅ فوق المنتجات */
-            background: #f5f5f5 !important; /* ✅ لون الخلفية */
+            position: relative !important; 
+            z-index: 10 !important; 
+            background: #f5f5f5 !important; 
           }
           .search-bar input { width: 100% !important; }
 
@@ -121,10 +117,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             grid-row: 2 !important;
             margin: 0 !important;
             padding: 0 0 24px 0 !important;
-            overflow-y: auto !important; /* ✅ التمرير هنا فقط */
+            overflow-y: auto !important; 
             overflow-x: hidden !important;
             align-content: start !important;
             -webkit-overflow-scrolling: touch !important;
+            min-height: 0 !important; /* ✅✅✅ السطر السحري لحل مشكلة التمرير */
           }
         `;
         iframeDoc.head.appendChild(style);
