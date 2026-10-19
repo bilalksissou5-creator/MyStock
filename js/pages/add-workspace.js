@@ -92,7 +92,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           
           /* المنتجات تنزل لسطر جديد */
           .products {
-            flex: 0 0 100% !important;
+            flex: 0 0 0% !important;
             margin-top: 16px !important;
           }
         `;
