@@ -32,7 +32,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const listIframe = document.getElementById('list-iframe');
   const detailIframe = document.getElementById('detail-iframe');
 
-  // ✅ 1. القسم الأول (لم ألمسه إطلاقاً، هو كما أعجبك)
+  // ✅ 1. القسم الأول (لم ألمس هذا الكود إطلاقاً، هو كما أعجبك)
   addIframe.addEventListener('load', () => {
     try {
       const iframeDoc = addIframe.contentDocument || addIframe.contentWindow.document;
@@ -49,65 +49,88 @@ document.addEventListener('DOMContentLoaded', async () => {
     } catch (e) {}
   });
 
-  // ✅ 2. القسم الثاني (الحل المضمون باستخدام block و sticky)
+  // ✅ 2. القسم الثاني (الحل القاطع بجمع العناصر في حاوية واحدة)
   listIframe.addEventListener('load', () => {
     try {
       const iframeDoc = listIframe.contentDocument || listIframe.contentWindow.document;
-      if (iframeDoc) {
-        const style = iframeDoc.createElement('style');
-        style.innerHTML = `
-          /* منع تمرير الحاويات الأم */
-          html, body { height: 100% !important; margin: 0 !important; overflow: hidden !important; }
-          
-          /* الحاوية الرئيسية هي المسؤولة عن التمرير */
-          .main {
-            display: block !important; /* ✅ السر: block وليس grid أو flex */
-            height: 100% !important;
-            overflow-y: auto !important; /* التمرير هنا */
-            padding: 0 !important;
-            box-sizing: border-box !important;
-          }
+      if (!iframeDoc) return;
 
-          /* ✅ 1. تثبيت العنوان */
-          .page-header {
-            position: sticky !important;
-            top: 0 !important;
-            z-index: 100 !important;
-            background: #f5f5f5 !important;
-            padding: 24px 24px 8px 24px !important;
-            margin: 0 !important;
-            display: flex !important;
-            justify-content: space-between !important;
-            align-items: center !important;
-          }
-          .page-header h2 { margin: 0 !important; font-size: 1.8rem !important; }
-          .page-header a[href="add.html"] { display: none !important; }
+      const mainEl = iframeDoc.querySelector('.main');
+      const pageHeader = iframeDoc.querySelector('.page-header');
+      const searchBar = iframeDoc.querySelector('.search-bar');
 
-          /* ✅ 2. تثبيت البحث */
-          .search-bar {
-            position: sticky !important;
-            top: 0px !important; /* ارتفاع العنوان التقريبي */
-            z-index: 99 !important;
-            background: #f5f5f5 !important;
-            margin: 0 !important;
-            padding: 0 24px 16px 24px !important;
-            max-width: none !important;
-          }
-          .search-bar input { width: 80% !important; }
-          .search-bar i { inset-inline-end: 36px !important; } /* إصلاح الأيقونة */
-
-          /* ✅ 3. المنتجات تتحرك تحت العناصر الثابتة */
-          .products {
-            padding: 16px 24px 24px 24px !important;
-            margin: 0 !important;
-          }
-        `;
-        iframeDoc.head.appendChild(style);
+      // ✅ الخطوة 1: جمع العنوان والبحث في حاوية واحدة
+      if (mainEl && pageHeader && searchBar && !iframeDoc.querySelector('.sticky-header-wrapper')) {
+        const wrapper = iframeDoc.createElement('div');
+        wrapper.className = 'sticky-header-wrapper';
+        mainEl.insertBefore(wrapper, pageHeader);
+        wrapper.appendChild(pageHeader);
+        wrapper.appendChild(searchBar);
       }
-    } catch (e) {}
+
+      // ✅ الخطوة 2: تطبيق CSS للتثبيت والترتيب الأفقي
+      const style = iframeDoc.createElement('style');
+      style.innerHTML = `
+        /* إيقاف التمرير في الصفحة والـ iframe */
+        html, body { overflow: hidden !important; height: 100% !important; margin: 0 !important; }
+        
+        /* الحاوية الرئيسية هي المسؤولة عن التمرير */
+        .main {
+          display: block !important;
+          height: 100% !important;
+          overflow-y: auto !important;
+          overflow-x: hidden !important;
+          padding: 24px !important;
+          box-sizing: border-box !important;
+        }
+
+        /* ✅ الحاوية الثابتة (العنوان + البحث) */
+        .sticky-header-wrapper {
+          position: sticky !important;
+          top: 0 !important;
+          z-index: 100 !important;
+          background: #f5f5f5 !important;
+          display: flex !important;
+          flex-direction: row !important;
+          align-items: center !important;
+          gap: 16px !important;
+          
+          /* تعويض مساحة main لكي تغطي الحاوية كامل العرض */
+          margin: -24px -24px 16px -24px !important;
+          padding: 24px 24px 16px 24px !important;
+          border-bottom: 1px solid #e5e5e5 !important;
+        }
+
+        /* تنسيق العنوان داخل الحاوية */
+        .sticky-header-wrapper .page-header {
+          flex: 0 0 auto !important;
+          margin: 0 !important;
+          padding: 0 !important;
+        }
+        .page-header h2 { margin: 0 !important; font-size: 1.2rem !important; }
+        .page-header a[href="add.html"] { display: none !important; }
+
+        /* تنسيق البحث داخل الحاوية */
+        .sticky-header-wrapper .search-bar {
+          flex: 1 1 auto !important;
+          margin: 0 !important;
+          padding: 0 !important;
+          max-width: none !important;
+        }
+        .search-bar input { width: 100% !important; }
+        .search-bar i { inset-inline-end: 12px !important; }
+
+        /* المنتجات */
+        .products {
+          margin: 0 !important;
+          padding: 0 !important;
+        }
+      `;
+      iframeDoc.head.appendChild(style);
+    } catch (e) { console.warn(e); }
   });
 
-  // ✅ 3. القسم الثالث (إعادة تفعيل التمرير بداخله)
+  // ✅ 3. القسم الثالث (إعادة تفعيل التمرير بداخله لكي لا يثبت)
   detailIframe.addEventListener('load', () => {
     try {
       const iframeDoc = detailIframe.contentDocument || detailIframe.contentWindow.document;
@@ -118,7 +141,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           .main {
             display: block !important;
             height: 100% !important;
-            overflow-y: auto !important; /* ✅ إعادة التمرير */
+            overflow-y: auto !important;
             padding: 24px !important;
             box-sizing: border-box !important;
           }
