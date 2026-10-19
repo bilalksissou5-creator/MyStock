@@ -80,7 +80,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             justify-content: space-between !important;
             align-items: center !important;
           }
-          .page-header h2 { margin: 0 !important; font-size: 1.4rem !important; }
+          .page-header h2 { margin: 0 !important; font-size: 1.6rem !important; }
           .page-header a[href="add.html"] { display: none !important; }
 
           /* ✅ 2. تثبيت البحث */
