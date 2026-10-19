@@ -49,7 +49,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     } catch (e) {}
   });
 
-  // ✅ 2. القسم الثاني - الحل الجذري (جمع العناصر في حاوية واحدة)
+  // ✅ 2. القسم الثاني - الحل القاطع بـ Flexbox
   listIframe.addEventListener('load', () => {
     try {
       const iframeDoc = listIframe.contentDocument || listIframe.contentWindow.document;
@@ -59,15 +59,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         const header = iframeDoc.querySelector('.page-header');
         const searchBar = iframeDoc.querySelector('.search-bar');
         
-        // ✅✅✅ السحر: جمع العنوان والبحث في حاوية واحدة (إن لم تكن موجودة)
+        // ✅ نقل العنوان والبحث إلى حاوية واحدة
         if (mainContent && header && searchBar) {
-          if (!iframeDoc.querySelector('.sticky-header-container')) {
+          if (!iframeDoc.querySelector('.fixed-top-container')) {
             const wrapper = iframeDoc.createElement('div');
-            wrapper.className = 'sticky-header-container';
-            
-            // إدخال الحاوية قبل العنوان
+            wrapper.className = 'fixed-top-container';
             mainContent.insertBefore(wrapper, header);
-            // نقل العناصر داخل الحاوية
             wrapper.appendChild(header);
             wrapper.appendChild(searchBar);
           }
@@ -75,7 +72,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         const style = iframeDoc.createElement('style');
         style.innerHTML = `
-          /* ✅ إيقاف تمرير الصفحة والـ iframe بالكامل */
+          /* ✅ إيقاف التمرير الخارجي بالكامل */
           html, body { 
             overflow: hidden !important; 
             height: 100% !important; 
@@ -85,73 +82,73 @@ document.addEventListener('DOMContentLoaded', async () => {
           }
           
           .main { 
+            display: flex !important;
+            flex-direction: column !important;
             height: 100% !important; 
             padding: 0 !important; 
             overflow: hidden !important; 
           }
 
-          /* ✅ الحاوية الوحيدة التي تتمرر */
+          /* ✅ الحاوية الرئيسية */
           #main-content {
-            display: block !important; 
+            display: flex !important;
+            flex-direction: column !important;
             height: 100% !important;
-            overflow-y: auto !important; 
-            padding: 0 !important;
-            -webkit-overflow-scrolling: touch !important;
+            padding: 16px !important;
+            box-sizing: border-box !important;
+            overflow: hidden !important;
           }
 
-          /* ✅ تنسيق الحاوية العلوية (تجمع العنوان والبحث أفقياً) */
-          .sticky-header-container {
-            position: sticky !important;
-            top: 0 !important;
-            z-index: 100 !important;
-            background: #f5f5f5 !important;
-            display: flex !important; /* يجعل العناصر أفقية */
+          /* ✅ الحاوية العلوية الثابتة (العنوان + البحث) */
+          .fixed-top-container {
+            flex: 0 0 auto !important; /* ✅ لا تتمدد ولا تنكمش */
+            display: flex !important;
             flex-direction: row !important;
             align-items: center !important;
             gap: 16px !important;
-            padding: 16px !important;
-            margin: 0 !important;
-            border-bottom: 1px solid #e5e5e5 !important; /* خط فاصل */
+            width: 100% !important;
+            margin-bottom: 16px !important;
+            z-index: 10 !important;
           }
 
-          /* ✅ تنسيق العنوان داخل الحاوية */
-          .sticky-header-container .page-header {
-            flex: 0 0 auto !important; /* لا يتمدد ولا ينكمش */
+          /* تنسيق العناصر داخل الحاوية العلوية */
+          .fixed-top-container .page-header {
+            flex: 0 0 auto !important;
             margin: 0 !important;
             padding: 0 !important;
+            display: flex !important;
+            align-items: center !important;
           }
           .page-header h2 { margin: 0 !important; font-size: 1.2rem !important; }
-          .page-header a[href="add.html"] { display: none !important; } /* إخفاء زر الإضافة */
+          .page-header a[href="add.html"] { display: none !important; }
 
-          /* ✅ تنسيق البحث داخل الحاوية */
-          .sticky-header-container .search-bar {
-            flex: 1 1 auto !important; /* يأخذ المساحة المتبقية */
+          .fixed-top-container .search-bar {
+            flex: 1 1 auto !important;
             margin: 0 !important;
             padding: 0 !important;
             max-width: none !important;
           }
-          .search-bar input { 
-            width: 100% !important; 
-            padding-inline-end: 36px !important; 
-          }
+          .search-bar input { width: 100% !important; }
+          .search-bar i { inset-inline-end: 12px !important; }
 
-          /* ✅ إصلاح أيقونة البحث */
-          .search-bar i {
-            inset-inline-end: 12px !important; /* إعادتها لمكانها الأصلي */
-          }
-
-          /* ✅ شبكة المنتجات */
+          /* ✅ المنتجات: هي الوحيدة التي تتحرك */
           .products {
-            padding: 16px !important;
+            flex: 1 1 auto !important; /* ✅ تأخذ باقي المساحة */
+            overflow-y: auto !important; /* ✅ التمرير هنا فقط */
+            overflow-x: hidden !important;
+            min-height: 0 !important; /* ✅ السطر السحري لتفعيل التمرير داخل Flexbox */
+            padding: 0 0 16px 0 !important;
             margin: 0 !important;
             display: grid !important;
             grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)) !important;
             gap: 16px !important;
+            align-content: start !important;
+            -webkit-overflow-scrolling: touch !important;
           }
         `;
         iframeDoc.head.appendChild(style);
       }
-    } catch (e) { console.warn('list iframe error:', e); }
+    } catch (e) {}
   });
 
   // ✅ 3. القسم الثالث
