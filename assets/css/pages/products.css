@@ -118,3 +118,35 @@
     font-size: 12px;
   }
 }
+
+/* ============================================
+   ✅ التعديل الجديد: جعل العنوان والبحث في سطر واحد (للحاسوب فقط)
+   ============================================ */
+@media (min-width: 1025px) {
+  /* جعل الحاوية الرئيسية مرنة لوضع العناصر بجانب بعضها */
+  #main-content {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    align-items: center !important;
+    gap: 16px !important;
+  }
+
+  /* العنوان يأخذ مساحته الطبيعية فقط */
+  .page-header {
+    margin-bottom: 0 !important;
+    flex: 0 0 auto !important;
+  }
+
+  /* البحث يأخذ باقي المساحة (مع إلغاء القيد المفروض في common.css) */
+  .search-bar {
+    flex: 1 1 auto !important;
+    margin-bottom: 0 !important;
+    max-width: none !important; /* ✅ هذا السطر يلغي الحد الأقصى 400px */
+  }
+
+  /* المنتجات تنزل لسطر جديد وتأخذ العرض بالكامل */
+  .products {
+    flex: 0 0 100% !important;
+    margin-top: 8px !important;
+  }
+}
