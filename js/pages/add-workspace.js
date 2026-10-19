@@ -49,79 +49,74 @@ document.addEventListener('DOMContentLoaded', async () => {
     } catch (e) {}
   });
 
-  // ✅ 2. القسم الثاني - التصحيح الجذري بـ CSS Grid
+  // ✅ 2. القسم الثاني - الحل الجذري بـ position: sticky
   listIframe.addEventListener('load', () => {
     try {
       const iframeDoc = listIframe.contentDocument || listIframe.contentWindow.document;
       if (iframeDoc) {
         const style = iframeDoc.createElement('style');
         style.innerHTML = `
-          /* ✅ منع تمرير الصفحة بالكامل */
+          /* ✅ إيقاف التمرير على مستوى الصفحة والـ iframe */
           html, body { 
             overflow: hidden !important; 
             height: 100% !important; 
             margin: 0 !important; 
             padding: 0 !important; 
-            background: #f5f5f5 !important;
+            background: #f5f5f5 !important; 
           }
           
-          /* ✅ الحاوية الرئيسية */
+          /* ✅ الحاوية الرئيسية تمنع التمرير الخارجي */
           .main { 
             height: 100% !important; 
             padding: 0 !important; 
             overflow: hidden !important; 
           }
 
-          /* ✅ تقسيم إلى شبكة: صف للعنوان والبحث، وصف للمنتجات */
+          /* ✅ الحاوية الوحيدة التي تتمرر */
           #main-content {
-            display: grid !important;
-            grid-template-columns: auto 1fr !important; /* عمود للعنوان، وعمود للبحث */
-            grid-template-rows: auto 1fr !important; /* ✅ الصف الثاني (1fr) يأخذ باقي المساحة */
-            gap: 16px !important;
-            padding: 24px !important;
+            display: block !important; /* ✅ block هو السر لنجاح sticky */
             height: 100% !important;
-            box-sizing: border-box !important;
-            overflow: hidden !important; /* إخفاء التمرير الخارجي */
+            overflow-y: auto !important; /* التمرير هنا فقط */
+            padding: 0 !important;
+            -webkit-overflow-scrolling: touch !important;
           }
 
-          /* ✅ 1. تثبيت العنوان */
+          /* ✅ 1. العنوان الثابت (يغطي المنتجات التي تمر تحته) */
           .page-header {
-            grid-column: 1 !important;
-            grid-row: 1 !important;
+            position: sticky !important;
+            top: 0 !important;
+            z-index: 100 !important;
+            background: #f5f5f5 !important;
             margin: 0 !important;
-            padding: 0 !important;
-            align-self: center !important;
+            padding: 16px 16px 8px 16px !important;
             display: flex !important;
+            justify-content: space-between !important;
             align-items: center !important;
+            border-bottom: 1px solid #e5e5e5 !important;
           }
-          
-          /* إخفاء زر Add Product من هذا القسم */
-          .page-header a[href="add.html"] { display: none !important; }
           .page-header h2 { margin: 0 !important; font-size: 1.2rem !important; }
+          .page-header a[href="add.html"] { display: none !important; } /* إخفاء زر الإضافة */
 
-          /* ✅ 2. تثبيت البحث */
+          /* ✅ 2. خانة البحث الثابتة (تحت العنوان مباشرة) */
           .search-bar {
-            grid-column: 2 !important;
-            grid-row: 1 !important;
+            position: sticky !important;
+            top: 56px !important; /* ارتفاع العنوان التقريبي */
+            z-index: 99 !important;
+            background: #f5f5f5 !important;
             margin: 0 !important;
-            padding: 0 !important;
+            padding: 8px 16px 16px 16px !important;
             max-width: none !important;
-            width: 100% !important;
-            align-self: center !important;
+            border-bottom: 1px solid #e5e5e5 !important;
           }
           .search-bar input { width: 100% !important; }
 
-          /* ✅ 3. المنتجات: هي الوحيدة التي تتمرر */
+          /* ✅ 3. المنتجات (تتحرك بسلاسة تحت العناصر الثابتة) */
           .products {
-            grid-column: 1 / -1 !important;
-            grid-row: 2 !important;
+            padding: 16px !important;
             margin: 0 !important;
-            padding: 0 0 24px 0 !important;
-            overflow-y: auto !important; /* التمرير هنا فقط */
-            overflow-x: hidden !important;
-            align-content: start !important;
-            -webkit-overflow-scrolling: touch !important;
-            min-height: 0 !important; /* ✅✅✅ السر: يسمح للشبكة بالتمرير بدلاً من التمدد */
+            display: grid !important;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)) !important;
+            gap: 16px !important;
           }
         `;
         iframeDoc.head.appendChild(style);
