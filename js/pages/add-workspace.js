@@ -53,7 +53,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     } catch (e) { console.warn('add iframe error:', e); }
   });
 
-  // ✅ 2. القسم الثاني (قائمة المنتجات) - التنسيق المباشر
+  // ✅ 2. القسم الثاني (قائمة المنتجات) - التنسيق المباشر والمصحح
   listIframe.addEventListener('load', () => {
     try {
       const iframeDoc = listIframe.contentDocument || listIframe.contentWindow.document;
@@ -63,37 +63,38 @@ document.addEventListener('DOMContentLoaded', async () => {
         iframeDoc.body.style.overflowY = 'auto';
         iframeDoc.body.style.paddingBottom = '80px';
         
-        // ✅ حقن CSS مباشر داخل الـ iframe لجعل العنوان والبحث في سطر واحد
+        // ✅ حقن CSS مباشر داخل الـ iframe (استخدام Grid بدلاً من Flex)
         const style = iframeDoc.createElement('style');
         style.innerHTML = `
           /* إخفاء زر الإضافة */
           .page-header a[href="add.html"] { display: none !important; }
           
-          /* إجبار الحاوية الرئيسية على الترتيب الأفقي */
+          /* استخدام Grid لترتيب العناصر بدقة */
           #main-content {
-            display: flex !important;
-            flex-wrap: wrap !important;
-            align-items: center !important;
-            gap: 12px !important;
+            display: grid !important;
+            grid-template-columns: auto 1fr !important; /* عمود للعنوان، وعمود للبحث */
+            align-items: center !important; /* محاذاة رأسية للعنوان والبحث */
+            align-content: start !important; /* ✅ إجبار المحتوى على الالتصاق بالأعلى (إلغاء المسافة) */
+            gap: 16px !important;
           }
           
-          /* العنوان */
+          /* العنوان في العمود الأول */
           .page-header {
-            flex: 0 0 auto !important;
+            grid-column: 1 !important;
             margin-bottom: 0 !important;
           }
           
-          /* البحث يأخذ المساحة المتبقية */
+          /* البحث في العمود الثاني ويأخذ المساحة */
           .search-bar {
-            flex: 1 1 auto !important;
+            grid-column: 2 !important;
             margin-bottom: 0 !important;
             max-width: none !important;
           }
           
-          /* المنتجات تنزل لسطر جديد */
+          /* المنتجات في صف جديد وتأخذ العرض بالكامل */
           .products {
-            flex: 0 0 100%!important;
-            margin-top: 16px !important;
+            grid-column: 1 / -1 !important;
+            margin-top: 0 !important;
           }
         `;
         iframeDoc.head.appendChild(style);
