@@ -49,64 +49,71 @@ document.addEventListener('DOMContentLoaded', async () => {
     } catch (e) {}
   });
 
-  // ✅ 2. القسم الثاني (الحل النهائي)
+  // ✅ 2. القسم الثاني (الحل النهائي بـ Grid)
   listIframe.addEventListener('load', () => {
     try {
       const iframeDoc = listIframe.contentDocument || listIframe.contentWindow.document;
       if (iframeDoc) {
-        
-        // جلب العناصر
-        const header = iframeDoc.querySelector('.page-header');
-        const searchBar = iframeDoc.querySelector('.search-bar');
-        const mainContent = iframeDoc.getElementById('main-content');
-
-        // تجميع العنوان والبحث في حاوية واحدة
-        if (header && searchBar && mainContent) {
-          if (!iframeDoc.querySelector('.fixed-top-bar')) {
-            const wrapper = iframeDoc.createElement('div');
-            wrapper.className = 'fixed-top-bar';
-            mainContent.insertBefore(wrapper, header);
-            wrapper.appendChild(header);
-            wrapper.appendChild(searchBar);
-          }
-        }
-
-        // تطبيق CSS النهائي
         const style = iframeDoc.createElement('style');
         style.innerHTML = `
-          html, body { overflow: hidden !important; height: 100% !important; margin: 0 !important; padding: 0 !important; }
-          .main { height: 100% !important; padding: 16px !important; box-sizing: border-box !important; overflow: hidden !important; }
+          /* ✅ إلغاء حركة الصفحة والـ iframe بالكامل */
+          html, body { 
+            overflow: hidden !important; 
+            height: 100% !important; 
+            margin: 0 !important; 
+            padding: 0 !important; 
+            background: #f5f5f5 !important; 
+          }
+          
+          .main { 
+            height: 100% !important; 
+            padding: 16px !important; 
+            box-sizing: border-box !important; 
+            overflow: hidden !important; 
+          }
 
-          /* ✅ إجبار الحاوية على الترتيب العمودي */
+          /* ✅ تقسيم الشاشة إلى صفين: الأول للهيدر، الثاني للمنتجات */
           #main-content {
-            display: flex !important;
-            flex-direction: column !important;
+            display: grid !important;
+            grid-template-columns: auto 1fr !important; 
+            grid-template-rows: auto 1fr !important; /* ✅ السطر السحري: الصف الثاني يأخذ باقي المساحة */
+            gap: 16px !important;
             height: 100% !important;
-            overflow: hidden !important;
-            gap: 16px !important;
+            overflow: hidden !important; /* لا يوجد تمرير هنا */
           }
 
-          /* ✅ الحاوية العلوية الثابتة */
-          .fixed-top-bar {
-            display: flex !important;
-            flex-direction: row !important;
-            align-items: center !important;
-            gap: 16px !important;
-            flex-shrink: 0 !important;
+          /* ✅ 1. العنوان */
+          .page-header {
+            grid-column: 1 !important;
+            grid-row: 1 !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            align-self: center !important;
           }
-
-          /* تنسيقات العنوان والبحث */
-          .page-header { margin: 0 !important; flex-shrink: 0 !important; }
+          .page-header h2 { margin: 0 !important; font-size: 1.2rem !important; }
           .page-header a[href="add.html"] { display: none !important; }
-          .search-bar { margin: 0 !important; flex: 1 !important; max-width: none !important; }
 
-          /* ✅ جعل المنتجات فقط هي التي تتمرر */
+          /* ✅ 2. خانة البحث */
+          .search-bar {
+            grid-column: 2 !important;
+            grid-row: 1 !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            max-width: none !important;
+            width: 100% !important;
+            align-self: center !important;
+          }
+          .search-bar input { width: 100% !important; }
+
+          /* ✅ 3. المنتجات (هي الوحيدة التي تتمرر) */
           .products {
-            flex: 1 !important;
-            overflow-y: auto !important;
+            grid-column: 1 / -1 !important;
+            grid-row: 2 !important;
+            margin: 0 !important;
+            padding: 0 0 20px 0 !important;
+            overflow-y: auto !important; /* التمرير هنا فقط */
             overflow-x: hidden !important;
             align-content: start !important;
-            padding-bottom: 20px !important;
             -webkit-overflow-scrolling: touch !important;
           }
         `;
