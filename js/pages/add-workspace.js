@@ -41,7 +41,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const listIframe = document.getElementById('list-iframe');
   const detailIframe = document.getElementById('detail-iframe');
 
-  // ✅ 1. القسم الأول (إضافة المنتج)
+  // ✅ 1. القسم الأول (إضافة المنتج) - مع تثبيت الهيدر
   addIframe.addEventListener('load', () => {
     try {
       const iframeDoc = addIframe.contentDocument || addIframe.contentWindow.document;
@@ -51,8 +51,24 @@ document.addEventListener('DOMContentLoaded', async () => {
         iframeDoc.body.style.paddingBottom = '30px';
         const style = iframeDoc.createElement('style');
         style.innerHTML = `
-          .main { padding-top: 0 !important; padding-bottom: 80px !important; }
-          .page-header { padding-top: 16px !important; }
+          /* إزالة المسافات من الحاوية الرئيسية */
+          .main { padding: 0 !important; }
+
+          /* ✅ تثبيت شريط العنوان (Add Products + Scan) في الأعلى */
+          .page-header {
+            position: sticky !important;
+            top: 0 !important;
+            z-index: 100 !important;
+            background: #f5f5f5 !important; /* لون خلفية الصفحة لكي يغطي العناصر عند التمرير */
+            padding: 16px !important;
+            margin: 0 !important;
+            border-bottom: 1px solid #e5e5e5 !important;
+          }
+
+          /* إضافة مسافة للنموذج حتى لا يلتصق بالحواف */
+          .add-form {
+            padding: 16px !important;
+          }
         `;
         iframeDoc.head.appendChild(style);
       }
