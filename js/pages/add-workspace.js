@@ -80,20 +80,20 @@ document.addEventListener('DOMContentLoaded', async () => {
             justify-content: space-between !important;
             align-items: center !important;
           }
-          .page-header h2 { margin: 0 !important; font-size: 1.6rem !important; }
+          .page-header h2 { margin: 0 !important; font-size: 1.8rem !important; }
           .page-header a[href="add.html"] { display: none !important; }
 
           /* ✅ 2. تثبيت البحث */
           .search-bar {
             position: sticky !important;
-            top: 64px !important; /* ارتفاع العنوان التقريبي */
+            top: 0px !important; /* ارتفاع العنوان التقريبي */
             z-index: 99 !important;
             background: #f5f5f5 !important;
             margin: 0 !important;
             padding: 0 24px 16px 24px !important;
             max-width: none !important;
           }
-          .search-bar input { width: 100% !important; }
+          .search-bar input { width: 80% !important; }
           .search-bar i { inset-inline-end: 36px !important; } /* إصلاح الأيقونة */
 
           /* ✅ 3. المنتجات تتحرك تحت العناصر الثابتة */
