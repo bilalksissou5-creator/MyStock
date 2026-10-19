@@ -32,7 +32,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const listIframe = document.getElementById('list-iframe');
   const detailIframe = document.getElementById('detail-iframe');
 
-  // ✅ 1. القسم الأول (باقي كما هو، لم نلمسه)
+  // ✅ 1. القسم الأول (لم ألمسه إطلاقاً، هو كما أعجبك)
   addIframe.addEventListener('load', () => {
     try {
       const iframeDoc = addIframe.contentDocument || addIframe.contentWindow.document;
@@ -49,71 +49,57 @@ document.addEventListener('DOMContentLoaded', async () => {
     } catch (e) {}
   });
 
-  // ✅ 2. القسم الثاني (الحل الجذري المصحح)
+  // ✅ 2. القسم الثاني (الحل المضمون باستخدام block و sticky)
   listIframe.addEventListener('load', () => {
     try {
       const iframeDoc = listIframe.contentDocument || listIframe.contentWindow.document;
       if (iframeDoc) {
         const style = iframeDoc.createElement('style');
         style.innerHTML = `
-          /* ✅ 1. إلغاء تمرير الحاويات الأم بالكامل وإعطائها طولاً محدداً */
-          html, body, .app {
-            height: 100% !important;
-            overflow: hidden !important;
-            margin: 0 !important;
-            padding: 0 !important;
-            background: #f5f5f5 !important;
-          }
-
-          /* ✅ 2. تحويل main إلى شبكة من صفين وتثبيت طولها */
+          /* منع تمرير الحاويات الأم */
+          html, body { height: 100% !important; margin: 0 !important; overflow: hidden !important; }
+          
+          /* الحاوية الرئيسية هي المسؤولة عن التمرير */
           .main {
-            display: grid !important;
-            grid-template-columns: auto 1fr !important; /* عمود للعنوان، وعمود للبحث */
-            grid-template-rows: auto 1fr !important; /* صف للعنوان والبحث، وصف للمنتجات */
-            gap: 16px !important;
-            height: 100% !important; /* تأخذ طول الـ iframe بالكامل */
-            padding: 24px !important;
+            display: block !important; /* ✅ السر: block وليس grid أو flex */
+            height: 100% !important;
+            overflow-y: auto !important; /* التمرير هنا */
+            padding: 0 !important;
             box-sizing: border-box !important;
-            overflow: hidden !important; /* منع التمرير الخارجي */
           }
 
-          /* ✅ 3. تثبيت العنوان */
+          /* ✅ 1. تثبيت العنوان */
           .page-header {
-            grid-column: 1 !important;
-            grid-row: 1 !important;
+            position: sticky !important;
+            top: 0 !important;
+            z-index: 100 !important;
+            background: #f5f5f5 !important;
+            padding: 24px 24px 8px 24px !important;
             margin: 0 !important;
-            padding: 0 !important;
-            align-self: center !important;
             display: flex !important;
+            justify-content: space-between !important;
             align-items: center !important;
           }
           .page-header h2 { margin: 0 !important; font-size: 1.2rem !important; }
-          .page-header a[href="add.html"] { display: none !important; } /* إخفاء زر الإضافة */
+          .page-header a[href="add.html"] { display: none !important; }
 
-          /* ✅ 4. تثبيت خانة البحث */
+          /* ✅ 2. تثبيت البحث */
           .search-bar {
-            grid-column: 2 !important;
-            grid-row: 1 !important;
+            position: sticky !important;
+            top: 64px !important; /* ارتفاع العنوان التقريبي */
+            z-index: 99 !important;
+            background: #f5f5f5 !important;
             margin: 0 !important;
-            padding: 0 !important;
+            padding: 0 24px 16px 24px !important;
             max-width: none !important;
-            width: 100% !important;
-            align-self: center !important;
           }
           .search-bar input { width: 100% !important; }
-          .search-bar i { inset-inline-end: 12px !important; }
+          .search-bar i { inset-inline-end: 36px !important; } /* إصلاح الأيقونة */
 
-          /* ✅ 5. المنتجات (هي الوحيدة التي تتمرر) */
+          /* ✅ 3. المنتجات تتحرك تحت العناصر الثابتة */
           .products {
-            grid-column: 1 / -1 !important;
-            grid-row: 2 !important;
+            padding: 16px 24px 24px 24px !important;
             margin: 0 !important;
-            padding: 0 8px 24px 0 !important; /* مساحة لشريط التمرير */
-            overflow-y: auto !important; /* التمرير هنا فقط */
-            overflow-x: hidden !important;
-            min-height: 0 !important; /* ✅✅✅ السر: يجبر المنتجات على احترام المساحة والتمرير */
-            align-content: start !important;
-            -webkit-overflow-scrolling: touch !important;
           }
         `;
         iframeDoc.head.appendChild(style);
@@ -121,14 +107,21 @@ document.addEventListener('DOMContentLoaded', async () => {
     } catch (e) {}
   });
 
-  // ✅ 3. القسم الثالث
+  // ✅ 3. القسم الثالث (إعادة تفعيل التمرير بداخله)
   detailIframe.addEventListener('load', () => {
     try {
       const iframeDoc = detailIframe.contentDocument || detailIframe.contentWindow.document;
       if (iframeDoc) {
         const style = iframeDoc.createElement('style');
         style.innerHTML = `
-          .page-header { padding-top: 16px !important; }
+          html, body { height: 100% !important; margin: 0 !important; overflow: hidden !important; }
+          .main {
+            display: block !important;
+            height: 100% !important;
+            overflow-y: auto !important; /* ✅ إعادة التمرير */
+            padding: 24px !important;
+            box-sizing: border-box !important;
+          }
         `;
         iframeDoc.head.appendChild(style);
       }
