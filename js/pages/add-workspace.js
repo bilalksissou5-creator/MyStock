@@ -66,7 +66,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (iframeDoc) {
         iframeDoc.documentElement.style.overflowY = 'auto';
         iframeDoc.body.style.overflowY = 'auto';
-        iframeDoc.body.style.paddingBottom = '100px';
+        iframeDoc.body.style.paddingBottom = '150px';
         const style = iframeDoc.createElement('style');
         style.innerHTML = `
           .page-header a[href="add.html"] { display: none !important; }
