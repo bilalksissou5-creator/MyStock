@@ -32,7 +32,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const listIframe = document.getElementById('list-iframe');
   const detailIframe = document.getElementById('detail-iframe');
 
-  // ✅ 1. القسم الأول (هذا هو الكود الذي نجح تماماً، ولم يتغير أي حرف فيه)
+  // ✅ 1. القسم الأول (هذا هو الكود الذي يعمل بشكل ممتاز، لم ألمسه)
   addIframe.addEventListener('load', () => {
     try {
       const iframeDoc = addIframe.contentDocument || addIframe.contentWindow.document;
@@ -49,26 +49,35 @@ document.addEventListener('DOMContentLoaded', async () => {
     } catch (e) {}
   });
 
-  // ✅ 2. القسم الثاني (تثبيت العنوان والبحث باستخدام Grid)
+  // ✅ 2. القسم الثاني (التثبيت المثالي باستخدام Grid)
   listIframe.addEventListener('load', () => {
     try {
       const iframeDoc = listIframe.contentDocument || listIframe.contentWindow.document;
       if (iframeDoc) {
         const style = iframeDoc.createElement('style');
         style.innerHTML = `
-          html, body { overflow: hidden !important; height: 100% !important; margin: 0 !important; padding: 0 !important; background: #f5f5f5 !important; }
-          
-          .main {
-            display: grid !important;
-            grid-template-columns: auto 1fr !important; 
-            grid-template-rows: auto 1fr !important; 
-            gap: 16px !important;
-            height: 100vh !important; 
-            padding: 24px !important;
-            box-sizing: border-box !important;
-            overflow: hidden !important; 
+          /* ✅ إعدادات الصفحة لمنع التمرير الخارجي */
+          html, body {
+            overflow: hidden !important;
+            height: 100% !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            background: #f5f5f5 !important;
           }
 
+          /* ✅ تقسيم الحاوية الرئيسية إلى شبكة من صفين */
+          .main {
+            display: grid !important;
+            grid-template-columns: auto 1fr !important;
+            grid-template-rows: auto 1fr !important;
+            gap: 16px !important;
+            height: 100% !important; /* ✅ 100% وليس 100vh ليتناسب مع الـ iframe */
+            padding: 24px !important;
+            box-sizing: border-box !important;
+            overflow: hidden !important; /* منع التمرير من الحاوية الأم */
+          }
+
+          /* ✅ 1. تثبيت العنوان في الصف الأول */
           .page-header {
             grid-column: 1 !important;
             grid-row: 1 !important;
@@ -81,6 +90,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           .page-header h2 { margin: 0 !important; font-size: 1.2rem !important; }
           .page-header a[href="add.html"] { display: none !important; }
 
+          /* ✅ 2. تثبيت البحث في الصف الأول بجانب العنوان */
           .search-bar {
             grid-column: 2 !important;
             grid-row: 1 !important;
@@ -93,15 +103,16 @@ document.addEventListener('DOMContentLoaded', async () => {
           .search-bar input { width: 100% !important; }
           .search-bar i { inset-inline-end: 12px !important; }
 
+          /* ✅ 3. المنتجات في الصف الثاني، وهي الوحيدة التي تتحرك */
           .products {
             grid-column: 1 / -1 !important;
             grid-row: 2 !important;
             margin: 0 !important;
-            padding: 0 8px 24px 0 !important; 
-            overflow-y: auto !important; 
+            padding: 0 8px 24px 0 !important;
+            overflow-y: auto !important; /* التمرير هنا فقط */
             overflow-x: hidden !important;
-            align-content: start !important; 
-            min-height: 0 !important; 
+            min-height: 0 !important; /* ✅✅✅ السر السحري لتفعيل التمرير داخل Grid */
+            align-content: start !important;
             -webkit-overflow-scrolling: touch !important;
           }
         `;
