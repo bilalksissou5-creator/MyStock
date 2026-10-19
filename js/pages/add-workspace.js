@@ -24,7 +24,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   main.innerHTML = `
     <div class="workspace">
       <div class="workspace-panel-left">
-        <iframe src="/products/add.html" class="workspace-iframe" id="add-iframe" scrolling="yes"></iframe>
+        <iframe src="/products/add.html" class="workspace-iframe" id="add-iframe" scrolling="no"></iframe>
       </div>
 
       <div class="workspace-panel-center">
@@ -41,33 +41,51 @@ document.addEventListener('DOMContentLoaded', async () => {
   const listIframe = document.getElementById('list-iframe');
   const detailIframe = document.getElementById('detail-iframe');
 
-  // ✅ 1. القسم الأول (إضافة المنتج) - مع تثبيت الهيدر
+  // ✅ 1. القسم الأول (إضافة المنتج) - تثبيت الهيدر وجعل النموذج فقط قابلاً للتمرير
   addIframe.addEventListener('load', () => {
     try {
       const iframeDoc = addIframe.contentDocument || addIframe.contentWindow.document;
       if (iframeDoc) {
-        iframeDoc.documentElement.style.overflowY = 'auto';
-        iframeDoc.body.style.overflowY = 'auto';
-        iframeDoc.body.style.paddingBottom = '60px';
         const style = iframeDoc.createElement('style');
         style.innerHTML = `
-          /* إزالة المسافات من الحاوية الرئيسية */
-          .main { padding: 0 !important; }
-
-          /* ✅ تثبيت شريط العنوان (Add Products + Scan) في الأعلى */
-          .page-header {
-            position: sticky !important;
-            top: 0 !important;
-            z-index: 100 !important;
-            background: #f5f5f5 !important; /* لون خلفية الصفحة لكي يغطي العناصر عند التمرير */
-            padding: 16px !important;
+          /* ✅ إلغاء حركة الـ iframe بالكامل */
+          html, body {
+            overflow: hidden !important;
+            height: 100% !important;
             margin: 0 !important;
-            border-bottom: 1px solid #e5e5e5 !important;
           }
 
-          /* إضافة مسافة للنموذج حتى لا يلتصق بالحواف */
-          .add-form {
+          /* ✅ تحويل main إلى Flexbox لترتيب الهيدر والنموذج */
+          .main {
+            display: flex !important;
+            flex-direction: column !important;
+            height: 100% !important;
+            padding: 0 !important;
+            overflow: hidden !important;
+          }
+
+          /* ✅ تثبيت شريط العنوان (Add Products + Scan) */
+          .page-header {
+            flex: 0 0 auto !important; /* يمنع الهيدر من التمدد أو الانكماش */
             padding: 16px !important;
+            margin: 0 !important;
+            background: #f5f5f5 !important;
+            border-bottom: 1px solid #e5e5e5 !important;
+            z-index: 10 !important;
+          }
+
+          /* ✅ جعل النموذج هو الجزء الوحيد الذي يتحرك بسلاسة */
+          .add-form {
+            flex: 1 1 auto !important; /* يأخذ المساحة المتبقية */
+            overflow-y: auto !important; /* تفعيل التمرير هنا فقط */
+            padding: 16px !important;
+            padding-bottom: 80px !important; /* مساحة إضافية لرؤية الأزرار السفلية */
+            -webkit-overflow-scrolling: touch !important; /* تمرير سلس على الأجهزة المحمولة */
+          }
+
+          /* تنسيق التنبيهات لتكون ضمن التمرير أو ثابتة حسب الرغبة (هنا ستكون ضمن التمرير) */
+          .alert {
+            margin: 16px 16px 0 16px !important;
           }
         `;
         iframeDoc.head.appendChild(style);
