@@ -74,13 +74,13 @@ document.addEventListener('DOMContentLoaded', async () => {
             top: 0 !important;
             z-index: 100 !important;
             background: #f5f5f5 !important;
-            padding: 10px 10px 8px 10px !important;
+            padding: 24px 24px 8px 24px !important;
             margin: 0 !important;
             display: flex !important;
             justify-content: space-between !important;
             align-items: center !important;
           }
-          .page-header h2 { margin: 0 !important; font-size: 1.2rem !important; }
+          .page-header h2 { margin: 0 !important; font-size: 1.4rem !important; }
           .page-header a[href="add.html"] { display: none !important; }
 
           /* ✅ 2. تثبيت البحث */
