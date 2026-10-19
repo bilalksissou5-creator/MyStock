@@ -86,16 +86,15 @@ async function loadProducts() {
     }
   }
 
-  // ✅ التعديل: التوجيه الذكي مع تمرير معرف المنتج، معرف المستخدم، معرف المورد
+  // ✅ التعديل: تمرير invoice_id في الرابط
   const isDesktop = window.innerWidth >= 1024;
 
   container.innerHTML = grouped.map(p => {
     const total = ((p.qty ?? 0) * (p.price ?? 0)).toFixed(2);
     const lowClass = (p.qty ?? 0) < 10 ? 'low' : '';
     
-    // ✅ بناء الرابط الجديد
     const targetUrl = isDesktop 
-      ? `/products/detail-workspace.html?productId=${p.id}&userId=${p.created_by || ''}&supplierId=${p.supplier_id || ''}` 
+      ? `/products/detail-workspace.html?productId=${p.id}&userId=${p.created_by || ''}&supplierId=${p.supplier_id || ''}&invoiceId=${p.invoice_id || ''}` 
       : `detail.html?id=${p.id}`;
 
     return `
@@ -125,7 +124,6 @@ async function loadProducts() {
     `;
   }).join('');
 
-  // ✅ دعم iframe (إذا كانت الصفحة مفتوحة داخل الـ Workspace الأوسط)
   if (window.self !== window.top) {
     document.querySelectorAll('.product-card').forEach(card => {
       card.addEventListener('click', (e) => {

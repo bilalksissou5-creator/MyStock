@@ -3,11 +3,11 @@
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   
-  // ✅ قراءة المعرفات من الرابط
   const urlParams = new URLSearchParams(window.location.search);
   const productId = urlParams.get('productId');
   const userId = urlParams.get('userId');
   const supplierId = urlParams.get('supplierId');
+  const invoiceId = urlParams.get('invoiceId');
 
   // ✅ تحويل الهاتف لصفحة التفاصيل الأصلية
   if (window.innerWidth <= 1024) {
@@ -27,21 +27,27 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   const main = document.getElementById('main-content');
 
+  // ✅ إضافة كلاس workspace-4-cols لضمان تساوي الأعمدة
   main.innerHTML = `
-    <div class="workspace">
-      <!-- القسم الأول: بطاقة المستخدم -->
+    <div class="workspace workspace-4-cols">
+      <!-- 1. بطاقة المستخدم -->
       <div class="workspace-panel-left">
         <iframe src="/user-card.html?userId=${userId || ''}" class="workspace-iframe" id="user-iframe" scrolling="yes"></iframe>
       </div>
 
-      <!-- القسم الثاني: تفاصيل المنتج -->
+      <!-- 2. تفاصيل المنتج -->
       <div class="workspace-panel-center">
         <iframe src="/products/detail.html?id=${productId}" class="workspace-iframe" id="detail-iframe" scrolling="yes"></iframe>
       </div>
 
-      <!-- القسم الثالث: تفاصيل المورد -->
+      <!-- 3. تفاصيل المورد -->
       <div class="workspace-panel-right">
         <iframe src="/suppliers/detail.html?id=${supplierId || ''}" class="workspace-iframe" id="supplier-iframe" scrolling="yes"></iframe>
+      </div>
+
+      <!-- 4. الفاتورة -->
+      <div class="workspace-panel-invoice">
+        <iframe src="${invoiceId ? `/invoice.html?id=${encodeURIComponent(invoiceId)}` : 'about:blank'}" class="workspace-iframe" id="invoice-iframe" scrolling="yes"></iframe>
       </div>
     </div>
   `;
@@ -49,6 +55,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const userIframe = document.getElementById('user-iframe');
   const detailIframe = document.getElementById('detail-iframe');
   const supplierIframe = document.getElementById('supplier-iframe');
+  const invoiceIframe = document.getElementById('invoice-iframe');
 
   // ✅ 1. القسم الأول (بطاقة المستخدم)
   userIframe.addEventListener('load', () => {
@@ -60,7 +67,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         iframeDoc.body.style.paddingBottom = '30px';
         const style = iframeDoc.createElement('style');
         style.innerHTML = `
-          .main { padding-top: 16px !important; padding-bottom: 80px !important; }
+          .main { padding-top: 0 !important; padding-bottom: 80px !important; }
           .page-header { padding-top: 16px !important; }
         `;
         iframeDoc.head.appendChild(style);
@@ -78,16 +85,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         iframeDoc.body.style.paddingBottom = '150px';
         const style = iframeDoc.createElement('style');
         style.innerHTML = `
-          /* إخفاء أي زر إضافة أو روابط غير مرغوبة إن وجدت */
           .page-header a[href="add.html"] { display: none !important; }
-          
-          /* إلغاء المسافة العلوية من main */
           .main { padding-top: 0 !important; padding-bottom: 80px !important; }
-          
-          /* مسافة داخلية 16px */
-          #main-content {
-            padding: 16px !important; 
-          }
+          #main-content { padding: 16px !important; }
         `;
         iframeDoc.head.appendChild(style);
       }
@@ -110,6 +110,24 @@ document.addEventListener('DOMContentLoaded', async () => {
         iframeDoc.head.appendChild(style);
       }
     } catch (e) { console.warn('supplier iframe error:', e); }
+  });
+
+  // ✅ 4. القسم الرابع (الفاتورة)
+  invoiceIframe.addEventListener('load', () => {
+    try {
+      const iframeDoc = invoiceIframe.contentDocument || invoiceIframe.contentWindow.document;
+      if (iframeDoc) {
+        iframeDoc.documentElement.style.overflowY = 'auto';
+        iframeDoc.body.style.overflowY = 'auto';
+        iframeDoc.body.style.paddingBottom = '30px';
+        const style = iframeDoc.createElement('style');
+        style.innerHTML = `
+          .main { padding-top: 0 !important; padding-bottom: 80px !important; }
+          .page-header { padding-top: 16px !important; }
+        `;
+        iframeDoc.head.appendChild(style);
+      }
+    } catch (e) { console.warn('invoice iframe error:', e); }
   });
 
 });

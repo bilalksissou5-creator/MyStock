@@ -56,3 +56,11 @@
     overflow-y: scroll; 
   }
 }
+/* ============================================
+   ✅ تخطيط 4 أقسام متساوية (لصفحة تفاصيل المنتج)
+   ============================================ */
+@media (min-width: 1024px) {
+  .workspace.workspace-4-cols {
+    grid-template-columns: repeat(4, 1fr) !important; /* 4 أعمدة متساوية */
+  }
+}
