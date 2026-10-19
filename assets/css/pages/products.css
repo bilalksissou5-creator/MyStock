@@ -118,3 +118,59 @@
     font-size: 12px;
   }
 }
+
+/* ============================================
+   ✅ التثبيت الجذري للعناصر (للحاسوب فقط)
+   ============================================ */
+@media (min-width: 1025px) {
+  
+  /* 1. إعداد الحاوية الرئيسية كشبكة (Grid) */
+  .main, #main-content {
+    display: grid !important;
+    grid-template-columns: auto 1fr !important; /* عمود للعنوان، وعمود للبحث */
+    grid-template-rows: auto 1fr !important; /* صف للعنوان والبحث، وصف للمنتجات */
+    gap: 16px !important;
+    height: 100% !important; /* نأخذ طول الـ iframe بالكامل */
+    padding: 24px !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important; /* منع التمرير الخارجي */
+  }
+
+  /* 2. تثبيت العنوان وإخفاء زر الإضافة */
+  .page-header {
+    grid-column: 1 !important;
+    grid-row: 1 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+  }
+  .page-header h2 { margin: 0 !important; font-size: 1.2rem !important; }
+  .page-header a[href="add.html"] { display: none !important; }
+
+  /* 3. تثبيت خانة البحث */
+  .search-bar {
+    grid-column: 2 !important;
+    grid-row: 1 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    max-width: none !important;
+    width: 100% !important;
+    align-self: center !important;
+  }
+  .search-bar input { width: 100% !important; }
+  .search-bar i { inset-inline-end: 12px !important; }
+
+  /* 4. المنتجات (هي الوحيدة التي تتحرك) */
+  .products {
+    grid-column: 1 / -1 !important;
+    grid-row: 2 !important;
+    margin: 0 !important;
+    padding: 0 8px 24px 0 !important; /* مساحة لشريط التمرير */
+    overflow-y: auto !important; /* تفعيل التمرير هنا فقط */
+    overflow-x: hidden !important;
+    min-height: 0 !important; /* ✅ السر السحري: يسمح بالتمرير داخل الشبكة */
+    align-content: start !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+}
