@@ -24,7 +24,7 @@
     display: grid;
     grid-template-columns: 320px minmax(0, 1fr) 380px;
     gap: 16px;
-    padding: 0px;
+    padding: 16px;
     box-sizing: border-box;
   }
 

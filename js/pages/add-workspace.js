@@ -48,54 +48,44 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (iframeDoc) {
         iframeDoc.documentElement.style.overflowY = 'auto';
         iframeDoc.body.style.overflowY = 'auto';
-        iframeDoc.body.style.paddingBottom = '30px';
+        const style = iframeDoc.createElement('style');
+        style.innerHTML = `
+          .main { padding-top: 0 !important; padding-bottom: 80px !important; }
+          .page-header { padding-top: 16px !important; }
+        `;
+        iframeDoc.head.appendChild(style);
       }
     } catch (e) { console.warn('add iframe error:', e); }
   });
 
-  // ✅ 2. القسم الثاني (قائمة المنتجات) - التنسيق المباشر والمصحح
+  // ✅ 2. القسم الثاني (قائمة المنتجات)
   listIframe.addEventListener('load', () => {
     try {
       const iframeDoc = listIframe.contentDocument || listIframe.contentWindow.document;
       if (iframeDoc) {
-        // تفعيل التمرير
         iframeDoc.documentElement.style.overflowY = 'auto';
         iframeDoc.body.style.overflowY = 'auto';
-        iframeDoc.body.style.paddingBottom = '30px';
         
-        // ✅ حقن CSS مباشر داخل الـ iframe (استخدام Grid بدلاً من Flex)
         const style = iframeDoc.createElement('style');
         style.innerHTML = `
-          /* إخفاء زر الإضافة */
           .page-header a[href="add.html"] { display: none !important; }
           
-          /* استخدام Grid لترتيب العناصر بدقة */
+          /* ✅ إلغاء المسافة العلوية من main */
+          .main { padding-top: 0 !important; padding-bottom: 80px !important; }
+          
+          /* ✅ استخدام Grid للترتيب مع مسافة داخلية 16px */
           #main-content {
             display: grid !important;
-            grid-template-columns: auto 1fr !important; /* عمود للعنوان، وعمود للبحث */
-            align-items: center !important; /* محاذاة رأسية للعنوان والبحث */
-            align-content: start !important; /* ✅ إجبار المحتوى على الالتصاق بالأعلى (إلغاء المسافة) */
+            grid-template-columns: auto 1fr !important;
+            align-items: center !important;
+            align-content: start !important;
             gap: 16px !important;
+            padding: 16px !important; 
           }
           
-          /* العنوان في العمود الأول */
-          .page-header {
-            grid-column: 1 !important;
-            margin-bottom: 0 !important;
-          }
-          
-          /* البحث في العمود الثاني ويأخذ المساحة */
-          .search-bar {
-            grid-column: 2 !important;
-            margin-bottom: 0 !important;
-            max-width: none !important;
-          }
-          
-          /* المنتجات في صف جديد وتأخذ العرض بالكامل */
-          .products {
-            grid-column: 1 / -1 !important;
-            margin-top: 0 !important;
-          }
+          .page-header { grid-column: 1 !important; margin-bottom: 0 !important; }
+          .search-bar { grid-column: 2 !important; margin-bottom: 0 !important; max-width: none !important; }
+          .products { grid-column: 1 / -1 !important; margin-top: 0 !important; }
         `;
         iframeDoc.head.appendChild(style);
       }
@@ -109,7 +99,12 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (iframeDoc) {
         iframeDoc.documentElement.style.overflowY = 'auto';
         iframeDoc.body.style.overflowY = 'auto';
-        iframeDoc.body.style.paddingBottom = '30px';
+        const style = iframeDoc.createElement('style');
+        style.innerHTML = `
+          .main { padding-top: 0 !important; padding-bottom: 80px !important; }
+          .page-header { padding-top: 16px !important; }
+        `;
+        iframeDoc.head.appendChild(style);
       }
     } catch (e) { console.warn('detail iframe error:', e); }
   });
