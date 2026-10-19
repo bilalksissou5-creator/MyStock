@@ -59,7 +59,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     } catch (e) { console.warn('add iframe error:', e); }
   });
 
-  // ✅ 2. القسم الثاني (قائمة المنتجات) - تثبيت العنوان والبحث باستخدام Grid
+  // ✅ 2. القسم الثاني (قائمة المنتجات) - تثبيت العنوان والبحث وإصلاح الأيقونة
   listIframe.addEventListener('load', () => {
     try {
       const iframeDoc = listIframe.contentDocument || listIframe.contentWindow.document;
@@ -73,13 +73,13 @@ document.addEventListener('DOMContentLoaded', async () => {
           /* ✅ حاوية التمرير الرئيسية */
           #main-content {
             display: grid !important;
-            grid-template-columns: auto 1fr !important; /* عمود للعنوان وعمود للبحث */
-            grid-template-rows: auto auto !important; /* صف للعنوان والبحث، صف للمنتجات */
+            grid-template-columns: auto 1fr !important; 
+            grid-template-rows: auto auto !important; 
             align-items: center !important;
             align-content: start !important;
             gap: 8px !important;
             height: 100% !important;
-            overflow-y: auto !important; /* التمرير هنا فقط */
+            overflow-y: auto !important; 
             padding: 0 !important;
             box-sizing: border-box !important;
           }
@@ -97,19 +97,27 @@ document.addEventListener('DOMContentLoaded', async () => {
           }
           .page-header h2 { font-size: 1.2rem !important; margin: 0 !important; }
 
-          /* ✅ تثبيت خانة البحث */
+          /* ✅ تثبيت خانة البحث (مع إصلاح المسافات) */
           .search-bar {
             grid-column: 2 !important;
             grid-row: 1 !important;
             margin: 0 !important;
-            padding: 16px 16px 16px 8px !important;
+            padding-block: 16px !important;
+            padding-inline-start: 8px !important;
+            padding-inline-end: 16px !important;
             max-width: none !important;
             position: sticky !important;
             top: 0 !important;
             background: #f5f5f5 !important;
             z-index: 100 !important;
+            box-sizing: border-box !important;
           }
           .search-bar input { width: 100% !important; }
+
+          /* ✅ إصلاح مكان أيقونة البحث */
+          .search-bar i {
+            inset-inline-end: 28px !important; /* 16px padding + 12px original */
+          }
 
           /* إخفاء زر الإضافة */
           .page-header a[href="add.html"] { display: none !important; }
