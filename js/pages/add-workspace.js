@@ -61,7 +61,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           
           /* الحاوية الرئيسية هي المسؤولة عن التمرير */
           .main {
-            display: block !important; /* ✅ السر: block وليس grid أو flex */
+            display: flex !important; /* ✅ السر: block وليس grid أو flex */
             height: 100% !important;
             overflow-y: auto !important; /* التمرير هنا */
             padding: 0 !important;
