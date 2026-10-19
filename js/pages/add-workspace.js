@@ -32,7 +32,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const listIframe = document.getElementById('list-iframe');
   const detailIframe = document.getElementById('detail-iframe');
 
-  // ✅ 1. القسم الأول
+  // ✅ 1. القسم الأول (كما هو، لا نلمسه)
   addIframe.addEventListener('load', () => {
     try {
       const iframeDoc = addIframe.contentDocument || addIframe.contentWindow.document;
@@ -49,89 +49,71 @@ document.addEventListener('DOMContentLoaded', async () => {
     } catch (e) {}
   });
 
-  // ✅ 2. القسم الثاني - الحل المضمون
+  // ✅ 2. القسم الثاني (الحل الجذري الصارم)
   listIframe.addEventListener('load', () => {
     try {
       const iframeDoc = listIframe.contentDocument || listIframe.contentWindow.document;
-      if (!iframeDoc) return;
-
-      // سحب العناصر
-      const mainEl = iframeDoc.querySelector('.main');
-      const pageHeader = iframeDoc.querySelector('.page-header');
-      const searchBar = iframeDoc.querySelector('.search-bar');
-
-      // تجميعها في حاوية واحدة (إذا لم تكن مجمعة)
-      if (mainEl && pageHeader && searchBar && !iframeDoc.querySelector('.sticky-header-wrapper')) {
-        const wrapper = iframeDoc.createElement('div');
-        wrapper.className = 'sticky-header-wrapper';
-        mainEl.insertBefore(wrapper, pageHeader);
-        wrapper.appendChild(pageHeader);
-        wrapper.appendChild(searchBar);
-      }
-
-      // تطبيق التنسيق
-      const style = iframeDoc.createElement('style');
-      style.innerHTML = `
-        /* إلغاء تمرير الصفحة الأم */
-        html, body { overflow: hidden !important; height: 100% !important; margin: 0 !important; }
-        
-        /* الحاوية الرئيسية للتمرير */
-        .main, #main-content {
-          display: block !important;
-          height: 100% !important;
-          overflow-y: auto !important;
-          overflow-x: hidden !important;
-          padding: 24px !important;
-          box-sizing: border-box !important;
-        }
-
-        /* الحاوية الثابتة الأفقيّة */
-        .sticky-header-wrapper {
-          position: sticky !important;
-          top: 0 !important;
-          z-index: 100 !important;
-          background: #f5f5f5 !important;
-          display: flex !important;
-          flex-direction: row !important;
-          align-items: center !important;
-          gap: 16px !important;
+      if (iframeDoc) {
+        const style = iframeDoc.createElement('style');
+        style.innerHTML = `
+          /* ✅ 1. قفل تمرير الصفحة والـ body */
+          html, body { overflow: hidden !important; height: 100% !important; margin: 0 !important; }
           
-          /* تعويض مساحة main لكي تغطي كامل العرض */
-          margin: -24px -24px 16px -24px !important;
-          padding: 24px 24px 16px 24px !important;
-          border-bottom: 1px solid #e5e5e5 !important;
-        }
+          /* ✅ 2. الحاوية الرئيسية تصبح شبكة (Grid) من صفين */
+          .main, #main-content {
+            display: grid !important;
+            grid-template-columns: auto 1fr !important; /* عمود للعنوان، وعمود للبحث */
+            grid-template-rows: auto 1fr !important; /* صف للهيدر، وصف للمنتجات */
+            gap: 16px !important;
+            height: 100vh !important; /* طول الشاشة بدقة */
+            padding: 24px !important;
+            box-sizing: border-box !important;
+            overflow: hidden !important; /* منع التمرير في الحاوية الأم */
+          }
 
-        /* تنسيق العنوان */
-        .sticky-header-wrapper .page-header {
-          flex: 0 0 auto !important;
-          margin: 0 !important;
-          padding: 0 !important;
-        }
-        .page-header h2 { margin: 0 !important; font-size: 1.2rem !important; }
-        .page-header a[href="add.html"] { display: none !important; }
+          /* ✅ 3. تثبيت العنوان وإخفاء الزر */
+          .page-header {
+            grid-column: 1 !important;
+            grid-row: 1 !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            display: flex !important;
+            align-items: center !important;
+          }
+          .page-header a[href="add.html"] { display: none !important; } /* إخفاء الزر نهائياً */
+          .page-header h2 { margin: 0 !important; font-size: 1.2rem !important; }
 
-        /* تنسيق البحث */
-        .sticky-header-wrapper .search-bar {
-          flex: 1 1 auto !important;
-          margin: 0 !important;
-          padding: 0 !important;
-          max-width: none !important;
-        }
-        .search-bar input { width: 100% !important; }
-        .search-bar i { inset-inline-end: 12px !important; }
+          /* ✅ 4. تثبيت خانة البحث */
+          .search-bar {
+            grid-column: 2 !important;
+            grid-row: 1 !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            max-width: none !important;
+            width: 100% !important;
+            align-self: center !important;
+          }
+          .search-bar input { width: 100% !important; }
 
-        /* المنتجات */
-        .products {
-          margin: 0 !important;
-          padding: 0 !important;
-        }
-      `;
-      iframeDoc.head.appendChild(style);
+          /* ✅ 5. المنتجات (هي الوحيدة التي تتحرك) */
+          .products {
+            grid-column: 1 / -1 !important;
+            grid-row: 2 !important;
+            margin: 0 !important;
+            padding: 0 8px 24px 0 !important; /* مساحة لشريط التمرير */
+            overflow-y: auto !important; /* التمرير هنا فقط */
+            overflow-x: hidden !important;
+            min-height: 0 !important; /* ✅ السر السحري: يسمح بالتمرير داخل الشبكة */
+            align-content: start !important;
+            -webkit-overflow-scrolling: touch !important;
+          }
+        `;
+        iframeDoc.head.appendChild(style);
+      }
     } catch (e) {}
   });
 
-  // ✅ 3. القسم الثالث
+  // ✅ 3. القسم الثالث (إعادة التمرير)
   detailIframe.addEventListener('load', () => {
     try {
       const iframeDoc = detailIframe.contentDocument || detailIframe.contentWindow.document;
@@ -139,13 +121,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const style = iframeDoc.createElement('style');
         style.innerHTML = `
           html, body { height: 100% !important; margin: 0 !important; overflow: hidden !important; }
-          .main {
-            display: block !important;
-            height: 100% !important;
-            overflow-y: auto !important;
-            padding: 24px !important;
-            box-sizing: border-box !important;
-          }
+          .main { display: block !important; height: 100% !important; overflow-y: auto !important; padding: 24px !important; box-sizing: border-box !important; }
         `;
         iframeDoc.head.appendChild(style);
       }

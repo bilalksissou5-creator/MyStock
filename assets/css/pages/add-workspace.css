@@ -12,7 +12,7 @@
    ============================================ */
 @media (min-width: 1024px) {
   
-  /* تثبيت الحاوية الرئيسية main */
+  /* تثبيت الحاوية الرئيسية main ومنع تمرير الصفحة الأم */
   body:has(.workspace) .main {
     overflow: hidden !important;
     padding: 0 !important;
@@ -24,7 +24,7 @@
     display: grid;
     grid-template-columns: 320px minmax(0, 1fr) 380px;
     gap: 16px;
-    height: calc(100vh - 60px);
+    height: calc(100vh - 60px); /* 60px = ارتفاع الهيدر */
     padding: 0 16px 16px 16px; 
     box-sizing: border-box;
     overflow: hidden;
@@ -43,7 +43,7 @@
     overflow: hidden;
   }
 
-  /* تنسيق الـ iframe */
+  /* تنسيق الـ iframe: يمنع التمرير الخارجي ليعتمد على الداخلي */
   .workspace-iframe {
     width: 100%;
     height: 100%;
@@ -52,7 +52,7 @@
     background: #ffffff;
     border-radius: 10px;
     box-sizing: border-box;
-    overflow: hidden; /* ✅ إزالة scroll والاعتماد على التمرير الداخلي */
+    overflow: hidden !important; /* ✅ التصحيح: إخفاء شريط التمرير الخارجي */
   }
 }
 
@@ -61,6 +61,6 @@
    ============================================ */
 @media (min-width: 1024px) {
   .workspace.workspace-4-cols {
-    grid-template-columns: repeat(4, 1fr) !important; 
+    grid-template-columns: repeat(4, 1fr) !important; /* 4 أعمدة متساوية */
   }
 }
