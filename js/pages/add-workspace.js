@@ -49,14 +49,33 @@ document.addEventListener('DOMContentLoaded', async () => {
     } catch (e) {}
   });
 
-  // ✅ 2. القسم الثاني - الحل الجذري بـ position: sticky
+  // ✅ 2. القسم الثاني - الحل الجذري (جمع العناصر في حاوية واحدة)
   listIframe.addEventListener('load', () => {
     try {
       const iframeDoc = listIframe.contentDocument || listIframe.contentWindow.document;
       if (iframeDoc) {
+        
+        const mainContent = iframeDoc.getElementById('main-content');
+        const header = iframeDoc.querySelector('.page-header');
+        const searchBar = iframeDoc.querySelector('.search-bar');
+        
+        // ✅✅✅ السحر: جمع العنوان والبحث في حاوية واحدة (إن لم تكن موجودة)
+        if (mainContent && header && searchBar) {
+          if (!iframeDoc.querySelector('.sticky-header-container')) {
+            const wrapper = iframeDoc.createElement('div');
+            wrapper.className = 'sticky-header-container';
+            
+            // إدخال الحاوية قبل العنوان
+            mainContent.insertBefore(wrapper, header);
+            // نقل العناصر داخل الحاوية
+            wrapper.appendChild(header);
+            wrapper.appendChild(searchBar);
+          }
+        }
+
         const style = iframeDoc.createElement('style');
         style.innerHTML = `
-          /* ✅ إيقاف التمرير على مستوى الصفحة والـ iframe */
+          /* ✅ إيقاف تمرير الصفحة والـ iframe بالكامل */
           html, body { 
             overflow: hidden !important; 
             height: 100% !important; 
@@ -65,7 +84,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             background: #f5f5f5 !important; 
           }
           
-          /* ✅ الحاوية الرئيسية تمنع التمرير الخارجي */
           .main { 
             height: 100% !important; 
             padding: 0 !important; 
@@ -74,43 +92,55 @@ document.addEventListener('DOMContentLoaded', async () => {
 
           /* ✅ الحاوية الوحيدة التي تتمرر */
           #main-content {
-            display: block !important; /* ✅ block هو السر لنجاح sticky */
+            display: block !important; 
             height: 100% !important;
-            overflow-y: auto !important; /* التمرير هنا فقط */
+            overflow-y: auto !important; 
             padding: 0 !important;
             -webkit-overflow-scrolling: touch !important;
           }
 
-          /* ✅ 1. العنوان الثابت (يغطي المنتجات التي تمر تحته) */
-          .page-header {
+          /* ✅ تنسيق الحاوية العلوية (تجمع العنوان والبحث أفقياً) */
+          .sticky-header-container {
             position: sticky !important;
             top: 0 !important;
             z-index: 100 !important;
             background: #f5f5f5 !important;
-            margin: 0 !important;
-            padding: 16px 16px 8px 16px !important;
-            display: flex !important;
-            justify-content: space-between !important;
+            display: flex !important; /* يجعل العناصر أفقية */
+            flex-direction: row !important;
             align-items: center !important;
-            border-bottom: 1px solid #e5e5e5 !important;
+            gap: 16px !important;
+            padding: 16px !important;
+            margin: 0 !important;
+            border-bottom: 1px solid #e5e5e5 !important; /* خط فاصل */
+          }
+
+          /* ✅ تنسيق العنوان داخل الحاوية */
+          .sticky-header-container .page-header {
+            flex: 0 0 auto !important; /* لا يتمدد ولا ينكمش */
+            margin: 0 !important;
+            padding: 0 !important;
           }
           .page-header h2 { margin: 0 !important; font-size: 1.2rem !important; }
           .page-header a[href="add.html"] { display: none !important; } /* إخفاء زر الإضافة */
 
-          /* ✅ 2. خانة البحث الثابتة (تحت العنوان مباشرة) */
-          .search-bar {
-            position: sticky !important;
-            top: 56px !important; /* ارتفاع العنوان التقريبي */
-            z-index: 99 !important;
-            background: #f5f5f5 !important;
+          /* ✅ تنسيق البحث داخل الحاوية */
+          .sticky-header-container .search-bar {
+            flex: 1 1 auto !important; /* يأخذ المساحة المتبقية */
             margin: 0 !important;
-            padding: 8px 16px 16px 16px !important;
+            padding: 0 !important;
             max-width: none !important;
-            border-bottom: 1px solid #e5e5e5 !important;
           }
-          .search-bar input { width: 100% !important; }
+          .search-bar input { 
+            width: 100% !important; 
+            padding-inline-end: 36px !important; 
+          }
 
-          /* ✅ 3. المنتجات (تتحرك بسلاسة تحت العناصر الثابتة) */
+          /* ✅ إصلاح أيقونة البحث */
+          .search-bar i {
+            inset-inline-end: 12px !important; /* إعادتها لمكانها الأصلي */
+          }
+
+          /* ✅ شبكة المنتجات */
           .products {
             padding: 16px !important;
             margin: 0 !important;
@@ -121,7 +151,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         `;
         iframeDoc.head.appendChild(style);
       }
-    } catch (e) {}
+    } catch (e) { console.warn('list iframe error:', e); }
   });
 
   // ✅ 3. القسم الثالث
