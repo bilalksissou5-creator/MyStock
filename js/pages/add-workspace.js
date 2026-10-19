@@ -48,7 +48,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (iframeDoc) {
         iframeDoc.documentElement.style.overflowY = 'auto';
         iframeDoc.body.style.overflowY = 'auto';
-        iframeDoc.body.style.paddingBottom = '30px';
+        iframeDoc.body.style.paddingBottom = '60px';
         const style = iframeDoc.createElement('style');
         style.innerHTML = `
           /* إزالة المسافات من الحاوية الرئيسية */
@@ -82,7 +82,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (iframeDoc) {
         iframeDoc.documentElement.style.overflowY = 'auto';
         iframeDoc.body.style.overflowY = 'auto';
-        iframeDoc.body.style.paddingBottom = '180px';
+        iframeDoc.body.style.paddingBottom = '150px';
         const style = iframeDoc.createElement('style');
         style.innerHTML = `
           .page-header a[href="add.html"] { display: none !important; }
