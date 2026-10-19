@@ -120,33 +120,36 @@
 }
 
 /* ============================================
-   ✅ التعديل: جعل العنوان والبحث في سطر واحد (للحاسوب فقط)
+   ✅ التعديل الجديد: جعل العنوان والبحث في سطر واحد (باستخدام Grid)
    ============================================ */
 @media (min-width: 1025px) {
-  /* جعل الحاوية الرئيسية مرنة لوضع العناصر بجانب بعضها */
+  /* استخدام Grid بدلاً من Flex لتجنب مشكلة التوسيط العمودي */
   #main-content {
-    display: flex !important;
-    flex-wrap: wrap !important;
-    align-items: center !important;
+    display: grid !important;
+    grid-template-columns: auto 1fr !important; /* العمود الأول للعنوان، الثاني للبحث */
+    grid-template-rows: auto auto !important; /* الصف الأول للعنوان والبحث، الثاني للمنتجات */
+    align-content: start !important; /* إجبار العناصر على الالتصاق بالأعلى */
     gap: 16px !important;
   }
 
-  /* العنوان يأخذ مساحته الطبيعية فقط */
+  /* العنوان في الزاوية العلوية اليمنى (أو اليسرى) */
   .page-header {
+    grid-column: 1 !important;
+    grid-row: 1 !important;
     margin-bottom: 0 !important;
-    flex: 0 0 auto !important;
   }
 
-  /* البحث يأخذ باقي المساحة */
+  /* البحث بجانبه ويأخذ باقي المساحة */
   .search-bar {
-    flex: 1 1 auto !important;
+    grid-column: 2 !important;
+    grid-row: 1 !important;
     margin-bottom: 0 !important;
     max-width: none !important;
   }
 
-  /* المنتجات تنزل لسطر جديد وتأخذ العرض بالكامل */
+  /* المنتجات تنزل في الصف الثاني وتأخذ العرض بالكامل */
   .products {
-    flex: 0 0 100% !important;
-    margin-top: 8px !important;
+    grid-column: 1 / -1 !important; /* يمتد على كل الأعمدة */
+    grid-row: 2 !important;
   }
 }
