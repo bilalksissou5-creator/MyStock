@@ -49,30 +49,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     } catch (e) {}
   });
 
-  // ✅ 2. القسم الثاني - الحل القاطع بـ Flexbox
+  // ✅ 2. القسم الثاني - الحل القاطع (الشبكة على العنصر نفسه)
   listIframe.addEventListener('load', () => {
     try {
       const iframeDoc = listIframe.contentDocument || listIframe.contentWindow.document;
       if (iframeDoc) {
-        
-        const mainContent = iframeDoc.getElementById('main-content');
-        const header = iframeDoc.querySelector('.page-header');
-        const searchBar = iframeDoc.querySelector('.search-bar');
-        
-        // ✅ نقل العنوان والبحث إلى حاوية واحدة
-        if (mainContent && header && searchBar) {
-          if (!iframeDoc.querySelector('.fixed-top-container')) {
-            const wrapper = iframeDoc.createElement('div');
-            wrapper.className = 'fixed-top-container';
-            mainContent.insertBefore(wrapper, header);
-            wrapper.appendChild(header);
-            wrapper.appendChild(searchBar);
-          }
-        }
-
         const style = iframeDoc.createElement('style');
         style.innerHTML = `
-          /* ✅ إيقاف التمرير الخارجي بالكامل */
+          /* ✅ منع تمرير الصفحة بالكامل */
           html, body { 
             overflow: hidden !important; 
             height: 100% !important; 
@@ -81,68 +65,53 @@ document.addEventListener('DOMContentLoaded', async () => {
             background: #f5f5f5 !important; 
           }
           
-          .main { 
-            display: flex !important;
-            flex-direction: column !important;
-            height: 100% !important; 
-            padding: 0 !important; 
-            overflow: hidden !important; 
-          }
-
-          /* ✅ الحاوية الرئيسية */
-          #main-content {
-            display: flex !important;
-            flex-direction: column !important;
-            height: 100% !important;
-            padding: 16px !important;
-            box-sizing: border-box !important;
-            overflow: hidden !important;
-          }
-
-          /* ✅ الحاوية العلوية الثابتة (العنوان + البحث) */
-          .fixed-top-container {
-            flex: 0 0 auto !important; /* ✅ لا تتمدد ولا تنكمش */
-            display: flex !important;
-            flex-direction: row !important;
-            align-items: center !important;
+          /* ✅ الحاوية الرئيسية (هي نفسها #main-content) */
+          .main, #main-content { 
+            display: grid !important;
+            grid-template-columns: auto 1fr !important; /* عمود للعنوان، وعمود للبحث */
+            grid-template-rows: auto 1fr !important; /* صف للعنوان والبحث، وصف للمنتجات */
             gap: 16px !important;
-            width: 100% !important;
-            margin-bottom: 16px !important;
-            z-index: 10 !important;
+            height: 100vh !important; /* تأخذ طول الشاشة بالكامل */
+            padding: 24px !important; 
+            box-sizing: border-box !important; 
+            overflow: hidden !important; /* منع التمرير الخارجي */
           }
 
-          /* تنسيق العناصر داخل الحاوية العلوية */
-          .fixed-top-container .page-header {
-            flex: 0 0 auto !important;
+          /* ✅ 1. العنوان (ثابت في الصف الأول) */
+          .page-header {
+            grid-column: 1 !important;
+            grid-row: 1 !important;
             margin: 0 !important;
             padding: 0 !important;
+            align-self: center !important;
             display: flex !important;
             align-items: center !important;
           }
           .page-header h2 { margin: 0 !important; font-size: 1.2rem !important; }
           .page-header a[href="add.html"] { display: none !important; }
 
-          .fixed-top-container .search-bar {
-            flex: 1 1 auto !important;
+          /* ✅ 2. البحث (ثابت في الصف الأول) */
+          .search-bar {
+            grid-column: 2 !important;
+            grid-row: 1 !important;
             margin: 0 !important;
             padding: 0 !important;
             max-width: none !important;
+            width: 100% !important;
+            align-self: center !important;
           }
           .search-bar input { width: 100% !important; }
-          .search-bar i { inset-inline-end: 12px !important; }
 
-          /* ✅ المنتجات: هي الوحيدة التي تتحرك */
+          /* ✅ 3. المنتجات (في الصف الثاني، وهي الوحيدة التي تتمرر) */
           .products {
-            flex: 1 1 auto !important; /* ✅ تأخذ باقي المساحة */
-            overflow-y: auto !important; /* ✅ التمرير هنا فقط */
-            overflow-x: hidden !important;
-            min-height: 0 !important; /* ✅ السطر السحري لتفعيل التمرير داخل Flexbox */
-            padding: 0 0 16px 0 !important;
+            grid-column: 1 / -1 !important;
+            grid-row: 2 !important;
             margin: 0 !important;
-            display: grid !important;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)) !important;
-            gap: 16px !important;
-            align-content: start !important;
+            padding: 0 8px 24px 0 !important; /* مساحة لشريط التمرير */
+            overflow-y: auto !important; /* التمرير هنا فقط */
+            overflow-x: hidden !important;
+            align-content: start !important; /* منع تمدد البطاقات عمودياً */
+            min-height: 0 !important; /* ✅✅✅ السر لتفعيل التمرير داخل الشبكة */
             -webkit-overflow-scrolling: touch !important;
           }
         `;
