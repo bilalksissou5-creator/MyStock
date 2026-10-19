@@ -28,7 +28,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       </div>
 
       <div class="workspace-panel-center">
-        <iframe src="/products/list.html" class="workspace-iframe" id="list-iframe" scrolling="yes"></iframe>
+        <!-- ✅ تغيير scrolling إلى no لمنع التمرير الخارجي -->
+        <iframe src="/products/list.html" class="workspace-iframe" id="list-iframe" scrolling="no"></iframe>
       </div>
 
       <div class="workspace-panel-right">
@@ -59,7 +60,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     } catch (e) { console.warn('add iframe error:', e); }
   });
 
-  // ✅ 2. القسم الثاني (قائمة المنتجات) - تثبيت العنوان والبحث وإصلاح الأيقونة
+  // ✅ 2. القسم الثاني (قائمة المنتجات) - تثبيت وتمرير سلس
   listIframe.addEventListener('load', () => {
     try {
       const iframeDoc = listIframe.contentDocument || listIframe.contentWindow.document;
@@ -67,21 +68,30 @@ document.addEventListener('DOMContentLoaded', async () => {
         const style = iframeDoc.createElement('style');
         style.innerHTML = `
           /* ✅ إلغاء حركة الـ iframe بالكامل */
-          html, body { overflow: hidden !important; height: 100% !important; margin: 0 !important; background: #f5f5f5 !important; }
-          .main { height: 100% !important; padding: 0 !important; overflow: hidden !important; }
+          html, body { 
+            overflow: hidden !important; 
+            height: 100% !important; 
+            margin: 0 !important; 
+            background: #f5f5f5 !important; 
+          }
+          .main { 
+            height: 100% !important; 
+            padding: 0 !important; 
+            overflow: hidden !important; 
+          }
 
           /* ✅ حاوية التمرير الرئيسية */
           #main-content {
             display: grid !important;
             grid-template-columns: auto 1fr !important; 
             grid-template-rows: auto auto !important; 
-            align-items: center !important;
             align-content: start !important;
             gap: 8px !important;
             height: 100% !important;
             overflow-y: auto !important; 
             padding: 0 !important;
             box-sizing: border-box !important;
+            -webkit-overflow-scrolling: touch !important; /* ✅ تمرير سلس جداً */
           }
 
           /* ✅ تثبيت العنوان */
@@ -94,6 +104,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             top: 0 !important;
             background: #f5f5f5 !important;
             z-index: 100 !important;
+            align-self: center !important;
           }
           .page-header h2 { font-size: 1.2rem !important; margin: 0 !important; }
 
@@ -111,13 +122,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             background: #f5f5f5 !important;
             z-index: 100 !important;
             box-sizing: border-box !important;
+            align-self: center !important;
           }
           .search-bar input { width: 100% !important; }
 
           /* ✅ إصلاح مكان أيقونة البحث */
-          .search-bar i {
-            inset-inline-end: 28px !important; /* 16px padding + 12px original */
-          }
+          .search-bar i { inset-inline-end: 28px !important; }
 
           /* إخفاء زر الإضافة */
           .page-header a[href="add.html"] { display: none !important; }
@@ -130,7 +140,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)) !important;
             gap: 16px !important;
             margin: 0 !important;
-            padding: 0 16px 16px 16px !important;
+            padding: 16px !important;
+            padding-top: 8px !important;
           }
         `;
         iframeDoc.head.appendChild(style);
