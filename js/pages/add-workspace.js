@@ -48,7 +48,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (iframeDoc) {
         iframeDoc.documentElement.style.overflowY = 'auto';
         iframeDoc.body.style.overflowY = 'auto';
-        iframeDoc.body.style.paddingBottom = '20px';
+        iframeDoc.body.style.paddingBottom = '25px';
         const style = iframeDoc.createElement('style');
         style.innerHTML = `
           .main { padding-top: 0 !important; padding-bottom: 80px !important; }
