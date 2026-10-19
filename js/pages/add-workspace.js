@@ -61,7 +61,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         // تفعيل التمرير
         iframeDoc.documentElement.style.overflowY = 'auto';
         iframeDoc.body.style.overflowY = 'auto';
-        iframeDoc.body.style.paddingBottom = '80px';
+        iframeDoc.body.style.paddingBottom = '60px';
         
         // ✅ حقن CSS مباشر داخل الـ iframe (استخدام Grid بدلاً من Flex)
         const style = iframeDoc.createElement('style');
@@ -109,7 +109,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (iframeDoc) {
         iframeDoc.documentElement.style.overflowY = 'auto';
         iframeDoc.body.style.overflowY = 'auto';
-        iframeDoc.body.style.paddingBottom = '80px';
+        iframeDoc.body.style.paddingBottom = '60px';
       }
     } catch (e) { console.warn('detail iframe error:', e); }
   });
