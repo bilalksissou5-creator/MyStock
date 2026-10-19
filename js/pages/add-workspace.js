@@ -20,6 +20,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         <iframe src="/products/add.html" class="workspace-iframe" id="add-iframe" scrolling="no"></iframe>
       </div>
       <div class="workspace-panel-center">
+        <!-- ✅ نترك التمرير "no" لأننا سنتحكم به عبر CSS داخل الصفحة -->
         <iframe src="/products/list.html" class="workspace-iframe" id="list-iframe" scrolling="no"></iframe>
       </div>
       <div class="workspace-panel-right">
@@ -32,7 +33,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const listIframe = document.getElementById('list-iframe');
   const detailIframe = document.getElementById('detail-iframe');
 
-  // ✅ 1. القسم الأول
+  // ✅ القسم الأول
   addIframe.addEventListener('load', () => {
     try {
       const iframeDoc = addIframe.contentDocument || addIframe.contentWindow.document;
@@ -49,80 +50,21 @@ document.addEventListener('DOMContentLoaded', async () => {
     } catch (e) {}
   });
 
-  // ✅ 2. القسم الثاني (الحل النهائي بـ Grid)
+  // ✅ القسم الثاني (نكتفي فقط بإخفاء زر الإضافة)
   listIframe.addEventListener('load', () => {
     try {
       const iframeDoc = listIframe.contentDocument || listIframe.contentWindow.document;
       if (iframeDoc) {
         const style = iframeDoc.createElement('style');
         style.innerHTML = `
-          /* ✅ إلغاء حركة الصفحة والـ iframe بالكامل */
-          html, body { 
-            overflow: hidden !important; 
-            height: 100% !important; 
-            margin: 0 !important; 
-            padding: 0 !important; 
-            background: #f5f5f5 !important; 
-          }
-          
-          .main { 
-            height: 100% !important; 
-            padding: 16px !important; 
-            box-sizing: border-box !important; 
-            overflow: hidden !important; 
-          }
-
-          /* ✅ تقسيم الشاشة إلى صفين: الأول للهيدر، الثاني للمنتجات */
-          #main-content {
-            display: grid !important;
-            grid-template-columns: auto 1fr !important; 
-            grid-template-rows: auto 1fr !important; /* ✅ السطر السحري: الصف الثاني يأخذ باقي المساحة */
-            gap: 16px !important;
-            height: 100% !important;
-            overflow: hidden !important; /* لا يوجد تمرير هنا */
-          }
-
-          /* ✅ 1. العنوان */
-          .page-header {
-            grid-column: 1 !important;
-            grid-row: 1 !important;
-            margin: 0 !important;
-            padding: 0 !important;
-            align-self: center !important;
-          }
-          .page-header h2 { margin: 0 !important; font-size: 1.2rem !important; }
           .page-header a[href="add.html"] { display: none !important; }
-
-          /* ✅ 2. خانة البحث */
-          .search-bar {
-            grid-column: 2 !important;
-            grid-row: 1 !important;
-            margin: 0 !important;
-            padding: 0 !important;
-            max-width: none !important;
-            width: 100% !important;
-            align-self: center !important;
-          }
-          .search-bar input { width: 100% !important; }
-
-          /* ✅ 3. المنتجات (هي الوحيدة التي تتمرر) */
-          .products {
-            grid-column: 1 / -1 !important;
-            grid-row: 2 !important;
-            margin: 0 !important;
-            padding: 0 0 20px 0 !important;
-            overflow-y: auto !important; /* التمرير هنا فقط */
-            overflow-x: hidden !important;
-            align-content: start !important;
-            -webkit-overflow-scrolling: touch !important;
-          }
         `;
         iframeDoc.head.appendChild(style);
       }
     } catch (e) {}
   });
 
-  // ✅ 3. القسم الثالث
+  // ✅ القسم الثالث
   detailIframe.addEventListener('load', () => {
     try {
       const iframeDoc = detailIframe.contentDocument || detailIframe.contentWindow.document;

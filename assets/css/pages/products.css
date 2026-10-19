@@ -120,36 +120,54 @@
 }
 
 /* ============================================
-   ✅ التعديل الجديد: جعل العنوان والبحث في سطر واحد (باستخدام Grid)
+   ✅ التعديل الجذري: تثبيت العنوان والبحث وتفعيل تمرير المنتجات
+   (يعمل فقط على شاشات الحاسوب)
    ============================================ */
 @media (min-width: 1025px) {
-  /* استخدام Grid بدلاً من Flex لتجنب مشكلة التوسيط العمودي */
-  #main-content {
-    display: grid !important;
-    grid-template-columns: auto 1fr !important; /* العمود الأول للعنوان، الثاني للبحث */
-    grid-template-rows: auto auto !important; /* الصف الأول للعنوان والبحث، الثاني للمنتجات */
-    align-content: start !important; /* إجبار العناصر على الالتصاق بالأعلى */
-    gap: 16px !important;
+  
+  /* 1. منع الحاوية الرئيسية من التمرير */
+  .main {
+    overflow: hidden !important; 
+    padding: 0 !important; 
+    height: 100vh !important; 
   }
 
-  /* العنوان في الزاوية العلوية اليمنى (أو اليسرى) */
+  /* 2. تقسيم المحتوى إلى شبكة (صفين) */
+  #main-content {
+    display: grid !important;
+    grid-template-columns: auto 1fr !important; /* عمود للعنوان، وعمود للبحث */
+    grid-template-rows: auto 1fr !important; /* صف علوي (تلقائي)، صف سفلي (باقي المساحة) */
+    gap: 16px !important;
+    height: 100% !important;
+    padding: 24px !important; /* إعادة المسافة الخارجية هنا */
+    box-sizing: border-box !important;
+  }
+
+  /* 3. الصف الأول: العنوان */
   .page-header {
     grid-column: 1 !important;
     grid-row: 1 !important;
-    margin-bottom: 0 !important;
+    margin: 0 !important;
+    align-self: center !important;
   }
 
-  /* البحث بجانبه ويأخذ باقي المساحة */
+  /* 4. الصف الأول: البحث */
   .search-bar {
     grid-column: 2 !important;
     grid-row: 1 !important;
-    margin-bottom: 0 !important;
+    margin: 0 !important;
     max-width: none !important;
+    align-self: center !important;
   }
 
-  /* المنتجات تنزل في الصف الثاني وتأخذ العرض بالكامل */
+  /* 5. الصف الثاني: المنتجات (هي الوحيدة التي تتمرر) */
   .products {
-    grid-column: 1 / -1 !important; /* يمتد على كل الأعمدة */
+    grid-column: 1 / -1 !important; /* تمتد على كل الأعمدة */
     grid-row: 2 !important;
+    overflow-y: auto !important; /* تفعيل التمرير هنا فقط */
+    overflow-x: hidden !important;
+    align-content: start !important; /* منع تمدد البطاقات عمودياً */
+    padding-right: 8px !important; /* مساحة صغيرة لشريط التمرير */
+    padding-bottom: 24px !important;
   }
 }
