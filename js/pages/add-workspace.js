@@ -32,7 +32,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const listIframe = document.getElementById('list-iframe');
   const detailIframe = document.getElementById('detail-iframe');
 
-  // ✅ 1. القسم الأول (هذا هو الكود الذي يعمل بشكل ممتاز، لم ألمسه)
+  // ✅ 1. القسم الأول (باقي كما هو، لم نلمسه)
   addIframe.addEventListener('load', () => {
     try {
       const iframeDoc = addIframe.contentDocument || addIframe.contentWindow.document;
@@ -49,35 +49,35 @@ document.addEventListener('DOMContentLoaded', async () => {
     } catch (e) {}
   });
 
-  // ✅ 2. القسم الثاني (التثبيت المثالي باستخدام Grid)
+  // ✅ 2. القسم الثاني (الحل الجذري المصحح)
   listIframe.addEventListener('load', () => {
     try {
       const iframeDoc = listIframe.contentDocument || listIframe.contentWindow.document;
       if (iframeDoc) {
         const style = iframeDoc.createElement('style');
         style.innerHTML = `
-          /* ✅ إعدادات الصفحة لمنع التمرير الخارجي */
-          html, body {
-            overflow: hidden !important;
+          /* ✅ 1. إلغاء تمرير الحاويات الأم بالكامل وإعطائها طولاً محدداً */
+          html, body, .app {
             height: 100% !important;
+            overflow: hidden !important;
             margin: 0 !important;
             padding: 0 !important;
             background: #f5f5f5 !important;
           }
 
-          /* ✅ تقسيم الحاوية الرئيسية إلى شبكة من صفين */
+          /* ✅ 2. تحويل main إلى شبكة من صفين وتثبيت طولها */
           .main {
             display: grid !important;
-            grid-template-columns: auto 1fr !important;
-            grid-template-rows: auto 1fr !important;
+            grid-template-columns: auto 1fr !important; /* عمود للعنوان، وعمود للبحث */
+            grid-template-rows: auto 1fr !important; /* صف للعنوان والبحث، وصف للمنتجات */
             gap: 16px !important;
-            height: 100% !important; /* ✅ 100% وليس 100vh ليتناسب مع الـ iframe */
+            height: 100% !important; /* تأخذ طول الـ iframe بالكامل */
             padding: 24px !important;
             box-sizing: border-box !important;
-            overflow: hidden !important; /* منع التمرير من الحاوية الأم */
+            overflow: hidden !important; /* منع التمرير الخارجي */
           }
 
-          /* ✅ 1. تثبيت العنوان في الصف الأول */
+          /* ✅ 3. تثبيت العنوان */
           .page-header {
             grid-column: 1 !important;
             grid-row: 1 !important;
@@ -88,9 +88,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             align-items: center !important;
           }
           .page-header h2 { margin: 0 !important; font-size: 1.2rem !important; }
-          .page-header a[href="add.html"] { display: none !important; }
+          .page-header a[href="add.html"] { display: none !important; } /* إخفاء زر الإضافة */
 
-          /* ✅ 2. تثبيت البحث في الصف الأول بجانب العنوان */
+          /* ✅ 4. تثبيت خانة البحث */
           .search-bar {
             grid-column: 2 !important;
             grid-row: 1 !important;
@@ -103,15 +103,15 @@ document.addEventListener('DOMContentLoaded', async () => {
           .search-bar input { width: 100% !important; }
           .search-bar i { inset-inline-end: 12px !important; }
 
-          /* ✅ 3. المنتجات في الصف الثاني، وهي الوحيدة التي تتحرك */
+          /* ✅ 5. المنتجات (هي الوحيدة التي تتمرر) */
           .products {
             grid-column: 1 / -1 !important;
             grid-row: 2 !important;
             margin: 0 !important;
-            padding: 0 8px 24px 0 !important;
+            padding: 0 8px 24px 0 !important; /* مساحة لشريط التمرير */
             overflow-y: auto !important; /* التمرير هنا فقط */
             overflow-x: hidden !important;
-            min-height: 0 !important; /* ✅✅✅ السر السحري لتفعيل التمرير داخل Grid */
+            min-height: 0 !important; /* ✅✅✅ السر: يجبر المنتجات على احترام المساحة والتمرير */
             align-content: start !important;
             -webkit-overflow-scrolling: touch !important;
           }
