@@ -28,7 +28,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       </div>
 
       <div class="workspace-panel-center">
-        <!-- ✅ تغيير scrolling إلى no لمنع التمرير الخارجي -->
         <iframe src="/products/list.html" class="workspace-iframe" id="list-iframe" scrolling="no"></iframe>
       </div>
 
@@ -60,88 +59,86 @@ document.addEventListener('DOMContentLoaded', async () => {
     } catch (e) { console.warn('add iframe error:', e); }
   });
 
-  // ✅ 2. القسم الثاني (قائمة المنتجات) - تثبيت وتمرير سلس
+  // ✅ 2. القسم الثاني (قائمة المنتجات) - التثبيت الذكي
   listIframe.addEventListener('load', () => {
     try {
       const iframeDoc = listIframe.contentDocument || listIframe.contentWindow.document;
       if (iframeDoc) {
+        
+        // ✅ الخطوة السحرية: جمع العنوان وخانة البحث في حاوية واحدة
+        const mainContent = iframeDoc.getElementById('main-content');
+        const header = iframeDoc.querySelector('.page-header');
+        const searchBar = iframeDoc.querySelector('.search-bar');
+        const products = iframeDoc.getElementById('products');
+
+        if (mainContent && header && searchBar && products) {
+          // إذا لم تكن الحاوية موجودة، نقوم بإنشائها
+          if (!iframeDoc.querySelector('.sticky-header-wrapper')) {
+            const wrapper = iframeDoc.createElement('div');
+            wrapper.className = 'sticky-header-wrapper';
+            
+            // نضع الحاوية الجديدة قبل العنوان
+            mainContent.insertBefore(wrapper, header);
+            // ننقل العنوان والبحث داخل الحاوية
+            wrapper.appendChild(header);
+            wrapper.appendChild(searchBar);
+          }
+        }
+
+        // ✅ إضافة CSS للتنسيق والتمرير السلس
         const style = iframeDoc.createElement('style');
         style.innerHTML = `
-          /* ✅ إلغاء حركة الـ iframe بالكامل */
-          html, body { 
-            overflow: hidden !important; 
-            height: 100% !important; 
-            margin: 0 !important; 
-            background: #f5f5f5 !important; 
-          }
-          .main { 
-            height: 100% !important; 
-            padding: 0 !important; 
-            overflow: hidden !important; 
-          }
+          /* إلغاء حركة الـ iframe بالكامل */
+          html, body { overflow: hidden !important; height: 100% !important; margin: 0 !important; background: #f5f5f5 !important; }
+          .main { height: 100% !important; padding: 0 !important; overflow: hidden !important; }
 
-          /* ✅ حاوية التمرير الرئيسية */
+          /* الحاوية الرئيسية للتمرير */
           #main-content {
-            display: grid !important;
-            grid-template-columns: auto 1fr !important; 
-            grid-template-rows: auto auto !important; 
-            align-content: start !important;
-            gap: 8px !important;
             height: 100% !important;
-            overflow-y: auto !important; 
+            overflow-y: auto !important;
             padding: 0 !important;
-            box-sizing: border-box !important;
-            -webkit-overflow-scrolling: touch !important; /* ✅ تمرير سلس جداً */
+            display: block !important; /* نستخدم block بدلاً من grid */
+            -webkit-overflow-scrolling: touch !important; /* تمرير سلس */
           }
 
-          /* ✅ تثبيت العنوان */
-          .page-header {
-            grid-column: 1 !important;
-            grid-row: 1 !important;
-            margin: 0 !important;
-            padding: 16px 8px 16px 16px !important;
+          /* ✅ تثبيت الحاوية التي تحمل العنوان والبحث */
+          .sticky-header-wrapper {
             position: sticky !important;
             top: 0 !important;
-            background: #f5f5f5 !important;
             z-index: 100 !important;
-            align-self: center !important;
+            background: #f5f5f5 !important;
+            display: flex !important;
+            align-items: center !important;
+            gap: 16px !important;
+            padding: 16px !important;
+            margin: 0 !important;
+          }
+
+          /* تنسيق العنوان داخل الحاوية */
+          .sticky-header-wrapper .page-header {
+            flex: 0 0 auto !important;
+            margin: 0 !important;
+            padding: 0 !important;
           }
           .page-header h2 { font-size: 1.2rem !important; margin: 0 !important; }
+          .page-header a[href="add.html"] { display: none !important; } /* إخفاء زر الإضافة */
 
-          /* ✅ تثبيت خانة البحث (مع إصلاح المسافات) */
-          .search-bar {
-            grid-column: 2 !important;
-            grid-row: 1 !important;
+          /* تنسيق خانة البحث داخل الحاوية */
+          .sticky-header-wrapper .search-bar {
+            flex: 1 1 auto !important;
             margin: 0 !important;
-            padding-block: 16px !important;
-            padding-inline-start: 8px !important;
-            padding-inline-end: 16px !important;
+            padding: 0 !important;
             max-width: none !important;
-            position: sticky !important;
-            top: 0 !important;
-            background: #f5f5f5 !important;
-            z-index: 100 !important;
-            box-sizing: border-box !important;
-            align-self: center !important;
           }
           .search-bar input { width: 100% !important; }
 
-          /* ✅ إصلاح مكان أيقونة البحث */
-          .search-bar i { inset-inline-end: 28px !important; }
-
-          /* إخفاء زر الإضافة */
-          .page-header a[href="add.html"] { display: none !important; }
-
-          /* ✅ إعداد شبكة المنتجات */
+          /* إعداد شبكة المنتجات لتأخذ باقي المساحة */
           .products {
-            grid-column: 1 / -1 !important;
-            grid-row: 2 !important;
+            padding: 0 16px 16px 16px !important;
+            margin: 0 !important;
             display: grid !important;
             grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)) !important;
             gap: 16px !important;
-            margin: 0 !important;
-            padding: 16px !important;
-            padding-top: 8px !important;
           }
         `;
         iframeDoc.head.appendChild(style);
