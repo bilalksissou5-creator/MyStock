@@ -32,7 +32,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const listIframe = document.getElementById('list-iframe');
   const detailIframe = document.getElementById('detail-iframe');
 
-  // ✅ 1. القسم الأول (لم ألمس هذا الكود إطلاقاً، هو كما أعجبك)
+  // ✅ 1. القسم الأول
   addIframe.addEventListener('load', () => {
     try {
       const iframeDoc = addIframe.contentDocument || addIframe.contentWindow.document;
@@ -49,17 +49,18 @@ document.addEventListener('DOMContentLoaded', async () => {
     } catch (e) {}
   });
 
-  // ✅ 2. القسم الثاني (الحل القاطع بجمع العناصر في حاوية واحدة)
+  // ✅ 2. القسم الثاني - الحل المضمون
   listIframe.addEventListener('load', () => {
     try {
       const iframeDoc = listIframe.contentDocument || listIframe.contentWindow.document;
       if (!iframeDoc) return;
 
+      // سحب العناصر
       const mainEl = iframeDoc.querySelector('.main');
       const pageHeader = iframeDoc.querySelector('.page-header');
       const searchBar = iframeDoc.querySelector('.search-bar');
 
-      // ✅ الخطوة 1: جمع العنوان والبحث في حاوية واحدة
+      // تجميعها في حاوية واحدة (إذا لم تكن مجمعة)
       if (mainEl && pageHeader && searchBar && !iframeDoc.querySelector('.sticky-header-wrapper')) {
         const wrapper = iframeDoc.createElement('div');
         wrapper.className = 'sticky-header-wrapper';
@@ -68,14 +69,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         wrapper.appendChild(searchBar);
       }
 
-      // ✅ الخطوة 2: تطبيق CSS للتثبيت والترتيب الأفقي
+      // تطبيق التنسيق
       const style = iframeDoc.createElement('style');
       style.innerHTML = `
-        /* إيقاف التمرير في الصفحة والـ iframe */
+        /* إلغاء تمرير الصفحة الأم */
         html, body { overflow: hidden !important; height: 100% !important; margin: 0 !important; }
         
-        /* الحاوية الرئيسية هي المسؤولة عن التمرير */
-        .main {
+        /* الحاوية الرئيسية للتمرير */
+        .main, #main-content {
           display: block !important;
           height: 100% !important;
           overflow-y: auto !important;
@@ -84,7 +85,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           box-sizing: border-box !important;
         }
 
-        /* ✅ الحاوية الثابتة (العنوان + البحث) */
+        /* الحاوية الثابتة الأفقيّة */
         .sticky-header-wrapper {
           position: sticky !important;
           top: 0 !important;
@@ -95,13 +96,13 @@ document.addEventListener('DOMContentLoaded', async () => {
           align-items: center !important;
           gap: 16px !important;
           
-          /* تعويض مساحة main لكي تغطي الحاوية كامل العرض */
+          /* تعويض مساحة main لكي تغطي كامل العرض */
           margin: -24px -24px 16px -24px !important;
           padding: 24px 24px 16px 24px !important;
           border-bottom: 1px solid #e5e5e5 !important;
         }
 
-        /* تنسيق العنوان داخل الحاوية */
+        /* تنسيق العنوان */
         .sticky-header-wrapper .page-header {
           flex: 0 0 auto !important;
           margin: 0 !important;
@@ -110,7 +111,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         .page-header h2 { margin: 0 !important; font-size: 1.2rem !important; }
         .page-header a[href="add.html"] { display: none !important; }
 
-        /* تنسيق البحث داخل الحاوية */
+        /* تنسيق البحث */
         .sticky-header-wrapper .search-bar {
           flex: 1 1 auto !important;
           margin: 0 !important;
@@ -127,10 +128,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
       `;
       iframeDoc.head.appendChild(style);
-    } catch (e) { console.warn(e); }
+    } catch (e) {}
   });
 
-  // ✅ 3. القسم الثالث (إعادة تفعيل التمرير بداخله لكي لا يثبت)
+  // ✅ 3. القسم الثالث
   detailIframe.addEventListener('load', () => {
     try {
       const iframeDoc = detailIframe.contentDocument || detailIframe.contentWindow.document;

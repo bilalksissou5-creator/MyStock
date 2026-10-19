@@ -25,7 +25,6 @@
     grid-template-columns: 320px minmax(0, 1fr) 380px;
     gap: 16px;
     height: calc(100vh - 60px);
-    /* ✅ التعديل الجديد: 0 من الأعلى، 16 من الجوانب والأسفل */
     padding: 0 16px 16px 16px; 
     box-sizing: border-box;
     overflow: hidden;
@@ -44,7 +43,7 @@
     overflow: hidden;
   }
 
-  /* تنسيق الـ iframe: التمرير يحدث داخله */
+  /* تنسيق الـ iframe */
   .workspace-iframe {
     width: 100%;
     height: 100%;
@@ -53,14 +52,15 @@
     background: #ffffff;
     border-radius: 10px;
     box-sizing: border-box;
-    overflow-y: scroll; 
+    overflow: hidden; /* ✅ إزالة scroll والاعتماد على التمرير الداخلي */
   }
 }
+
 /* ============================================
    ✅ تخطيط 4 أقسام متساوية (لصفحة تفاصيل المنتج)
    ============================================ */
 @media (min-width: 1024px) {
   .workspace.workspace-4-cols {
-    grid-template-columns: repeat(4, 1fr) !important; /* 4 أعمدة متساوية */
+    grid-template-columns: repeat(4, 1fr) !important; 
   }
 }
