@@ -79,7 +79,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             flex: 1 1 auto !important; /* يأخذ المساحة المتبقية */
             overflow-y: auto !important; /* تفعيل التمرير هنا فقط */
             padding: 16px !important;
-            padding-bottom: 80px !important; /* مساحة إضافية لرؤية الأزرار السفلية */
+            padding-bottom: 100px !important; /* مساحة إضافية لرؤية الأزرار السفلية */
             -webkit-overflow-scrolling: touch !important; /* تمرير سلس على الأجهزة المحمولة */
           }
 
