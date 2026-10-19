@@ -3,13 +3,13 @@
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   
-  // 1. قراءة المعرفات من الرابط
+  // ✅ قراءة المعرفات من الرابط
   const urlParams = new URLSearchParams(window.location.search);
   const productId = urlParams.get('productId');
   const userId = urlParams.get('userId');
   const supplierId = urlParams.get('supplierId');
 
-  // 2. تحويل الهاتف لصفحة التفاصيل الأصلية
+  // ✅ تحويل الهاتف لصفحة التفاصيل الأصلية
   if (window.innerWidth <= 1024) {
     window.location.replace(`/products/detail.html?id=${productId}`);
     return; 
@@ -27,7 +27,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   const main = document.getElementById('main-content');
 
-  // 3. بناء الأقسام الثلاثة
   main.innerHTML = `
     <div class="workspace">
       <!-- القسم الأول: بطاقة المستخدم -->
@@ -51,10 +50,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   const detailIframe = document.getElementById('detail-iframe');
   const supplierIframe = document.getElementById('supplier-iframe');
 
-  // 4. دالة مساعدة لتفعيل التمرير وإزالة المسافات
-  const formatIframe = (iframeElement) => {
+  // ✅ 1. القسم الأول (بطاقة المستخدم)
+  userIframe.addEventListener('load', () => {
     try {
-      const iframeDoc = iframeElement.contentDocument || iframeElement.contentWindow.document;
+      const iframeDoc = userIframe.contentDocument || userIframe.contentWindow.document;
       if (iframeDoc) {
         iframeDoc.documentElement.style.overflowY = 'auto';
         iframeDoc.body.style.overflowY = 'auto';
@@ -66,11 +65,51 @@ document.addEventListener('DOMContentLoaded', async () => {
         `;
         iframeDoc.head.appendChild(style);
       }
-    } catch (e) { console.warn('iframe error:', e); }
-  };
+    } catch (e) { console.warn('user iframe error:', e); }
+  });
 
-  // 5. تطبيق التنسيق عند تحميل كل قسم
-  userIframe.addEventListener('load', () => formatIframe(userIframe));
-  detailIframe.addEventListener('load', () => formatIframe(detailIframe));
-  supplierIframe.addEventListener('load', () => formatIframe(supplierIframe));
+  // ✅ 2. القسم الثاني (تفاصيل المنتج)
+  detailIframe.addEventListener('load', () => {
+    try {
+      const iframeDoc = detailIframe.contentDocument || detailIframe.contentWindow.document;
+      if (iframeDoc) {
+        iframeDoc.documentElement.style.overflowY = 'auto';
+        iframeDoc.body.style.overflowY = 'auto';
+        iframeDoc.body.style.paddingBottom = '150px';
+        const style = iframeDoc.createElement('style');
+        style.innerHTML = `
+          /* إخفاء أي زر إضافة أو روابط غير مرغوبة إن وجدت */
+          .page-header a[href="add.html"] { display: none !important; }
+          
+          /* إلغاء المسافة العلوية من main */
+          .main { padding-top: 0 !important; padding-bottom: 80px !important; }
+          
+          /* مسافة داخلية 16px */
+          #main-content {
+            padding: 16px !important; 
+          }
+        `;
+        iframeDoc.head.appendChild(style);
+      }
+    } catch (e) { console.warn('detail iframe error:', e); }
+  });
+
+  // ✅ 3. القسم الثالث (تفاصيل المورد)
+  supplierIframe.addEventListener('load', () => {
+    try {
+      const iframeDoc = supplierIframe.contentDocument || supplierIframe.contentWindow.document;
+      if (iframeDoc) {
+        iframeDoc.documentElement.style.overflowY = 'auto';
+        iframeDoc.body.style.overflowY = 'auto';
+        iframeDoc.body.style.paddingBottom = '30px';
+        const style = iframeDoc.createElement('style');
+        style.innerHTML = `
+          .main { padding-top: 0 !important; padding-bottom: 80px !important; }
+          .page-header { padding-top: 16px !important; }
+        `;
+        iframeDoc.head.appendChild(style);
+      }
+    } catch (e) { console.warn('supplier iframe error:', e); }
+  });
+
 });
