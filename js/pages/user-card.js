@@ -15,15 +15,27 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   const main = document.getElementById('main-content');
 
-  // ✅ ضبط التنسيقات لتناسب العمود الضيق (320px)
+  // ✅ تعديل التنسيقات: إزالة الغلاف، وتوسيط الأفاتار
   const style = document.createElement('style');
   style.innerHTML = `
     .main { padding: 0 !important; }
-    .profile-fb-wrapper { border-radius: 10px; margin-bottom: 0; box-shadow: none; border: none; }
-    .profile-cover { height: 80px !important; border-radius: 10px 10px 0 0; }
-    .profile-avatar-fb-wrap { margin-top: -30px !important; }
-    .profile-avatar-fb { width: 60px !important; height: 60px !important; }
-    .profile-fb-info h3 { font-size: 16px !important; }
+    .profile-fb-wrapper { border-radius: 10px; margin-bottom: 0; box-shadow: none; border: none; padding-top: 16px; }
+    
+    /* ✅ إخفاء الغلاف تماماً */
+    .profile-cover { display: none !important; }
+    
+    /* ✅ توسيط الصورة الشخصية وإعطائها مساحة من الأعلى */
+    .profile-avatar-fb-wrap { 
+      margin-top: 0 !important; 
+      display: flex; 
+      justify-content: center; 
+      position: relative;
+      padding-bottom: 8px;
+    }
+    
+    .profile-avatar-fb { width: 80px !important; height: 80px !important; }
+    .profile-fb-info { text-align: center; padding-top: 0 !important; }
+    
     .records-row { margin: 0 16px 16px 16px !important; gap: 8px; }
     .record-item { padding: 8px !important; font-size: 12px !important; }
     .log-panel { margin: 0 16px 16px 16px !important; }
@@ -38,18 +50,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     return;
   }
 
-  // جلب البريد الإلكتروني للمستخدم (من auth.users - قد لا يكون متاحاً دائماً)
-  // سنستخدم الاسم والدور بدلاً من ذلك إذا لم يتوفر البريد
   const email = profile.email || '—';
-
   const roleLabel = profile.role === 'admin' ? tr('mp_role_admin') : profile.role === 'deputy' ? tr('wk_role_deputy') : tr('wk_role_worker');
   const isMeOnline = typeof isUserOnline === 'function' && isUserOnline(profile);
 
   main.innerHTML = `
     <div class="profile-fb-wrapper">
-      <div class="profile-cover">
-        ${profile.cover_url ? `<img src="${profile.cover_url}" alt="cover">` : `<div class="cover-placeholder"></div>`}
-      </div>
+      <!-- ✅ تم حذف div الخاص بالغلاف من هنا -->
 
       <div class="profile-avatar-fb-wrap">
         <div class="profile-avatar-fb">
