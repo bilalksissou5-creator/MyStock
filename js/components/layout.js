@@ -48,11 +48,11 @@ function renderLayout(activePage) {
 
   const tr = (key) => (window.t ? window.t(key) : key);
   
-  // ✅✅✅ التعديل: تغيير رابط "إضافة منتج" ليشير إلى صفحة Workspace الجديدة
   const navItems = [
     { href: '/dashboard.html', label: tr('nav_dashboard'), icon: 'fa-house' },
     { href: '/products/add-workspace.html', label: tr('nav_add_product'), icon: 'fa-circle-plus' },
-    { href: '/movements/out.html', label: tr('nav_out_product'), icon: 'fa-circle-minus' },
+    // ✅ التعديل هنا: تغيير المسار إلى صفحة الـ Workspace للإخراج
+    { href: '/movements/out-workspace.html', label: tr('nav_out_product'), icon: 'fa-circle-minus' },
     { href: '/products/list.html', label: tr('nav_products'), icon: 'fa-box' },
     { href: '/movements/list.html', label: tr('nav_movements'), icon: 'fa-right-left' },
     { href: '/workers/list.html', label: tr('nav_workers'), icon: 'fa-users' },
