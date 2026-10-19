@@ -49,109 +49,84 @@ document.addEventListener('DOMContentLoaded', async () => {
     } catch (e) {}
   });
 
-  // ✅ 2. القسم الثاني - الحل القوي بإعادة الهيكلة
+  // ✅ 2. القسم الثاني - التصحيح الجذري بـ CSS Grid
   listIframe.addEventListener('load', () => {
     try {
       const iframeDoc = listIframe.contentDocument || listIframe.contentWindow.document;
-      if (!iframeDoc) return;
-      
-      const mainEl = iframeDoc.querySelector('.main');
-      const mainContent = iframeDoc.getElementById('main-content');
-      const pageHeader = iframeDoc.querySelector('.page-header');
-      const searchBar = iframeDoc.querySelector('.search-bar');
-      
-      // ✅✅✅ إعادة الهيكلة: نقل العنوان والبحث خارج #main-content
-      if (mainEl && mainContent && pageHeader && searchBar) {
-        if (!iframeDoc.querySelector('.top-fixed-bar')) {
-          const topBar = iframeDoc.createElement('div');
-          topBar.className = 'top-fixed-bar';
-          // نضع الشريط العلوي قبل #main-content
-          mainEl.insertBefore(topBar, mainContent);
-          // ننقل العنوان والبحث إلى الشريط العلوي
-          topBar.appendChild(pageHeader);
-          topBar.appendChild(searchBar);
-        }
+      if (iframeDoc) {
+        const style = iframeDoc.createElement('style');
+        style.innerHTML = `
+          /* ✅ منع تمرير الصفحة بالكامل */
+          html, body { 
+            overflow: hidden !important; 
+            height: 100% !important; 
+            margin: 0 !important; 
+            padding: 0 !important; 
+            background: #f5f5f5 !important;
+          }
+          
+          /* ✅ الحاوية الرئيسية */
+          .main { 
+            height: 100% !important; 
+            padding: 0 !important; 
+            overflow: hidden !important; 
+          }
+
+          /* ✅ تقسيم إلى شبكة: صف للعنوان والبحث، وصف للمنتجات */
+          #main-content {
+            display: grid !important;
+            grid-template-columns: auto 1fr !important; /* عمود للعنوان، وعمود للبحث */
+            grid-template-rows: auto 1fr !important; /* ✅ الصف الثاني (1fr) يأخذ باقي المساحة */
+            gap: 16px !important;
+            padding: 24px !important;
+            height: 100% !important;
+            box-sizing: border-box !important;
+            overflow: hidden !important; /* إخفاء التمرير الخارجي */
+          }
+
+          /* ✅ 1. تثبيت العنوان */
+          .page-header {
+            grid-column: 1 !important;
+            grid-row: 1 !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            align-self: center !important;
+            display: flex !important;
+            align-items: center !important;
+          }
+          
+          /* إخفاء زر Add Product من هذا القسم */
+          .page-header a[href="add.html"] { display: none !important; }
+          .page-header h2 { margin: 0 !important; font-size: 1.2rem !important; }
+
+          /* ✅ 2. تثبيت البحث */
+          .search-bar {
+            grid-column: 2 !important;
+            grid-row: 1 !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            max-width: none !important;
+            width: 100% !important;
+            align-self: center !important;
+          }
+          .search-bar input { width: 100% !important; }
+
+          /* ✅ 3. المنتجات: هي الوحيدة التي تتمرر */
+          .products {
+            grid-column: 1 / -1 !important;
+            grid-row: 2 !important;
+            margin: 0 !important;
+            padding: 0 0 24px 0 !important;
+            overflow-y: auto !important; /* التمرير هنا فقط */
+            overflow-x: hidden !important;
+            align-content: start !important;
+            -webkit-overflow-scrolling: touch !important;
+            min-height: 0 !important; /* ✅✅✅ السر: يسمح للشبكة بالتمرير بدلاً من التمدد */
+          }
+        `;
+        iframeDoc.head.appendChild(style);
       }
-      
-      // ✅ تطبيق CSS الحاسم
-      const style = iframeDoc.createElement('style');
-      style.innerHTML = `
-        /* ✅ إيقاف التمرير على مستوى الصفحة */
-        html, body { 
-          overflow: hidden !important; 
-          height: 100% !important; 
-          margin: 0 !important; 
-          padding: 0 !important;
-        }
-        
-        /* ✅ .main يصبح حاوية Flex عمودية */
-        .main { 
-          display: flex !important;
-          flex-direction: column !important;
-          height: 100% !important;
-          padding: 0 !important;
-          overflow: hidden !important;
-        }
-        
-        /* ✅ الشريط العلوي الثابت (العنوان + البحث) */
-        .top-fixed-bar {
-          flex: 0 0 auto !important; /* ✅ ثابت، لا ينكمش ولا يتمدد */
-          display: flex !important;
-          align-items: center !important;
-          gap: 16px !important;
-          padding: 16px 24px !important;
-          background: #f5f5f5 !important;
-          border-bottom: 1px solid #e5e5e5 !important;
-          z-index: 10 !important;
-          position: relative !important;
-        }
-        
-        .top-fixed-bar .page-header {
-          margin: 0 !important;
-          padding: 0 !important;
-          flex-shrink: 0 !important;
-        }
-        
-        .top-fixed-bar .page-header h2 {
-          margin: 0 !important;
-          font-size: 1.2rem !important;
-        }
-        
-        .top-fixed-bar .page-header a[href="add.html"] {
-          display: none !important;
-        }
-        
-        .top-fixed-bar .search-bar {
-          flex: 1 !important;
-          margin: 0 !important;
-          padding: 0 !important;
-          max-width: none !important;
-        }
-        
-        .top-fixed-bar .search-bar input {
-          width: 100% !important;
-        }
-        
-        /* ✅ #main-content يصبح الحاوية الوحيدة القابلة للتمرير */
-        #main-content {
-          display: block !important;
-          flex: 1 1 auto !important; /* ✅ يأخذ باقي المساحة */
-          overflow-y: auto !important;
-          overflow-x: hidden !important;
-          padding: 24px !important;
-          min-height: 0 !important; /* ✅✅✅ حرج جداً لتفعيل التمرير */
-          -webkit-overflow-scrolling: touch !important;
-          height: auto !important;
-        }
-        
-        .products {
-          margin: 0 !important;
-          padding: 0 !important;
-        }
-      `;
-      iframeDoc.head.appendChild(style);
-      
-    } catch (e) { console.warn('list iframe error:', e); }
+    } catch (e) {}
   });
 
   // ✅ 3. القسم الثالث
