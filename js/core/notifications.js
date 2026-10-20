@@ -1,6 +1,6 @@
 // ============================================
 // الإشعارات
-// الدور: جلب + إنشاء إشعارات للمستخدمين في المنظمة
+// الدور: جلب + إنشاء إشعارات + تحديث فوري بسرعة البرق
 // ============================================
 
 // ============================================
@@ -61,7 +61,6 @@ async function notifyOrganization({
   userName = null,
   excludeUserId = null,
 }) {
-  // جلب أعضاء المنظمة
   const { data: members, error } = await db
     .from('profiles')
     .select('id')
@@ -72,7 +71,6 @@ async function notifyOrganization({
     return false;
   }
 
-  // تحضير الإشعارات
   const notifications = members
     .filter(m => m.id !== excludeUserId)
     .map(m => ({
@@ -169,33 +167,44 @@ async function updateNotifCounter() {
 }
 
 // ============================================
-// ✅ بدء التحديث الفوري (Realtime) بدلاً من التحديث الدوري
+// ✅ التحديث الفوري (Realtime) بسرعة البرق
 // ============================================
 let notifRealtimeChannel = null;
 
 function startNotifPolling() {
+  // ملاحظة: احتفظنا باسم الدالة كما هو لكي تعمل مع layout.js
+  // لكننا سنستخدم التحديث الفوري بدلاً من المؤقت الزمني
+  
   if (window.__stopNotifPolling) {
     updateNotifCounter();
     return;
   }
 
-  // 1. تحديث العداد عند تحميل الصفحة لأول مرة
+  // 1. تحديث فوري عند تحميل الصفحة لأول مرة
   updateNotifCounter();
 
-  // 2. إلغاء أي قناة قديمة لتجنب التكرار
+  // 2. إلغاء أي قناة قديمة لتجنب تكرار الاستماع
   if (notifRealtimeChannel) {
     db.removeChannel(notifRealtimeChannel);
+    notifRealtimeChannel = null;
   }
 
   // 3. الاستماع الفوري للإشعارات الجديدة
-  notifRealtimeChannel = db.channel('custom-notifications-channel')
+  notifRealtimeChannel = db.channel('realtime-notifications-' + Date.now())
     .on(
       'postgres_changes',
       { event: 'INSERT', schema: 'public', table: 'notifications' },
       (payload) => {
         // بمجرد إضافة إشعار جديد، نقوم بتحديث العداد فوراً
+        console.log('⚡ إشعار جديد وصل فوراً:', payload);
         updateNotifCounter();
       }
     )
-    .subscribe();
+    .subscribe((status) => {
+      if (status === 'SUBSCRIBED') {
+        console.log('✅ Realtime notifications is active!');
+      } else if (status === 'CHANNEL_ERROR') {
+        console.warn('⚠️ Realtime failed. Check Supabase Replication.');
+      }
+    });
 }
