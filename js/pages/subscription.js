@@ -150,7 +150,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       ${buildPlanCard({
         id: 'basic',
         name: tr('sub_plan_basic'),
-        price: '199',
+        price: '20', /* ✅ السعر الجديد */
         badge: null,
         features: [
           { icon: 'fa-users', label: tr('sub_feat_users'), value: '10' },
@@ -164,7 +164,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       ${buildPlanCard({
         id: 'pro',
         name: tr('sub_plan_pro'),
-        price: '299',
+        price: '30', /* ✅ السعر الجديد */
         badge: tr('sub_most_popular'),
         popular: true,
         features: [
@@ -179,7 +179,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       ${buildPlanCard({
         id: 'advanced',
         name: tr('sub_plan_advanced'),
-        price: '499',
+        price: '50', /* ✅ السعر الجديد */
         badge: null,
         features: [
           { icon: 'fa-users', label: tr('sub_feat_users'), value: tr('sub_unlimited'), unlimited: true },
@@ -249,8 +249,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         <div class="plan-header">
           <h3 class="plan-name">${name}</h3>
           <div class="plan-price">
+            <!-- ✅ علامة الدولار قبل السعر -->
+            <span class="plan-price-currency">$</span>
             <span class="plan-price-value">${price}</span>
-            <span class="plan-price-currency">MAD</span>
           </div>
           <span class="plan-price-period">${tr('sub_per_month')}</span>
         </div>
@@ -298,7 +299,8 @@ document.addEventListener('DOMContentLoaded', async () => {
           </div>
           <div class="pending-row">
             <span>${tr('sub_pending_amount')}</span>
-            <strong>${sub.price || 199} MAD</strong>
+            <!-- ✅ تحديث السعر الافتراضي هنا أيضاً -->
+            <strong>${sub.price || 20} $</strong>
           </div>
           <div class="pending-row">
             <span>${tr('sub_pending_date')}</span>
