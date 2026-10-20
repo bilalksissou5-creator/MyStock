@@ -1,7 +1,7 @@
 // ============================================
 // صفحة إضافة منتجات
 // ✅ دعم كامل للترجمة
-// ✅ دعم Workspace (تقسيم 3 أقسام)
+// ✅ دعم Workspace (تحديث فوري بسرعة البرق)
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   if (window.__productAddLoaded) return;
@@ -143,7 +143,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   let selectedSupplier = null;
   let isAddingProduct = false;
-  let isSaving = false; // ✅ منع الضغط المتكرر
+  let isSaving = false;
   let html5QrCode = null;
   let scannedImageUrl = null;
 
@@ -262,7 +262,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   saveAllBtn.addEventListener('click', async (e) => {
     e.preventDefault(); e.stopPropagation();
-    if (isSaving || saveAllBtn.disabled) return; // ✅ منع الضغط المتكرر
+    if (isSaving || saveAllBtn.disabled) return;
     isSaving = true; saveAllBtn.disabled = true;
     const errBox = document.getElementById('form-error'); const successBox = document.getElementById('form-success');
     errBox.style.display = 'none'; successBox.style.display = 'none';
@@ -327,11 +327,22 @@ document.addEventListener('DOMContentLoaded', async () => {
       successBox.textContent = `${tr('prod_add_new_count')} ${insertedCount} | ${tr('prod_add_upd_count')} ${updatedCount} | ${tr('prod_add_invoice_count')} ${invoiceNumber}`;
       successBox.style.display = 'block';
       
-      // ✅ إرسال إشارة للـ Workspace لتحديث القائمة فوراً قبل إعادة التوجيه
-      if (window.self !== window.top && lastProductId) {
+      // ✅✅✅ سرعة البرق: إرسال بيانات المنتجات للقائمة فوراً دون انتظار
+      if (window.self !== window.top) {
+        // نرسل فقط المنتجات الجديدة (بدون تكرار)
+        const instantProducts = addedProducts.map(p => ({
+          id: 'temp_' + Date.now() + '_' + Math.random(),
+          name: p.name,
+          sku: p.sku,
+          price: Number(p.price),
+          qty: 0, // الكمية تبدأ صفر ثم تتحدث
+          category: p.category,
+          image_url: p.image_url
+        }));
+        
         window.parent.postMessage({
-          type: 'NEW_PRODUCT_SAVED',
-          productId: lastProductId
+          type: 'PRODUCT_INSTANT_ADD',
+          products: instantProducts
         }, '*');
       }
       
@@ -342,7 +353,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   });
 
-  // ✅ استقبال النقرات من القائمة وعرضها في القسم الثالث
   window.addEventListener('message', (event) => {
     const data = event.data;
     if (!data || typeof data !== 'object') return;

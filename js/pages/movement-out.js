@@ -1,6 +1,6 @@
 // ============================================
 // صفحة إخراج منتجات (متعددة) + إيصال بيع
-// ✅ دعم كامل للترجمة
+// ✅ دعم كامل للترجمة + تحديث فوري للكميات
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   if (window.__movementOutLoaded) return;
@@ -654,16 +654,22 @@ document.addEventListener('DOMContentLoaded', async () => {
       successBox.textContent = `${tr('mout_success')} ${receiptNumber}`;
       successBox.style.display = 'block';
 
+      // ✅✅✅ سرعة البرق: حساب الكميات الجديدة وإرسالها فوراً للقائمة
+      if (window.self !== window.top) {
+        const updates = addedProducts.map(p => ({
+          id: p.id,
+          newQty: Number(p.available) - Number(p.qty) // الكمية المتاحة ناقص الكمية المخرجة
+        }));
+        
+        window.parent.postMessage({
+          type: 'PRODUCT_INSTANT_UPDATE_QTY',
+          updates: updates
+        }, '*');
+      }
+
       addedProducts.length = 0;
       renderAddedProducts();
       document.getElementById('note').value = '';
-
-      // ✅✅✅ التعديل الجديد: إرسال إشارة للـ Workspace لتحديث القائمة فوراً قبل إعادة التوجيه
-      if (window.self !== window.top) {
-        window.parent.postMessage({
-          type: 'NEW_PRODUCT_OUT_SAVED'
-        }, '*');
-      }
 
       setTimeout(() => {
         window.location.href = `/receipt.html?id=${newReceipt.id}`;
