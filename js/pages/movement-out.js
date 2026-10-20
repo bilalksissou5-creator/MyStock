@@ -658,6 +658,13 @@ document.addEventListener('DOMContentLoaded', async () => {
       renderAddedProducts();
       document.getElementById('note').value = '';
 
+      // ✅✅✅ التعديل الجديد: إرسال إشارة للـ Workspace لتحديث القائمة فوراً قبل إعادة التوجيه
+      if (window.self !== window.top) {
+        window.parent.postMessage({
+          type: 'NEW_PRODUCT_OUT_SAVED'
+        }, '*');
+      }
+
       setTimeout(() => {
         window.location.href = `/receipt.html?id=${newReceipt.id}`;
       }, 1200);

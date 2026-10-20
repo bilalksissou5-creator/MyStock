@@ -100,15 +100,6 @@ async function notifyOrganization({
 
 // ============================================
 // ✅ دالة مركزية: سجّل نشاطاً + أنشئ إشعاراً
-// استخدمها من أي مكان في التطبيق
-//
-// مثال:
-//   await logActivity({
-//     title: 'تعديل منتج',
-//     message: 'تم تعديل المنتج X',
-//     type: 'info',
-//     link: '/products/list.html',
-//   });
 // ============================================
 async function logActivity({
   orgId = null,
@@ -119,7 +110,6 @@ async function logActivity({
   userName = null,
   excludeUserId = null,
 }) {
-  // إذا لم يُمرر orgId أو userName — جلبهما تلقائياً
   if (!orgId || !userName) {
     try {
       const { data: { user } } = await db.auth.getUser();
@@ -179,13 +169,33 @@ async function updateNotifCounter() {
 }
 
 // ============================================
-// بدء التحديث الدوري (كل 30 ثانية)
+// ✅ بدء التحديث الفوري (Realtime) بدلاً من التحديث الدوري
 // ============================================
+let notifRealtimeChannel = null;
+
 function startNotifPolling() {
   if (window.__stopNotifPolling) {
     updateNotifCounter();
     return;
   }
+
+  // 1. تحديث العداد عند تحميل الصفحة لأول مرة
   updateNotifCounter();
-  setInterval(updateNotifCounter, 30000);
+
+  // 2. إلغاء أي قناة قديمة لتجنب التكرار
+  if (notifRealtimeChannel) {
+    db.removeChannel(notifRealtimeChannel);
+  }
+
+  // 3. الاستماع الفوري للإشعارات الجديدة
+  notifRealtimeChannel = db.channel('custom-notifications-channel')
+    .on(
+      'postgres_changes',
+      { event: 'INSERT', schema: 'public', table: 'notifications' },
+      (payload) => {
+        // بمجرد إضافة إشعار جديد، نقوم بتحديث العداد فوراً
+        updateNotifCounter();
+      }
+    )
+    .subscribe();
 }
