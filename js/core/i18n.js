@@ -644,6 +644,7 @@ const translations = {
     lang_page_desc: 'سيتم استخدام اللغة الموجودة في أعلى القائمة بشكل افتراضي. إذا لم يكن أحد التطبيقات يدعم لغتك الافتراضية، فسيتم استخدام اللغة التالية في القائمة كبديل.',
 
     sub_title_full: 'MyStock - الاشتراك',
+    currency_symbol: '$', // <--- تمت الإضافة هنا
     sub_choose_plan: 'اختر باقة الاشتراك',
     sub_choose_plan_desc: 'اختر الباقة المناسبة لاحتياجاتك. يمكنك الترقية أو التخفيض في أي وقت.',
     sub_plan_basic: 'الباقة الأساسية',
@@ -1441,6 +1442,7 @@ const translations = {
     lang_page_desc: 'La langue en haut de la liste sera utilisée par défaut. Si une application ne prend pas en charge votre langue par défaut, la langue suivante dans la liste sera utilisée à la place.',
 
     sub_title_full: 'MyStock - Abonnement',
+    currency_symbol: '$', // <--- تمت الإضافة هنا
     sub_choose_plan: 'Choisissez votre forfait',
     sub_choose_plan_desc: 'Choisissez le forfait adapté à vos besoins. Vous pouvez changer à tout moment.',
     sub_plan_basic: 'Forfait de base',
@@ -2238,6 +2240,7 @@ const translations = {
     lang_page_desc: 'The language at the top of the list will be used by default. If an application does not support your default language, the next language in the list will be used instead.',
 
     sub_title_full: 'MyStock - Subscription',
+    currency_symbol: '$', // <--- تمت الإضافة هنا
     sub_choose_plan: 'Choose Your Plan',
     sub_choose_plan_desc: 'Choose the plan that fits your needs. You can upgrade or downgrade anytime.',
     sub_plan_basic: 'Basic Plan',

@@ -249,8 +249,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         <div class="plan-header">
           <h3 class="plan-name">${name}</h3>
           <div class="plan-price">
-            <!-- ✅ علامة الدولار قبل السعر -->
-            <span class="plan-price-currency">$</span>
+            <!-- ✅ استخدام رمز العملة من ملف الترجمة -->
+            <span class="plan-price-currency">${tr('currency_symbol')}</span>
             <span class="plan-price-value">${price}</span>
           </div>
           <span class="plan-price-period">${tr('sub_per_month')}</span>
@@ -299,8 +299,8 @@ document.addEventListener('DOMContentLoaded', async () => {
           </div>
           <div class="pending-row">
             <span>${tr('sub_pending_amount')}</span>
-            <!-- ✅ تحديث السعر الافتراضي هنا أيضاً -->
-            <strong>${sub.price || 20} $</strong>
+            <!-- ✅ استخدام رمز العملة من ملف الترجمة هنا أيضاً -->
+            <strong>${tr('currency_symbol')}${sub.price || 20}</strong>
           </div>
           <div class="pending-row">
             <span>${tr('sub_pending_date')}</span>
