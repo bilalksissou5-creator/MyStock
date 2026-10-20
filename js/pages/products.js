@@ -1,8 +1,10 @@
 // ============================================
-// صفحة المنتجات
+// صفحة المنتجات (مع التحديث الفوري)
 // ✅ دعم كامل للترجمة
 // ✅ توجيه ذكي (Workspace للحاسوب، Detail للهاتف)
 // ============================================
+let productsChannel = null; // متغير لحفظ قناة Realtime
+
 document.addEventListener('DOMContentLoaded', async () => {
   const user = await requireAuth();
   if (!user) return;
@@ -40,6 +42,25 @@ document.addEventListener('DOMContentLoaded', async () => {
       const text = card.textContent.toLowerCase();
       card.style.display = text.includes(q) ? '' : 'none';
     });
+  });
+
+  // ✅ 1. تفعيل التحديث الفوري من الأجهزة الأخرى (Supabase Realtime)
+  productsChannel = db.channel('custom-products-channel')
+    .on(
+      'postgres_changes',
+      { event: '*', schema: 'public', table: 'products' }, // يراقب الإضافة، التعديل، والحذف
+      (payload) => {
+        console.log('تحديث فوري من جهاز آخر:', payload);
+        loadProducts(); // إعادة جلب المنتجات فوراً دون تحديث الصفحة
+      }
+    )
+    .subscribe();
+
+  // ✅ 2. الاستماع لرسالة التحديث من الـ Workspace (عند الإضافة على نفس الشاشة)
+  window.addEventListener('message', (event) => {
+    if (event.data && event.data.type === 'REFRESH_PRODUCTS') {
+      loadProducts();
+    }
   });
 });
 
@@ -86,7 +107,7 @@ async function loadProducts() {
     }
   }
 
-  // ✅ التعديل: تمرير invoice_id في الرابط
+  // ✅ التوجيه الذكي
   const isDesktop = window.innerWidth >= 1024;
 
   container.innerHTML = grouped.map(p => {
@@ -124,6 +145,7 @@ async function loadProducts() {
     `;
   }).join('');
 
+  // ✅ دعم iframe (إذا كانت الصفحة مفتوحة داخل الـ Workspace الأوسط)
   if (window.self !== window.top) {
     document.querySelectorAll('.product-card').forEach(card => {
       card.addEventListener('click', (e) => {

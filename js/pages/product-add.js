@@ -1,5 +1,7 @@
 // ============================================
-// صفحة إضافة منتجات (نموذج فقط - بدون Workspace داخلي)
+// صفحة إضافة منتجات
+// ✅ دعم كامل للترجمة
+// ✅ دعم Workspace (تقسيم 3 أقسام)
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   if (window.__productAddLoaded) return;
@@ -19,7 +21,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   const { data: suppliers } = await db.from('suppliers').select('*').order('name');
 
-  // ✅ بناء نموذج الإضافة فقط (بدون Workspace داخلي)
   main.innerHTML = `
     <div class="page-header">
       <h2>${tr('prod_add_title')}</h2>
@@ -142,7 +143,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   let selectedSupplier = null;
   let isAddingProduct = false;
-  let isSaving = false;
+  let isSaving = false; // ✅ منع الضغط المتكرر
   let html5QrCode = null;
   let scannedImageUrl = null;
 
@@ -261,7 +262,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   saveAllBtn.addEventListener('click', async (e) => {
     e.preventDefault(); e.stopPropagation();
-    if (isSaving || saveAllBtn.disabled) return;
+    if (isSaving || saveAllBtn.disabled) return; // ✅ منع الضغط المتكرر
     isSaving = true; saveAllBtn.disabled = true;
     const errBox = document.getElementById('form-error'); const successBox = document.getElementById('form-success');
     errBox.style.display = 'none'; successBox.style.display = 'none';
@@ -326,6 +327,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       successBox.textContent = `${tr('prod_add_new_count')} ${insertedCount} | ${tr('prod_add_upd_count')} ${updatedCount} | ${tr('prod_add_invoice_count')} ${invoiceNumber}`;
       successBox.style.display = 'block';
       
+      // ✅ إرسال إشارة للـ Workspace لتحديث القائمة فوراً قبل إعادة التوجيه
       if (window.self !== window.top && lastProductId) {
         window.parent.postMessage({
           type: 'NEW_PRODUCT_SAVED',
@@ -340,6 +342,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   });
 
+  // ✅ استقبال النقرات من القائمة وعرضها في القسم الثالث
   window.addEventListener('message', (event) => {
     const data = event.data;
     if (!data || typeof data !== 'object') return;
