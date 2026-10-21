@@ -111,7 +111,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   // تحديث عرض اللغة
   // ═══════════════════════════════════════════
   function updateLanguageDisplay() {
-    const flags = { ar: '🇲🇦', fr: '🇫🇷', en: '🇬🇧' };
+    const flags = { ar: '', fr: '', en: '' };
     const names = { ar: 'العربية', fr: 'Français', en: 'English' };
 
     langFlag.textContent = flags[selectedLang];
