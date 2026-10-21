@@ -32,7 +32,7 @@
 .welcome-header {
   text-align: center;
   margin-bottom: 48px;
-
+}
 
 .welcome-logo-icon {
   width: 72px;
@@ -44,12 +44,12 @@
   align-items: center;
   justify-content: center;
   box-shadow: 0 10px 30px rgba(23, 23, 23, 0.15);
-
+}
 
 .welcome-logo-icon i {
   color: white;
   font-size: 32px;
-
+}
 
 .welcome-title {
   font-size: 28px;
