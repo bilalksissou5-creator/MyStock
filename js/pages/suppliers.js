@@ -1,7 +1,9 @@
 // ============================================
-// صفحة الموردين
+// صفحة الموردين (مع التحديث الفوري)
 // ✅ دعم كامل للترجمة
 // ============================================
+let suppliersChannel = null; // متغير لحفظ قناة Realtime
+
 document.addEventListener('DOMContentLoaded', async () => {
   const user = await requireAuth();
   if (!user) return;
@@ -42,6 +44,25 @@ document.addEventListener('DOMContentLoaded', async () => {
       const text = card.textContent.toLowerCase();
       card.style.display = text.includes(q) ? '' : 'none';
     });
+  });
+
+  // ✅ 1. تفعيل التحديث الفوري من الأجهزة الأخرى (Supabase Realtime)
+  suppliersChannel = db.channel('custom-suppliers-channel')
+    .on(
+      'postgres_changes',
+      { event: '*', schema: 'public', table: 'suppliers' },
+      (payload) => {
+        console.log('تحديث فوري للموردين من جهاز آخر:', payload);
+        loadSuppliers(); // إعادة جلب الموردين فوراً دون تحديث الصفحة
+      }
+    )
+    .subscribe();
+
+  // ✅ 2. الاستماع لرسالة التحديث (عند الإضافة على نفس الشاشة)
+  window.addEventListener('message', (event) => {
+    if (event.data && event.data.type === 'REFRESH_SUPPLIERS') {
+      loadSuppliers();
+    }
   });
 });
 
