@@ -1,8 +1,9 @@
 // ============================================
-// صفحة الموردين (مع التحديث الفوري)
+// صفحة الموردين (مع التحديث الفوري بسرعة البرق)
 // ✅ دعم كامل للترجمة
 // ============================================
-let suppliersChannel = null; // متغير لحفظ قناة Realtime
+let suppliersChannel = null;
+let cachedSuppliers = []; // مخزن مؤقت
 
 document.addEventListener('DOMContentLoaded', async () => {
   const user = await requireAuth();
@@ -36,8 +37,23 @@ document.addEventListener('DOMContentLoaded', async () => {
     </div>
   `;
 
+  // ✅ 1. سرعة البرق: التحقق من وجود مورد جديد تم إضافته للتو
+  const instantData = sessionStorage.getItem('instant_new_supplier');
+  if (instantData) {
+    try {
+      const instantSupplier = JSON.parse(instantData);
+      sessionStorage.removeItem('instant_new_supplier'); // مسحها بعد الاستخدام
+      
+      // عرض المورد فوراً في الشاشة دون انتظار السيرفر
+      cachedSuppliers = [instantSupplier];
+      renderSuppliersToDOM();
+    } catch (e) { console.warn('Instant supplier error:', e); }
+  }
+
+  // ✅ 2. جلب البيانات الكاملة من السيرفر في الخلفية
   await loadSuppliers();
 
+  // تفعيل البحث
   document.getElementById('search-suppliers').addEventListener('input', (e) => {
     const q = e.target.value.trim().toLowerCase();
     document.querySelectorAll('.supplier-card').forEach(card => {
@@ -46,42 +62,41 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   });
 
-  // ✅ 1. تفعيل التحديث الفوري من الأجهزة الأخرى (Supabase Realtime)
+  // ✅ 3. التحديث الفوري من الأجهزة الأخرى (Realtime)
   suppliersChannel = db.channel('custom-suppliers-channel')
     .on(
       'postgres_changes',
       { event: '*', schema: 'public', table: 'suppliers' },
       (payload) => {
         console.log('تحديث فوري للموردين من جهاز آخر:', payload);
-        loadSuppliers(); // إعادة جلب الموردين فوراً دون تحديث الصفحة
+        loadSuppliers(); 
       }
     )
     .subscribe();
-
-  // ✅ 2. الاستماع لرسالة التحديث (عند الإضافة على نفس الشاشة)
-  window.addEventListener('message', (event) => {
-    if (event.data && event.data.type === 'REFRESH_SUPPLIERS') {
-      loadSuppliers();
-    }
-  });
 });
 
 async function loadSuppliers() {
-  const tr = (key) => (window.t ? window.t(key) : key);
-
-  const container = document.getElementById('suppliers-list');
-
   const { data, error } = await db
     .from('suppliers')
     .select('*')
     .order('created_at', { ascending: false });
 
   if (error) {
-    container.innerHTML = `<div class="alert alert-error">${tr('prod_detail_err')} ${error.message}</div>`;
+    const container = document.getElementById('suppliers-list');
+    container.innerHTML = `<div class="alert alert-error">خطأ: ${error.message}</div>`;
     return;
   }
 
-  if (!data || data.length === 0) {
+  cachedSuppliers = data || [];
+  renderSuppliersToDOM();
+}
+
+function renderSuppliersToDOM() {
+  const tr = (key) => (window.t ? window.t(key) : key);
+  const container = document.getElementById('suppliers-list');
+  if (!container) return;
+
+  if (cachedSuppliers.length === 0) {
     container.innerHTML = `
       <div class="empty-state">
         <i class="fas fa-truck"></i>
@@ -93,7 +108,7 @@ async function loadSuppliers() {
 
   container.innerHTML = `
     <div class="suppliers-grid">
-      ${data.map(s => `
+      ${cachedSuppliers.map(s => `
         <a href="/suppliers/detail.html?id=${s.id}" class="supplier-card">
           <div class="supplier-avatar">
             <i class="fas fa-truck"></i>

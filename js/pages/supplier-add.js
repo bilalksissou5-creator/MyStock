@@ -1,6 +1,7 @@
 // ============================================
 // صفحة إضافة مورد
 // ✅ دعم كامل للترجمة
+// ✅ إضافة بسرعة البرق
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   const user = await requireAuth();
@@ -145,7 +146,10 @@ async function handleSubmit(e) {
   successBox.textContent = tr('sup_success');
   successBox.style.display = 'block';
 
+  // ✅✅✅ سرعة البرق: حفظ المورد في الذاكرة المؤقتة لتعرضه صفحة القائمة فوراً
+  sessionStorage.setItem('instant_new_supplier', JSON.stringify(newSupplier));
+
   setTimeout(() => {
     window.location.href = 'list.html';
-  }, 1200);
+  }, 1000); // قللنا الوقت إلى ثانية واحدة لأن القائمة ستعرضه فوراً
 }
