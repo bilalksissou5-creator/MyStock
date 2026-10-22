@@ -1,6 +1,6 @@
 // ============================================
 // صفحة إخراج منتجات (متعددة) + إيصال بيع
-// ✅ دعم كامل للترجمة + تجميع الكميات
+// ✅ حقل الكمية فارغ افتراضياً
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   if (window.__movementOutLoaded) return;
@@ -83,7 +83,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         <div class="form-grid">
           <div class="form-group">
             <label>${tr('mout_qty')}</label>
-            <input type="number" id="quantity" value="1" min="0.01" step="0.01">
+            <!-- ✅ التعديل هنا: جعل الحقل فارغاً وإضافة نص توضيحي -->
+            <input type="number" id="quantity" value="" placeholder="1" min="0.01" step="0.01">
           </div>
           <div class="form-group">
             <label>${tr('mout_price')}</label>
@@ -226,7 +227,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     selectedProduct = found;
     productInput.value = `${found.name} (${found.sku ?? '—'})`;
     hiddenId.value = found.id;
-    quantityInput.value = '1';
+    // ✅ التعديل هنا: الحقل يبقى فارغاً عند اختيار المنتج
+    quantityInput.value = ''; 
 
     const sellingPrice = getSellingPrice(found);
     priceInput.value = sellingPrice.toFixed(2);
@@ -245,18 +247,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (!e.target.closest('#product-input') && !e.target.closest('#product-suggestions')) {
       suggestions.style.display = 'none';
     }
-  });
-
-  quantityInput.addEventListener('input', () => {
-    if (!selectedProduct) return;
-    const idx = addedProducts.findIndex(p => p.id === selectedProduct.id);
-    if (idx === -1) return;
-
-    const newQty = Number(quantityInput.value);
-    if (!newQty || newQty <= 0) return;
-
-    addedProducts[idx].qty = newQty;
-    renderAddedProducts();
   });
 
   async function startScanner() {
@@ -354,7 +344,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       name: found.name,
       sku: found.sku,
       image_url: found.image_url,
-      qty: 1,
+      qty: 1, // الكمية الافتراضية عند المسح المباشر
       price: sellingPrice,
       costPrice: costPrice,
       available: available,
@@ -458,6 +448,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const price = Number(priceInput.value) || 0;
     const available = Number(selectedProduct.qty ?? 0);
 
+    // التحقق من أن المستخدم أدخل كمية
     if (!qty || qty <= 0) {
       errBox.textContent = tr('prod_add_err_qty');
       errBox.style.display = 'block';
@@ -480,7 +471,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     const existing = addedProducts.find(p => p.id === selectedProduct.id);
 
     if (existing) {
-      // ✅ التعديل هنا: إضافة الكمية الجديدة بدلاً من استبدالها
       existing.qty += qty; 
       existing.price = price;
       existing.costPrice = costPrice;
@@ -488,11 +478,11 @@ document.addEventListener('DOMContentLoaded', async () => {
       isAdding = false;
       addBtn.disabled = false;
       
-      // تفريغ الحقل
+      // تفريغ الحقول بعد الإضافة
       productInput.value = '';
       hiddenId.value = '';
       availableQtyInput.value = '—';
-      quantityInput.value = '1';
+      quantityInput.value = ''; // ✅ يبقى فارغاً
       priceInput.value = '0';
       selectedProduct = null;
       return;
@@ -512,7 +502,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     productInput.value = '';
     hiddenId.value = '';
     availableQtyInput.value = '—';
-    quantityInput.value = '1';
+    quantityInput.value = ''; // ✅ يبقى فارغاً
     priceInput.value = '0';
     selectedProduct = null;
     productInput.focus();
