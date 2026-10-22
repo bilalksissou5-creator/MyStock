@@ -1,66 +1,58 @@
 /* ============================================
-   Workspace (تقسيم صفحة الإضافة)
+   Workspace Grid Layout (بدون iframes)
    ============================================ */
 
-/* في الهاتف والتابلت: يظهر القسم الأول فقط */
-.workspace-panel-left { display: block; width: 100%; height: 100%; }
-.workspace-panel-center, .workspace-panel-right { display: none; }
-.workspace-iframe { width: 100%; height: 100%; border: none; display: block; background: transparent; }
+/* الحاوية الرئيسية */
+.workspace-grid {
+  display: grid;
+  height: calc(100vh - 60px); /* طول الشاشة ناقص الهيدر */
+  padding: 16px;
+  gap: 16px;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+/* الأجزاء الثلاثة */
+.panel-add,
+.panel-list,
+.panel-detail {
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden; /* لمنع خروج المحتوى */
+  height: 100%;
+}
+
+/* جعل كل جزء قابل للتمرير بداخله */
+.panel-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+  -webkit-overflow-scrolling: touch;
+}
 
 /* ============================================
-   ✅ الحاسوب والشاشات الكبيرة (أكبر من 1024px)
+   ✅ الحاسوب (أكبر من 1024px) - تقسيم 3 أعمدة
    ============================================ */
 @media (min-width: 1024px) {
-  
-  /* تثبيت الحاوية الرئيسية main ومنع تمرير الصفحة الأم */
-  body:has(.workspace) .main {
-    overflow: hidden !important;
-    padding: 0 !important;
-    height: 100vh !important;
-  }
-
-  /* الحاوية الرئيسية Workspace */
-  .workspace {
-    display: grid;
-    grid-template-columns: 320px minmax(0, 1fr) 380px;
-    gap: 16px;
-    height: calc(100vh - 60px); /* 60px = ارتفاع الهيدر */
-    padding: 0 16px 16px 16px; 
-    box-sizing: border-box;
-    overflow: hidden;
-  }
-
-  /* الأقسام الثلاثة */
-  .workspace-panel-left,
-  .workspace-panel-center,
-  .workspace-panel-right {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    background: #ffffff;
-    border-radius: 10px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
-    overflow: hidden;
-  }
-
-  /* تنسيق الـ iframe: يمنع التمرير الخارجي ليعتمد على الداخلي */
-  .workspace-iframe {
-    width: 100%;
-    height: 100%;
-    border: none;
-    display: block;
-    background: #ffffff;
-    border-radius: 10px;
-    box-sizing: border-box;
-    overflow: hidden !important; /* ✅ التصحيح: إخفاء شريط التمرير الخارجي */
+  .workspace-grid {
+    grid-template-columns: 360px 1fr 380px; /* العرض: إضافة، قائمة، تفاصيل */
   }
 }
 
 /* ============================================
-   ✅ تخطيط 4 أقسام متساوية (لصفحة تفاصيل المنتج)
+   ✅ الهاتف (أقل من 1024px) - نعرض جزء واحد فقط
    ============================================ */
-@media (min-width: 1024px) {
-  .workspace.workspace-4-cols {
-    grid-template-columns: repeat(4, 1fr) !important; /* 4 أعمدة متساوية */
+@media (max-width: 1023px) {
+  .workspace-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* إخفاء القائمة والتفاصيل افتراضياً على الهاتف */
+  .panel-list,
+  .panel-detail {
+    display: none;
   }
 }
