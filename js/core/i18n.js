@@ -1,3 +1,4 @@
+
 // ============================================
 // نظام الترجمة (i18n)
 // ============================================
@@ -831,6 +832,10 @@ const translations = {
     time_zone_location: 'ضبط المنطقة الزمنية حسب الموقع',
     time_zone_location_desc: 'قم بتشغيل الموقع لاستخدام هذه الميزة.',
     time_use_24h: 'استخدام تنسيق 24 ساعة',
+
+    // Org Edit Notifications
+    oe_notif_title: 'تحديث المنظمة',
+    oe_notif_msg: 'قام بتحديث إعدادات المنظمة',
   },
 
   fr: {
@@ -1653,6 +1658,10 @@ const translations = {
     time_zone_location: 'Définir le fuseau horaire selon la position',
     time_zone_location_desc: 'Activez la localisation pour utiliser cette fonctionnalité.',
     time_use_24h: 'Format 24 heures',
+
+    // Org Edit Notifications
+    oe_notif_title: 'Mise à jour de l\'organisation',
+    oe_notif_msg: 'a mis à jour les paramètres de l\'organisation',
   },
 
   en: {
@@ -2475,6 +2484,10 @@ const translations = {
     time_zone_location: 'Set time zone based on location',
     time_zone_location_desc: 'Turn on location to use this feature.',
     time_use_24h: 'Use 24-hour format',
+
+    // Org Edit Notifications
+    oe_notif_title: 'Organization Updated',
+    oe_notif_msg: 'updated the organization settings',
   },
 
   

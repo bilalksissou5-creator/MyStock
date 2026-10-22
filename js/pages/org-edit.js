@@ -1,6 +1,6 @@
 // ============================================
 // صفحة تعديل المنظمة (للمدير فقط)
-// ✅ دعم كامل للترجمة + تحديث فوري
+// ✅ دعم كامل للترجمة + تحديث فوري + إشعارات
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   const user = await requireAuth();
@@ -334,6 +334,18 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       if (updateError) throw new Error(updateError.message);
 
+      // ✅✅✅ إضافة الإشعار هنا
+      if (typeof notifyOrganization === 'function') {
+        await notifyOrganization({
+          orgId: org.id,
+          title: tr('oe_notif_title') || 'تحديث المنظمة',
+          message: `${myProfile.full_name || tr('prod_detail_user')} ${tr('oe_notif_msg') || 'قام بتحديث إعدادات المنظمة'}`,
+          type: 'info',
+          link: '/org-edit.html',
+          userName: myProfile.full_name || null,
+        });
+      }
+
       showSuccess(tr('oe_success'));
       pendingLogoFile = null;
 
@@ -361,18 +373,15 @@ document.addEventListener('DOMContentLoaded', async () => {
       const updatedOrg = payload.new;
       console.log('⚡ تم تحديث بيانات المنظمة من جهاز آخر:', updatedOrg);
 
-      // تحديث الاسم
       if (updatedOrg.name && nameInput.value !== updatedOrg.name) {
         nameInput.value = updatedOrg.name;
       }
 
-      // تحديث الشعار
       if (updatedOrg.logo_url && updatedOrg.logo_url !== org.logo_url) {
         logoPreview.innerHTML = `<img src="${updatedOrg.logo_url}" alt="logo">`;
         org.logo_url = updatedOrg.logo_url;
       }
 
-      // تحديث الشكل
       if (updatedOrg.logo_shape && updatedOrg.logo_shape !== currentShape) {
         currentShape = updatedOrg.logo_shape;
         document.querySelectorAll('.shape-option').forEach(b => {
@@ -381,7 +390,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         applyShape(currentShape);
       }
 
-      // تحديث العملة
       if (updatedOrg.currency_symbol) {
         currencySymbolInput.value = updatedOrg.currency_symbol;
         currencySymbol = updatedOrg.currency_symbol;
@@ -391,7 +399,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         currencyCode = updatedOrg.currency_code;
       }
 
-      // تحديث المفاتيح
       showOrgName = updatedOrg.show_org_name !== false;
       showOrgNameToggle.checked = showOrgName;
       showOrgNameStatus.textContent = showOrgName ? tr('prod_detail_enabled') : tr('prod_detail_disabled');
