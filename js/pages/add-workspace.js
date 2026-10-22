@@ -1,5 +1,5 @@
 // ============================================
-// Workspace (تقسيم صفحة الإضافة) - نظيف
+// Workspace (تقسيم صفحة الإضافة) - نظيف بدون CSS
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   
@@ -43,7 +43,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     detailIframe.src = `/products/detail.html?id=${encodeURIComponent(lastViewedProductId)}`;
   }
 
-  // ✅ مستمع الرسائل
+  // ✅ مستمع الرسائل (سرعة البرق)
   window.addEventListener('message', (event) => {
     const data = event.data;
     if (!data || typeof data !== 'object') return;
