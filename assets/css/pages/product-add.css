@@ -1,5 +1,5 @@
 /* ============================================
-   صفحة إضافة منتجات
+   صفحة إضافة منتجات (التصميم الأصلي)
    ============================================ */
 
 .add-form {
@@ -509,7 +509,7 @@
 }
 
 /* ============================================
-   ✅ تثبيت الهيدر داخل Workspace فقط (إصلاح نهائي)
+   ✅ إصلاح التمرير داخل Workspace (الجزء الأول)
    ============================================ */
 html.in-iframe, html.in-iframe body {
   height: 100% !important;
@@ -521,24 +521,23 @@ html.in-iframe .main {
   display: flex !important;
   flex-direction: column !important;
   height: 100% !important;
-  padding: 0 !important;
+  padding: 16px !important; 
+  box-sizing: border-box !important;
   overflow: hidden !important;
 }
 
 html.in-iframe .page-header {
   flex: 0 0 auto !important;
-  padding: 16px !important;
+  padding: 0 0 16px 0 !important;
   margin: 0 !important;
-  background: #f5f5f5 !important;
-  border-bottom: 1px solid #e5e5e5 !important;
+  background: transparent !important;
   z-index: 10 !important;
 }
 
 html.in-iframe .add-form {
   flex: 1 1 auto !important;
   overflow-y: auto !important;
-  padding: 16px !important;
-  padding-bottom: 80px !important;
+  padding: 0 !important;
+  padding-inline-end: 8px !important;
   box-sizing: border-box !important;
-  max-width: 100% !important;
 }

@@ -1,5 +1,5 @@
 /* ============================================
-   صفحة المنتجات (الأساسيات)
+   صفحة المنتجات (التصميم الأصلي)
    ============================================ */
 
 .products {
@@ -171,7 +171,7 @@
 }
 
 /* ============================================
-   ✅ إصلاح التمرير داخل Workspace (iframes)
+   ✅ إصلاح التمرير داخل Workspace (الجزء الثاني)
    ============================================ */
 html.in-iframe, html.in-iframe body {
   height: 100% !important;
@@ -179,42 +179,38 @@ html.in-iframe, html.in-iframe body {
   margin: 0 !important;
 }
 
-/* تحويل الحاوية الرئيسية لعمود Flex */
 html.in-iframe .main {
   display: flex !important;
   flex-direction: column !important;
-  height: 100vh !important;
-  padding: 0 !important;
+  height: 100% !important;
+  padding: 16px !important; 
+  box-sizing: border-box !important;
   overflow: hidden !important;
 }
 
-/* تثبيت العنوان */
 html.in-iframe .page-header {
   flex: 0 0 auto !important;
-  padding: 16px 16px 8px 16px !important;
+  padding: 0 0 12px 0 !important;
   margin: 0 !important;
-  background: #f5f5f5 !important;
+  background: transparent !important;
   z-index: 100 !important;
 }
 
-/* تثبيت البحث */
 html.in-iframe .search-bar {
   flex: 0 0 auto !important;
-  margin: 0 !important;
-  padding: 0 16px 16px 16px !important;
-  background: #f5f5f5 !important;
-  border-bottom: 1px solid #e5e5e5 !important;
+  margin: 0 0 16px 0 !important;
+  padding: 0 !important;
+  background: transparent !important;
   max-width: none !important;
   width: 100% !important;
   z-index: 99 !important;
 }
 
-/* ✅ إجبار المنتجات على التمرير */
 html.in-iframe .products {
   flex: 1 1 auto !important;
   overflow-y: auto !important;
-  min-height: 0 !important; /* هذا السطر هو الذي يفعل التمرير */
-  padding: 16px !important;
+  min-height: 0 !important; /* السطر السحري لتفعيل التمرير */
+  padding: 0 8px 0 0 !important; /* مسافة لشريط التمرير */
   margin: 0 !important;
   align-content: start !important;
   display: grid !important;

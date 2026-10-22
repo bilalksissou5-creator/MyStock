@@ -1,8 +1,9 @@
 // ============================================
-// Workspace (تقسيم صفحة الإضافة) - نظيف
+// Workspace (تقسيم صفحة الإضافة) - نظيف 100%
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   
+  // ✅ تحويل الهاتف لصفحة الإضافة الأصلية
   if (window.innerWidth <= 1024) {
     window.location.replace('/products/add.html');
     return; 
@@ -20,6 +21,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   const main = document.getElementById('main-content');
 
+  // ✅ بناء الـ iframes
   main.innerHTML = `
     <div class="workspace">
       <div class="workspace-panel-left">
@@ -38,7 +40,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const listIframe = document.getElementById('list-iframe');
   const detailIframe = document.getElementById('detail-iframe');
 
-  // ✅ استرجاع آخر منتج
+  // ✅ استرجاع آخر منتج تم عرضه
   const lastViewedProductId = sessionStorage.getItem('last_viewed_product_id');
   if (lastViewedProductId) {
     detailIframe.src = `/products/detail.html?id=${encodeURIComponent(lastViewedProductId)}`;
@@ -49,11 +51,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     const data = event.data;
     if (!data || typeof data !== 'object') return;
 
+    // عند اختيار منتج من القائمة
     if (data.type === 'PRODUCT_SELECTED' && data.productId) {
       sessionStorage.setItem('last_viewed_product_id', data.productId);
       detailIframe.src = `/products/detail.html?id=${encodeURIComponent(data.productId)}`;
     }
 
+    // عند حفظ منتج جديد (تحديث القائمة)
     if (data.type === 'NEW_PRODUCT_SAVED') {
       if (listIframe && listIframe.contentWindow) {
         listIframe.contentWindow.postMessage({ type: 'REFRESH_PRODUCTS' }, '*');
