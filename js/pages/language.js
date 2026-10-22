@@ -11,8 +11,22 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   const container = document.getElementById('language-content');
   
-  // جلب المستخدم الحالي
-  const { data: { user } } = await db.auth.getUser();
+  // ✅ حماية: التأكد من وجود الحاوية
+  if (!container) {
+    console.error('عنصر language-content غير موجود في الصفحة');
+    return;
+  }
+
+  // ✅ حماية: جلب المستخدم دون أن يتوقف الكود إذا حدث خطأ
+  let user = null;
+  try {
+    if (typeof db !== 'undefined' && db.auth) {
+      const { data } = await db.auth.getUser();
+      user = data?.user;
+    }
+  } catch (e) {
+    console.warn('لم يتم جلب المستخدم:', e);
+  }
 
   // ═══════════════════════════════════════════
   // قائمة اللغات
@@ -75,7 +89,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('apply-btn')?.addEventListener('click', async () => {
       if (selectedLang === currentLang) return;
 
-      // 1. تطبيق اللغة محلياً (تغيير واجهة المستخدم فوراً)
       if (window.setLanguage) {
         window.setLanguage(selectedLang);
       } else {
@@ -83,16 +96,17 @@ document.addEventListener('DOMContentLoaded', async () => {
         window.location.reload();
       }
 
-      // 2. حفظ اللغة في قاعدة البيانات (للمزامنة بين الأجهزة)
-      if (user) {
-        await db.from('profiles').update({ app_lang: selectedLang }).eq('id', user.id);
+      if (user && typeof db !== 'undefined') {
+        try {
+          await db.from('profiles').update({ app_lang: selectedLang }).eq('id', user.id);
+        } catch (e) { console.warn(e); }
       }
 
       currentLang = selectedLang;
       setTimeout(() => render(), 50);
     });
 
-    // ✅ زر "تعديل" → نفس وظيفة الحفظ
+    // ✅ زر "تعديل"
     document.getElementById('edit-btn')?.addEventListener('click', async () => {
       if (selectedLang === currentLang) return;
       
@@ -103,8 +117,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         window.location.reload();
       }
 
-      if (user) {
-        await db.from('profiles').update({ app_lang: selectedLang }).eq('id', user.id);
+      if (user && typeof db !== 'undefined') {
+        try {
+          await db.from('profiles').update({ app_lang: selectedLang }).eq('id', user.id);
+        } catch (e) { console.warn(e); }
       }
 
       currentLang = selectedLang;
@@ -116,33 +132,28 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // ═══════════════════════════════════════════
   // ✅ التحديث الفوري (Realtime)
-  // إذا غيرت اللغة من جهاز آخر، ستتغير هنا فوراً
   // ═══════════════════════════════════════════
-  if (user) {
-    db.channel('lang-sync-' + user.id)
-      .on('postgres_changes', { 
-        event: 'UPDATE', 
-        schema: 'public', 
-        table: 'profiles',
-        filter: `id=eq.${user.id}` // نراقب تغييرات هذا المستخدم فقط
-      }, (payload) => {
-        const newLang = payload.new.app_lang;
-        
-        // إذا تغيرت اللغة في قاعدة البيانات وكانت مختلفة عن الحالية
-        if (newLang && newLang !== currentLang) {
-          console.log('⚡ تم تغيير اللغة من جهاز آخر:', newLang);
-          
-          if (window.setLanguage) {
-            window.setLanguage(newLang);
+  if (user && typeof db !== 'undefined') {
+    try {
+      db.channel('lang-sync-' + user.id)
+        .on('postgres_changes', { 
+          event: 'UPDATE', 
+          schema: 'public', 
+          table: 'profiles',
+          filter: `id=eq.${user.id}`
+        }, (payload) => {
+          const newLang = payload.new.app_lang;
+          if (newLang && newLang !== currentLang) {
+            console.log('⚡ تم تغيير اللغة من جهاز آخر:', newLang);
+            if (window.setLanguage) window.setLanguage(newLang);
+            currentLang = newLang;
+            selectedLang = newLang;
+            render();
           }
-          
-          currentLang = newLang;
-          selectedLang = newLang;
-          
-          // إعادة بناء الواجهة لتحديث الترجمة والعلامة ✓
-          render();
-        }
-      })
-      .subscribe();
+        })
+        .subscribe();
+    } catch (e) {
+      console.warn('Realtime subscription error:', e);
+    }
   }
 });
