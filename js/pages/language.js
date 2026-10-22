@@ -1,15 +1,18 @@
 // ============================================
-// صفحة اختيار اللغة (One UI)
+// صفحة اختيار اللغة (One UI) مع التحديث الفوري
 // ✅ اختيار + تطبيق فوري + علامة ✓
-// ✅ دعم كامل للترجمة
+// ✅ مزامنة اللغة بين الأجهزة عبر Supabase Realtime
 // ============================================
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
   if (window.applyLanguage) window.applyLanguage();
   const tr = (key) => (window.t ? window.t(key) : key);
 
   document.title = tr('lang_title_full');
 
   const container = document.getElementById('language-content');
+  
+  // جلب المستخدم الحالي
+  const { data: { user } } = await db.auth.getUser();
 
   // ═══════════════════════════════════════════
   // قائمة اللغات
@@ -69,9 +72,10 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // ✅ زر "تطبيق"
-    document.getElementById('apply-btn')?.addEventListener('click', () => {
+    document.getElementById('apply-btn')?.addEventListener('click', async () => {
       if (selectedLang === currentLang) return;
 
+      // 1. تطبيق اللغة محلياً (تغيير واجهة المستخدم فوراً)
       if (window.setLanguage) {
         window.setLanguage(selectedLang);
       } else {
@@ -79,20 +83,66 @@ document.addEventListener('DOMContentLoaded', () => {
         window.location.reload();
       }
 
-      currentLang = selectedLang;
+      // 2. حفظ اللغة في قاعدة البيانات (للمزامنة بين الأجهزة)
+      if (user) {
+        await db.from('profiles').update({ app_lang: selectedLang }).eq('id', user.id);
+      }
 
-      // ✅ إعادة البناء لتحديث الترجمة + العلامة ✓
+      currentLang = selectedLang;
       setTimeout(() => render(), 50);
     });
 
     // ✅ زر "تعديل" → نفس وظيفة الحفظ
-    document.getElementById('edit-btn')?.addEventListener('click', () => {
+    document.getElementById('edit-btn')?.addEventListener('click', async () => {
       if (selectedLang === currentLang) return;
-      window.setLanguage(selectedLang);
+      
+      if (window.setLanguage) {
+        window.setLanguage(selectedLang);
+      } else {
+        localStorage.setItem('app_lang', selectedLang);
+        window.location.reload();
+      }
+
+      if (user) {
+        await db.from('profiles').update({ app_lang: selectedLang }).eq('id', user.id);
+      }
+
       currentLang = selectedLang;
       setTimeout(() => render(), 50);
     });
   }
 
   render();
+
+  // ═══════════════════════════════════════════
+  // ✅ التحديث الفوري (Realtime)
+  // إذا غيرت اللغة من جهاز آخر، ستتغير هنا فوراً
+  // ═══════════════════════════════════════════
+  if (user) {
+    db.channel('lang-sync-' + user.id)
+      .on('postgres_changes', { 
+        event: 'UPDATE', 
+        schema: 'public', 
+        table: 'profiles',
+        filter: `id=eq.${user.id}` // نراقب تغييرات هذا المستخدم فقط
+      }, (payload) => {
+        const newLang = payload.new.app_lang;
+        
+        // إذا تغيرت اللغة في قاعدة البيانات وكانت مختلفة عن الحالية
+        if (newLang && newLang !== currentLang) {
+          console.log('⚡ تم تغيير اللغة من جهاز آخر:', newLang);
+          
+          if (window.setLanguage) {
+            window.setLanguage(newLang);
+          }
+          
+          currentLang = newLang;
+          selectedLang = newLang;
+          
+          // إعادة بناء الواجهة لتحديث الترجمة والعلامة ✓
+          render();
+        }
+      })
+      .subscribe();
+  }
 });
