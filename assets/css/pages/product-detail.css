@@ -557,3 +557,5 @@
 [dir="ltr"] .switch-item {
   flex-direction: row;
 }
+/* تفعيل التمرير داخل القسم الثالث في Workspace */
+.in-iframe .main { height: 100%; overflow-y: auto; padding: 24px; }

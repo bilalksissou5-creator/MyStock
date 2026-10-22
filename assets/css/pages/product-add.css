@@ -513,3 +513,8 @@
   .scanner-box { padding: 16px; }
   .scanner-reader { min-height: 250px; }
 }
+/* تثبيت الهيدر والبحث داخل Workspace فقط */
+.in-iframe .main { display: flex; flex-direction: column; height: 100%; overflow: hidden; padding: 0; }
+.in-iframe .page-header { flex-shrink: 0; }
+.in-iframe .search-bar { flex-shrink: 0; }
+.in-iframe .products { flex: 1; overflow-y: auto; padding: 16px; }

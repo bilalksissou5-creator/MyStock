@@ -174,3 +174,8 @@
     -webkit-overflow-scrolling: touch !important;
   }
 }
+
+/* تثبيت الهيدر داخل Workspace فقط */
+.in-iframe .main { display: flex; flex-direction: column; height: 100%; overflow: hidden; padding: 0; }
+.in-iframe .page-header { flex-shrink: 0; }
+.in-iframe .add-form { flex: 1; overflow-y: auto; padding-bottom: 80px; }
