@@ -1,9 +1,11 @@
 // ============================================
-// صفحة المنتجات (مع التحديث الفوري)
+// صفحة المنتجات (مع التحديث الفوري والعملة)
 // ✅ دعم كامل للترجمة
-// ✅ توجيه ذكي (Workspace للحاسوب، Detail للهاتف)
 // ============================================
-let productsChannel = null; // متغير لحفظ قناة Realtime
+let productsChannel = null; 
+let cachedProducts = []; 
+let orgCurrencySymbol = ''; 
+let orgShowCurrency = false; 
 
 document.addEventListener('DOMContentLoaded', async () => {
   const user = await requireAuth();
@@ -15,6 +17,20 @@ document.addEventListener('DOMContentLoaded', async () => {
   const tr = (key) => (window.t ? window.t(key) : key);
 
   document.title = tr('products_title_full');
+
+  // ✅ 1. جلب العملة من إعدادات المنظمة
+  try {
+    const { data: profile } = await db.from('profiles').select('organization_id').eq('id', user.id).single();
+    if (profile?.organization_id) {
+      const { data: org } = await db.from('organizations').select('currency_symbol, show_currency').eq('id', profile.organization_id).single();
+      if (org) {
+        orgCurrencySymbol = org.currency_symbol || '';
+        orgShowCurrency = org.show_currency !== false;
+      }
+    }
+  } catch (err) {
+    console.warn('Failed to load currency settings:', err);
+  }
 
   const main = document.getElementById('main-content');
   main.innerHTML = `
@@ -34,7 +50,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     <div id="products" class="products">${tr('loading')}</div>
   `;
 
-  await loadProducts();
+  await loadProductsFromDB();
 
   document.getElementById('search-products').addEventListener('input', (e) => {
     const q = e.target.value.trim().toLowerCase();
@@ -44,43 +60,63 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   });
 
-  // ✅ 1. تفعيل التحديث الفوري من الأجهزة الأخرى (Supabase Realtime)
   productsChannel = db.channel('custom-products-channel')
     .on(
       'postgres_changes',
-      { event: '*', schema: 'public', table: 'products' }, // يراقب الإضافة، التعديل، والحذف
-      (payload) => {
-        console.log('تحديث فوري من جهاز آخر:', payload);
-        loadProducts(); // إعادة جلب المنتجات فوراً دون تحديث الصفحة
-      }
+      { event: '*', schema: 'public', table: 'products' },
+      (payload) => { loadProductsFromDB(); }
     )
     .subscribe();
 
-  // ✅ 2. الاستماع لرسالة التحديث من الـ Workspace (عند الإضافة على نفس الشاشة)
   window.addEventListener('message', (event) => {
-    if (event.data && event.data.type === 'REFRESH_PRODUCTS') {
-      loadProducts();
+    const data = event.data;
+    if (!data || typeof data !== 'object') return;
+
+    if (data.type === 'PRODUCT_INSTANT_ADD' && data.products) {
+      data.products.forEach(p => cachedProducts.unshift(p));
+      renderProductsToDOM();
+    }
+
+    if (data.type === 'PRODUCT_INSTANT_UPDATE_QTY' && data.updates) {
+      data.updates.forEach(update => {
+        const index = cachedProducts.findIndex(p => p.id === update.id);
+        if (index !== -1) cachedProducts[index].qty = update.newQty;
+      });
+      renderProductsToDOM();
     }
   });
 });
 
-async function loadProducts() {
-  const tr = (key) => (window.t ? window.t(key) : key);
-
+async function loadProductsFromDB() {
   const { data, error } = await db
     .from('products')
     .select('*, suppliers(name)')
     .order('created_at', { ascending: false });
 
   const container = document.getElementById('products');
-  if (!container) return;
-
   if (error) {
-    container.innerHTML = `<div class="alert alert-error">${tr('products_error')} ${error.message}</div>`;
+    container.innerHTML = `<div class="alert alert-error">${error.message}</div>`;
     return;
   }
 
-  if (!data || data.length === 0) {
+  cachedProducts = data || [];
+  renderProductsToDOM();
+}
+
+// ✅ 2. دالة تنسيق السعر مع العملة
+function formatPrice(price) {
+  const val = Number(price || 0).toFixed(2);
+  if (!orgShowCurrency || !orgCurrencySymbol) return val;
+  return `${val} ${orgCurrencySymbol}`;
+}
+
+// ✅ 3. دالة رسم الشاشة
+function renderProductsToDOM() {
+  const tr = (key) => (window.t ? window.t(key) : key);
+  const container = document.getElementById('products');
+  if (!container) return;
+
+  if (cachedProducts.length === 0) {
     container.innerHTML = `
       <div class="empty-state">
         <i class="fas fa-box-open"></i>
@@ -93,9 +129,8 @@ async function loadProducts() {
   const groupedMap = new Map();
   const grouped = [];
 
-  for (const p of data) {
+  for (const p of cachedProducts) {
     const key = `${(p.name ?? '').trim()}|${p.supplier_id ?? ''}|${p.price ?? 0}`;
-
     if (groupedMap.has(key)) {
       const existing = groupedMap.get(key);
       existing.qty = (existing.qty ?? 0) + (p.qty ?? 0);
@@ -107,11 +142,10 @@ async function loadProducts() {
     }
   }
 
-  // ✅ التوجيه الذكي
   const isDesktop = window.innerWidth >= 1024;
 
   container.innerHTML = grouped.map(p => {
-    const total = ((p.qty ?? 0) * (p.price ?? 0)).toFixed(2);
+    const total = (Number(p.qty ?? 0) * Number(p.price ?? 0));
     const lowClass = (p.qty ?? 0) < 10 ? 'low' : '';
     
     const targetUrl = isDesktop 
@@ -121,9 +155,7 @@ async function loadProducts() {
     return `
       <a href="${targetUrl}" class="product-card" data-product-id="${p.id}">
         <div class="product-card-image">
-          ${p.image_url
-            ? `<img src="${p.image_url}" alt="${p.name}">`
-            : `<i class="fas fa-box-open"></i>`}
+          ${p.image_url ? `<img src="${p.image_url}" alt="${p.name}">` : `<i class="fas fa-box-open"></i>`}
         </div>
         <h3>${p.name ?? tr('products_no_name')}</h3>
         <p class="sku">${p.sku ?? '—'}</p>
@@ -134,28 +166,26 @@ async function loadProducts() {
           </div>
           <div class="stat">
             <div class="stat-label">${tr('products_price')}</div>
-            <div class="stat-value">${p.price ?? 0}</div>
+            <!-- ✅ استخدام دالة التنسيق هنا -->
+            <div class="stat-value">${formatPrice(p.price)}</div>
           </div>
           <div class="stat">
             <div class="stat-label">${tr('products_total')}</div>
-            <div class="stat-value">${total}</div>
+            <!-- ✅ استخدام دالة التنسيق هنا -->
+            <div class="stat-value">${formatPrice(total)}</div>
           </div>
         </div>
       </a>
     `;
   }).join('');
 
-  // ✅ دعم iframe (إذا كانت الصفحة مفتوحة داخل الـ Workspace الأوسط)
   if (window.self !== window.top) {
     document.querySelectorAll('.product-card').forEach(card => {
       card.addEventListener('click', (e) => {
         e.preventDefault();
         e.stopPropagation();
         const productId = card.dataset.productId;
-        window.parent.postMessage({
-          type: 'PRODUCT_SELECTED',
-          productId: productId
-        }, '*');
+        window.parent.postMessage({ type: 'PRODUCT_SELECTED', productId: productId }, '*');
       });
     });
   }
