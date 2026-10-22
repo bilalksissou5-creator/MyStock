@@ -1,7 +1,7 @@
 // ============================================
 // صفحة إضافة منتجات
 // ✅ دعم كامل للترجمة
-// ✅ دعم Workspace (تحديث فوري بسرعة البرق)
+// ✅ تجميع الكميات عند مسح نفس المنتج
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   if (window.__productAddLoaded) return;
@@ -249,10 +249,26 @@ document.addEventListener('DOMContentLoaded', async () => {
     isAddingProduct = true; doneBtn.disabled = true;
     const errBox = document.getElementById('form-error'); errBox.style.display = 'none';
     const name = nameInput.value.trim(); const qty = Number(qtyInput.value) || 0; const price = Number(priceInput.value) || 0;
-    const category = categoryInput.value.trim(); const sku = skuInput.value.trim() || ('SKU-' + Date.now() + '-' + Math.floor(Math.random() * 10000));
+    const category = categoryInput.value.trim(); const sku = skuInput.value.trim();
+
     if (!name) { errBox.textContent = tr('prod_add_err_name'); errBox.style.display = 'block'; nameInput.focus(); isAddingProduct = false; doneBtn.disabled = false; return; }
     if (qty <= 0) { errBox.textContent = tr('prod_add_err_qty'); errBox.style.display = 'block'; qtyInput.focus(); isAddingProduct = false; doneBtn.disabled = false; return; }
-    addedProducts.push({ name, qty, price, category, sku, image_url: scannedImageUrl });
+
+    // ✅ التعديل هنا: البحث عن المنتج في السلة باستخدام الباركود (SKU) أو الاسم والسعر
+    const existingItemIndex = addedProducts.findIndex(p => 
+      (sku && p.sku === sku) || (!sku && p.name === name && p.price === price)
+    );
+
+    if (existingItemIndex !== -1) {
+      // المنتج موجود مسبقاً -> زيادة الكمية فقط
+      addedProducts[existingItemIndex].qty += qty;
+    } else {
+      // منتج جديد -> إضافته للسلة
+      const finalSku = sku || ('SKU-' + Date.now() + '-' + Math.floor(Math.random() * 10000));
+      addedProducts.push({ name, qty, price, category, sku: finalSku, image_url: scannedImageUrl });
+    }
+
+    // تفريغ الحقول
     nameInput.value = ''; qtyInput.value = '1'; priceInput.value = '0'; skuInput.value = ''; scannedImageUrl = null; nameInput.focus();
     renderAddedProducts();
     setTimeout(() => { isAddingProduct = false; doneBtn.disabled = false; }, 400);
@@ -327,23 +343,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       successBox.textContent = `${tr('prod_add_new_count')} ${insertedCount} | ${tr('prod_add_upd_count')} ${updatedCount} | ${tr('prod_add_invoice_count')} ${invoiceNumber}`;
       successBox.style.display = 'block';
       
-      // ✅✅✅ سرعة البرق: إرسال بيانات المنتجات للقائمة فوراً دون انتظار
-      if (window.self !== window.top) {
-        // نرسل فقط المنتجات الجديدة (بدون تكرار)
-        const instantProducts = addedProducts.map(p => ({
-          id: 'temp_' + Date.now() + '_' + Math.random(),
-          name: p.name,
-          sku: p.sku,
-          price: Number(p.price),
-          qty: 0, // الكمية تبدأ صفر ثم تتحدث
-          category: p.category,
-          image_url: p.image_url
-        }));
-        
-        window.parent.postMessage({
-          type: 'PRODUCT_INSTANT_ADD',
-          products: instantProducts
-        }, '*');
+      if (window.self !== window.top && lastProductId) {
+        window.parent.postMessage({ type: 'NEW_PRODUCT_SAVED', productId: lastProductId }, '*');
       }
       
       setTimeout(() => { window.location.replace(`/invoice.html?id=${encodeURIComponent(invoiceNumber)}`); }, 1500);
