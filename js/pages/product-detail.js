@@ -93,7 +93,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           <div class="stat-label">${tr('prod_detail_buy_price')}</div>
           <div class="stat-value">
             <span class="edit-field center" id="f-price" data-value="${product.price ?? 0}"></span>
-            ${currencySymbol ? `<span style="font-size: 0.9em; color: #737373; font-weight: 500;">${currencySymbol}</span>` : ''}
+            ${currencySymbol ? `<span style="font-size: 0.9em; color: #171717; font-weight: 500;">${currencySymbol}</span>` : ''}
           </div>
         </div>
         <div class="stat">
