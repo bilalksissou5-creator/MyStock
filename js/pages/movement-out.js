@@ -1,6 +1,6 @@
 // ============================================
 // صفحة إخراج منتجات (متعددة) + إيصال بيع
-// ✅ دعم كامل للترجمة + تحديث فوري للكميات
+// ✅ دعم كامل للترجمة + تجميع الكميات
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   if (window.__movementOutLoaded) return;
@@ -341,7 +341,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     if (existing) {
       selectProduct(found);
-      quantityInput.value = existing.qty;
+      // في حالة المسح، نضع الكمية الحالية في الحقل لكي يراها المستخدم
+      quantityInput.value = existing.qty; 
       return;
     }
 
@@ -479,12 +480,21 @@ document.addEventListener('DOMContentLoaded', async () => {
     const existing = addedProducts.find(p => p.id === selectedProduct.id);
 
     if (existing) {
-      existing.qty = qty;
+      // ✅ التعديل هنا: إضافة الكمية الجديدة بدلاً من استبدالها
+      existing.qty += qty; 
       existing.price = price;
       existing.costPrice = costPrice;
       renderAddedProducts();
       isAdding = false;
       addBtn.disabled = false;
+      
+      // تفريغ الحقل
+      productInput.value = '';
+      hiddenId.value = '';
+      availableQtyInput.value = '—';
+      quantityInput.value = '1';
+      priceInput.value = '0';
+      selectedProduct = null;
       return;
     }
 
@@ -654,11 +664,10 @@ document.addEventListener('DOMContentLoaded', async () => {
       successBox.textContent = `${tr('mout_success')} ${receiptNumber}`;
       successBox.style.display = 'block';
 
-      // ✅✅✅ سرعة البرق: حساب الكميات الجديدة وإرسالها فوراً للقائمة
       if (window.self !== window.top) {
         const updates = addedProducts.map(p => ({
           id: p.id,
-          newQty: Number(p.available) - Number(p.qty) // الكمية المتاحة ناقص الكمية المخرجة
+          newQty: Number(p.available) - Number(p.qty)
         }));
         
         window.parent.postMessage({
