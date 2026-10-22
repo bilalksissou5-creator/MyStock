@@ -819,6 +819,18 @@ const translations = {
     adm_app_languages_desc: 'إدارة اللغات المتاحة في التطبيق',
     adm_date_time: 'التاريخ والوقت',
     adm_date_time_desc: 'إعدادات المنطقة الزمنية وتنسيق التاريخ',
+
+    // Time Settings Translations
+    time_settings_title: 'التاريخ و الوقت',
+    time_auto: 'التاريخ والوقت التلقائي',
+    time_auto_desc: 'استخدم التاريخ والوقت اللذين توفرهما شبكتك.',
+    time_set_date: 'ضبط التاريخ',
+    time_set_time: 'ضبط الوقت',
+    time_zone_auto: 'منطقة زمنية تلقائية',
+    time_zone_auto_desc: 'استخدم المنطقة الزمنية التي تم توفيرها بواسطة شبكة الهاتف المحمول لديك.',
+    time_zone_location: 'ضبط المنطقة الزمنية حسب الموقع',
+    time_zone_location_desc: 'قم بتشغيل الموقع لاستخدام هذه الميزة.',
+    time_use_24h: 'استخدام تنسيق 24 ساعة',
   },
 
   fr: {
@@ -1629,6 +1641,18 @@ const translations = {
     adm_app_languages_desc: 'Gérer les langues disponibles dans l\'application',
     adm_date_time: 'Date et heure',
     adm_date_time_desc: 'Paramètres de fuseau horaire et de format de date',
+
+    // Time Settings Translations
+    time_settings_title: 'Date et heure',
+    time_auto: 'Date et heure automatiques',
+    time_auto_desc: 'Utiliser l\'heure fournie par le réseau.',
+    time_set_date: 'Régler la date',
+    time_set_time: 'Régler l\'heure',
+    time_zone_auto: 'Fuseau horaire automatique',
+    time_zone_auto_desc: 'Utiliser le fuseau horaire fourni par le réseau mobile.',
+    time_zone_location: 'Définir le fuseau horaire selon la position',
+    time_zone_location_desc: 'Activez la localisation pour utiliser cette fonctionnalité.',
+    time_use_24h: 'Format 24 heures',
   },
 
   en: {
@@ -2439,6 +2463,18 @@ const translations = {
     adm_app_languages_desc: 'Manage available languages in the app',
     adm_date_time: 'Date & Time',
     adm_date_time_desc: 'Timezone and date format settings',
+
+    // Time Settings Translations
+    time_settings_title: 'Date & Time',
+    time_auto: 'Automatic date and time',
+    time_auto_desc: 'Use time provided by network.',
+    time_set_date: 'Set date',
+    time_set_time: 'Set time',
+    time_zone_auto: 'Automatic time zone',
+    time_zone_auto_desc: 'Use time zone provided by mobile network.',
+    time_zone_location: 'Set time zone based on location',
+    time_zone_location_desc: 'Turn on location to use this feature.',
+    time_use_24h: 'Use 24-hour format',
   },
 
   

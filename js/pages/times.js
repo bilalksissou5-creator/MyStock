@@ -34,6 +34,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     </div>
 
     <div class="times-wrapper">
+
+      <!-- ══════════════════════════════════
+           البطاقة 1: اللغة
+           ══════════════════════════════════ -->
       <div class="times-card">
         <a href="/language.html" class="times-item">
           <div class="times-item-left">
@@ -42,6 +46,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           </div>
           <i class="fas fa-chevron-left times-arrow"></i>
         </a>
+
         <div class="times-item" style="cursor:default;">
           <div class="times-item-left">
             <div class="times-title">${tr('adm_app_languages')}</div>
@@ -50,11 +55,16 @@ document.addEventListener('DOMContentLoaded', async () => {
         </div>
       </div>
 
+      <!-- ══════════════════════════════════
+           البطاقة 2: التاريخ والوقت
+           ✅ تم تحويلها إلى رابط يفتح صفحة الإعدادات
+           ══════════════════════════════════ -->
       <div class="times-card">
-        <div class="times-item" style="cursor:default;">
+        <a href="/time-settings.html" class="times-item">
           <div class="times-item-left">
             <div class="times-title">${tr('adm_date_time')}</div>
             <div class="times-desc">${tr('adm_date_time_desc')}</div>
+
             <div class="times-live" style="margin-top:12px;">
               <div class="times-live-row">
                 <i class="fas fa-calendar"></i>
@@ -66,20 +76,43 @@ document.addEventListener('DOMContentLoaded', async () => {
               </div>
             </div>
           </div>
-        </div>
+          <i class="fas fa-chevron-left times-arrow"></i>
+        </a>
       </div>
+
     </div>
   `;
 
+  // ═══════════════════════════════════════════
+  // ✅ عرض التاريخ والوقت الحي داخل البطاقة
+  // ═══════════════════════════════════════════
   const localeMap = { ar: 'ar-MA', fr: 'fr-FR', en: 'en-US' };
+
   function updateDateTime() {
     const now = new Date();
     const locale = localeMap[currentLang] || 'ar-MA';
-    const dateStr = now.toLocaleDateString(locale, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-    const timeStr = now.toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
-    if (document.getElementById('live-date')) document.getElementById('live-date').textContent = dateStr;
-    if (document.getElementById('live-time')) document.getElementById('live-time').textContent = timeStr;
+
+    const dateStr = now.toLocaleDateString(locale, {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    });
+
+    const timeStr = now.toLocaleTimeString(locale, {
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: false,
+    });
+
+    const dateEl = document.getElementById('live-date');
+    const timeEl = document.getElementById('live-time');
+
+    if (dateEl) dateEl.textContent = dateStr;
+    if (timeEl) timeEl.textContent = timeStr;
   }
-  updateDateTime();
+
+  updateTime = updateDateTime();
   setInterval(updateDateTime, 1000);
 });
