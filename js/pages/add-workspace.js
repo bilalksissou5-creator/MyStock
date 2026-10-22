@@ -38,7 +38,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const listIframe = document.getElementById('list-iframe');
   const detailIframe = document.getElementById('detail-iframe');
 
-  // ✅ 1. القسم الأول (إضافة المنتج)
+  // ✅ 1. تنسيق القسم الأول (إضافة المنتج)
   addIframe.addEventListener('load', () => {
     try {
       const iframeDoc = addIframe.contentDocument || addIframe.contentWindow.document;
@@ -55,21 +55,26 @@ document.addEventListener('DOMContentLoaded', async () => {
     } catch (e) { console.warn('add iframe error:', e); }
   });
 
-  // ✅ 2. القسم الثاني (قائمة المنتجات)
+  // ✅ 2. تنسيق القسم الثاني (قائمة المنتجات)
   listIframe.addEventListener('load', () => {
     try {
       const iframeDoc = listIframe.contentDocument || listIframe.contentWindow.document;
       if (iframeDoc) {
         const style = iframeDoc.createElement('style');
         style.innerHTML = `
+          html, body { overflow: hidden !important; height: 100% !important; margin: 0 !important; }
+          .main { display: flex !important; flex-direction: column !important; height: 100% !important; padding: 0 !important; overflow: hidden !important; }
           .page-header a[href="add.html"] { display: none !important; }
+          .page-header { flex: 0 0 auto !important; margin: 0 !important; padding: 16px 16px 8px 16px !important; background: #f5f5f5 !important; z-index: 100 !important; }
+          .search-bar { flex: 0 0 auto !important; margin: 0 !important; padding: 8px 16px 16px 16px !important; background: #f5f5f5 !important; border-bottom: 1px solid #e5e5e5 !important; max-width: none !important; z-index: 99 !important; }
+          .products { flex: 1 1 auto !important; overflow-y: auto !important; padding: 16px !important; margin: 0 !important; align-content: start !important; -webkit-overflow-scrolling: touch !important; }
         `;
         iframeDoc.head.appendChild(style);
       }
     } catch (e) { console.warn('list iframe error:', e); }
   });
 
-  // ✅ 3. القسم الثالث (تفاصيل المنتج)
+  // ✅ 3. تنسيق القسم الثالث (تفاصيل المنتج)
   detailIframe.addEventListener('load', () => {
     try {
       const iframeDoc = detailIframe.contentDocument || detailIframe.contentWindow.document;
@@ -90,7 +95,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     detailIframe.src = `/products/detail.html?id=${encodeURIComponent(lastViewedProductId)}`;
   }
 
-  // ✅ مستمع الرسائل (سرعة البرق)
+  // ✅ مستمع الرسائل
   window.addEventListener('message', (event) => {
     const data = event.data;
     if (!data || typeof data !== 'object') return;
