@@ -1,5 +1,5 @@
 // ============================================
-// Workspace (تقسيم صفحة الإضافة) - نظيف بدون CSS
+// Workspace (تقسيم صفحة الإضافة) - نظيف
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   
@@ -26,7 +26,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         <iframe src="/products/add.html" class="workspace-iframe" id="add-iframe" scrolling="no"></iframe>
       </div>
       <div class="workspace-panel-center">
-        <iframe src="/products/list.html" class="workspace-iframe" id="list-iframe" scrolling="no"></iframe>
+        <!-- ✅ أزلنا scrolling="no" لكي يسمح بالتمرير -->
+        <iframe src="/products/list.html" class="workspace-iframe" id="list-iframe"></iframe>
       </div>
       <div class="workspace-panel-right">
         <iframe src="about:blank" class="workspace-iframe" id="detail-iframe" scrolling="yes"></iframe>

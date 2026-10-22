@@ -1,5 +1,5 @@
 /* ============================================
-   صفحة المنتجات
+   صفحة المنتجات (الأساسيات)
    ============================================ */
 
 .products {
@@ -119,6 +119,9 @@
   }
 }
 
+/* ============================================
+   ✅ التثبيت الجذري للعناصر (للحاسوب كصفحة مستقلة)
+   ============================================ */
 @media (min-width: 1025px) {
   .main, #main-content {
     display: grid !important;
@@ -168,7 +171,7 @@
 }
 
 /* ============================================
-   ✅ تثبيت الهيدر والبحث داخل Workspace فقط (إصلاح نهائي)
+   ✅ إصلاح التمرير داخل Workspace (iframes)
    ============================================ */
 html.in-iframe, html.in-iframe body {
   height: 100% !important;
@@ -176,15 +179,16 @@ html.in-iframe, html.in-iframe body {
   margin: 0 !important;
 }
 
+/* تحويل الحاوية الرئيسية لعمود Flex */
 html.in-iframe .main {
   display: flex !important;
   flex-direction: column !important;
-  height: 100% !important;
+  height: 100vh !important;
   padding: 0 !important;
   overflow: hidden !important;
-  gap: 0 !important; /* إلغاء الجاب القديم */
 }
 
+/* تثبيت العنوان */
 html.in-iframe .page-header {
   flex: 0 0 auto !important;
   padding: 16px 16px 8px 16px !important;
@@ -193,10 +197,11 @@ html.in-iframe .page-header {
   z-index: 100 !important;
 }
 
+/* تثبيت البحث */
 html.in-iframe .search-bar {
   flex: 0 0 auto !important;
   margin: 0 !important;
-  padding: 8px 16px 16px 16px !important;
+  padding: 0 16px 16px 16px !important;
   background: #f5f5f5 !important;
   border-bottom: 1px solid #e5e5e5 !important;
   max-width: none !important;
@@ -204,10 +209,15 @@ html.in-iframe .search-bar {
   z-index: 99 !important;
 }
 
+/* ✅ إجبار المنتجات على التمرير */
 html.in-iframe .products {
   flex: 1 1 auto !important;
   overflow-y: auto !important;
+  min-height: 0 !important; /* هذا السطر هو الذي يفعل التمرير */
   padding: 16px !important;
   margin: 0 !important;
   align-content: start !important;
+  display: grid !important;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)) !important;
+  gap: 12px !important;
 }
