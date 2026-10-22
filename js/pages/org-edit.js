@@ -1,350 +1,207 @@
 // ============================================
-// صفحة تعديل المنظمة (للمدير فقط)
-// ✅ دعم كامل للترجمة
+// صفحة المنتجات (مع التحديث الفوري وإظهار العملة)
 // ============================================
+let productsChannel = null; 
+let cachedProducts = []; 
+let orgCurrencySymbol = ''; 
+let orgShowCurrency = false; 
+
 document.addEventListener('DOMContentLoaded', async () => {
   const user = await requireAuth();
   if (!user) return;
 
-  renderLayout('profile.html');
+  renderLayout('products/list.html');
 
   if (window.applyLanguage) window.applyLanguage();
   const tr = (key) => (window.t ? window.t(key) : key);
 
-  document.title = tr('oe_title_full');
+  document.title = tr('products_title_full');
+
+  // ✅ [التغيير 1]: جلب إعدادات العملة من قاعدة البيانات
+  try {
+    const { data: profile } = await db.from('profiles').select('organization_id').eq('id', user.id).single();
+    if (profile?.organization_id) {
+      const { data: org } = await db.from('organizations').select('currency_symbol, show_currency').eq('id', profile.organization_id).single();
+      if (org) {
+        orgCurrencySymbol = org.currency_symbol || '';
+        orgShowCurrency = org.show_currency !== false;
+        console.log("✅ تم جلب إعدادات العملة:", orgCurrencySymbol, orgShowCurrency);
+      }
+    }
+  } catch (err) {
+    console.warn('❌ فشل جلب العملة:', err);
+  }
 
   const main = document.getElementById('main-content');
-
-  const { data: myProfile } = await db
-    .from('profiles')
-    .select('*')
-    .eq('id', user.id)
-    .single();
-
-  if (myProfile?.role !== 'admin') {
-    main.innerHTML = `<div class="alert alert-error">${tr('oe_no_permission')}</div>`;
-    return;
-  }
-
-  const { data: org, error } = await db
-    .from('organizations')
-    .select('*')
-    .eq('id', myProfile.organization_id)
-    .single();
-
-  if (error || !org) {
-    main.innerHTML = `<div class="alert alert-error">${tr('oe_not_found')}</div>`;
-    return;
-  }
-
-  let currentShape = org.logo_shape || 'circle';
-  let showOrgName = org.show_org_name !== false;
-  let currencyCode = org.currency_code || 'MAD';
-  let currencySymbol = org.currency_symbol || 'DH';
-  let showCurrency = org.show_currency !== false;
-  let pendingLogoFile = null;
-
-  const currenciesList = Object.entries(CurrencyUtils.CURRENCIES)
-    .map(([code, info]) => `<option value="${code}" data-symbol="${info.symbol}">${info.name} (${code})</option>`)
-    .join('');
-
   main.innerHTML = `
     <div class="page-header">
-      <h2>${tr('oe_title')}</h2>
-      <a href="/profile-dashboard.html" class="btn-secondary">
-        <i class="fas fa-arrow-right"></i>
-        <span>${tr('prod_detail_back')}</span>
+      <h2>${tr('products_title')}</h2>
+      <a href="add.html" class="btn-primary">
+        <i class="fas fa-plus"></i>
+        <span>${tr('products_add')}</span>
       </a>
     </div>
 
-    <div class="alert alert-error" id="org-error" style="display:none;"></div>
-    <div class="alert alert-success" id="org-success" style="display:none;"></div>
-
-    <div class="org-edit-wrapper">
-
-      <div class="org-section">
-        <h3>${tr('oe_logo_title')}</h3>
-
-        <div class="org-logo-preview" id="org-logo-preview">
-          ${org.logo_url
-            ? `<img src="${org.logo_url}" alt="logo" id="logo-img">`
-            : `<i class="fas fa-building" id="logo-placeholder"></i>`}
-        </div>
-
-        <div class="shape-picker">
-          <button type="button" class="shape-option" data-shape="circle" title="${tr('oe_shape_circle')}">
-            <div class="shape-preview shape-circle"></div>
-          </button>
-          <button type="button" class="shape-option" data-shape="square" title="${tr('oe_shape_square')}">
-            <div class="shape-preview shape-square"></div>
-          </button>
-          <button type="button" class="shape-option" data-shape="rectangle" title="${tr('oe_shape_rectangle')}">
-            <div class="shape-preview shape-rectangle"></div>
-          </button>
-        </div>
-
-        <input type="file" id="logo-input" accept="image/*" style="display:none;">
-
-        <button type="button" class="btn-secondary full-width" id="choose-logo-btn">
-          <i class="fas fa-camera"></i>
-          <span>${tr('pe_choose_image')}</span>
-        </button>
-      </div>
-
-      <div class="org-section">
-        <h3>${tr('oe_name_title')}</h3>
-        <div class="form-group">
-          <label>${tr('pd_name')}</label>
-          <input type="text" id="org-name" value="${org.name ?? ''}" placeholder="${tr('oe_name_ph')}">
-        </div>
-
-        <div class="switch-item">
-          <div class="switch-content">
-            <div class="switch-header">
-              <strong class="switch-title">${tr('oe_show_name')}</strong>
-              <span class="switch-status ${showOrgName ? 'on' : 'off'}" id="show-org-name-status">
-                ${showOrgName ? tr('prod_detail_enabled') : tr('prod_detail_disabled')}
-              </span>
-            </div>
-            <p class="switch-desc">${tr('oe_show_name_desc')}</p>
-          </div>
-          <label class="switch">
-            <input type="checkbox" id="show-org-name-toggle" ${showOrgName ? 'checked' : ''}>
-            <span class="switch-slider"></span>
-          </label>
-        </div>
-      </div>
-
-      <div class="org-section">
-        <h3>💰 ${tr('oe_currency_title')}</h3>
-        <p class="org-hint">${tr('oe_currency_hint')}</p>
-
-        <div class="form-group">
-          <label>${tr('oe_currency')}</label>
-          <select id="currency-code" class="form-select">
-            ${currenciesList}
-          </select>
-        </div>
-
-        <div class="form-group">
-          <label>${tr('oe_symbol')}</label>
-          <input type="text" id="currency-symbol" value="${currencySymbol}" placeholder="DH" dir="ltr">
-          <small class="field-hint">${tr('oe_symbol_hint')}</small>
-        </div>
-
-        <div class="switch-item">
-          <div class="switch-content">
-            <div class="switch-header">
-              <strong class="switch-title">${tr('oe_show_currency')}</strong>
-              <span class="switch-status ${showCurrency ? 'on' : 'off'}" id="show-currency-status">
-                ${showCurrency ? tr('prod_detail_enabled') : tr('prod_detail_disabled')}
-              </span>
-            </div>
-            <p class="switch-desc">${tr('oe_show_currency_desc')}</p>
-          </div>
-          <label class="switch">
-            <input type="checkbox" id="show-currency-toggle" ${showCurrency ? 'checked' : ''}>
-            <span class="switch-slider"></span>
-          </label>
-        </div>
-
-        <div class="currency-preview">
-          <span class="preview-label">${tr('oe_preview')}</span>
-          <span class="preview-value" id="currency-preview-value">
-            ${CurrencyUtils.formatCurrency(1500, currencySymbol, showCurrency)}
-          </span>
-        </div>
-      </div>
-
+    <div class="search-bar">
+      <i class="fas fa-search"></i>
+      <input type="text" id="search-products" placeholder="${tr('products_search_ph')}">
     </div>
 
-    <div class="org-save-bar">
-      <button type="button" class="btn-primary full-width" id="save-btn">
-        <i class="fas fa-check"></i>
-        <span>${tr('pe_save')}</span>
-      </button>
-    </div>
+    <div id="products" class="products">${tr('loading')}</div>
   `;
 
-  const errBox = document.getElementById('org-error');
-  const successBox = document.getElementById('org-success');
-  const logoInput = document.getElementById('logo-input');
-  const logoPreview = document.getElementById('org-logo-preview');
-  const nameInput = document.getElementById('org-name');
-  const showOrgNameToggle = document.getElementById('show-org-name-toggle');
-  const showOrgNameStatus = document.getElementById('show-org-name-status');
-  const currencyCodeSelect = document.getElementById('currency-code');
-  const currencySymbolInput = document.getElementById('currency-symbol');
-  const showCurrencyToggle = document.getElementById('show-currency-toggle');
-  const showCurrencyStatus = document.getElementById('show-currency-status');
-  const currencyPreviewValue = document.getElementById('currency-preview-value');
+  await loadProductsFromDB();
 
-  currencyCodeSelect.value = currencyCode;
-
-  function showError(msg) {
-    successBox.style.display = 'none';
-    errBox.textContent = msg;
-    errBox.style.display = 'block';
-    setTimeout(() => { errBox.style.display = 'none'; }, 4000);
-  }
-
-  function showSuccess(msg) {
-    errBox.style.display = 'none';
-    successBox.textContent = msg;
-    successBox.style.display = 'block';
-    setTimeout(() => { successBox.style.display = 'none'; }, 3000);
-  }
-
-  function applyShape(shape) {
-    logoPreview.classList.remove('shape-circle', 'shape-square', 'shape-rectangle');
-    logoPreview.classList.add('shape-' + shape);
-  }
-
-  applyShape(currentShape);
-
-  document.querySelectorAll('.shape-option').forEach(btn => {
-    if (btn.dataset.shape === currentShape) btn.classList.add('active');
-    btn.addEventListener('click', () => {
-      currentShape = btn.dataset.shape;
-      document.querySelectorAll('.shape-option').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      applyShape(currentShape);
+  document.getElementById('search-products').addEventListener('input', (e) => {
+    const q = e.target.value.trim().toLowerCase();
+    document.querySelectorAll('.product-card').forEach(card => {
+      const text = card.textContent.toLowerCase();
+      card.style.display = text.includes(q) ? '' : 'none';
     });
   });
 
-  showOrgNameToggle.addEventListener('change', () => {
-    showOrgName = showOrgNameToggle.checked;
-    showOrgNameStatus.textContent = showOrgName ? tr('prod_detail_enabled') : tr('prod_detail_disabled');
-    showOrgNameStatus.classList.toggle('on', showOrgName);
-    showOrgNameStatus.classList.toggle('off', !showOrgName);
-  });
-
-  showCurrencyToggle.addEventListener('change', () => {
-    showCurrency = showCurrencyToggle.checked;
-    showCurrencyStatus.textContent = showCurrency ? tr('prod_detail_enabled') : tr('prod_detail_disabled');
-    showCurrencyStatus.classList.toggle('on', showCurrency);
-    showCurrencyStatus.classList.toggle('off', !showCurrency);
-    updateCurrencyPreview();
-  });
-
-  currencyCodeSelect.addEventListener('change', () => {
-    currencyCode = currencyCodeSelect.value;
-    const selectedOption = currencyCodeSelect.options[currencyCodeSelect.selectedIndex];
-    const autoSymbol = selectedOption.dataset.symbol || '';
-
-    if (!currencySymbolInput.value.trim() || currencySymbolInput.dataset.auto === 'true') {
-      currencySymbolInput.value = autoSymbol;
-      currencySymbolInput.dataset.auto = 'true';
-    }
-
-    currencySymbol = currencySymbolInput.value;
-    updateCurrencyPreview();
-  });
-
-  currencySymbolInput.addEventListener('input', () => {
-    currencySymbol = currencySymbolInput.value.trim() || CurrencyUtils.getCurrencySymbol(currencyCode);
-    currencySymbolInput.dataset.auto = 'false';
-    updateCurrencyPreview();
-  });
-
-  function updateCurrencyPreview() {
-    currencyPreviewValue.textContent = CurrencyUtils.formatCurrency(1500, currencySymbol, showCurrency);
-  }
-
-  document.getElementById('choose-logo-btn').addEventListener('click', () => {
-    logoInput.click();
-  });
-
-  logoInput.addEventListener('change', (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    if (file.size > 5 * 1024 * 1024) {
-      showError(tr('pe_err_size'));
-      logoInput.value = '';
-      return;
-    }
-    if (!file.type.startsWith('image/')) {
-      showError(tr('pe_err_not_image'));
-      logoInput.value = '';
-      return;
-    }
-
-    pendingLogoFile = file;
-    const previewUrl = URL.createObjectURL(file);
-    logoPreview.innerHTML = `<img src="${previewUrl}" alt="logo">`;
-  });
-
-  async function uploadLogo(file) {
-    const ext = (file.name.split('.').pop() || 'jpg').toLowerCase();
-    const fileName = `${org.id}/logo-${Date.now()}.${ext}`;
-
-    const { error: uploadError } = await db.storage
-      .from('organizations')
-      .upload(fileName, file, {
-        cacheControl: '3600',
-        upsert: true,
-        contentType: file.type,
-      });
-
-    if (uploadError) throw new Error(tr('pe_err_upload') + ' ' + uploadError.message);
-
-    const { data: urlData } = db.storage.from('organizations').getPublicUrl(fileName);
-    return urlData.publicUrl;
-  }
-
-  document.getElementById('save-btn').addEventListener('click', async () => {
-    const btn = document.getElementById('save-btn');
-    const newName = nameInput.value.trim();
-
-    if (!newName) {
-      showError(tr('oe_err_name'));
-      return;
-    }
-
-    if (!currencySymbolInput.value.trim()) {
-      showError(tr('oe_err_symbol'));
-      return;
-    }
-
-    btn.disabled = true;
-    btn.querySelector('span').textContent = tr('pe_saving');
-
-    try {
-      let logoUrl = org.logo_url;
-
-      if (pendingLogoFile) {
-        logoUrl = await uploadLogo(pendingLogoFile);
+  productsChannel = db.channel('custom-products-channel')
+    .on(
+      'postgres_changes',
+      { event: '*', schema: 'public', table: 'products' },
+      (payload) => {
+        loadProductsFromDB(); 
       }
+    )
+    .subscribe();
 
-      const updates = {
-        name: newName,
-        logo_url: logoUrl,
-        logo_shape: currentShape,
-        show_org_name: showOrgName,
-        currency_code: currencyCode,
-        currency_symbol: currencySymbolInput.value.trim(),
-        show_currency: showCurrency,
-      };
+  window.addEventListener('message', (event) => {
+    const data = event.data;
+    if (!data || typeof data !== 'object') return;
 
-      const { error: updateError } = await db
-        .from('organizations')
-        .update(updates)
-        .eq('id', org.id);
+    if (data.type === 'PRODUCT_INSTANT_ADD' && data.products) {
+      data.products.forEach(p => cachedProducts.unshift(p));
+      renderProductsToDOM();
+    }
 
-      if (updateError) throw new Error(updateError.message);
-
-      showSuccess(tr('oe_success'));
-      pendingLogoFile = null;
-
-      setTimeout(() => {
-        window.location.href = '/profile-dashboard.html';
-      }, 1500);
-
-    } catch (err) {
-      showError(err.message);
-      btn.disabled = false;
-      btn.querySelector('span').textContent = tr('pe_save');
+    if (data.type === 'PRODUCT_INSTANT_UPDATE_QTY' && data.updates) {
+      data.updates.forEach(update => {
+        const index = cachedProducts.findIndex(p => p.id === update.id);
+        if (index !== -1) cachedProducts[index].qty = update.newQty;
+      });
+      renderProductsToDOM();
     }
   });
 });
+
+async function loadProductsFromDB() {
+  const { data, error } = await db
+    .from('products')
+    .select('*, suppliers(name)')
+    .order('created_at', { ascending: false });
+
+  const container = document.getElementById('products');
+  if (error) {
+    container.innerHTML = `<div class="alert alert-error">${error.message}</div>`;
+    return;
+  }
+
+  cachedProducts = data || [];
+  renderProductsToDOM();
+}
+
+// ✅ [التغيير 2]: دالة تنسيق السعر مع العملة
+function formatPrice(price) {
+  const val = Number(price || 0);
+  const formattedNum = val.toFixed(2);
+
+  // إذا لم تكن هناك عملة محددة، نعرض الرقم فقط
+  if (!orgShowCurrency || !orgCurrencySymbol) {
+    return formattedNum;
+  }
+  
+  // استخدام مكتبة CurrencyUtils إذا كانت موجودة
+  if (typeof CurrencyUtils !== 'undefined' && CurrencyUtils.formatCurrency) {
+    return CurrencyUtils.formatCurrency(val, orgCurrencySymbol, orgShowCurrency);
+  }
+  
+  // الخيار الاحتياطي: عرض الرقم ثم الرمز (مثال: 150.00 DH)
+  return `${formattedNum} ${orgCurrencySymbol}`;
+}
+
+function renderProductsToDOM() {
+  const tr = (key) => (window.t ? window.t(key) : key);
+  const container = document.getElementById('products');
+  if (!container) return;
+
+  if (cachedProducts.length === 0) {
+    container.innerHTML = `
+      <div class="empty-state">
+        <i class="fas fa-box-open"></i>
+        <p>${tr('products_empty')}</p>
+      </div>
+    `;
+    return;
+  }
+
+  const groupedMap = new Map();
+  const grouped = [];
+
+  for (const p of cachedProducts) {
+    const key = `${(p.name ?? '').trim()}|${p.supplier_id ?? ''}|${p.price ?? 0}`;
+    if (groupedMap.has(key)) {
+      const existing = groupedMap.get(key);
+      existing.qty = (existing.qty ?? 0) + (p.qty ?? 0);
+    } else {
+      const copy = { ...p };
+      copy.qty = p.qty ?? 0;
+      groupedMap.set(key, copy);
+      grouped.push(copy);
+    }
+  }
+
+  const isDesktop = window.innerWidth >= 1024;
+
+  container.innerHTML = grouped.map(p => {
+    const total = (Number(p.qty ?? 0) * Number(p.price ?? 0));
+    const lowClass = (p.qty ?? 0) < 10 ? 'low' : '';
+    
+    const targetUrl = isDesktop 
+      ? `/products/detail-workspace.html?productId=${p.id}&userId=${p.created_by || ''}&supplierId=${p.supplier_id || ''}&invoiceId=${p.invoice_id || ''}` 
+      : `detail.html?id=${p.id}`;
+
+    return `
+      <a href="${targetUrl}" class="product-card" data-product-id="${p.id}">
+        <div class="product-card-image">
+          ${p.image_url
+            ? `<img src="${p.image_url}" alt="${p.name}">`
+            : `<i class="fas fa-box-open"></i>`}
+        </div>
+        <h3>${p.name ?? tr('products_no_name')}</h3>
+        <p class="sku">${p.sku ?? '—'}</p>
+        <div class="product-stats">
+          <div class="stat">
+            <div class="stat-label">${tr('products_qty')}</div>
+            <div class="stat-value ${lowClass}">${p.qty ?? 0}</div>
+          </div>
+          <div class="stat">
+            <div class="stat-label">${tr('products_price')}</div>
+            <!-- ✅ [التغيير 3]: استدعاء دالة التنسيق هنا -->
+            <div class="stat-value">${formatPrice(p.price)}</div>
+          </div>
+          <div class="stat">
+            <div class="stat-label">${tr('products_total')}</div>
+            <!-- ✅ [التغيير 4]: استدعاء دالة التنسيق هنا -->
+            <div class="stat-value">${formatPrice(total)}</div>
+          </div>
+        </div>
+      </a>
+    `;
+  }).join('');
+
+  if (window.self !== window.top) {
+    document.querySelectorAll('.product-card').forEach(card => {
+      card.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const productId = card.dataset.productId;
+        window.parent.postMessage({ type: 'PRODUCT_SELECTED', productId: productId }, '*');
+      });
+    });
+  }
+}
