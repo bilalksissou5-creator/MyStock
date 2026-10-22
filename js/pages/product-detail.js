@@ -48,7 +48,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       .eq('id', profile.organization_id)
       .single();
     
-    // نتحقق من تفعيل إظهار العملة في المنظمة
     if (org?.show_currency !== false) {
       currencySymbol = org?.currency_symbol || '';
     }
@@ -94,15 +93,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         </div>
         <div class="stat">
           <div class="stat-label">${tr('prod_detail_buy_price')}</div>
-          <div class="stat-value">
-            <!-- ✅ عرض السعر مع العملة -->
+          <!-- ✅ تم تعديل هذه الحاوية لتجعل السعر والعملة بجانب بعضهما -->
+          <div class="stat-value" style="display: flex; justify-content: center; align-items: center; gap: 4px;">
             <span class="edit-field center" id="f-price" data-value="${product.price ?? 0}"></span>
-            ${currencySymbol ? `<span style="font-size: 0.8em; margin-inline-start: 4px;">${currencySymbol}</span>` : ''}
+            ${currencySymbol ? `<span style="font-size: 0.9em; color: #737373; font-weight: 500;">${currencySymbol}</span>` : ''}
           </div>
         </div>
         <div class="stat">
           <div class="stat-label">${tr('products_total')}</div>
-          <!-- ✅ عرض المجموع مع العملة -->
           <div class="stat-value" id="f-total">${total} ${currencySymbol}</div>
         </div>
       </div>
@@ -166,7 +164,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     const qty = Number(document.getElementById('f-qty').dataset.value ?? 0);
     const price = Number(document.getElementById('f-price').dataset.value ?? 0);
     const totalVal = (qty * price).toFixed(2);
-    // ✅ إضافة العملة عند إعادة حساب المجموع
     document.getElementById('f-total').textContent = `${totalVal} ${currencySymbol}`.trim();
   }
 
