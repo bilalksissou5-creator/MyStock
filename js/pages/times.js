@@ -1,7 +1,6 @@
 // ============================================
 // صفحة الإدارة العامة (One UI)
-// ✅ بطاقة اللغة + بطاقة التاريخ والوقت (عرض حي)
-// ✅ دعم كامل للترجمة
+// ✅ بطاقة اللغة + بطاقة التاريخ والوقت
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   const user = await requireAuth();
@@ -15,10 +14,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   document.title = tr('adm_title_full');
 
   const main = document.getElementById('main-content');
-
-  // ═══════════════════════════════════════════
-  // قائمة اللغات
-  // ═══════════════════════════════════════════
   const currentLang = window.getCurrentLang ? window.getCurrentLang() : 'ar';
 
   const langNames = {
@@ -39,12 +34,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     </div>
 
     <div class="times-wrapper">
-
-      <!-- ══════════════════════════════════
-           البطاقة 1: اللغة
-           ══════════════════════════════════ -->
       <div class="times-card">
-
         <a href="/language.html" class="times-item">
           <div class="times-item-left">
             <div class="times-title">${tr('adm_language')}</div>
@@ -52,26 +42,19 @@ document.addEventListener('DOMContentLoaded', async () => {
           </div>
           <i class="fas fa-chevron-left times-arrow"></i>
         </a>
-
         <div class="times-item" style="cursor:default;">
           <div class="times-item-left">
             <div class="times-title">${tr('adm_app_languages')}</div>
             <div class="times-desc">${tr('adm_app_languages_desc')}</div>
           </div>
         </div>
-
       </div>
 
-      <!-- ══════════════════════════════════
-           البطاقة 2: التاريخ والوقت
-           ══════════════════════════════════ -->
       <div class="times-card">
-
         <div class="times-item" style="cursor:default;">
           <div class="times-item-left">
             <div class="times-title">${tr('adm_date_time')}</div>
             <div class="times-desc">${tr('adm_date_time_desc')}</div>
-
             <div class="times-live" style="margin-top:12px;">
               <div class="times-live-row">
                 <i class="fas fa-calendar"></i>
@@ -84,48 +67,19 @@ document.addEventListener('DOMContentLoaded', async () => {
             </div>
           </div>
         </div>
-
       </div>
-
     </div>
   `;
 
-  // ═══════════════════════════════════════════
-  // ✅ عرض التاريخ والوقت الحي
-  // ═══════════════════════════════════════════
   const localeMap = { ar: 'ar-MA', fr: 'fr-FR', en: 'en-US' };
-
   function updateDateTime() {
     const now = new Date();
-    const lang = window.getCurrentLang ? window.getCurrentLang() : 'ar';
-    const locale = localeMap[lang] || 'ar-MA';
-
-    // التاريخ
-    const dateStr = now.toLocaleDateString(locale, {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    });
-
-    // الوقت (HH:MM:SS)
-    const timeStr = now.toLocaleTimeString(locale, {
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit',
-      hour12: false,
-    });
-
-    const dateEl = document.getElementById('live-date');
-    const timeEl = document.getElementById('live-time');
-
-    if (dateEl) dateEl.textContent = dateStr;
-    if (timeEl) timeEl.textContent = timeStr;
+    const locale = localeMap[currentLang] || 'ar-MA';
+    const dateStr = now.toLocaleDateString(locale, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+    const timeStr = now.toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
+    if (document.getElementById('live-date')) document.getElementById('live-date').textContent = dateStr;
+    if (document.getElementById('live-time')) document.getElementById('live-time').textContent = timeStr;
   }
-
-  // أول تحديث فوري
   updateDateTime();
-
-  // تحديث كل ثانية
   setInterval(updateDateTime, 1000);
 });

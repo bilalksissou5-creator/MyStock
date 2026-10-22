@@ -807,6 +807,18 @@ const translations = {
     sub_feat_invoices_500: '500 فاتورة/شهر',
     sub_feat_invoices_unlimited: 'فواتير غير محدودة',
     sub_support_247: 'دعم 24/7',
+
+    // Admin / Times Translations
+    adm_title_full: 'MyStock - الإدارة العامة',
+    adm_title: 'الإدارة العامة',
+    lang_ar: 'العربية',
+    lang_fr: 'الفرنسية',
+    lang_en: 'الإنجليزية',
+    adm_language: 'اللغة',
+    adm_app_languages: 'لغات التطبيق',
+    adm_app_languages_desc: 'إدارة اللغات المتاحة في التطبيق',
+    adm_date_time: 'التاريخ والوقت',
+    adm_date_time_desc: 'إعدادات المنطقة الزمنية وتنسيق التاريخ',
   },
 
   fr: {
@@ -1605,6 +1617,18 @@ const translations = {
     sub_feat_invoices_500: '500 factures/mois',
     sub_feat_invoices_unlimited: 'Factures illimitées',
     sub_support_247: 'Support 24/7',
+
+    // Admin / Times Translations
+    adm_title_full: 'MyStock - Administration',
+    adm_title: 'Administration',
+    lang_ar: 'Arabe',
+    lang_fr: 'Français',
+    lang_en: 'Anglais',
+    adm_language: 'Langue',
+    adm_app_languages: 'Langues de l\'application',
+    adm_app_languages_desc: 'Gérer les langues disponibles dans l\'application',
+    adm_date_time: 'Date et heure',
+    adm_date_time_desc: 'Paramètres de fuseau horaire et de format de date',
   },
 
   en: {
@@ -2403,6 +2427,18 @@ const translations = {
     sub_feat_invoices_500: '500 invoices/month',
     sub_feat_invoices_unlimited: 'Unlimited invoices',
     sub_support_247: '24/7 Support',
+
+    // Admin / Times Translations
+    adm_title_full: 'MyStock - Administration',
+    adm_title: 'Administration',
+    lang_ar: 'Arabic',
+    lang_fr: 'French',
+    lang_en: 'English',
+    adm_language: 'Language',
+    adm_app_languages: 'App Languages',
+    adm_app_languages_desc: 'Manage available languages in the app',
+    adm_date_time: 'Date & Time',
+    adm_date_time_desc: 'Timezone and date format settings',
   },
 
   
