@@ -1,6 +1,6 @@
 // ============================================
 // صفحة إخراج منتجات (متعددة) + إيصال بيع
-// ✅ حقل الكمية فارغ دائماً لمنع التضاعف
+// ✅ إضافة تلقائية بكمية 1 عند المسح
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   if (window.__movementOutLoaded) return;
@@ -226,7 +226,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     selectedProduct = found;
     productInput.value = `${found.name} (${found.sku ?? '—'})`;
     hiddenId.value = found.id;
-    quantityInput.value = ''; // يبقى فارغاً
+    quantityInput.value = 1; // ✅ يضع 1 افتراضياً
 
     const sellingPrice = getSellingPrice(found);
     priceInput.value = sellingPrice.toFixed(2);
@@ -295,7 +295,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const value = String(barcode).trim();
     if (!value) return;
 
-    let found = (products ?? []).find(p => p.sku === value);
+    let found = (products ?? []).find(p => p.sku === value || p.qr_code === value);
 
     if (!found) {
       const { data: dbFound, error } = await db
@@ -329,8 +329,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     if (existing) {
       selectProduct(found);
-      // ✅ التعديل: لا نضع الكمية القديمة في الحقل لتجنب التضاعف
-      quantityInput.value = ''; 
+      quantityInput.value = 1; // ✅ عند المسح المتكرر، نضع 1
       return;
     }
 
@@ -478,7 +477,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       productInput.value = '';
       hiddenId.value = '';
       availableQtyInput.value = '—';
-      quantityInput.value = ''; // تفريغ الحقل
+      quantityInput.value = ''; 
       priceInput.value = '0';
       selectedProduct = null;
       return;
@@ -498,7 +497,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     productInput.value = '';
     hiddenId.value = '';
     availableQtyInput.value = '—';
-    quantityInput.value = ''; // تفريغ الحقل
+    quantityInput.value = ''; 
     priceInput.value = '0';
     selectedProduct = null;
     productInput.focus();
