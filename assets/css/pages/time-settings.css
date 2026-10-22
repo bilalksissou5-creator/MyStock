@@ -1,0 +1,148 @@
+/* ============================================
+   صفحة إعدادات الوقت والتاريخ (Time Settings)
+   ============================================ */
+
+/* الحاوية الرئيسية للبطاقات */
+.times-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-width: 600px;
+  margin: 0 auto;
+  padding-bottom: 20px;
+}
+
+/* البطاقة البيضاء */
+.times-card {
+  background: #ffffff;
+  border-radius: 24px;
+  padding: 0;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+  overflow: hidden;
+}
+
+/* صف الإعدادات الواحد */
+.time-setting-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+/* إزالة الخط السفلي من آخر صف في البطاقة */
+.time-setting-row:last-child {
+  border-bottom: none;
+}
+
+/* حاوية النصوص (العنوان والوصف) */
+.time-setting-text {
+  flex: 1;
+  padding-inline-end: 16px;
+}
+
+/* عنوان الإعداد */
+.time-setting-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #171717;
+  margin-bottom: 4px;
+}
+
+/* وصف الإعداد */
+.time-setting-desc {
+  font-size: 13px;
+  color: #737373;
+  line-height: 1.4;
+}
+
+/* القيمة (التاريخ أو الوقت) */
+.time-setting-value {
+  font-size: 15px;
+  color: #007aff; /* أزرق سامسونج */
+  font-weight: 600;
+  cursor: pointer;
+  direction: ltr; /* لضمان ظهور الأرقام بشكل صحيح */
+}
+
+/* ============================================
+   ✅ تصميم مفاتيح التبديل (Switch - One UI)
+   ============================================ */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 48px;
+  height: 28px;
+  flex-shrink: 0;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #e5e5ea;
+  transition: .3s;
+  border-radius: 28px;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 24px;
+  width: 24px;
+  left: 2px;
+  bottom: 2px;
+  background-color: white;
+  transition: .3s;
+  border-radius: 50%;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+}
+
+/* حالة المفتاح عندما يكون مفتوحاً (Checked) */
+input:checked + .slider {
+  background-color: #007aff; /* أزرق سامسونج */
+}
+
+/* حركة الدائرة عند التفعيل (من اليسار لليمين) */
+input:checked + .slider:before {
+  transform: translateX(20px);
+}
+
+/* دعم اللغة العربية (RTL) - عكس حركة الدائرة */
+html[dir="rtl"] input:checked + .slider:before {
+  transform: translateX(-20px);
+}
+
+/* ============================================
+   التجاوب مع شاشات الهاتف (Responsive)
+   ============================================ */
+@media (max-width: 480px) {
+  .times-card {
+    border-radius: 20px;
+  }
+
+  .time-setting-row {
+    padding: 14px 16px;
+  }
+
+  .time-setting-title {
+    font-size: 15px;
+  }
+
+  .time-setting-desc {
+    font-size: 12px;
+  }
+
+  .time-setting-value {
+    font-size: 14px;
+  }
+}
