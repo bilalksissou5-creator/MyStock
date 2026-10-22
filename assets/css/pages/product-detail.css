@@ -113,6 +113,11 @@
   font-size: 1.05rem;
   font-weight: 700;
   color: #171717;
+  /* ✅ التعديل هنا: جعل الحاوية مرنة لتقريب السعر والعملة */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px; 
 }
 
 .stat-value.low {
@@ -380,6 +385,13 @@
   text-align: center;
   width: 100%;
   margin: -4px 0;
+}
+
+/* ✅ التعديل هنا: إلغاء العرض 100% داخل الصناديق لكي تقترب العملة */
+.product-stats .edit-field.center {
+  width: auto;
+  margin: 0;
+  padding: 0;
 }
 
 .inline-display {

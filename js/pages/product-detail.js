@@ -1,7 +1,5 @@
 // ============================================
 // صفحة تفاصيل المنتج (مع إظهار العملة)
-// ✅ قسم سعر البيع (Switch + قيمة)
-// ✅ دعم كامل للترجمة
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   const user = await requireAuth();
@@ -93,8 +91,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         </div>
         <div class="stat">
           <div class="stat-label">${tr('prod_detail_buy_price')}</div>
-          <!-- ✅ تم تعديل هذه الحاوية لتجعل السعر والعملة بجانب بعضهما -->
-          <div class="stat-value" style="display: flex; justify-content: center; align-items: center; gap: 4px;">
+          <div class="stat-value">
             <span class="edit-field center" id="f-price" data-value="${product.price ?? 0}"></span>
             ${currencySymbol ? `<span style="font-size: 0.9em; color: #737373; font-weight: 500;">${currencySymbol}</span>` : ''}
           </div>
