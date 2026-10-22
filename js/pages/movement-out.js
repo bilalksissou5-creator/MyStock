@@ -1,6 +1,6 @@
 // ============================================
 // صفحة إخراج منتجات (متعددة) + إيصال بيع
-// ✅ إضافة تلقائية بكمية 1 عند المسح
+// ✅ تعديل الكمية مباشرة من الحقل + منع التضاعف
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   if (window.__movementOutLoaded) return;
@@ -226,12 +226,18 @@ document.addEventListener('DOMContentLoaded', async () => {
     selectedProduct = found;
     productInput.value = `${found.name} (${found.sku ?? '—'})`;
     hiddenId.value = found.id;
-    quantityInput.value = 1; // ✅ يضع 1 افتراضياً
 
     const sellingPrice = getSellingPrice(found);
     priceInput.value = sellingPrice.toFixed(2);
-
     availableQtyInput.value = found.qty ?? 0;
+
+    // ✅ إذا كان المنتج موجوداً في السلة، نضع كميته الحالية في الحقل
+    const existing = addedProducts.find(p => p.id === found.id);
+    if (existing) {
+      quantityInput.value = existing.qty;
+    } else {
+      quantityInput.value = 1;
+    }
   }
 
   productInput.addEventListener('input', () => {
@@ -244,6 +250,22 @@ document.addEventListener('DOMContentLoaded', async () => {
   document.addEventListener('pointerdown', (e) => {
     if (!e.target.closest('#product-input') && !e.target.closest('#product-suggestions')) {
       suggestions.style.display = 'none';
+    }
+  });
+
+  // ✅ التعديل الجديد: تحديث السلة فوراً عند تغيير الكمية في الحقل
+  quantityInput.addEventListener('input', () => {
+    if (!selectedProduct) return;
+    
+    const newQty = Number(quantityInput.value);
+    if (!newQty || newQty <= 0) return;
+
+    const existingIndex = addedProducts.findIndex(p => p.id === selectedProduct.id);
+    
+    // إذا كان المنتج موجوداً بالفعل في السلة، نقوم بتحديث كميته فوراً
+    if (existingIndex !== -1) {
+      addedProducts[existingIndex].qty = newQty;
+      renderAddedProducts();
     }
   });
 
@@ -329,7 +351,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     if (existing) {
       selectProduct(found);
-      quantityInput.value = 1; // ✅ عند المسح المتكرر، نضع 1
+      // سيتم وضع الكمية الحالية تلقائياً في الحقل بواسطة دالة selectProduct
       return;
     }
 
@@ -467,10 +489,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     const existing = addedProducts.find(p => p.id === selectedProduct.id);
 
     if (existing) {
-      existing.qty += qty; 
-      existing.price = price;
-      existing.costPrice = costPrice;
-      renderAddedProducts();
+      // ✅ التعديل هنا: إذا كان المنتج موجوداً، الكمية تم تحديثها مسبقاً بواسطة مستمع الحقل
+      // لذلك نحن فقط نقوم بتفريغ الحقول ولا نضيف الكمية مرة أخرى.
       isAdding = false;
       addBtn.disabled = false;
       
