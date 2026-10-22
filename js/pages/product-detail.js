@@ -1,5 +1,5 @@
 // ============================================
-// صفحة تفاصيل المنتج
+// صفحة تفاصيل المنتج (مع إظهار العملة)
 // ✅ قسم سعر البيع (Switch + قيمة)
 // ✅ دعم كامل للترجمة
 // ============================================
@@ -44,10 +44,14 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (profile?.organization_id) {
     const { data: org } = await db
       .from('organizations')
-      .select('currency_symbol')
+      .select('currency_symbol, show_currency')
       .eq('id', profile.organization_id)
       .single();
-    currencySymbol = org?.currency_symbol || '';
+    
+    // نتحقق من تفعيل إظهار العملة في المنظمة
+    if (org?.show_currency !== false) {
+      currencySymbol = org?.currency_symbol || '';
+    }
   }
 
   const total = ((product.qty ?? 0) * (product.price ?? 0)).toFixed(2);
@@ -91,12 +95,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         <div class="stat">
           <div class="stat-label">${tr('prod_detail_buy_price')}</div>
           <div class="stat-value">
+            <!-- ✅ عرض السعر مع العملة -->
             <span class="edit-field center" id="f-price" data-value="${product.price ?? 0}"></span>
+            ${currencySymbol ? `<span style="font-size: 0.8em; margin-inline-start: 4px;">${currencySymbol}</span>` : ''}
           </div>
         </div>
         <div class="stat">
           <div class="stat-label">${tr('products_total')}</div>
-          <div class="stat-value" id="f-total">${total}</div>
+          <!-- ✅ عرض المجموع مع العملة -->
+          <div class="stat-value" id="f-total">${total} ${currencySymbol}</div>
         </div>
       </div>
 
@@ -158,7 +165,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   function recalcTotal() {
     const qty = Number(document.getElementById('f-qty').dataset.value ?? 0);
     const price = Number(document.getElementById('f-price').dataset.value ?? 0);
-    document.getElementById('f-total').textContent = (qty * price).toFixed(2);
+    const totalVal = (qty * price).toFixed(2);
+    // ✅ إضافة العملة عند إعادة حساب المجموع
+    document.getElementById('f-total').textContent = `${totalVal} ${currencySymbol}`.trim();
   }
 
   const fieldLabels = {
