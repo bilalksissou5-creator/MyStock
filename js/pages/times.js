@@ -31,7 +31,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   main.innerHTML = `
     <div class="page-header">
-      <h2>${tr('adm_title')}</h2>
+      <h2>${tr('General Administration')}</h2>
       <a href="/settings.html" class="btn-secondary">
         <i class="fas fa-arrow-right"></i>
         <span>${tr('prod_detail_back')}</span>
