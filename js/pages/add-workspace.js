@@ -1,5 +1,6 @@
 // ============================================
 // Workspace (تقسيم صفحة الإضافة)
+// ✅ تثبيت العناصر العلوية في القسم 1 و 2
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   
@@ -38,31 +39,99 @@ document.addEventListener('DOMContentLoaded', async () => {
   const listIframe = document.getElementById('list-iframe');
   const detailIframe = document.getElementById('detail-iframe');
 
-  // ✅ 1. القسم الأول (إضافة المنتج)
+  // ✅ 1. القسم الأول (إضافة المنتج) - تثبيت الهيدر وجعل النموذج يتحرك
   addIframe.addEventListener('load', () => {
     try {
       const iframeDoc = addIframe.contentDocument || addIframe.contentWindow.document;
       if (iframeDoc) {
         const style = iframeDoc.createElement('style');
         style.innerHTML = `
+          /* منع تمرير الصفحة بالكامل */
           html, body { overflow: hidden !important; height: 100% !important; margin: 0 !important; }
-          .main { display: flex !important; flex-direction: column !important; height: 100% !important; padding: 0 !important; overflow: hidden !important; }
-          .page-header { flex: 0 0 auto !important; padding: 16px !important; margin: 0 !important; background: #f5f5f5 !important; border-bottom: 1px solid #e5e5e5 !important; z-index: 10 !important; }
-          .add-form { flex: 1 1 auto !important; overflow-y: auto !important; padding: 16px !important; padding-bottom: 80px !important; -webkit-overflow-scrolling: touch !important; }
+          
+          /* تحويل main إلى Flexbox لترتيب الهيدر والنموذج */
+          .main { 
+            display: flex !important; 
+            flex-direction: column !important; 
+            height: 100% !important; 
+            padding: 0 !important; 
+            overflow: hidden !important; 
+          }
+          
+          /* ✅ تثبيت شريط العنوان (Add Products + Scan) */
+          .page-header { 
+            flex: 0 0 auto !important; /* يمنع الهيدر من التمدد أو الانكماش */
+            padding: 16px !important; 
+            margin: 0 !important; 
+            background: #f5f5f5 !important; 
+            border-bottom: 1px solid #e5e5e5 !important; 
+            z-index: 10 !important; 
+          }
+          
+          /* ✅ جعل النموذج هو الجزء الوحيد الذي يتحرك */
+          .add-form { 
+            flex: 1 1 auto !important; /* يأخذ المساحة المتبقية */
+            overflow-y: auto !important; /* تفعيل التمرير هنا فقط */
+            padding: 16px !important; 
+            padding-bottom: 80px !important; /* مساحة للأزرار السفلية */
+            -webkit-overflow-scrolling: touch !important; 
+          }
         `;
         iframeDoc.head.appendChild(style);
       }
     } catch (e) { console.warn('add iframe error:', e); }
   });
 
-  // ✅ 2. القسم الثاني (قائمة المنتجات)
+  // ✅ 2. القسم الثاني (قائمة المنتجات) - تثبيت العنوان والبحث وجعل المنتجات تتحرك
   listIframe.addEventListener('load', () => {
     try {
       const iframeDoc = listIframe.contentDocument || listIframe.contentWindow.document;
       if (iframeDoc) {
         const style = iframeDoc.createElement('style');
         style.innerHTML = `
+          /* منع تمرير الصفحة بالكامل */
+          html, body { overflow: hidden !important; height: 100% !important; margin: 0 !important; }
+          
+          .main { 
+            display: flex !important; 
+            flex-direction: column !important; 
+            height: 100% !important; 
+            padding: 0 !important; 
+            overflow: hidden !important; 
+          }
+
+          /* إخفاء زر الإضافة */
           .page-header a[href="add.html"] { display: none !important; }
+
+          /* ✅ تثبيت شريط العنوان (Products) */
+          .page-header {
+            flex: 0 0 auto !important;
+            margin: 0 !important;
+            padding: 16px 16px 8px 16px !important;
+            background: #f5f5f5 !important;
+            z-index: 100 !important;
+          }
+
+          /* ✅ تثبيت خانة البحث تحت العنوان مباشرة */
+          .search-bar {
+            flex: 0 0 auto !important;
+            margin: 0 !important;
+            padding: 8px 16px 16px 16px !important;
+            background: #f5f5f5 !important;
+            border-bottom: 1px solid #e5e5e5 !important;
+            max-width: none !important;
+            z-index: 99 !important;
+          }
+
+          /* ✅ جعل حاوية المنتجات هي الوحيدة التي تتحرك */
+          .products {
+            flex: 1 1 auto !important;
+            overflow-y: auto !important;
+            padding: 16px !important;
+            margin: 0 !important;
+            align-content: start !important;
+            -webkit-overflow-scrolling: touch !important;
+          }
         `;
         iframeDoc.head.appendChild(style);
       }
