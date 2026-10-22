@@ -99,7 +99,8 @@
   content: "";
   height: 24px;
   width: 24px;
-  left: 2px;
+  /* ✅ التعديل هنا: استخدام inset-inline-start بدلاً من left */
+  inset-inline-start: 2px; 
   bottom: 2px;
   background-color: white;
   transition: .3s;
@@ -112,12 +113,12 @@ input:checked + .slider {
   background-color: #007aff; /* أزرق سامسونج */
 }
 
-/* حركة الدائرة عند التفعيل (من اليسار لليمين) */
+/* ✅ حركة الدائرة عند التفعيل (للغات LTR مثل الإنجليزية) */
 input:checked + .slider:before {
   transform: translateX(20px);
 }
 
-/* دعم اللغة العربية (RTL) - عكس حركة الدائرة */
+/* ✅ حركة الدائرة عند التفعيل (للغة العربية RTL) */
 html[dir="rtl"] input:checked + .slider:before {
   transform: translateX(-20px);
 }
