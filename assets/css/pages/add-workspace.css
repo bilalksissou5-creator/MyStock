@@ -1,11 +1,10 @@
 /* ============================================
-   Workspace Grid Layout (بدون iframes)
+   Workspace Grid Layout (إصلاح جذري للتصميم)
    ============================================ */
 
-/* الحاوية الرئيسية */
 .workspace-grid {
   display: grid;
-  height: calc(100vh - 60px); /* طول الشاشة ناقص الهيدر */
+  height: calc(100vh - 60px);
   padding: 16px;
   gap: 16px;
   box-sizing: border-box;
@@ -13,7 +12,6 @@
   background: #f5f5f5;
 }
 
-/* الأجزاء الثلاثة */
 .panel-add,
 .panel-list,
 .panel-detail {
@@ -22,42 +20,91 @@
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
   display: flex;
   flex-direction: column;
-  overflow: hidden; /* لمنع خروج المحتوى */
+  overflow: hidden;
   height: 100%;
 }
 
-/* جعل كل جزء قابل للتمرير بداخله */
 .panel-content {
   flex: 1;
   overflow-y: auto;
   padding: 16px;
   -webkit-overflow-scrolling: touch;
+  display: flex;
+  flex-direction: column;
 }
 
-/* إخفاء شريط التمرير الافتراضي وتجميله */
-.panel-content::-webkit-scrollbar { width: 6px; }
+/* تنسيق شريط التمرير */
+.panel-content::-webkit-scrollbar { width: 4px; }
 .panel-content::-webkit-scrollbar-thumb { background: #d4d4d4; border-radius: 4px; }
 
-/* ============================================
-   ✅ الحاسوب (أكبر من 1024px) - تقسيم 3 أعمدة
-   ============================================ */
 @media (min-width: 1024px) {
   .workspace-grid {
-    grid-template-columns: 380px 1fr 400px; /* العرض: إضافة، قائمة، تفاصيل */
+    grid-template-columns: 340px 1fr 360px;
   }
 }
 
 /* ============================================
-   ✅ الهاتف (أقل من 1024px) - نعرض جزء واحد فقط
+   ✅ إصلاحات داخلية لكل قسم (تجاوز CSS القديم)
    ============================================ */
-@media (max-width: 1023px) {
-  .workspace-grid {
-    grid-template-columns: 1fr;
-  }
 
-  /* إخفاء القائمة والتفاصيل افتراضياً على الهاتف */
-  .panel-list,
-  .panel-detail {
-    display: none;
-  }
+/* 1. إصلاح قسم الإضافة (اليسار) */
+.panel-add .add-form {
+  max-width: 100% !important;
+  margin: 0 !important;
+}
+.panel-add .form-grid {
+  grid-template-columns: 1fr !important; /* جعل الحقول فوق بعضها */
+  gap: 12px !important;
+}
+.panel-add .page-header {
+  margin-bottom: 12px !important;
+}
+.panel-add .page-header h2 {
+  font-size: 1.2rem !important;
+}
+
+/* 2. إصلاح قسم القائمة (الوسط) */
+.panel-list .page-header {
+  margin-bottom: 12px !important;
+  flex-shrink: 0 !important;
+}
+.panel-list .search-bar {
+  margin-bottom: 12px !important;
+  flex-shrink: 0 !important;
+  max-width: 100% !important;
+}
+.panel-list .products {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)) !important;
+  gap: 12px !important;
+  padding: 0 !important;
+  flex: 1;
+  align-content: start !important;
+}
+.panel-list .product-card-image {
+  height: 100px !important;
+}
+.panel-list .product-card h3 {
+  font-size: 0.85rem !important;
+}
+.panel-list .product-stats {
+  grid-template-columns: 1fr 1fr !important;
+  gap: 4px !important;
+}
+
+/* 3. إصلاح قسم التفاصيل (اليمين) */
+.panel-detail .product-card-detail {
+  max-width: 100% !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  box-shadow: none !important;
+  background: transparent !important;
+}
+.panel-detail .product-image {
+  height: 160px !important;
+  border-radius: 8px !important;
+}
+.panel-detail .product-stats {
+  grid-template-columns: 1fr 1fr !important;
+  gap: 8px !important;
 }

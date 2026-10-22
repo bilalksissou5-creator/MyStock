@@ -1,10 +1,8 @@
 // ============================================
 // Workspace (تقسيم صفحة الإضافة) - إصدار Grid
-// ✅ بدون iframes (دمج النموذج، القائمة، والتفاصيل)
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   
-  // ✅ تحويل الهاتف لصفحة الإضافة الأصلية (حفاظاً على تجربة الهاتف)
   if (window.innerWidth <= 1024) {
     window.location.replace('/products/add.html');
     return; 
@@ -30,7 +28,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     orgCurrencySymbol = org?.currency_symbol || '';
   }
 
-  // ✅ بناء الهيكل الأساسي للشبكة (Grid)
+  // ✅ بناء الهيكل الأساسي
   main.innerHTML = `
     <div class="workspace-grid">
       
@@ -38,31 +36,30 @@ document.addEventListener('DOMContentLoaded', async () => {
       <div class="panel-add">
         <div class="panel-content" id="add-panel">
           <div class="page-header">
-            <h2 style="font-size:1.2rem;">${tr('prod_add_title')}</h2>
+            <h2>${tr('prod_add_title')}</h2>
             <button type="button" class="btn-primary scan-btn" id="scan-btn">
               <i class="fas fa-barcode"></i> <span>${tr('prod_add_scan')}</span>
             </button>
           </div>
           <div class="alert alert-error" id="form-error" style="display:none;"></div>
           <div class="alert alert-success" id="form-success" style="display:none;"></div>
-          <div class="add-form" style="padding:0; box-shadow:none; background:transparent;">
+          <div class="add-form" id="form-fields-container">
             <!-- سيتم بناء النموذج هنا -->
-            <div id="form-fields-container"></div>
           </div>
         </div>
       </div>
 
       <!-- 2. قسم القائمة -->
       <div class="panel-list">
-        <div class="panel-content" id="list-panel" style="display:flex; flex-direction:column;">
-          <div class="page-header" style="margin-bottom:8px;">
-            <h2 style="font-size:1.2rem;">${tr('products_title')}</h2>
+        <div class="panel-content" id="list-panel">
+          <div class="page-header">
+            <h2>${tr('products_title')}</h2>
           </div>
-          <div class="search-bar" style="margin-bottom:12px; max-width:100%;">
+          <div class="search-bar">
             <i class="fas fa-search"></i>
             <input type="text" id="search-products" placeholder="${tr('products_search_ph')}">
           </div>
-          <div id="products-list-container" class="products" style="flex:1; overflow-y:auto; align-content:start;">
+          <div id="products-list-container" class="products">
             ${tr('loading')}
           </div>
         </div>
@@ -82,30 +79,23 @@ document.addEventListener('DOMContentLoaded', async () => {
   `;
 
   // ============================================
-  // 1. منطق قسم الإضافة (Add Panel)
+  // 1. منطق قسم الإضافة
   // ============================================
   let addedProducts = [];
   let isSaving = false;
   let scannedImageUrl = null;
-  let html5QrCode = null;
-
-  // جلب الموردين لـ suggestions (تبسيط)
-  const { data: suppliers } = await db.from('suppliers').select('*').order('name');
 
   document.getElementById('form-fields-container').innerHTML = `
-    <div class="product-input-card" style="margin-bottom:12px;">
-      <div class="form-group" style="margin:0;">
+    <div class="product-input-card">
+      <div class="form-group">
         <label>${tr('prod_add_supplier')}</label>
         <input type="text" id="supplier-input" placeholder="${tr('prod_add_supplier_ph')}" autocomplete="off">
-        <input type="hidden" id="supplier_id">
       </div>
     </div>
-    <div class="product-input-card" style="margin-bottom:12px;">
+    <div class="product-input-card">
       <div class="form-group"><label>${tr('prod_add_name')}</label><input type="text" id="product-name"></div>
-      <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
-         <div class="form-group"><label>${tr('prod_add_qty')}</label><input type="number" id="product-qty" value="1" min="1"></div>
-         <div class="form-group"><label>${tr('prod_add_price')}</label><input type="number" id="product-price" value="0" step="0.01"></div>
-      </div>
+      <div class="form-group"><label>${tr('prod_add_qty')}</label><input type="number" id="product-qty" value="1" min="1"></div>
+      <div class="form-group"><label>${tr('prod_add_price')}</label><input type="number" id="product-price" value="0" step="0.01"></div>
       <div class="form-group"><label>${tr('prod_add_category')}</label><input type="text" id="product-category"></div>
       <div class="form-group"><label>${tr('prod_add_barcode')}</label><input type="text" id="product-sku" dir="ltr"></div>
       <button type="button" class="btn-primary" id="done-btn" style="width:100%; justify-content:center;">
@@ -113,8 +103,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       </button>
     </div>
     
-    <!-- ملخص وسلة -->
-    <div class="added-products-section" style="background:transparent; padding:0; box-shadow:none;">
+    <div class="added-products-section" style="padding:0; box-shadow:none;">
       <div id="added-products" class="added-products"></div>
       <div class="form-summary" style="margin-top:12px;">
         <div class="summary-row"><span>${tr('prod_add_sum_count')}</span><strong id="sum-rows">0</strong></div>
@@ -127,7 +116,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     </div>
   `;
 
-  // ربط أحداث النموذج
   const nameInput = document.getElementById('product-name');
   const qtyInput = document.getElementById('product-qty');
   const priceInput = document.getElementById('product-price');
@@ -167,24 +155,21 @@ document.addEventListener('DOMContentLoaded', async () => {
   window.removeItem = (i) => { addedProducts.splice(i, 1); renderCart(); };
   renderCart();
 
-  // حفظ المنتجات (مبسط من الكود السابق)
   document.getElementById('save-all-btn').addEventListener('click', async () => {
     if(addedProducts.length === 0 || isSaving) return;
     isSaving = true;
     const btn = document.getElementById('save-all-btn');
     btn.innerHTML = '...';
     try {
-      // كود الحفظ الخاص بك هنا (Insert into products + invoices)
-      // لتبسيط الملف، افترض أن الحفظ يعمل كالسابق
       alert('تم الحفظ (ضع كود Supabase الخاص بك هنا)');
       addedProducts = []; renderCart(); 
-      loadProductList(); // تحديث القائمة
+      loadProductList();
     } catch (e) { alert(e.message); }
     isSaving = false; btn.innerHTML = 'Save';
   });
 
   // ============================================
-  // 2. منطق قسم القائمة (List Panel)
+  // 2. منطق قسم القائمة
   // ============================================
   let cachedProducts = [];
 
@@ -198,7 +183,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     const container = document.getElementById('products-list-container');
     if(cachedProducts.length === 0) { container.innerHTML = `<p>لا توجد منتجات</p>`; return; }
     
-    // تجميع المنتجات (Grouping)
     const grouped = [];
     const map = new Map();
     for(const p of cachedProducts) {
@@ -212,8 +196,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         <div class="product-card-image">
           ${p.image_url ? `<img src="${p.image_url}">` : `<i class="fas fa-box"></i>`}
         </div>
-        <h3 style="font-size:0.9rem;">${p.name}</h3>
-        <div class="product-stats" style="grid-template-columns:1fr 1fr;">
+        <h3>${p.name}</h3>
+        <p class="sku">${p.sku || '—'}</p>
+        <div class="product-stats">
            <div class="stat"><div class="stat-label">Qty</div><div class="stat-value">${p.qty}</div></div>
            <div class="stat"><div class="stat-label">Price</div><div class="stat-value">${p.price} ${orgCurrencySymbol}</div></div>
         </div>
@@ -221,7 +206,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     `).join('');
   }
 
-  // البحث في القائمة
   document.getElementById('search-products').addEventListener('input', (e) => {
     const val = e.target.value.toLowerCase();
     document.querySelectorAll('#products-list-container .product-card').forEach(c => {
@@ -229,13 +213,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   });
 
-  // التحديث الفوري
   db.channel('ws-products').on('postgres_changes', { event: '*', schema: 'public', table: 'products' }, () => {
     loadProductList();
   }).subscribe();
 
   // ============================================
-  // 3. منطق قسم التفاصيل (Detail Panel)
+  // 3. منطق قسم التفاصيل
   // ============================================
   window.openDetail = async (productId) => {
     const detailPanel = document.getElementById('detail-panel');
@@ -245,10 +228,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     if(!product) { detailPanel.innerHTML = `<p>المنتج غير موجود</p>`; return; }
 
-    // تصميم بسيط للتفاصيل داخل اللوحة
     detailPanel.innerHTML = `
       <div class="page-header" style="margin-bottom:12px;">
-        <h2 style="font-size:1.1rem;">${tr('prod_detail_title')}</h2>
+        <h2>${tr('prod_detail_title')}</h2>
         <button class="btn-secondary" onclick="document.getElementById('detail-panel').innerHTML='<div class=\\'empty-state\\'><p>Select a product</p></div>'">
           <i class="fas fa-times"></i>
         </button>
@@ -280,6 +262,5 @@ document.addEventListener('DOMContentLoaded', async () => {
     loadProductList();
   };
 
-  // تشغيل جلب القائمة لأول مرة
   loadProductList();
 });
