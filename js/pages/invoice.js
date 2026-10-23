@@ -1,6 +1,6 @@
 // ============================================
 // صفحة الفاتورة الواحدة
-// ✅ دعم كامل للترجمة + زر مشاركة
+// ✅ دعم كامل للترجمة + مشاركة PDF
 // ============================================
 
 const ROWS_PER_PAGE = 13;
@@ -47,55 +47,30 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   let supplier = null;
   if (invoice.supplier_id) {
-    const { data: sup } = await db
-      .from('suppliers')
-      .select('*')
-      .eq('id', invoice.supplier_id)
-      .single();
+    const { data: sup } = await db.from('suppliers').select('*').eq('id', invoice.supplier_id).single();
     supplier = sup;
   }
 
   let org = null;
   if (invoice.organization_id) {
-    const { data: o } = await db
-      .from('organizations')
-      .select('name, logo_url, logo_shape, show_org_name, currency_code, currency_symbol, show_currency')
-      .eq('id', invoice.organization_id)
-      .single();
+    const { data: o } = await db.from('organizations').select('name, logo_url, logo_shape, show_org_name, currency_code, currency_symbol, show_currency').eq('id', invoice.organization_id).single();
     org = o;
   }
 
   let createdBy = null;
   if (invoice.created_by) {
-    const { data: prof } = await db
-      .from('profiles')
-      .select('full_name')
-      .eq('id', invoice.created_by)
-      .single();
+    const { data: prof } = await db.from('profiles').select('full_name').eq('id', invoice.created_by).single();
     createdBy = prof;
   }
 
-  const { data: items } = await db
-    .from('invoice_items')
-    .select('*')
-    .eq('invoice_id', invoice.id)
-    .order('created_at', { ascending: true });
+  const { data: items } = await db.from('invoice_items').select('*').eq('invoice_id', invoice.id).order('created_at', { ascending: true });
 
-  renderInvoice({
-    invoice,
-    supplier,
-    org,
-    createdBy,
-    items: items ?? [],
-    canDelete,
-  });
+  renderInvoice({ invoice, supplier, org, createdBy, items: items ?? [], canDelete });
 
   if (canDelete) {
     const deleteBtn = document.getElementById('delete-invoice-btn');
     if (deleteBtn) {
-      deleteBtn.addEventListener('click', () => {
-        handleDeleteInvoice(invoice);
-      });
+      deleteBtn.addEventListener('click', () => handleDeleteInvoice(invoice));
     }
   }
 });
@@ -134,51 +109,25 @@ function buildPage({ pageNumber, totalPages, pageItems, invoice, supplier, org, 
 
   return `
     <div class="invoice-page">
-
       <div class="invoice-header">
         <div class="invoice-logo shape-${logoShape}">
-          ${org?.logo_url
-            ? `<img src="${org.logo_url}" alt="logo">`
-            : `<div class="logo-placeholder"><i class="fas fa-boxes-stacked"></i></div>`}
+          ${org?.logo_url ? `<img src="${org.logo_url}" alt="logo">` : `<div class="logo-placeholder"><i class="fas fa-boxes-stacked"></i></div>`}
         </div>
-        ${showOrgName ? `
-          <div class="invoice-org">
-            <h1>${org?.name ?? 'MyStock'}</h1>
-          </div>
-        ` : ''}
+        ${showOrgName ? `<div class="invoice-org"><h1>${org?.name ?? 'MyStock'}</h1></div>` : ''}
       </div>
 
       <div class="invoice-info-row">
         <div class="info-box">
           <h3>${tr('inv_page_info_title')}</h3>
-          <div class="info-row">
-            <strong>${tr('inv_page_number')}</strong>
-            <span>${invoice.invoice_number}</span>
-          </div>
-          <div class="info-row">
-            <strong>${tr('inv_page_date')}</strong>
-            <span>${dateStr}</span>
-          </div>
-          <div class="info-row">
-            <strong>${tr('inv_page_time')}</strong>
-            <span>${timeStr}</span>
-          </div>
+          <div class="info-row"><strong>${tr('inv_page_number')}</strong><span>${invoice.invoice_number}</span></div>
+          <div class="info-row"><strong>${tr('inv_page_date')}</strong><span>${dateStr}</span></div>
+          <div class="info-row"><strong>${tr('inv_page_time')}</strong><span>${timeStr}</span></div>
         </div>
-
         <div class="info-box">
           <h3>${tr('inv_page_supplier_title')}</h3>
-          <div class="info-row">
-            <strong>${tr('inv_page_supplier_name')}</strong>
-            <span>${supplier?.name ?? '—'}</span>
-          </div>
-          <div class="info-row">
-            <strong>${tr('inv_page_supplier_phone')}</strong>
-            <span dir="ltr">${supplier?.phone ?? '—'}</span>
-          </div>
-          <div class="info-row">
-            <strong>${tr('inv_page_supplier_specialty')}</strong>
-            <span>${supplier?.specialty ?? '—'}</span>
-          </div>
+          <div class="info-row"><strong>${tr('inv_page_supplier_name')}</strong><span>${supplier?.name ?? '—'}</span></div>
+          <div class="info-row"><strong>${tr('inv_page_supplier_phone')}</strong><span dir="ltr">${supplier?.phone ?? '—'}</span></div>
+          <div class="info-row"><strong>${tr('inv_page_supplier_specialty')}</strong><span>${supplier?.specialty ?? '—'}</span></div>
         </div>
       </div>
 
@@ -194,11 +143,7 @@ function buildPage({ pageNumber, totalPages, pageItems, invoice, supplier, org, 
         </thead>
         <tbody>
           ${pageItems.length === 0 ? `
-            <tr>
-              <td colspan="5" style="text-align:center; color:#737373; padding:20px;">
-                ${tr('inv_page_no_items')}
-              </td>
-            </tr>
+            <tr><td colspan="5" style="text-align:center; color:#737373; padding:20px;">${tr('inv_page_no_items')}</td></tr>
           ` : pageItems.map((item, i) => `
             <tr>
               <td>${globalRowStart + i + 1}</td>
@@ -240,10 +185,7 @@ function buildPage({ pageNumber, totalPages, pageItems, invoice, supplier, org, 
         </div>
       </div>
 
-      ${totalPages > 1 ? `
-        <div class="page-number">${tr('inv_page_page')} ${pageNumber} ${tr('inv_page_of')} ${totalPages}</div>
-      ` : ''}
-
+      ${totalPages > 1 ? `<div class="page-number">${tr('inv_page_page')} ${pageNumber} ${tr('inv_page_of')} ${totalPages}</div>` : ''}
     </div>
   `;
 }
@@ -252,7 +194,6 @@ function renderInvoice({ invoice, supplier, org, createdBy, items, canDelete }) 
   const tr = (key) => (window.t ? window.t(key) : key);
 
   const container = document.getElementById('invoice-content');
-
   const pages = splitIntoPages(items);
   const totalPages = pages.length;
 
@@ -260,18 +201,10 @@ function renderInvoice({ invoice, supplier, org, createdBy, items, canDelete }) 
 
   pages.forEach((pageItems, idx) => {
     html += buildPage({
-      pageNumber: idx + 1,
-      totalPages,
-      pageItems,
-      invoice,
-      supplier,
-      org,
-      createdBy,
-      globalRowStart: idx * ROWS_PER_PAGE,
+      pageNumber: idx + 1, totalPages, pageItems, invoice, supplier, org, createdBy, globalRowStart: idx * ROWS_PER_PAGE,
     });
   });
 
-  // ✅ التعديل هنا: استبدال زر Invoices بزر Share
   html += `
     <div class="invoice-actions no-print">
       <button class="btn-primary" onclick="window.print()">
@@ -279,10 +212,10 @@ function renderInvoice({ invoice, supplier, org, createdBy, items, canDelete }) 
         <span>${tr('inv_page_print')}</span>
       </button>
       
-      <!-- ✅ زر المشاركة الجديد -->
-      <button class="btn-secondary" id="share-invoice-btn">
-        <i class="fas fa-share-nodes"></i>
-        <span>${tr('inv_page_share') || 'Share'}</span>
+      <!-- ✅ زر المشاركة (PDF) -->
+      <button class="btn-secondary" id="share-pdf-btn">
+        <i class="fas fa-file-pdf"></i>
+        <span id="share-btn-text">${tr('inv_page_share') || 'مشاركة PDF'}</span>
       </button>
       
       ${canDelete ? `
@@ -296,30 +229,67 @@ function renderInvoice({ invoice, supplier, org, createdBy, items, canDelete }) 
 
   container.innerHTML = html;
 
-  // ✅ إضافة حدث الضغط على زر المشاركة
-  const shareBtn = document.getElementById('share-invoice-btn');
+  // ✅ منطق مشاركة الـ PDF
+  const shareBtn = document.getElementById('share-pdf-btn');
   if (shareBtn) {
     shareBtn.addEventListener('click', async () => {
-      const shareData = {
-        title: `${tr('inv_page_title_full')} - ${invoice.invoice_number}`,
-        text: `${tr('inv_page_info_title')} ${invoice.invoice_number}`,
-        url: window.location.href
-      };
+      const btnText = document.getElementById('share-btn-text');
+      const originalText = btnText.textContent;
+      btnText.textContent = 'جارٍ التجهيز...';
+      shareBtn.disabled = true;
 
-      if (navigator.share) {
-        try {
-          await navigator.share(shareData);
-        } catch (err) {
-          console.log('Error sharing:', err);
+      try {
+        // إخفاء الأزرار أثناء إنشاء الـ PDF
+        const actionsDiv = document.querySelector('.invoice-actions');
+        if (actionsDiv) actionsDiv.style.display = 'none';
+
+        const element = document.getElementById('invoice-content');
+        
+        // خيارات إنشاء الـ PDF
+        const opt = {
+          margin: 0,
+          filename: `Invoice-${invoice.invoice_number}.pdf`,
+          image: { type: 'jpeg', quality: 0.98 },
+          html2canvas: { scale: 2, useCORS: true },
+          jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
+        };
+
+        // إنشاء الـ PDF كـ Blob (ملف)
+        const pdfBlob = await html2pdf().set(opt).from(element).outputPdf('blob');
+
+        // إعادة إظهار الأزرار
+        if (actionsDiv) actionsDiv.style.display = 'flex';
+
+        // تحويل الـ Blob إلى File لمشاركته
+        const file = new File([pdfBlob], `Invoice-${invoice.invoice_number}.pdf`, { type: 'application/pdf' });
+
+        // التحقق من دعم المتصفح لمشاركة الملفات (الهواتف تدعمها)
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          await navigator.share({
+            files: [file],
+            title: `Invoice ${invoice.invoice_number}`,
+            text: `Invoice from ${org?.name || 'MyStock'}`
+          });
+        } else {
+          // بديل للحاسوب: تحميل الملف مباشرة
+          const url = URL.createObjectURL(pdfBlob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `Invoice-${invoice.invoice_number}.pdf`;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+          alert('تم تحميل الفاتورة كملف PDF.');
         }
-      } else {
-        // بديل للحاسوب: نسخ الرابط إلى الحافظة
-        try {
-          await navigator.clipboard.writeText(window.location.href);
-          alert(tr('link_copied') || 'Link copied to clipboard!');
-        } catch (err) {
-          alert('Failed to copy link.');
-        }
+      } catch (err) {
+        console.error('PDF Error:', err);
+        alert('حدث خطأ أثناء إنشاء الملف.');
+        const actionsDiv = document.querySelector('.invoice-actions');
+        if (actionsDiv) actionsDiv.style.display = 'flex';
+      } finally {
+        btnText.textContent = originalText;
+        shareBtn.disabled = false;
       }
     });
   }
@@ -327,50 +297,20 @@ function renderInvoice({ invoice, supplier, org, createdBy, items, canDelete }) 
 
 async function handleDeleteInvoice(invoice) {
   const tr = (key) => (window.t ? window.t(key) : key);
-
-  const confirmed = confirm(
-    `${tr('inv_page_confirm_del')} "${invoice.invoice_number}"?\n\n` +
-    `${tr('inv_page_confirm_del_msg')}`
-  );
-
+  const confirmed = confirm(`${tr('inv_page_confirm_del')} "${invoice.invoice_number}"?\n\n${tr('inv_page_confirm_del_msg')}`);
   if (!confirmed) return;
 
   const btn = document.getElementById('delete-invoice-btn');
-  if (btn) {
-    btn.disabled = true;
-    btn.querySelector('span').textContent = tr('inv_page_deleting');
-  }
+  if (btn) { btn.disabled = true; btn.querySelector('span').textContent = tr('inv_page_deleting'); }
 
   try {
-    const { error: itemsErr } = await db
-      .from('invoice_items')
-      .delete()
-      .eq('invoice_id', invoice.id);
-
-    if (itemsErr) throw new Error(tr('inv_page_err_items') + ' ' + itemsErr.message);
-
-    const { error: productsErr } = await db
-      .from('products')
-      .delete()
-      .eq('invoice_id', invoice.invoice_number);
-
-    if (productsErr) throw new Error(tr('inv_page_err_products') + ' ' + productsErr.message);
-
-    const { error: invoiceErr } = await db
-      .from('invoices')
-      .delete()
-      .eq('id', invoice.id);
-
-    if (invoiceErr) throw new Error(tr('inv_page_err_invoice') + ' ' + invoiceErr.message);
-
+    await db.from('invoice_items').delete().eq('invoice_id', invoice.id);
+    await db.from('products').delete().eq('invoice_id', invoice.invoice_number);
+    await db.from('invoices').delete().eq('id', invoice.id);
     alert(tr('inv_page_deleted'));
     window.location.href = '/invoices/list.html';
-
   } catch (err) {
     alert(tr('prod_detail_err') + ' ' + err.message);
-    if (btn) {
-      btn.disabled = false;
-      btn.querySelector('span').textContent = tr('inv_page_delete');
-    }
+    if (btn) { btn.disabled = false; btn.querySelector('span').textContent = tr('inv_page_delete'); }
   }
 }
