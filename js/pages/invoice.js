@@ -1,6 +1,6 @@
 // ============================================
 // صفحة الفاتورة الواحدة
-// ✅ دعم كامل للترجمة + مشاركة PDF (html3pdf)
+// ✅ دعم كامل للترجمة + مشاركة عبر الطباعة
 // ============================================
 
 const ROWS_PER_PAGE = 13;
@@ -111,7 +111,7 @@ function buildPage({ pageNumber, totalPages, pageItems, invoice, supplier, org, 
     <div class="invoice-page">
       <div class="invoice-header">
         <div class="invoice-logo shape-${logoShape}">
-          ${org?.logo_url ? `<img src="${org.logo_url}" alt="logo" crossorigin="anonymous">` : `<div class="logo-placeholder"><i class="fas fa-boxes-stacked"></i></div>`}
+          ${org?.logo_url ? `<img src="${org.logo_url}" alt="logo">` : `<div class="logo-placeholder"><i class="fas fa-boxes-stacked"></i></div>`}
         </div>
         ${showOrgName ? `<div class="invoice-org"><h1>${org?.name ?? 'MyStock'}</h1></div>` : ''}
       </div>
@@ -212,10 +212,10 @@ function renderInvoice({ invoice, supplier, org, createdBy, items, canDelete }) 
         <span>${tr('inv_page_print')}</span>
       </button>
       
-      <!-- ✅ زر المشاركة (PDF) -->
+      <!-- ✅ زر المشاركة (عبر الطباعة) -->
       <button class="btn-secondary" id="share-pdf-btn">
         <i class="fas fa-file-pdf"></i>
-        <span id="share-btn-text">${tr('inv_page_share') || 'مشاركة PDF'}</span>
+        <span>${tr('inv_page_share') || 'مشاركة PDF'}</span>
       </button>
       
       ${canDelete ? `
@@ -229,73 +229,21 @@ function renderInvoice({ invoice, supplier, org, createdBy, items, canDelete }) 
 
   container.innerHTML = html;
 
-  // ✅ منطق مشاركة الـ PDF باستخدام html3pdf
+  // ✅ منطق المشاركة: فتح نافذة الطباعة
   const shareBtn = document.getElementById('share-pdf-btn');
   if (shareBtn) {
-    shareBtn.addEventListener('click', async () => {
-      const btnText = document.getElementById('share-btn-text');
-      const originalText = btnText.textContent;
-      btnText.textContent = 'جارٍ التجهيز...';
-      shareBtn.disabled = true;
+    shareBtn.addEventListener('click', () => {
+      // إخفاء الأزرار مؤقتاً لطباعة نظيفة
+      const actionsDiv = document.querySelector('.invoice-actions');
+      if (actionsDiv) actionsDiv.style.display = 'none';
 
-      try {
-        // إخفاء الأزرار أثناء إنشاء الـ PDF
-        const actionsDiv = document.querySelector('.invoice-actions');
-        if (actionsDiv) actionsDiv.style.display = 'none';
+      // استدعاء نافذة الطباعة (التي تتيح حفظ/مشاركة PDF)
+      window.print();
 
-        // نأخذ أول صفحة فقط (أو يمكنك تركها لتأخذ كل الصفحات)
-        const element = document.querySelector('.invoice-page'); 
-        
-        // خيارات إنشاء الـ PDF (محسنة للهواتف)
-        const opt = {
-          margin: 0,
-          filename: `Invoice-${invoice.invoice_number}.pdf`,
-          image: { type: 'jpeg', quality: 0.95 },
-          html2canvas: { 
-            scale: 1, // ✅ تقليل الجودة قليلاً لتجنب تجاوز حجم الذاكرة على الهاتف
-            useCORS: true, // ✅ السماح بتحميل الصور من السيرفر
-            logging: false
-          },
-          jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
-        };
-
-        // ✅ استخدام html3pdf بدلاً من html2pdf
-        const pdfBlob = await html3pdf().set(opt).from(element).outputPdf('blob');
-
-        // إعادة إظهار الأزرار
+      // إعادة إظهار الأزرار بعد الطباعة
+      setTimeout(() => {
         if (actionsDiv) actionsDiv.style.display = 'flex';
-
-        // تحويل الـ Blob إلى File لمشاركته
-        const file = new File([pdfBlob], `Invoice-${invoice.invoice_number}.pdf`, { type: 'application/pdf' });
-
-        // التحقق من دعم المتصفح لمشاركة الملفات
-        if (navigator.canShare && navigator.canShare({ files: [file] })) {
-          await navigator.share({
-            files: [file],
-            title: `Invoice ${invoice.invoice_number}`,
-            text: `Invoice from ${org?.name || 'MyStock'}`
-          });
-        } else {
-          // بديل للحاسوب: تحميل الملف مباشرة
-          const url = URL.createObjectURL(pdfBlob);
-          const a = document.createElement('a');
-          a.href = url;
-          a.download = `Invoice-${invoice.invoice_number}.pdf`;
-          document.body.appendChild(a);
-          a.click();
-          document.body.removeChild(a);
-          URL.revokeObjectURL(url);
-          alert('تم تحميل الفاتورة كملف PDF.');
-        }
-      } catch (err) {
-        console.error('PDF Error:', err);
-        alert('حدث خطأ أثناء إنشاء الملف. يرجى المحاولة مرة أخرى.');
-        const actionsDiv = document.querySelector('.invoice-actions');
-        if (actionsDiv) actionsDiv.style.display = 'flex';
-      } finally {
-        btnText.textContent = originalText;
-        shareBtn.disabled = false;
-      }
+      }, 1000);
     });
   }
 }
