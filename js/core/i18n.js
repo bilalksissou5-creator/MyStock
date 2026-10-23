@@ -836,6 +836,9 @@ const translations = {
     // Org Edit Notifications
     oe_notif_title: 'تحديث المنظمة',
     oe_notif_msg: 'قام بتحديث إعدادات المنظمة',
+
+    inv_page_share: 'مشاركة',
+    link_copied: 'تم نسخ الرابط!',
   },
 
   fr: {
@@ -1662,6 +1665,9 @@ const translations = {
     // Org Edit Notifications
     oe_notif_title: 'Mise à jour de l\'organisation',
     oe_notif_msg: 'a mis à jour les paramètres de l\'organisation',
+
+    inv_page_share: 'Partager',
+    link_copied: 'Lien copié !',
   },
 
   en: {
@@ -2488,6 +2494,9 @@ const translations = {
     // Org Edit Notifications
     oe_notif_title: 'Organization Updated',
     oe_notif_msg: 'updated the organization settings',
+
+    inv_page_share: 'Share',
+    link_copied: 'Link copied!',
   },
 
   

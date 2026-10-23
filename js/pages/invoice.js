@@ -1,6 +1,6 @@
 // ============================================
 // صفحة الفاتورة الواحدة
-// ✅ دعم كامل للترجمة
+// ✅ دعم كامل للترجمة + زر مشاركة
 // ============================================
 
 const ROWS_PER_PAGE = 13;
@@ -271,16 +271,20 @@ function renderInvoice({ invoice, supplier, org, createdBy, items, canDelete }) 
     });
   });
 
+  // ✅ التعديل هنا: استبدال زر Invoices بزر Share
   html += `
     <div class="invoice-actions no-print">
       <button class="btn-primary" onclick="window.print()">
         <i class="fas fa-print"></i>
         <span>${tr('inv_page_print')}</span>
       </button>
-      <a href="/invoices/list.html" class="btn-secondary">
-        <i class="fas fa-file-invoice"></i>
-        <span>${tr('inv_page_invoices')}</span>
-      </a>
+      
+      <!-- ✅ زر المشاركة الجديد -->
+      <button class="btn-secondary" id="share-invoice-btn">
+        <i class="fas fa-share-nodes"></i>
+        <span>${tr('inv_page_share') || 'Share'}</span>
+      </button>
+      
       ${canDelete ? `
         <button class="btn-danger" id="delete-invoice-btn">
           <i class="fas fa-trash"></i>
@@ -291,6 +295,34 @@ function renderInvoice({ invoice, supplier, org, createdBy, items, canDelete }) 
   `;
 
   container.innerHTML = html;
+
+  // ✅ إضافة حدث الضغط على زر المشاركة
+  const shareBtn = document.getElementById('share-invoice-btn');
+  if (shareBtn) {
+    shareBtn.addEventListener('click', async () => {
+      const shareData = {
+        title: `${tr('inv_page_title_full')} - ${invoice.invoice_number}`,
+        text: `${tr('inv_page_info_title')} ${invoice.invoice_number}`,
+        url: window.location.href
+      };
+
+      if (navigator.share) {
+        try {
+          await navigator.share(shareData);
+        } catch (err) {
+          console.log('Error sharing:', err);
+        }
+      } else {
+        // بديل للحاسوب: نسخ الرابط إلى الحافظة
+        try {
+          await navigator.clipboard.writeText(window.location.href);
+          alert(tr('link_copied') || 'Link copied to clipboard!');
+        } catch (err) {
+          alert('Failed to copy link.');
+        }
+      }
+    });
+  }
 }
 
 async function handleDeleteInvoice(invoice) {
