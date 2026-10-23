@@ -1,6 +1,6 @@
 // ============================================
 // صفحة الفاتورة الواحدة
-// ✅ دعم كامل للترجمة + مشاركة PDF
+// ✅ دعم كامل للترجمة + مشاركة PDF (html3pdf)
 // ============================================
 
 const ROWS_PER_PAGE = 13;
@@ -111,7 +111,7 @@ function buildPage({ pageNumber, totalPages, pageItems, invoice, supplier, org, 
     <div class="invoice-page">
       <div class="invoice-header">
         <div class="invoice-logo shape-${logoShape}">
-          ${org?.logo_url ? `<img src="${org.logo_url}" alt="logo">` : `<div class="logo-placeholder"><i class="fas fa-boxes-stacked"></i></div>`}
+          ${org?.logo_url ? `<img src="${org.logo_url}" alt="logo" crossorigin="anonymous">` : `<div class="logo-placeholder"><i class="fas fa-boxes-stacked"></i></div>`}
         </div>
         ${showOrgName ? `<div class="invoice-org"><h1>${org?.name ?? 'MyStock'}</h1></div>` : ''}
       </div>
@@ -229,7 +229,7 @@ function renderInvoice({ invoice, supplier, org, createdBy, items, canDelete }) 
 
   container.innerHTML = html;
 
-  // ✅ منطق مشاركة الـ PDF
+  // ✅ منطق مشاركة الـ PDF باستخدام html3pdf
   const shareBtn = document.getElementById('share-pdf-btn');
   if (shareBtn) {
     shareBtn.addEventListener('click', async () => {
@@ -243,19 +243,24 @@ function renderInvoice({ invoice, supplier, org, createdBy, items, canDelete }) 
         const actionsDiv = document.querySelector('.invoice-actions');
         if (actionsDiv) actionsDiv.style.display = 'none';
 
-        const element = document.getElementById('invoice-content');
+        // نأخذ أول صفحة فقط (أو يمكنك تركها لتأخذ كل الصفحات)
+        const element = document.querySelector('.invoice-page'); 
         
-        // خيارات إنشاء الـ PDF
+        // خيارات إنشاء الـ PDF (محسنة للهواتف)
         const opt = {
           margin: 0,
           filename: `Invoice-${invoice.invoice_number}.pdf`,
-          image: { type: 'jpeg', quality: 0.98 },
-          html2canvas: { scale: 2, useCORS: true },
+          image: { type: 'jpeg', quality: 0.95 },
+          html2canvas: { 
+            scale: 1, // ✅ تقليل الجودة قليلاً لتجنب تجاوز حجم الذاكرة على الهاتف
+            useCORS: true, // ✅ السماح بتحميل الصور من السيرفر
+            logging: false
+          },
           jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
         };
 
-        // إنشاء الـ PDF كـ Blob (ملف)
-        const pdfBlob = await html2pdf().set(opt).from(element).outputPdf('blob');
+        // ✅ استخدام html3pdf بدلاً من html2pdf
+        const pdfBlob = await html3pdf().set(opt).from(element).outputPdf('blob');
 
         // إعادة إظهار الأزرار
         if (actionsDiv) actionsDiv.style.display = 'flex';
@@ -263,7 +268,7 @@ function renderInvoice({ invoice, supplier, org, createdBy, items, canDelete }) 
         // تحويل الـ Blob إلى File لمشاركته
         const file = new File([pdfBlob], `Invoice-${invoice.invoice_number}.pdf`, { type: 'application/pdf' });
 
-        // التحقق من دعم المتصفح لمشاركة الملفات (الهواتف تدعمها)
+        // التحقق من دعم المتصفح لمشاركة الملفات
         if (navigator.canShare && navigator.canShare({ files: [file] })) {
           await navigator.share({
             files: [file],
@@ -284,7 +289,7 @@ function renderInvoice({ invoice, supplier, org, createdBy, items, canDelete }) 
         }
       } catch (err) {
         console.error('PDF Error:', err);
-        alert('حدث خطأ أثناء إنشاء الملف.');
+        alert('حدث خطأ أثناء إنشاء الملف. يرجى المحاولة مرة أخرى.');
         const actionsDiv = document.querySelector('.invoice-actions');
         if (actionsDiv) actionsDiv.style.display = 'flex';
       } finally {
