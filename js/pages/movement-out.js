@@ -1,6 +1,6 @@
 // ============================================
 // صفحة إخراج منتجات (متعددة) + إيصال بيع
-// ✅ إضافة تلقائية عند المسح، ومنع التضاعف
+// ✅ المسح يملأ الحقول فقط، والزر يضيف ويُفرغ
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   if (window.__movementOutLoaded) return;
@@ -222,12 +222,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   }
 
+  // ✅ دالة الملء فقط (لا تضيف للسلة)
   function selectProduct(found) {
     selectedProduct = found;
     productInput.value = `${found.name} (${found.sku ?? '—'})`;
     hiddenId.value = found.id;
-    
-    // ✅ السر هنا: دائماً نضع 1 في الحقل عند المسح أو الاختيار
     quantityInput.value = 1; 
 
     const sellingPrice = getSellingPrice(found);
@@ -293,6 +292,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     scannerModal.style.display = 'none';
   }
 
+  // ✅ دالة المسح (تملأ الحقول فقط)
   async function handleScan(barcode) {
     const value = String(barcode).trim();
     if (!value) return;
@@ -327,29 +327,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       return;
     }
 
-    const existing = addedProducts.find(p => p.id === found.id);
-
-    if (existing) {
-      selectProduct(found);
-      // عند المسح، سيضع 1 تلقائياً، وإذا ضغط "Add" سيضيف 1 إلى الكمية الحالية
-      return;
-    }
-
-    const sellingPrice = getSellingPrice(found);
-    const costPrice = Number(found.price ?? 0);
-
-    addedProducts.push({
-      id: found.id,
-      name: found.name,
-      sku: found.sku,
-      image_url: found.image_url,
-      qty: 1, 
-      price: sellingPrice,
-      costPrice: costPrice,
-      available: available,
-    });
-
-    renderAddedProducts();
+    // ✅ نكتفي بملء الحقول هنا، ولا نضيف للسلة
     selectProduct(found);
   }
 
@@ -426,6 +404,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('sum-total').textContent = totalValue.toFixed(2);
   }
 
+  // ✅ دالة الإضافة (تضيف للسلة وتُفرغ الحقول)
   function addProduct() {
     if (isAdding || addBtn.disabled) return;
     isAdding = true;
@@ -469,34 +448,25 @@ document.addEventListener('DOMContentLoaded', async () => {
     const existing = addedProducts.find(p => p.id === selectedProduct.id);
 
     if (existing) {
-      // ✅ التعديل هنا: إذا كان المنتج موجوداً، نضيف الكمية الجديدة (التي هي 1) إلى القديمة
       existing.qty += qty; 
       existing.price = price;
       existing.costPrice = costPrice;
       renderAddedProducts();
-      isAdding = false;
-      addBtn.disabled = false;
-      
-      productInput.value = '';
-      hiddenId.value = '';
-      availableQtyInput.value = '—';
-      quantityInput.value = ''; 
-      priceInput.value = '0';
-      selectedProduct = null;
-      return;
+    } else {
+      addedProducts.push({
+        id: selectedProduct.id,
+        name: selectedProduct.name,
+        sku: selectedProduct.sku,
+        image_url: selectedProduct.image_url,
+        qty: qty,
+        price: price,
+        costPrice: costPrice,
+        available: available,
+      });
+      renderAddedProducts();
     }
 
-    addedProducts.push({
-      id: selectedProduct.id,
-      name: selectedProduct.name,
-      sku: selectedProduct.sku,
-      image_url: selectedProduct.image_url,
-      qty: qty,
-      price: price,
-      costPrice: costPrice,
-      available: available,
-    });
-
+    // ✅ تفريغ جميع الحقول بعد الإضافة
     productInput.value = '';
     hiddenId.value = '';
     availableQtyInput.value = '—';
@@ -504,8 +474,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     priceInput.value = '0';
     selectedProduct = null;
     productInput.focus();
-
-    renderAddedProducts();
 
     setTimeout(() => {
       isAdding = false;
