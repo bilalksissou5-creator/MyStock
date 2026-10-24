@@ -1,0 +1,113 @@
+/* ============================================
+   صفحة تحديث التطبيق (Update App)
+   ============================================ */
+
+.update-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 70vh;
+  max-width: 480px;
+  margin: 0 auto;
+  text-align: center;
+  padding: 20px;
+}
+
+/* أيقونة التحديث */
+.update-icon-container {
+  width: 100px;
+  height: 100px;
+  background: #f5f5f5;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 24px;
+  position: relative;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.update-icon-container i {
+  font-size: 40px;
+  color: #2563eb; /* لون أزرق جذاب */
+}
+
+/* تأثير الدوران أثناء التحديث */
+.update-icon-container.spinning i {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  100% { transform: rotate(360deg); }
+}
+
+/* النصوص */
+.update-title {
+  font-size: 1.4rem;
+  font-weight: 800;
+  margin-bottom: 12px;
+  color: #171717;
+}
+
+.update-desc {
+  font-size: 14px;
+  color: #737373;
+  margin-bottom: 24px;
+  line-height: 1.6;
+}
+
+/* بطاقة الإصدار */
+.update-version {
+  background: #ffffff;
+  border: 1px solid #e5e5e5;
+  padding: 14px 20px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #404040;
+  margin-bottom: 30px;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* الزر */
+.update-btn {
+  width: 100%;
+  padding: 14px;
+  font-size: 16px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+/* رسائل الحالة (نجاح/خطأ) */
+.update-status {
+  font-size: 14px;
+  font-weight: 600;
+  min-height: 20px;
+}
+
+.status-success { color: #16a34a; }
+.status-error { color: #dc2626; }
+
+/* التجاوب مع الهاتف */
+@media (max-width: 480px) {
+  .update-icon-container {
+    width: 80px;
+    height: 80px;
+  }
+  
+  .update-icon-container i {
+    font-size: 32px;
+  }
+  
+  .update-title {
+    font-size: 1.2rem;
+  }
+}

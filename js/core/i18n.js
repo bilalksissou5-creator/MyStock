@@ -842,6 +842,15 @@ const translations = {
 
     // Register Phone Translation
     register_phone: 'رقم الهاتف *',
+
+    update_title: 'تحديث التطبيق',
+    update_page_title: 'هل تريد تحديث التطبيق؟',
+    update_page_desc: 'إذا كنت تواجه مشاكل أو لا ترى أحدث الميزات، اضغط على الزر أدناه لتحديث التطبيق.',
+    update_current_version: 'الإصدار الحالي:',
+    update_now: 'تحديث الآن',
+    update_checking: 'جارٍ التحديث...',
+    update_success: '✅ تم التحديث بنجاح! جارٍ إعادة التشغيل...',
+    update_error: '❌ حدث خطأ أثناء التحديث. حاول مرة أخرى.',
   },
 
   fr: {
@@ -1674,6 +1683,15 @@ const translations = {
 
     // Register Phone Translation
     register_phone: 'Numéro de téléphone *',
+
+    update_title: 'Mettre à jour l\'application',
+    update_page_title: 'Voulez-vous mettre à jour ?',
+    update_page_desc: 'Si vous rencontrez des problèmes ou ne voyez pas les nouvelles fonctionnalités, cliquez sur le bouton ci-dessous.',
+    update_current_version: 'Version actuelle :',
+    update_now: 'Mettre à jour',
+    update_checking: 'Mise à jour...',
+    update_success: '✅ Mise à jour réussie ! Redémarrage...',
+    update_error: '❌ Erreur lors de la mise à jour. Réessayez.',
   },
 
   en: {
@@ -2506,6 +2524,15 @@ const translations = {
 
     // Register Phone Translation
     register_phone: 'Phone Number *',
+
+    update_title: 'Update App',
+    update_page_title: 'Want to update the app?',
+    update_page_desc: 'If you are facing issues or missing the latest features, click the button below to update the app.',
+    update_current_version: 'Current version:',
+    update_now: 'Update Now',
+    update_checking: 'Updating...',
+    update_success: '✅ Update successful! Restarting...',
+    update_error: '❌ Update error. Please try again.',
   },
 
   

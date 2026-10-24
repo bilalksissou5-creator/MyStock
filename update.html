@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MyStock - Update App</title>
+
+  <script>
+    (function() {
+      var lang = localStorage.getItem('app_lang') || 'ar';
+      document.documentElement.lang = lang;
+      document.documentElement.dir = (lang === 'ar') ? 'rtl' : 'ltr';
+    })();
+  </script>
+
+  <link rel="stylesheet" href="/assets/css/common.css">
+  <!-- ✅ سنقوم بإنشاء ملف التنسيق الخاص بصفحة التحديث لاحقاً -->
+  <link rel="stylesheet" href="/assets/css/pages/update.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+  <div class="app"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="/js/core/supabase.js"></script>
+  <script src="/js/core/i18n.js"></script>
+  <script src="/js/core/auth.js"></script>
+  <script src="/js/core/notifications.js"></script>
+  <script src="/js/components/layout.js"></script>
+  
+  <!-- ✅ ملف الجافاسكريبت الخاص بصفحة التحديث -->
+  <script src="/js/pages/update.js"></script>
+</body>
+</html>

@@ -67,7 +67,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       <div class="settings-card">
 
-        <div class="settings-item" id="update-app-item">
+        <!-- ✅ تم تحويل البطاقة إلى رابط يفتح صفحة التحديث -->
+        <a href="/update.html" class="settings-item" id="update-app-item">
           <div class="settings-item-left">
             <div class="settings-icon icon-teal">
               <i class="fas fa-download"></i>
@@ -77,7 +78,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             </div>
           </div>
           <i class="fas fa-chevron-right settings-arrow"></i>
-        </div>
+        </a>
 
         <div class="settings-item" id="about-app-item">
           <div class="settings-item-left">
