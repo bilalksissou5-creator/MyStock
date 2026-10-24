@@ -1,6 +1,6 @@
 // ============================================
-// صفحة تحديث التطبيق
-// ✅ إذا لم يوجد تحديث: يظهر "التطبيق محدث" ويختفي الزر
+// صفحة تحديث التطبيق (تحديث حقيقي 100%)
+// ✅ تظهر علامة صح إذا لم يوجد تحديث
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   const user = await requireAuth();
@@ -15,11 +15,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   const main = document.getElementById('main-content');
 
-  // 1. جلب الإصدار المحلي (الحالي)
   let localVersion = localStorage.getItem('app_version') || '1.0.0';
-  
-  // 2. جلب الإصدار من السيرفر
   let serverVersion = localVersion;
+  
   try {
     const res = await fetch('/version.json?t=' + Date.now());
     if (res.ok) {
@@ -28,18 +26,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   } catch (e) {}
 
-  // 3. هل يوجد تحديث؟
   const hasUpdate = serverVersion !== localVersion;
 
-  // تجهيز النصوص والأيقونات
   const pageTitle = hasUpdate ? tr('update_page_title') : tr('update_up_to_date');
   const pageDesc = hasUpdate ? tr('update_page_desc') : '';
-  
-  const iconHtml = hasUpdate 
-    ? `<i class="fas fa-arrow-down"></i>` 
-    : `<i class="fas fa-check-circle" style="color: #16a34a;"></i>`; // علامة صح خضراء
-  
-  const containerStyle = hasUpdate ? '' : 'background: #dcfce7;'; // خلفية خضراء فاتحة
+  const iconHtml = hasUpdate ? `<i class="fas fa-arrow-down"></i>` : `<i class="fas fa-check-circle" style="color: #16a34a;"></i>`;
+  const containerStyle = hasUpdate ? '' : 'background: #dcfce7;';
 
   main.innerHTML = `
     <div class="page-header">
@@ -51,27 +43,21 @@ document.addEventListener('DOMContentLoaded', async () => {
     </div>
 
     <div class="update-wrapper">
-      <!-- الأيقونة تتغير حسب الحالة -->
       <div class="update-icon-container" id="update-icon" style="${containerStyle}">
         ${iconHtml}
       </div>
 
       <h1 class="update-title" id="update-title">${pageTitle}</h1>
-      
-      <!-- الشرح يختفي إذا كان التطبيق محدثاً -->
-      <p class="update-desc" id="update-desc" style="${!hasUpdate ? 'display:none;' : ''}">
-        ${pageDesc}
-      </p>
+      <p class="update-desc" id="update-desc" style="${!hasUpdate ? 'display:none;' : ''}">${pageDesc}</p>
 
       <div class="update-version" id="version-box">
         <span>${tr('update_current_version')}</span>
         <span id="app-version">v${localVersion}</span>
       </div>
 
-      <!-- شريط التقدم (مخفي مبدئياً) -->
       <div class="progress-container" id="progress-container">
         <div class="progress-header">
-          <span id="progress-text">${tr('update_downloading') || 'جارٍ التحميل...'}</span>
+          <span id="progress-text">${tr('update_downloading')}</span>
           <span class="progress-percent" id="progress-percent">0%</span>
         </div>
         <div class="progress-bar-bg">
@@ -80,7 +66,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         <div class="progress-size" id="progress-size">0.00 MB / 0.00 MB</div>
       </div>
 
-      <!-- ✅ زر التحديث يظهر فقط إذا كان هناك تحديث -->
       ${hasUpdate ? `
         <button class="btn-primary update-btn" id="update-btn">
           <i class="fas fa-sync-alt"></i>
@@ -92,12 +77,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     </div>
   `;
 
-  // إذا لم يكن هناك تحديث، لا نحتاج لتفعيل أي أزرار، ونكتفي بالعرض
   if (!hasUpdate) return;
 
-  // ============================================
-  // منطق التحديث (يعمل فقط إذا كان هناك تحديث)
-  // ============================================
+  // منطق التحديث
   const updateBtn = document.getElementById('update-btn');
   const updateIcon = document.getElementById('update-icon');
   const statusMsg = document.getElementById('update-status');
@@ -111,20 +93,14 @@ document.addEventListener('DOMContentLoaded', async () => {
   const versionBox = document.getElementById('version-box');
 
   const filesToUpdate = [
-    '/version.json',
-    '/assets/css/common.css',
-    '/assets/css/pages/update.css',
-    '/assets/css/pages/settings.css',
-    '/js/core/i18n.js',
-    '/js/core/auth.js',
-    '/js/components/layout.js',
-    '/js/pages/update.js',
-    '/js/pages/settings.js'
+    '/version.json', '/assets/css/common.css', '/assets/css/pages/update.css',
+    '/assets/css/pages/settings.css', '/js/core/i18n.js', '/js/core/auth.js',
+    '/js/components/layout.js', '/js/pages/update.js', '/js/pages/settings.js'
   ];
 
   updateBtn.addEventListener('click', async () => {
     updateBtn.style.display = 'none';
-    updateTitle.textContent = tr('update_installing') || 'جارٍ تثبيت التحديث...';
+    updateTitle.textContent = tr('update_installing');
     updateDesc.style.display = 'none';
     versionBox.style.display = 'none';
     progressContainer.style.display = 'block';
@@ -134,8 +110,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     let loadedBytes = 0;
 
     try {
-      progressText.textContent = tr('update_checking_size') || 'جارٍ حساب الحجم...';
-      
+      progressText.textContent = tr('update_checking_size');
       for (const file of filesToUpdate) {
         const res = await fetch(file + '?t=' + Date.now(), { method: 'HEAD' });
         const size = parseInt(res.headers.get('content-length') || '0', 10);
@@ -143,17 +118,14 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
       if (totalBytes === 0) totalBytes = 2 * 1024 * 1024; 
 
-      progressText.textContent = tr('update_downloading') || 'جارٍ التحميل...';
-
+      progressText.textContent = tr('update_downloading');
       for (const file of filesToUpdate) {
         const res = await fetch(file + '?t=' + Date.now());
         const reader = res.body.getReader();
-
         while (true) {
           const { done, value } = await reader.read();
           if (done) break;
           loadedBytes += value.length;
-          
           const percent = Math.min(100, Math.floor((loadedBytes / totalBytes) * 100));
           progressFill.style.width = `${percent}%`;
           progressPercent.textContent = `${percent}%`;
@@ -161,34 +133,28 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
       }
 
-      // مسح الكاش
       if ('caches' in window) {
         const cacheNames = await caches.keys();
         await Promise.all(cacheNames.map(name => caches.delete(name)));
       }
 
-      // تحديث الإصدار المحلي ليطابق السيرفر
       localStorage.setItem('app_version', serverVersion);
-
-      // إظهار النجاح
       progressFill.style.width = '100%';
       progressPercent.textContent = '100%';
-      updateTitle.textContent = tr('update_success') || '✅ تم التحديث بنجاح!';
-      statusMsg.textContent = tr('update_restarting') || 'جارٍ إعادة التشغيل...';
+      updateTitle.textContent = tr('update_success');
+      statusMsg.textContent = tr('update_restarting');
       statusMsg.className = 'update-status status-success';
       updateIcon.classList.remove('spinning');
 
       setTimeout(() => {
-        const baseUrl = window.location.href.split('?')[0];
-        window.location.replace(baseUrl + '?updated=' + new Date().getTime());
+        window.location.replace(window.location.href.split('?')[0] + '?updated=' + new Date().getTime());
       }, 1500);
 
     } catch (error) {
       console.error('Update Error:', error);
-      statusMsg.textContent = tr('update_error') || '❌ حدث خطأ أثناء التحميل.';
+      statusMsg.textContent = tr('update_error');
       statusMsg.className = 'update-status status-error';
       updateIcon.classList.remove('spinning');
-      
       setTimeout(() => {
         updateBtn.style.display = 'flex';
         progressContainer.style.display = 'none';

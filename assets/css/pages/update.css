@@ -14,7 +14,6 @@
   padding: 20px;
 }
 
-/* الحاوية الدائرية */
 .update-icon-container {
   width: 100px;
   height: 100px;
@@ -33,16 +32,14 @@
 .update-icon-container i {
   font-size: 40px;
   color: #2563eb;
-  position: relative;
 }
 
-/* التوهج أثناء التحميل */
+/* حالة التحديث (سهم يتحرك) */
 .update-icon-container.spinning {
   background: #eff6ff;
   box-shadow: 0 0 0 8px rgba(37, 99, 235, 0.1), 0 4px 20px rgba(37, 99, 235, 0.15);
 }
 
-/* حركة السهم أثناء التحميل */
 .update-icon-container.spinning i {
   animation: conveyor-download 1.4s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
 }
@@ -54,7 +51,6 @@
   100% { transform: translateY(25px); opacity: 0; }
 }
 
-/* النصوص */
 .update-title {
   font-size: 1.4rem;
   font-weight: 800;
@@ -104,9 +100,7 @@
 .status-success { color: #16a34a; }
 .status-error { color: #dc2626; }
 
-/* ============================================
-   ✅ شريط التقدم الحقيقي
-   ============================================ */
+/* شريط التقدم الحقيقي */
 .progress-container {
   display: none;
   width: 100%;
@@ -135,7 +129,6 @@
   background-color: #e5e5e5;
   border-radius: 4px;
   overflow: hidden;
-  position: relative;
 }
 
 .progress-bar-fill {
