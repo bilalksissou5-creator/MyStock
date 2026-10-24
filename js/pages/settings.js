@@ -1,6 +1,6 @@
 // ============================================
 // صفحة الإعدادات
-// ✅ دعم كامل للترجمة + إظهار التحديث الجديد باللون الأزرق
+// ✅ دعم كامل للترجمة + إظهار حالة التحديث
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   const user = await requireAuth();
@@ -33,11 +33,13 @@ document.addEventListener('DOMContentLoaded', async () => {
   // ✅ 3. المقارنة: هل يوجد تحديث جديد؟
   const hasUpdate = serverVersion !== localVersion;
   
-  // تجهيز شكل النص (أزرق إذا كان هناك تحديث، رمادي إذا كان محدثاً)
-  const versionColor = hasUpdate ? '#2563eb' : '#737373';
+  // تجهيز شكل النص:
+  // إذا كان هناك تحديث (hasUpdate = true) -> لون أزرق "تحديث جديد"
+  // إذا لم يكن هناك تحديث (hasUpdate = false) -> لون أخضر "تم التحديث"
+  const versionColor = hasUpdate ? '#2563eb' : '#16a34a'; 
   const versionText = hasUpdate 
-    ? `${tr('stg_new_version') || 'جديد'}: v${serverVersion}` 
-    : `${tr('stg_current_version')}: v${localVersion}`;
+    ? `${tr('stg_new_version') || 'تحديث جديد'}: v${serverVersion}` 
+    : `${tr('stg_updated') || 'تم التحديث'} (v${localVersion})`;
 
   main.innerHTML = `
     <div class="page-header">
@@ -100,8 +102,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             <div class="settings-text">
               <div class="settings-title">${tr('stg_update')}</div>
               
-              <!-- النص هنا يتغير لونه بناءً على وجود تحديث -->
-              <div class="settings-subtitle" style="color: ${versionColor}; font-size: 12px; margin-top: 2px; font-weight: ${hasUpdate ? '700' : '500'};">
+              <!-- النص هنا يتغير لونه ونصه بناءً على وجود تحديث -->
+              <div class="settings-subtitle" style="color: ${versionColor}; font-size: 12px; margin-top: 2px; font-weight: 700;">
                 ${versionText}
               </div>
               
