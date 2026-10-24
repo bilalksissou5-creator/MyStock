@@ -2,6 +2,7 @@
 // صفحة اختيار اللغة (One UI) مع التحديث الفوري
 // ✅ اختيار + تطبيق فوري + علامة ✓
 // ✅ مزامنة اللغة بين الأجهزة عبر Supabase Realtime
+// ✅ إعادة تحميل الصفحة لضمان تطبيق الترجمة على كل التطبيق
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   if (window.applyLanguage) window.applyLanguage();
@@ -11,13 +12,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   const container = document.getElementById('language-content');
   
-  // ✅ حماية: التأكد من وجود الحاوية
   if (!container) {
     console.error('عنصر language-content غير موجود في الصفحة');
     return;
   }
 
-  // ✅ حماية: جلب المستخدم دون أن يتوقف الكود إذا حدث خطأ
   let user = null;
   try {
     if (typeof db !== 'undefined' && db.auth) {
@@ -28,22 +27,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     console.warn('لم يتم جلب المستخدم:', e);
   }
 
-  // ═══════════════════════════════════════════
-  // قائمة اللغات
-  // ═══════════════════════════════════════════
   const LANGUAGES = [
     { code: 'ar', nameKey: 'lang_ar' },
     { code: 'en', nameKey: 'lang_en' },
     { code: 'fr', nameKey: 'lang_fr' },
   ];
 
-  // اللغة الحالية
   let currentLang = window.getCurrentLang ? window.getCurrentLang() : 'ar';
   let selectedLang = currentLang;
 
-  // ═══════════════════════════════════════════
-  // بناء الواجهة
-  // ═══════════════════════════════════════════
   function render() {
     const itemsHTML = LANGUAGES.map((lang, index) => `
       <div class="lang-item ${selectedLang === lang.code ? 'active' : ''}" data-lang="${lang.code}">
@@ -89,21 +81,22 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('apply-btn')?.addEventListener('click', async () => {
       if (selectedLang === currentLang) return;
 
+      // 1. تحديث الواجهة محلياً
       if (window.setLanguage) {
         window.setLanguage(selectedLang);
       } else {
         localStorage.setItem('app_lang', selectedLang);
-        window.location.reload();
       }
 
+      // 2. حفظ في قاعدة البيانات (للمزامنة)
       if (user && typeof db !== 'undefined') {
         try {
           await db.from('profiles').update({ app_lang: selectedLang }).eq('id', user.id);
         } catch (e) { console.warn(e); }
       }
 
-      currentLang = selectedLang;
-      setTimeout(() => render(), 50);
+      // 3. إعادة تحميل الصفحة لضمان تطبيق الترجمة على كامل التطبيق
+      window.location.reload();
     });
 
     // ✅ زر "تعديل"
@@ -114,7 +107,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         window.setLanguage(selectedLang);
       } else {
         localStorage.setItem('app_lang', selectedLang);
-        window.location.reload();
       }
 
       if (user && typeof db !== 'undefined') {
@@ -123,8 +115,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         } catch (e) { console.warn(e); }
       }
 
-      currentLang = selectedLang;
-      setTimeout(() => render(), 50);
+      // إعادة تحميل الصفحة
+      window.location.reload();
     });
   }
 
@@ -146,9 +138,9 @@ document.addEventListener('DOMContentLoaded', async () => {
           if (newLang && newLang !== currentLang) {
             console.log('⚡ تم تغيير اللغة من جهاز آخر:', newLang);
             if (window.setLanguage) window.setLanguage(newLang);
-            currentLang = newLang;
-            selectedLang = newLang;
-            render();
+            
+            // إعادة تحميل الصفحة فوراً لتطبيق الترجمة
+            window.location.reload();
           }
         })
         .subscribe();

@@ -15,6 +15,24 @@ async function login(email, password) {
 
   await setOnline(data.user.id);
 
+  // ✅ جلب اللغة المفضلة للمستخدم من قاعدة البيانات وتطبيقها
+  try {
+    const { data: profile } = await db
+      .from('profiles')
+      .select('app_lang')
+      .eq('id', data.user.id)
+      .single();
+
+    if (profile?.app_lang) {
+      const localLang = localStorage.getItem('app_lang') || 'ar';
+      if (localLang !== profile.app_lang) {
+        localStorage.setItem('app_lang', profile.app_lang);
+      }
+    }
+  } catch (e) {
+    console.warn('خطأ في جلب لغة المستخدم:', e);
+  }
+
   return { ok: true, user: data.user };
 }
 
@@ -210,6 +228,7 @@ document.addEventListener('DOMContentLoaded', () => {
       btn.disabled = false;
       btn.querySelector('span').textContent = 'دخول';
     } else {
+      // التحويل إلى لوحة التحكم (سيتم تحميلها باللغة الجديدة تلقائياً)
       window.location.href = '/dashboard.html';
     }
   });

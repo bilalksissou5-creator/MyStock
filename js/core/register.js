@@ -1,11 +1,11 @@
 // ============================================
 // صفحة إنشاء حساب جديد
-// ✅ يقرأ البلد من localStorage (welcome.html)
+// ✅ يقرأ البلد واللغة من localStorage (welcome.html)
 // ✅ يطبق اللغة تلقائياً
 // ✅ يُنشئ subscriptions بحالة pending
 // ✅ يُحوّل إلى subscription.html بعد التسجيل
 // ✅ منع Enter/Go/Done من إرسال الفورم
-// ✅ حفظ رقم الهاتف
+// ✅ حفظ رقم الهاتف واللغة في Supabase
 // ============================================
 document.addEventListener('DOMContentLoaded', () => {
 
@@ -62,9 +62,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const password = document.getElementById('password').value;
     const passwordConfirm = document.getElementById('password_confirm').value;
     
-    // ✅ قراءة رقم الهاتف من الحقل الجديد
+    // ✅ قراءة رقم الهاتف من الحقل
     const phoneInput = document.getElementById('phone');
     const phone = phoneInput ? phoneInput.value.trim() : '';
+
+    // ✅ قراءة اللغة المختارة
+    const appLang = localStorage.getItem('app_lang') || 'ar';
 
     // ✅ التحقق من الحقول
     if (!firstName || !lastName) {
@@ -154,7 +157,7 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    // 3. تحديث الملف الشخصي (✅ إضافة حفظ رقم الهاتف هنا)
+    // 3. تحديث الملف الشخصي (✅ حفظ الهاتف + اللغة)
     const { error: profileError } = await db
       .from('profiles')
       .update({
@@ -162,7 +165,8 @@ document.addEventListener('DOMContentLoaded', () => {
         organization_id: orgData.id,
         role: 'admin',
         country: country,
-        phone: phone, // ✅ حفظ رقم الهاتف
+        phone: phone,
+        app_lang: appLang, // ✅ حفظ اللغة هنا
       })
       .eq('id', userId);
 
