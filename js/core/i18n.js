@@ -853,6 +853,8 @@ const translations = {
     update_error: '❌ حدث خطأ أثناء التحديث. حاول مرة أخرى.',
 
     stg_current_version: 'الإصدار الحالي',
+
+    stg_new_version: 'تحديث جديد',
   },
 
   fr: {
@@ -1696,6 +1698,8 @@ const translations = {
     update_error: '❌ Erreur lors de la mise à jour. Réessayez.',
 
     stg_current_version: 'Version actuelle',
+
+    stg_new_version: 'Nouvelle mise à jour',
   },
 
   en: {
@@ -2539,6 +2543,8 @@ const translations = {
     update_error: '❌ Update error. Please try again.',
 
     stg_current_version: 'Current version',
+
+    stg_new_version: 'New update',
   },
 
   

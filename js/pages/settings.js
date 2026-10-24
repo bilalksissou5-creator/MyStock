@@ -1,6 +1,6 @@
 // ============================================
 // صفحة الإعدادات
-// ✅ دعم كامل للترجمة + عرض إصدار التطبيق
+// ✅ دعم كامل للترجمة + إظهار التحديث الجديد باللون الأزرق
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   const user = await requireAuth();
@@ -15,20 +15,29 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   const main = document.getElementById('main-content');
 
-  // ✅ جلب إصدار التطبيق الحالي
-  let appVersion = localStorage.getItem('app_version') || '1.0.0';
+  // ✅ 1. جلب الإصدار المحفوظ في ذاكرة المستخدم (النسخة التي يستخدمها حالياً)
+  const localVersion = localStorage.getItem('app_version') || '1.0.0';
+  
+  // ✅ 2. جلب الإصدار الجديد من السيرفر
+  let serverVersion = localVersion;
   try {
-    // محاولة قراءة الإصدار من ملف version.json إذا كان موجوداً
     const res = await fetch('/version.json?t=' + Date.now());
     if (res.ok) {
       const data = await res.json();
-      appVersion = data.version || appVersion;
-      // تحديث الذاكرة المؤقتة
-      localStorage.setItem('app_version', appVersion);
+      serverVersion = data.version || serverVersion;
     }
   } catch (e) {
-    console.warn('ملف version.json غير موجود، سيتم استخدام الإصدار الافتراضي.');
+    console.warn('ملف version.json غير موجود.');
   }
+
+  // ✅ 3. المقارنة: هل يوجد تحديث جديد؟
+  const hasUpdate = serverVersion !== localVersion;
+  
+  // تجهيز شكل النص (أزرق إذا كان هناك تحديث، رمادي إذا كان محدثاً)
+  const versionColor = hasUpdate ? '#2563eb' : '#737373';
+  const versionText = hasUpdate 
+    ? `${tr('stg_new_version') || 'جديد'}: v${serverVersion}` 
+    : `${tr('stg_current_version')}: v${localVersion}`;
 
   main.innerHTML = `
     <div class="page-header">
@@ -82,7 +91,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       <div class="settings-card">
 
-        <!-- ✅ بطاقة التحديث مع عرض الإصدار تحتها -->
+        <!-- ✅ بطاقة التحديث -->
         <a href="/update.html" class="settings-item" id="update-app-item">
           <div class="settings-item-left">
             <div class="settings-icon icon-teal">
@@ -90,10 +99,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             </div>
             <div class="settings-text">
               <div class="settings-title">${tr('stg_update')}</div>
-              <!-- هنا يظهر الإصدار تحت العنوان -->
-              <div class="settings-subtitle" style="color: #737373; font-size: 12px; margin-top: 2px;">
-                ${tr('stg_current_version')}: v${appVersion}
+              
+              <!-- النص هنا يتغير لونه بناءً على وجود تحديث -->
+              <div class="settings-subtitle" style="color: ${versionColor}; font-size: 12px; margin-top: 2px; font-weight: ${hasUpdate ? '700' : '500'};">
+                ${versionText}
               </div>
+              
             </div>
           </div>
           <i class="fas fa-chevron-right settings-arrow"></i>
