@@ -839,6 +839,9 @@ const translations = {
 
     inv_page_share: 'مشاركة',
     link_copied: 'تم نسخ الرابط!',
+
+    // Register Phone Translation
+    register_phone: 'رقم الهاتف *',
   },
 
   fr: {
@@ -1668,6 +1671,9 @@ const translations = {
 
     inv_page_share: 'Partager',
     link_copied: 'Lien copié !',
+
+    // Register Phone Translation
+    register_phone: 'Numéro de téléphone *',
   },
 
   en: {
@@ -2497,6 +2503,9 @@ const translations = {
 
     inv_page_share: 'Share',
     link_copied: 'Link copied!',
+
+    // Register Phone Translation
+    register_phone: 'Phone Number *',
   },
 
   
