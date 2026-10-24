@@ -1,7 +1,7 @@
 // ============================================
 // صفحة تحديث التطبيق (Update App)
 // ✅ مسح الكاش وتحديث Service Worker
-// ✅ واجهة مستخدم تفاعلية
+// ✅ أيقونة سهم ثابتة الحاوية، ومتحركة السهم
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   const user = await requireAuth();
@@ -39,8 +39,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     </div>
 
     <div class="update-wrapper">
+      <!-- الحاوية ثابتة، والسهم هو الذي يتحرك -->
       <div class="update-icon-container" id="update-icon">
-        <i class="fas fa-cloud-download-alt"></i>
+        <i class="fas fa-arrow-down"></i>
       </div>
 
       <h1 class="update-title">${tr('update_page_title')}</h1>
@@ -71,6 +72,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   updateBtn.addEventListener('click', async () => {
     updateBtn.disabled = true;
     updateBtn.querySelector('span').textContent = tr('update_checking');
+    
+    // ✅ إضافة كلاس الحركة للسهم
     updateIcon.classList.add('spinning');
     statusMsg.textContent = '';
     
@@ -109,7 +112,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       statusMsg.textContent = tr('update_error');
       statusMsg.className = 'update-status status-error';
       
-      // إعادة الزر لحالته الطبيعية
+      // إعادة الزر والأيقونة لحالتها الطبيعية
       updateBtn.disabled = false;
       updateBtn.querySelector('span').textContent = tr('update_now');
       updateIcon.classList.remove('spinning');

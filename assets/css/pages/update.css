@@ -14,7 +14,7 @@
   padding: 20px;
 }
 
-/* أيقونة التحديث */
+/* الحاوية الدائرية (ثابتة تماماً) */
 .update-icon-container {
   width: 100px;
   height: 100px;
@@ -28,18 +28,29 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
+/* السهم (هو فقط الذي سيتحرك) */
 .update-icon-container i {
   font-size: 40px;
-  color: #2563eb; /* لون أزرق جذاب */
+  color: #2563eb; /* اللون الأزرق */
 }
 
-/* تأثير الدوران أثناء التحديث */
+/* ✅ حركة السهم عند التحديث (قفز للأسفل والأعلى) */
 .update-icon-container.spinning i {
-  animation: spin 1s linear infinite;
+  animation: bounce-download 1s ease-in-out infinite;
 }
 
-@keyframes spin {
-  100% { transform: rotate(360deg); }
+/* ============================================
+   الحركة
+   ============================================ */
+@keyframes bounce-download {
+  0%, 100% {
+    transform: translateY(-10px); /* يرتفع للأعلى قليلاً */
+    opacity: 0.7;
+  }
+  50% {
+    transform: translateY(10px); /* ينزل للأسفل (إيحاء التحميل) */
+    opacity: 1;
+  }
 }
 
 /* النصوص */
@@ -86,7 +97,7 @@
   margin-bottom: 16px;
 }
 
-/* رسائل الحالة (نجاح/خطأ) */
+/* رسائل الحالة */
 .update-status {
   font-size: 14px;
   font-weight: 600;
