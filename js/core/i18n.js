@@ -851,6 +851,8 @@ const translations = {
     update_checking: 'جارٍ التحديث...',
     update_success: '✅ تم التحديث بنجاح! جارٍ إعادة التشغيل...',
     update_error: '❌ حدث خطأ أثناء التحديث. حاول مرة أخرى.',
+
+    stg_current_version: 'الإصدار الحالي',
   },
 
   fr: {
@@ -1692,6 +1694,8 @@ const translations = {
     update_checking: 'Mise à jour...',
     update_success: '✅ Mise à jour réussie ! Redémarrage...',
     update_error: '❌ Erreur lors de la mise à jour. Réessayez.',
+
+    stg_current_version: 'Version actuelle',
   },
 
   en: {
@@ -2533,6 +2537,8 @@ const translations = {
     update_checking: 'Updating...',
     update_success: '✅ Update successful! Restarting...',
     update_error: '❌ Update error. Please try again.',
+
+    stg_current_version: 'Current version',
   },
 
   

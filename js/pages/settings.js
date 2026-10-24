@@ -1,6 +1,6 @@
 // ============================================
 // صفحة الإعدادات
-// ✅ دعم كامل للترجمة
+// ✅ دعم كامل للترجمة + عرض إصدار التطبيق
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   const user = await requireAuth();
@@ -14,6 +14,21 @@ document.addEventListener('DOMContentLoaded', async () => {
   document.title = tr('stg_title_full');
 
   const main = document.getElementById('main-content');
+
+  // ✅ جلب إصدار التطبيق الحالي
+  let appVersion = localStorage.getItem('app_version') || '1.0.0';
+  try {
+    // محاولة قراءة الإصدار من ملف version.json إذا كان موجوداً
+    const res = await fetch('/version.json?t=' + Date.now());
+    if (res.ok) {
+      const data = await res.json();
+      appVersion = data.version || appVersion;
+      // تحديث الذاكرة المؤقتة
+      localStorage.setItem('app_version', appVersion);
+    }
+  } catch (e) {
+    console.warn('ملف version.json غير موجود، سيتم استخدام الإصدار الافتراضي.');
+  }
 
   main.innerHTML = `
     <div class="page-header">
@@ -67,7 +82,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       <div class="settings-card">
 
-        <!-- ✅ تم تحويل البطاقة إلى رابط يفتح صفحة التحديث -->
+        <!-- ✅ بطاقة التحديث مع عرض الإصدار تحتها -->
         <a href="/update.html" class="settings-item" id="update-app-item">
           <div class="settings-item-left">
             <div class="settings-icon icon-teal">
@@ -75,6 +90,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             </div>
             <div class="settings-text">
               <div class="settings-title">${tr('stg_update')}</div>
+              <!-- هنا يظهر الإصدار تحت العنوان -->
+              <div class="settings-subtitle" style="color: #737373; font-size: 12px; margin-top: 2px;">
+                ${tr('stg_current_version')}: v${appVersion}
+              </div>
             </div>
           </div>
           <i class="fas fa-chevron-right settings-arrow"></i>
