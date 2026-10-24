@@ -1,7 +1,7 @@
 // ============================================
 // صفحة تحديث التطبيق (Update App)
 // ✅ مسح الكاش وتحديث Service Worker
-// ✅ أيقونة سهم ثابتة الحاوية، ومتحركة السهم
+// ✅ إعادة تحميل قوية لتجاوز الكاش
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   const user = await requireAuth();
@@ -16,14 +16,15 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   const main = document.getElementById('main-content');
 
-  // ✅ محاولة قراءة إصدار التطبيق الحالي
+  // ✅ محاولة قراءة إصدار التطبيق الحالي من ملف version.json
   let currentAppVersion = localStorage.getItem('app_version') || '1.0.0';
   try {
-    // إذا كان هناك ملف version.json في المشروع، سنقرأ الإصدار منه
     const res = await fetch('/version.json?t=' + Date.now());
     if (res.ok) {
       const data = await res.json();
       currentAppVersion = data.version || currentAppVersion;
+      // تحديث الذاكرة المحلية بالإصدار الجديد
+      localStorage.setItem('app_version', currentAppVersion);
     }
   } catch (e) {
     console.warn('ملف version.json غير موجود، سيتم استخدام الإصدار الافتراضي.');
@@ -52,7 +53,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       <div class="update-version">
         <span>${tr('update_current_version')}</span>
-        <span id="app-version">${currentAppVersion}</span>
+        <span id="app-version">v${currentAppVersion}</span>
       </div>
 
       <button class="btn-primary update-btn" id="update-btn">
@@ -100,11 +101,12 @@ document.addEventListener('DOMContentLoaded', async () => {
       
       // حفظ الإصدار الجديد في الذاكرة
       localStorage.setItem('app_version', currentAppVersion);
-      versionEl.textContent = currentAppVersion;
 
-      // 4. إعادة تحميل الصفحة بقوة (Hard Reload) بعد ثانية ونصف
+      // 4. إعادة تحميل الصفحة بقوة (تجاوز الكاش تماماً) بعد ثانية ونصف
       setTimeout(() => {
-        window.location.reload(true);
+        // هذه الطريقة تضمن إعادة التحميل مع تجاهل الكاش في جميع المتصفحات
+        const baseUrl = window.location.href.split('?')[0];
+        window.location.replace(baseUrl + '?updated=' + new Date().getTime());
       }, 1500);
 
     } catch (error) {
