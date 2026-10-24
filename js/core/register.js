@@ -5,6 +5,7 @@
 // ✅ يُنشئ subscriptions بحالة pending
 // ✅ يُحوّل إلى subscription.html بعد التسجيل
 // ✅ منع Enter/Go/Done من إرسال الفورم
+// ✅ حفظ رقم الهاتف
 // ============================================
 document.addEventListener('DOMContentLoaded', () => {
 
@@ -60,6 +61,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const email = document.getElementById('email').value.trim();
     const password = document.getElementById('password').value;
     const passwordConfirm = document.getElementById('password_confirm').value;
+    
+    // ✅ قراءة رقم الهاتف من الحقل الجديد
+    const phoneInput = document.getElementById('phone');
+    const phone = phoneInput ? phoneInput.value.trim() : '';
 
     // ✅ التحقق من الحقول
     if (!firstName || !lastName) {
@@ -70,6 +75,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (!orgName) {
       errBox.textContent = 'اسم المنظمة مطلوب';
+      errBox.style.display = 'block';
+      return;
+    }
+
+    // ✅ التحقق من رقم الهاتف
+    if (!phone) {
+      errBox.textContent = 'رقم الهاتف مطلوب';
+      errBox.style.display = 'block';
+      return;
+    }
+    if (phone.length < 8) {
+      errBox.textContent = 'رقم الهاتف يجب أن يكون 8 أرقام على الأقل';
       errBox.style.display = 'block';
       return;
     }
@@ -137,7 +154,7 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    // 3. تحديث الملف الشخصي
+    // 3. تحديث الملف الشخصي (✅ إضافة حفظ رقم الهاتف هنا)
     const { error: profileError } = await db
       .from('profiles')
       .update({
@@ -145,6 +162,7 @@ document.addEventListener('DOMContentLoaded', () => {
         organization_id: orgData.id,
         role: 'admin',
         country: country,
+        phone: phone, // ✅ حفظ رقم الهاتف
       })
       .eq('id', userId);
 
