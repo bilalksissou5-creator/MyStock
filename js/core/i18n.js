@@ -873,6 +873,9 @@ const translations = {
     stg_new_version: 'تحديث جديد',
 
     stg_updated: 'تم التحديث',
+
+    update_up_to_date: 'التطبيق محدث لآخر إصدار',
+    stg_updated: 'تم التحديث',
   },
 
   fr: {
@@ -1736,6 +1739,9 @@ const translations = {
     stg_new_version: 'Nouvelle mise à jour',
 
     stg_updated: 'À jour',
+
+    update_up_to_date: 'L\'application est à jour',
+    stg_updated: 'À jour',
   },
 
   en: {
@@ -2598,6 +2604,9 @@ const translations = {
 
     stg_new_version: 'New update',
 
+    stg_updated: 'Updated',
+
+    update_up_to_date: 'App is up to date',
     stg_updated: 'Updated',
   },
 
