@@ -17,13 +17,52 @@ async function autoCheckPaymentBlock() {
     if (typeof db === 'undefined') return;
     const { data: { user } } = await db.auth.getUser();
     if (!user) return;
-    const { data: profile } = await db.from('profiles').select('role, organization_id, bank_card_last4, bank_card_active, bank_card_deactivated_at, card_warning_sent').eq('id', user.id).single();
+    
+    // ✅ تم جلب card_warning_sent هنا لكي نعرف هل تم إرسال التحذير أم لا
+    const { data: profile } = await db.from('profiles').select('role, organization_id, bank_card_last4, bank_card_active, bank_card_deactivated_at, card_warning_sent, full_name').eq('id', user.id).single();
     if (!profile || profile.role !== 'admin' || !profile.organization_id) return;
     
     if (profile.bank_card_last4) {
       if (profile.bank_card_active === false && profile.bank_card_deactivated_at) {
         const elapsed = Date.now() - new Date(profile.bank_card_deactivated_at).getTime();
-        if (elapsed >= 3 * 24 * 60 * 60 * 1000) window.location.replace('/bank-card.html?blocked=1');
+        
+        // 1. حظر الخدمة بعد 3 أيام
+        if (elapsed >= 3 * 24 * 60 * 60 * 1000) {
+            window.location.replace('/bank-card.html?blocked=1');
+            return;
+        }
+
+        // 2. ✅ إرسال التحذيرات التلقائية (تبقى يومان، تبقى 12 ساعة)
+        const warningSent = profile.card_warning_sent || 0;
+        let newWarningLevel = 0;
+        let warningTitle = '';
+        let warningMsg = '';
+
+        if (elapsed >= 2.5 * 24 * 60 * 60 * 1000 && warningSent < 2) {
+            newWarningLevel = 2;
+            warningTitle = window.t ? window.t('warn_title_3') : '🚨 تبقى 12 ساعة';
+            warningMsg = window.t ? window.t('warn_msg_3') : 'تبقى 12 ساعة فقط! أعد تفعيل البطاقة أو أضف بطاقة جديدة الآن.';
+        } else if (elapsed >= 1 * 24 * 60 * 60 * 1000 && warningSent < 1) {
+            newWarningLevel = 1;
+            warningTitle = window.t ? window.t('warn_title_2') : '🔔 تبقى يومان';
+            warningMsg = window.t ? window.t('warn_msg_2') : 'مرّ يوم على إلغاء تفعيل البطاقة. تبقى يومان قبل إيقاف التطبيق.';
+        }
+
+        if (newWarningLevel > warningSent) {
+             if (typeof notifyOrganization === 'function') {
+                 notifyOrganization({
+                     orgId: profile.organization_id,
+                     title: warningTitle,
+                     message: warningMsg,
+                     type: 'warning',
+                     link: '/bank-card.html',
+                     userName: profile.full_name
+                 }).then(() => {
+                     // تحديث حالة التحذير في قاعدة البيانات لكي لا يتكرر
+                     db.from('profiles').update({ card_warning_sent: newWarningLevel }).eq('id', user.id);
+                 });
+             }
+        }
       }
       return;
     }

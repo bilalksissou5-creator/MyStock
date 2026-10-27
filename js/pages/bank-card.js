@@ -1,7 +1,6 @@
 // ============================================
 // صفحة البطاقة البنكية (Lemon Squeezy)
-// ✅ عرض البطاقة + التحكم الكامل
-// ✅ دعم كامل للترجمة
+// ✅ عرض البطاقة + التحكم الكامل + إشعارات
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   const user = await requireAuth();
@@ -68,8 +67,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   function render() {
     const hasCard = !!profile?.bank_card_last4;
-
-    // ✅ فقط bank_card_active يحدد الحالة
     const isActive = profile?.bank_card_active !== false;
 
     const params = new URLSearchParams(window.location.search);
@@ -212,7 +209,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     main.appendChild(wrapper);
 
-    // ✅ زر إلغاء التفعيل
+    // ✅ زر إلغاء التفعيل (إرسال تحذير 3 أيام)
     document.getElementById('deactivate-btn')?.addEventListener('click', async () => {
       if (!confirm(tr('bc_confirm_deactivate'))) return;
 
@@ -237,6 +234,20 @@ document.addEventListener('DOMContentLoaded', async () => {
         profile.bank_card_active = false;
         profile.bank_card_deactivated_at = new Date().toISOString();
         profile.card_warning_sent = 0;
+
+        // ✅ إرسال إشعار التحذير الأول (3 أيام)
+        if (typeof notifyOrganization === 'function' && profile?.organization_id) {
+          try {
+            await notifyOrganization({
+              orgId: profile.organization_id,
+              title: tr('warn_title_1'),
+              message: tr('warn_msg_1'),
+              type: 'warning',
+              link: '/bank-card.html',
+              userName: profile.full_name || null,
+            });
+          } catch (e) { console.warn(e); }
+        }
 
         showSuccess(tr('bc_deactivated'));
         setTimeout(() => render(), 800);
