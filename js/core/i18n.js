@@ -876,6 +876,8 @@ const translations = {
 
     update_up_to_date: 'التطبيق محدث لآخر إصدار',
     stg_updated: 'تم التحديث',
+
+    dev_role: 'مطور ومصمم تطبيق MyStock. أسعى لدمج التكنولوجيا في إدارة الأعمال اليومية.',
   },
 
   fr: {
@@ -1742,6 +1744,8 @@ const translations = {
 
     update_up_to_date: 'L\'application est à jour',
     stg_updated: 'À jour',
+
+    dev_role: 'Développeur et concepteur de MyStock. Je m\'efforce d\'intégrer la technologie dans la gestion quotidienne des entreprises.',
   },
 
   en: {
@@ -2608,6 +2612,8 @@ const translations = {
 
     update_up_to_date: 'App is up to date',
     stg_updated: 'Updated',
+
+    dev_role: 'Developer and designer of MyStock. Striving to integrate technology into daily business management.',
   },
 
   
