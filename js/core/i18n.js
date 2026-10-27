@@ -885,6 +885,11 @@ const translations = {
     warn_msg_1: 'لقد ألغيت تفعيل بطاقتك البنكية. لديك 3 أيام لإعادة تفعيلها أو إضافة بطاقة جديدة قبل إيقاف التطبيق.',
     warn_msg_2: 'مرّ يوم على إلغاء تفعيل بطاقتك. تبقى يومان قبل إيقاف التطبيق.',
     warn_msg_3: 'تبقى 12 ساعة فقط! أعد تفعيل بطاقتك أو أضف بطاقة جديدة الآن.',
+
+    bc_notif_new_card_title: 'بطاقة بنكية جديدة',
+    bc_notif_new_card_msg: 'قام بإضافة بطاقة بنكية جديدة وتفعيل الاشتراك',
+    bc_notif_reactivate_title: 'إعادة تفعيل البطاقة',
+    bc_notif_reactivate_msg: 'قام بإعادة تفعيل البطاقة البنكية',
   },
 
   fr: {
@@ -1760,6 +1765,11 @@ const translations = {
     warn_msg_1: 'Vous avez désactivé votre carte bancaire. Vous avez 3 jours pour la réactiver ou ajouter une nouvelle carte.',
     warn_msg_2: 'Un jour s\'est écoulé. Il vous reste 2 jours avant la suspension.',
     warn_msg_3: 'Il ne reste que 12 heures ! Réactivez votre carte ou ajoutez-en une nouvelle.',
+
+    bc_notif_new_card_title: 'Nouvelle carte bancaire',
+    bc_notif_new_card_msg: 'a ajouté une nouvelle carte et activé l\'abonnement',
+    bc_notif_reactivate_title: 'Réactivation de la carte',
+    bc_notif_reactivate_msg: 'a réactivé la carte bancaire',
   },
 
   en: {
@@ -2635,6 +2645,11 @@ const translations = {
     warn_msg_1: 'You deactivated your bank card. You have 3 days to reactivate it or add a new card before suspension.',
     warn_msg_2: 'A day has passed. 2 days left before suspension.',
     warn_msg_3: 'Only 12 hours left! Reactivate your card or add a new one now.',
+
+    bc_notif_new_card_title: 'New Bank Card',
+    bc_notif_new_card_msg: 'added a new card and activated the subscription',
+    bc_notif_reactivate_title: 'Card Reactivated',
+    bc_notif_reactivate_msg: 'reactivated the bank card',
   },
 
   

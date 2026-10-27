@@ -2,7 +2,7 @@
 // صفحة الاشتراك (One UI Style)
 // ✅ 3 بطاقات اشتراك + Gumroad Checkout
 // ✅ دعم وضع "تغيير البطاقة" (?change=1)
-// ✅ دعم كامل للترجمة
+// ✅ دعم كامل للترجمة + إشعار إضافة بطاقة
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   const user = await getCurrentUser();
@@ -74,6 +74,20 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     if (updateError) {
       console.error('Update error:', updateError);
+    } else {
+      // ✅✅✅ إضافة إشعار إضافة بطاقة جديدة هنا
+      if (typeof notifyOrganization === 'function') {
+        try {
+          await notifyOrganization({
+            orgId: profile.organization_id,
+            title: tr('bc_notif_new_card_title') || 'بطاقة بنكية جديدة',
+            message: `${profile.full_name || tr('prod_detail_user')} ${tr('bc_notif_new_card_msg') || 'قام بإضافة بطاقة بنكية جديدة وتفعيل الاشتراك'}`,
+            type: 'success',
+            link: '/bank-card.html',
+            userName: profile.full_name || null,
+          });
+        } catch (e) { console.warn(e); }
+      }
     }
 
     setTimeout(() => {
