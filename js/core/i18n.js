@@ -878,6 +878,13 @@ const translations = {
     stg_updated: 'تم التحديث',
 
     dev_role: 'مطور ومصمم تطبيق MyStock. أسعى لدمج التكنولوجيا في إدارة الأعمال اليومية.',
+
+    warn_title_1: '⚠️ بطاقتك غير مفعّلة',
+    warn_title_2: '🔔 تبقى يومان',
+    warn_title_3: '🚨 تبقى 12 ساعة',
+    warn_msg_1: 'لقد ألغيت تفعيل بطاقتك البنكية. لديك 3 أيام لإعادة تفعيلها أو إضافة بطاقة جديدة قبل إيقاف التطبيق.',
+    warn_msg_2: 'مرّ يوم على إلغاء تفعيل بطاقتك. تبقى يومان قبل إيقاف التطبيق.',
+    warn_msg_3: 'تبقى 12 ساعة فقط! أعد تفعيل بطاقتك أو أضف بطاقة جديدة الآن.',
   },
 
   fr: {
@@ -1746,6 +1753,13 @@ const translations = {
     stg_updated: 'À jour',
 
     dev_role: 'Développeur et concepteur de MyStock. Je m\'efforce d\'intégrer la technologie dans la gestion quotidienne des entreprises.',
+
+    warn_title_1: '⚠️ Carte inactive',
+    warn_title_2: '🔔 2 jours restants',
+    warn_title_3: '🚨 12 heures restantes',
+    warn_msg_1: 'Vous avez désactivé votre carte bancaire. Vous avez 3 jours pour la réactiver ou ajouter une nouvelle carte.',
+    warn_msg_2: 'Un jour s\'est écoulé. Il vous reste 2 jours avant la suspension.',
+    warn_msg_3: 'Il ne reste que 12 heures ! Réactivez votre carte ou ajoutez-en une nouvelle.',
   },
 
   en: {
@@ -2614,6 +2628,13 @@ const translations = {
     stg_updated: 'Updated',
 
     dev_role: 'Developer and designer of MyStock. Striving to integrate technology into daily business management.',
+
+    warn_title_1: '⚠️ Card inactive',
+    warn_title_2: '🔔 2 days left',
+    warn_title_3: '🚨 12 hours left',
+    warn_msg_1: 'You deactivated your bank card. You have 3 days to reactivate it or add a new card before suspension.',
+    warn_msg_2: 'A day has passed. 2 days left before suspension.',
+    warn_msg_3: 'Only 12 hours left! Reactivate your card or add a new one now.',
   },
 
   
