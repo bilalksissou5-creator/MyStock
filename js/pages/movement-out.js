@@ -1,8 +1,7 @@
 // ============================================
 // صفحة إخراج منتجات (متعددة) + إيصال بيع
+// ✅ طباعة صامتة عبر iframe مخفي (لا صفحة إيصال ظاهرة)
 // ✅ خصم qty مباشرة
-// ✅ بحث في product_barcodes
-// ✅ طباعة تلقائية بدون تحويل لصفحة الإيصال
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   if (window.__movementOutLoaded) return;
@@ -171,10 +170,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   // طباعة
   // ============================================
   function isAndroid() { return /Android/i.test(navigator.userAgent); }
-  function isIOS() {
-    return /iPad|iPhone|iPod/i.test(navigator.userAgent) ||
-           (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-  }
 
   function buildRawBTText(receiptNumber, items, totalQty, totalValue) {
     const L = [];
@@ -219,56 +214,48 @@ document.addEventListener('DOMContentLoaded', async () => {
     } catch (err) { console.warn('RawBT error:', err); }
   }
 
-  function printViaPopup(receiptId, printWin) {
-    if (!printWin || printWin.closed) return false;
-    try {
-      printWin.location.href = '/receipt.html?id=' + encodeURIComponent(receiptId);
-      printWin.addEventListener('load', function onLoad() {
-        printWin.removeEventListener('load', onLoad);
-        setTimeout(() => {
-          try { printWin.focus(); printWin.print(); }
-          catch (e) { console.warn('print error:', e); }
-        }, 1200);
-      });
-      try {
-        printWin.onafterprint = () => {
-          setTimeout(() => { try { printWin.close(); } catch (e) {} }, 800);
-        };
-      } catch (e) {}
-      return true;
-    } catch (err) {
-      console.warn('Popup print error:', err);
-      return false;
-    }
-  }
-
+  // ✅ الطباعة عبر iframe مخفي فقط (لا صفحة إيصال ظاهرة)
   function printViaIframe(receiptId) {
     try {
       const iframe = document.createElement('iframe');
-      iframe.style.cssText = 'position:fixed;left:-9999px;top:0;width:210mm;height:297mm;border:0;opacity:0;pointer-events:none;';
+      iframe.id = '__print_frame';
+      iframe.style.cssText = 'position:fixed;right:0;bottom:0;width:80mm;height:200mm;border:0;opacity:0;pointer-events:none;z-index:-1;';
       iframe.src = '/receipt.html?id=' + encodeURIComponent(receiptId);
-      document.body.appendChild(iframe);
+
       iframe.onload = () => {
         setTimeout(() => {
-          try { iframe.contentWindow.focus(); iframe.contentWindow.print(); }
-          catch (e) { console.warn('iframe print error:', e); }
-          setTimeout(() => { try { iframe.remove(); } catch (e) {} }, 3000);
-        }, 1200);
+          try {
+            const doc = iframe.contentWindow.document;
+            // حقن CSS للطباعة الحرارية 80mm
+            if (doc && doc.head) {
+              const style = doc.createElement('style');
+              style.textContent = '@media print{@page{margin:0;size:80mm auto}body{margin:0!important;padding:0!important}nav,header,footer,button,.no-print,.app-nav,.app-header,.sidebar,.topbar{display:none!important}}';
+              doc.head.appendChild(style);
+            }
+            iframe.contentWindow.focus();
+            iframe.contentWindow.print();
+          } catch (e) { console.warn('iframe print error:', e); }
+          setTimeout(() => { try { iframe.remove(); } catch (e) {} }, 8000);
+        }, 1500);
       };
-      return true;
-    } catch (err) {
-      console.warn('iframe setup error:', err);
-      return false;
-    }
+
+      document.body.appendChild(iframe);
+
+      // حماية: احذف الـ iframe إن لم يُطبع
+      setTimeout(() => { try { iframe.remove(); } catch (e) {} }, 20000);
+    } catch (err) { console.warn('iframe setup error:', err); }
   }
 
-  function autoPrintReceipt(receiptId, receiptNumber, items, printWin) {
+  function autoPrintReceipt(receiptId, receiptNumber, items) {
     const totalQty = items.reduce((s, p) => s + Number(p.qty), 0);
     const totalValue = items.reduce((s, p) => s + Number(p.qty) * Number(p.price), 0);
 
-    if (isAndroid()) { printViaRawBT(receiptNumber, items, totalQty, totalValue); return; }
-    if (isIOS()) return;
-    if (!printViaPopup(receiptId, printWin)) printViaIframe(receiptId);
+    if (isAndroid()) {
+      printViaRawBT(receiptNumber, items, totalQty, totalValue);
+      return;
+    }
+    // ديسكتوب + iOS: iframe فقط
+    printViaIframe(receiptId);
   }
 
   // ============================================
@@ -336,9 +323,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   });
 
-  // ============================================
-  // الماسح
-  // ============================================
   async function startScanner() {
     if (typeof Html5Qrcode === 'undefined') { alert(tr('prod_add_scanner_err')); return; }
     scannerModal.style.display = 'flex';
@@ -516,7 +500,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
 
   // ============================================
-  // الحفظ + الطباعة (بدون تحويل)
+  // الحفظ + الطباعة (بدون فتح أي صفحة)
   // ============================================
   saveBtn.addEventListener('click', async (e) => {
     e.preventDefault(); e.stopPropagation();
@@ -532,21 +516,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       errBox.textContent = tr('prod_add_err_empty');
       errBox.style.display = 'block';
       return;
-    }
-
-    let printWin = null;
-    if (!isAndroid() && !isIOS()) {
-      try {
-        printWin = window.open('', '_blank', 'width=400,height=650');
-        if (printWin && printWin.document) {
-          printWin.document.write(
-            '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Print</title></head>' +
-            '<body style="font-family:sans-serif;text-align:center;padding:40px;color:#555;">' +
-            '<p>جارٍ تجهيز الإيصال...</p></body></html>'
-          );
-          printWin.document.close();
-        }
-      } catch (err) { printWin = null; }
     }
 
     isSaving = true;
@@ -612,7 +581,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       const { error: moveError } = await db.from('stock_movements').insert(movements);
       if (moveError) throw new Error(tr('mout_err_movements') + ' ' + moveError.message);
 
-      // ✅ خصم qty مباشرة
       for (const p of addedProducts) {
         const { data: fresh } = await db.from('products').select('qty').eq('id', p.id).single();
         const newQty = Math.max(0, Number(fresh?.qty || 0) - Number(p.qty));
@@ -646,24 +614,21 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       const itemsSnapshot = addedProducts.map(p => ({ ...p }));
 
-      // ✅ طباعة فقط — لا تحويل
-      autoPrintReceipt(newReceipt.id, receiptNumber, itemsSnapshot, printWin);
+      // ✅ طباعة عبر iframe مخفي — لا نافذة، لا صفحة إيصال ظاهرة
+      autoPrintReceipt(newReceipt.id, receiptNumber, itemsSnapshot);
 
-      // تفريغ
+      // تفريغ السلة
       addedProducts.length = 0;
       renderAddedProducts();
       document.getElementById('note').value = '';
 
-      // ✅ إعادة تفعيل الزر للبيع التالي
       saveBtn.disabled = false;
       saveBtn.querySelector('span').textContent = tr('mout_save');
       isSaving = false;
 
-      // إخفاء رسالة النجاح بعد 5 ثوانٍ
       setTimeout(() => { successBox.style.display = 'none'; }, 5000);
 
     } catch (error) {
-      if (printWin && !printWin.closed) { try { printWin.close(); } catch (e) {} }
       errBox.textContent = error.message;
       errBox.style.display = 'block';
       saveBtn.disabled = false;
