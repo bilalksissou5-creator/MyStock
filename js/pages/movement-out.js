@@ -1,7 +1,11 @@
 // ============================================
 // صفحة إخراج منتجات (متعددة) + إيصال بيع
-// ✅ المسح يملأ الحقول فقط، والزر يضيف ويُفرغ
-// ✅ خصم qty مباشرة (بدل trigger)
+// ✅ خصم qty مباشرة
+// ✅ بحث في product_barcodes
+// ✅ طباعة تلقائية:
+//    - أندرويد: RawBT (صامت)
+//    - ديسكتوب: نافذة طباعة الإيصال
+//    - iOS/فشل: تحويل لصفحة الإيصال
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   if (window.__movementOutLoaded) return;
@@ -62,7 +66,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     <div class="alert alert-success" id="form-success" style="display:none;"></div>
 
     <div class="out-form">
-
       <div class="product-input-card">
         <div class="form-group">
           <label>${tr('mout_note')}</label>
@@ -131,7 +134,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         </button>
         <a href="/movements/list.html" class="btn-secondary">${tr('mout_cancel')}</a>
       </div>
-
     </div>
 
     <div class="scanner-modal" id="scanner-modal" style="display:none;">
@@ -168,17 +170,127 @@ document.addEventListener('DOMContentLoaded', async () => {
   let isSaving = false;
   let html5QrCode = null;
 
-  function showSuggestions(filter) {
-    const q = filter.trim().toLowerCase();
-    if (q.length < 1) {
-      suggestions.innerHTML = '';
-      suggestions.style.display = 'none';
+  // ============================================
+  // طباعة تلقائية
+  // ============================================
+  function isAndroid() { return /Android/i.test(navigator.userAgent); }
+  function isIOS() {
+    return /iPad|iPhone|iPod/i.test(navigator.userAgent) ||
+           (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  }
+
+  function buildRawBTText(receiptNumber, items, totalQty, totalValue) {
+    const L = [];
+    L.push('\x1B\x61\x01');
+    L.push('\x1B\x21\x30');
+    L.push('MyStock');
+    L.push('\x1B\x21\x00');
+    L.push('================================');
+    L.push('رقم الإيصال: ' + receiptNumber);
+    L.push(new Date().toLocaleString('ar'));
+    L.push('--------------------------------');
+    items.forEach(p => {
+      const qty = Number(p.qty);
+      const price = Number(p.price);
+      L.push(p.name);
+      L.push('  ' + qty + ' x ' + price.toFixed(2) + ' = ' + (qty * price).toFixed(2));
+    });
+    L.push('--------------------------------');
+    L.push('عدد القطع: ' + totalQty);
+    L.push('\x1B\x21\x30');
+    L.push('الإجمالي: ' + totalValue.toFixed(2));
+    L.push('\x1B\x21\x00');
+    L.push('\x1B\x61\x01');
+    L.push('شكراً لتعاملكم معنا');
+    L.push('');
+    L.push('');
+    L.push('');
+    L.push('\x1D\x56\x42\x00');
+    return L.join('\n');
+  }
+
+  function printViaRawBT(receiptNumber, items, totalQty, totalValue) {
+    try {
+      const text = buildRawBTText(receiptNumber, items, totalQty, totalValue);
+      const url = 'intent:' + encodeURIComponent(text) +
+                  '#Intent;scheme=rawbt;package=ru.a402d.rawbtprinter;end;';
+      const iframe = document.createElement('iframe');
+      iframe.style.display = 'none';
+      iframe.src = url;
+      document.body.appendChild(iframe);
+      setTimeout(() => { try { iframe.remove(); } catch (e) {} }, 3500);
+    } catch (err) {
+      console.warn('RawBT error:', err);
+    }
+  }
+
+  function printViaPopup(receiptId, printWin) {
+    if (!printWin || printWin.closed) return false;
+    try {
+      printWin.location.href = '/receipt.html?id=' + encodeURIComponent(receiptId);
+      printWin.addEventListener('load', function onLoad() {
+        printWin.removeEventListener('load', onLoad);
+        setTimeout(() => {
+          try { printWin.focus(); printWin.print(); }
+          catch (e) { console.warn('print error:', e); }
+        }, 1200);
+      });
+      try {
+        printWin.onafterprint = () => {
+          setTimeout(() => { try { printWin.close(); } catch (e) {} }, 800);
+        };
+      } catch (e) {}
+      return true;
+    } catch (err) {
+      console.warn('Popup print error:', err);
+      return false;
+    }
+  }
+
+  function printViaIframe(receiptId) {
+    try {
+      const iframe = document.createElement('iframe');
+      iframe.style.cssText = 'position:fixed;left:-9999px;top:0;width:210mm;height:297mm;border:0;opacity:0;pointer-events:none;';
+      iframe.src = '/receipt.html?id=' + encodeURIComponent(receiptId);
+      document.body.appendChild(iframe);
+      iframe.onload = () => {
+        setTimeout(() => {
+          try { iframe.contentWindow.focus(); iframe.contentWindow.print(); }
+          catch (e) { console.warn('iframe print error:', e); }
+          setTimeout(() => { try { iframe.remove(); } catch (e) {} }, 3000);
+        }, 1200);
+      };
+      return true;
+    } catch (err) {
+      console.warn('iframe setup error:', err);
+      return false;
+    }
+  }
+
+  function autoPrintReceipt(receiptId, receiptNumber, items, printWin) {
+    const totalQty = items.reduce((s, p) => s + Number(p.qty), 0);
+    const totalValue = items.reduce((s, p) => s + Number(p.qty) * Number(p.price), 0);
+
+    if (isAndroid()) {
+      printViaRawBT(receiptNumber, items, totalQty, totalValue);
       return;
     }
+    if (isIOS()) return;
+
+    if (!printViaPopup(receiptId, printWin)) {
+      printViaIframe(receiptId);
+    }
+  }
+
+  // ============================================
+  // المنتجات
+  // ============================================
+  function showSuggestions(filter) {
+    const q = filter.trim().toLowerCase();
+    if (q.length < 1) { suggestions.innerHTML = ''; suggestions.style.display = 'none'; return; }
 
     const filtered = (products ?? []).filter(p =>
-      (p.name ?? '').toLowerCase().includes(q) ||
-      (p.sku ?? '').toLowerCase().includes(q)
+      (p.name ?? '').toLowerCase().includes(q) || (p.sku ?? '').toLowerCase().includes(q)
     ).slice(0, 5);
 
     if (filtered.length === 0) {
@@ -206,14 +318,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     suggestions.querySelectorAll('.suggestion-card').forEach(card => {
       card.addEventListener('pointerdown', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        const id = card.dataset.id;
-        const found = products.find(p => p.id === id);
-        if (found) {
-          selectProduct(found);
-          suggestions.style.display = 'none';
-        }
+        e.preventDefault(); e.stopPropagation();
+        const found = products.find(p => p.id === card.dataset.id);
+        if (found) { selectProduct(found); suggestions.style.display = 'none'; }
       });
     });
   }
@@ -223,8 +330,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     productInput.value = `${found.name} (${found.sku ?? '—'})`;
     hiddenId.value = found.id;
     quantityInput.value = 1;
-    const sellingPrice = getSellingPrice(found);
-    priceInput.value = sellingPrice.toFixed(2);
+    priceInput.value = getSellingPrice(found).toFixed(2);
     availableQtyInput.value = found.qty ?? 0;
   }
 
@@ -241,27 +347,20 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   });
 
+  // ============================================
+  // الماسح
+  // ============================================
   async function startScanner() {
-    if (typeof Html5Qrcode === 'undefined') {
-      alert(tr('prod_add_scanner_err'));
-      return;
-    }
-
+    if (typeof Html5Qrcode === 'undefined') { alert(tr('prod_add_scanner_err')); return; }
     scannerModal.style.display = 'flex';
     scannerReader.innerHTML = '';
-
     try {
       html5QrCode = new Html5Qrcode("scanner-reader");
       const config = { fps: 10, qrbox: { width: 250, height: 250 }, aspectRatio: 1.0 };
-
       await html5QrCode.start(
-        { facingMode: "environment" },
-        config,
-        async (decodedText) => {
-          await handleScan(decodedText);
-          await stopScanner();
-        },
-        () => { }
+        { facingMode: "environment" }, config,
+        async (decodedText) => { await handleScan(decodedText); await stopScanner(); },
+        () => {}
       );
     } catch (err) {
       alert(tr('prod_add_camera_err') + ' ' + err.message);
@@ -271,10 +370,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   async function stopScanner() {
     if (html5QrCode) {
-      try {
-        await html5QrCode.stop();
-        await html5QrCode.clear();
-      } catch (e) { }
+      try { await html5QrCode.stop(); await html5QrCode.clear(); } catch (e) {}
       html5QrCode = null;
     }
     scannerModal.style.display = 'none';
@@ -287,69 +383,38 @@ document.addEventListener('DOMContentLoaded', async () => {
     let found = (products ?? []).find(p => p.sku === value || p.qr_code === value);
 
     if (!found) {
-      const { data: dbFound, error } = await db
-        .from('products')
-        .select('*')
+      const { data: dbFound, error } = await db.from('products').select('*')
         .eq('organization_id', profile?.organization_id)
-        .eq('sku', value)
-        .limit(1)
-        .maybeSingle();
-
-      if (error) {
-        alert(tr('prod_add_err_find') + ' ' + error.message);
-        return;
-      }
+        .eq('sku', value).limit(1).maybeSingle();
+      if (error) { alert(tr('prod_add_err_find') + ' ' + error.message); return; }
       found = dbFound;
     }
 
-    // ✅ البحث في product_barcodes (باركود بديل)
     if (!found) {
-      const { data: aliasRow } = await db
-        .from('product_barcodes')
-        .select('product_id')
+      const { data: aliasRow } = await db.from('product_barcodes').select('product_id')
         .eq('organization_id', profile?.organization_id)
-        .eq('barcode', value)
-        .limit(1)
-        .maybeSingle();
-
+        .eq('barcode', value).limit(1).maybeSingle();
       if (aliasRow?.product_id) {
-        const { data: prod } = await db
-          .from('products')
-          .select('*')
-          .eq('id', aliasRow.product_id)
-          .single();
+        const { data: prod } = await db.from('products').select('*').eq('id', aliasRow.product_id).single();
         if (prod) found = prod;
       }
     }
 
-    if (!found) {
-      alert(`${tr('mout_not_found')}\n${value}`);
-      return;
-    }
-
-    const available = Number(found.qty ?? 0);
-    if (available <= 0) {
-      alert(`${tr('mout_no_stock')} "${found.name}"`);
-      return;
-    }
-
+    if (!found) { alert(`${tr('mout_not_found')}\n${value}`); return; }
+    if (Number(found.qty ?? 0) <= 0) { alert(`${tr('mout_no_stock')} "${found.name}"`); return; }
     selectProduct(found);
   }
 
   scanBtn.addEventListener('click', startScanner);
   scannerClose.addEventListener('click', stopScanner);
-  scannerModal.addEventListener('click', (e) => {
-    if (e.target === scannerModal) stopScanner();
-  });
+  scannerModal.addEventListener('click', (e) => { if (e.target === scannerModal) stopScanner(); });
 
+  // ============================================
+  // السلة
+  // ============================================
   function renderAddedProducts() {
     if (addedProducts.length === 0) {
-      addedContainer.innerHTML = `
-        <div class="empty-added">
-          <i class="fas fa-box-open"></i>
-          <p>${tr('mout_empty')}</p>
-        </div>
-      `;
+      addedContainer.innerHTML = `<div class="empty-added"><i class="fas fa-box-open"></i><p>${tr('mout_empty')}</p></div>`;
       updateSummary();
       return;
     }
@@ -357,27 +422,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     addedContainer.innerHTML = addedProducts.map((p, index) => `
       <div class="added-product-card">
         <div class="added-product-image">
-          ${p.image_url
-            ? `<img src="${p.image_url}" alt="${p.name}">`
-            : `<i class="fas fa-box-open"></i>`}
+          ${p.image_url ? `<img src="${p.image_url}" alt="${p.name}">` : `<i class="fas fa-box-open"></i>`}
         </div>
         <div class="added-product-info">
           <strong>${p.name}</strong>
           <span>${p.sku ?? '—'}</span>
         </div>
         <div class="added-product-stats">
-          <div class="stat-mini">
-            <span>${tr('products_qty')}</span>
-            <b>${p.qty}</b>
-          </div>
-          <div class="stat-mini">
-            <span>${tr('products_price')}</span>
-            <b>${Number(p.price).toFixed(2)}</b>
-          </div>
-          <div class="stat-mini highlight">
-            <span>${tr('products_total')}</span>
-            <b>${(Number(p.qty) * Number(p.price)).toFixed(2)}</b>
-          </div>
+          <div class="stat-mini"><span>${tr('products_qty')}</span><b>${p.qty}</b></div>
+          <div class="stat-mini"><span>${tr('products_price')}</span><b>${Number(p.price).toFixed(2)}</b></div>
+          <div class="stat-mini highlight"><span>${tr('products_total')}</span><b>${(Number(p.qty) * Number(p.price)).toFixed(2)}</b></div>
         </div>
         <button type="button" class="added-product-delete" data-index="${index}" title="${tr('prod_add_delete')}">
           <i class="fas fa-xmark"></i>
@@ -387,8 +441,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     addedContainer.querySelectorAll('.added-product-delete').forEach(btn => {
       btn.addEventListener('pointerdown', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
+        e.preventDefault(); e.stopPropagation();
         addedProducts.splice(Number(btn.dataset.index), 1);
         renderAddedProducts();
       });
@@ -398,8 +451,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   function updateSummary() {
-    let totalQty = 0;
-    let totalValue = 0;
+    let totalQty = 0, totalValue = 0;
     addedProducts.forEach(p => {
       totalQty += Number(p.qty);
       totalValue += Number(p.qty) * Number(p.price);
@@ -411,19 +463,14 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   function addProduct() {
     if (isAdding || addBtn.disabled) return;
-    isAdding = true;
-    addBtn.disabled = true;
+    isAdding = true; addBtn.disabled = true;
 
     const errBox = document.getElementById('form-error');
     errBox.style.display = 'none';
 
     if (!selectedProduct) {
-      errBox.textContent = tr('mout_err_select');
-      errBox.style.display = 'block';
-      productInput.focus();
-      isAdding = false;
-      addBtn.disabled = false;
-      return;
+      errBox.textContent = tr('mout_err_select'); errBox.style.display = 'block';
+      productInput.focus(); isAdding = false; addBtn.disabled = false; return;
     }
 
     const qty = Number(quantityInput.value);
@@ -431,21 +478,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     const available = Number(selectedProduct.qty ?? 0);
 
     if (!qty || qty <= 0) {
-      errBox.textContent = tr('prod_add_err_qty');
-      errBox.style.display = 'block';
-      quantityInput.focus();
-      isAdding = false;
-      addBtn.disabled = false;
-      return;
+      errBox.textContent = tr('prod_add_err_qty'); errBox.style.display = 'block';
+      quantityInput.focus(); isAdding = false; addBtn.disabled = false; return;
     }
-
     if (qty > available) {
-      errBox.textContent = `${tr('mout_err_max')} ${available}`;
-      errBox.style.display = 'block';
-      quantityInput.focus();
-      isAdding = false;
-      addBtn.disabled = false;
-      return;
+      errBox.textContent = `${tr('mout_err_max')} ${available}`; errBox.style.display = 'block';
+      quantityInput.focus(); isAdding = false; addBtn.disabled = false; return;
     }
 
     const costPrice = Number(selectedProduct.price ?? 0);
@@ -455,7 +493,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       existing.qty += qty;
       existing.price = price;
       existing.costPrice = costPrice;
-      renderAddedProducts();
     } else {
       addedProducts.push({
         id: selectedProduct.id,
@@ -467,8 +504,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         costPrice: costPrice,
         available: available,
       });
-      renderAddedProducts();
     }
+    renderAddedProducts();
 
     productInput.value = '';
     hiddenId.value = '';
@@ -478,68 +515,66 @@ document.addEventListener('DOMContentLoaded', async () => {
     selectedProduct = null;
     productInput.focus();
 
-    setTimeout(() => {
-      isAdding = false;
-      addBtn.disabled = false;
-    }, 400);
+    setTimeout(() => { isAdding = false; addBtn.disabled = false; }, 400);
   }
 
-  addBtn.addEventListener('click', (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    addProduct();
-  });
+  addBtn.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); addProduct(); });
 
   [productInput, quantityInput, priceInput].forEach(input => {
     input.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') {
-        e.preventDefault();
-        addBtn.click();
-      }
+      if (e.key === 'Enter') { e.preventDefault(); addBtn.click(); }
     });
   });
 
+  // ============================================
+  // الحفظ + الطباعة التلقائية
+  // ============================================
   saveBtn.addEventListener('click', async (e) => {
-    e.preventDefault();
-    e.stopPropagation();
+    e.preventDefault(); e.stopPropagation();
 
     if (isSaving || saveBtn.disabled) return;
-    isSaving = true;
-    saveBtn.disabled = true;
 
     const errBox = document.getElementById('form-error');
     const successBox = document.getElementById('form-success');
-
     errBox.style.display = 'none';
     successBox.style.display = 'none';
 
     if (addedProducts.length === 0) {
       errBox.textContent = tr('prod_add_err_empty');
       errBox.style.display = 'block';
-      isSaving = false;
-      saveBtn.disabled = false;
       return;
     }
 
+    // فتح نافذة الطباعة مسبقاً (قبل async) للديسكتوب فقط
+    let printWin = null;
+    if (!isAndroid() && !isIOS()) {
+      try {
+        printWin = window.open('', '_blank', 'width=400,height=650');
+        if (printWin && printWin.document) {
+          printWin.document.write(
+            '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Print</title></head>' +
+            '<body style="font-family:sans-serif;text-align:center;padding:40px;color:#555;">' +
+            '<p>جارٍ تجهيز الإيصال...</p></body></html>'
+          );
+          printWin.document.close();
+        }
+      } catch (err) { printWin = null; }
+    }
+
+    isSaving = true;
+    saveBtn.disabled = true;
     saveBtn.querySelector('span').textContent = tr('prod_add_saving');
 
     try {
       const { data: { user: authUser } } = await db.auth.getUser();
       const { data: prof } = await db
-        .from('profiles')
-        .select('organization_id, full_name')
-        .eq('id', authUser.id)
-        .single();
-
+        .from('profiles').select('organization_id, full_name').eq('id', authUser.id).single();
       if (!prof?.organization_id) throw new Error(tr('prod_add_err_org'));
 
       const { data: lastReceipt } = await db
-        .from('receipts')
-        .select('receipt_number')
+        .from('receipts').select('receipt_number')
         .eq('organization_id', prof.organization_id)
-        .order('created_at', { ascending: false })
-        .limit(1)
-        .maybeSingle();
+        .order('created_at', { ascending: false }).limit(1).maybeSingle();
 
       let nextNumber = 1;
       if (lastReceipt?.receipt_number) {
@@ -551,18 +586,13 @@ document.addEventListener('DOMContentLoaded', async () => {
       const totalQty = addedProducts.reduce((s, p) => s + Number(p.qty), 0);
       const totalValue = addedProducts.reduce((s, p) => s + Number(p.qty) * Number(p.price), 0);
 
-      const { data: newReceipt, error: receiptErr } = await db
-        .from('receipts')
-        .insert({
-          receipt_number: receiptNumber,
-          organization_id: prof.organization_id,
-          total_qty: totalQty,
-          total_value: totalValue,
-          created_by: authUser.id,
-        })
-        .select()
-        .single();
-
+      const { data: newReceipt, error: receiptErr } = await db.from('receipts').insert({
+        receipt_number: receiptNumber,
+        organization_id: prof.organization_id,
+        total_qty: totalQty,
+        total_value: totalValue,
+        created_by: authUser.id,
+      }).select().single();
       if (receiptErr) throw new Error(tr('mout_err_receipt') + ' ' + receiptErr.message);
 
       const receiptItems = addedProducts.map(p => {
@@ -580,7 +610,6 @@ document.addEventListener('DOMContentLoaded', async () => {
           total: qty * price,
         };
       });
-
       const { error: itemsErr } = await db.from('receipt_items').insert(receiptItems);
       if (itemsErr) throw new Error(tr('mout_err_items') + ' ' + itemsErr.message);
 
@@ -592,22 +621,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         quantity: Number(p.qty),
         performed_by: authUser.id,
       }));
-
       const { error: moveError } = await db.from('stock_movements').insert(movements);
       if (moveError) throw new Error(tr('mout_err_movements') + ' ' + moveError.message);
 
-      // ✅ خصم qty مباشرة (بدل trigger)
+      // ✅ خصم qty مباشرة
       for (const p of addedProducts) {
-        const { data: fresh } = await db
-          .from('products')
-          .select('qty')
-          .eq('id', p.id)
-          .single();
+        const { data: fresh } = await db.from('products').select('qty').eq('id', p.id).single();
         const newQty = Math.max(0, Number(fresh?.qty || 0) - Number(p.qty));
-        const { error: qtyErr } = await db
-          .from('products')
-          .update({ qty: newQty })
-          .eq('id', p.id);
+        const { error: qtyErr } = await db.from('products').update({ qty: newQty }).eq('id', p.id);
         if (qtyErr) throw new Error(tr('mout_err_movements') + ' ' + qtyErr.message);
       }
 
@@ -621,9 +642,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             link: `/receipt.html?id=${newReceipt.id}`,
             userName: prof.full_name || null,
           });
-        } catch (notifErr) {
-          console.error('❌ Notification error:', notifErr);
-        }
+        } catch (notifErr) { console.error('Notification error:', notifErr); }
       }
 
       successBox.textContent = `${tr('mout_success')} ${receiptNumber}`;
@@ -634,21 +653,27 @@ document.addEventListener('DOMContentLoaded', async () => {
           id: p.id,
           newQty: Number(p.available) - Number(p.qty)
         }));
-        window.parent.postMessage({
-          type: 'PRODUCT_INSTANT_UPDATE_QTY',
-          updates: updates
-        }, '*');
+        window.parent.postMessage({ type: 'PRODUCT_INSTANT_UPDATE_QTY', updates }, '*');
       }
 
+      // ✅ لقطة للسلة قبل التفريغ (للطباعة)
+      const itemsSnapshot = addedProducts.map(p => ({ ...p }));
+
+      // ✅ الطباعة التلقائية
+      autoPrintReceipt(newReceipt.id, receiptNumber, itemsSnapshot, printWin);
+
+      // تفريغ
       addedProducts.length = 0;
       renderAddedProducts();
       document.getElementById('note').value = '';
 
+      // التحويل لصفحة الإيصال بعد الطباعة
       setTimeout(() => {
         window.location.href = `/receipt.html?id=${newReceipt.id}`;
-      }, 1200);
+      }, isAndroid() ? 2200 : 4000);
 
     } catch (error) {
+      if (printWin && !printWin.closed) { try { printWin.close(); } catch (e) {} }
       errBox.textContent = error.message;
       errBox.style.display = 'block';
       saveBtn.disabled = false;
