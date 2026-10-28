@@ -14,17 +14,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (window.applyLanguage) window.applyLanguage();
   const tr = (key) => (window.t ? window.t(key) : key);
 
-  // 🔧 حماية من XSS
-  const escapeHtml = (str) => {
-    if (str == null) return '';
-    return String(str)
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#39;');
-  };
-
   document.title = tr('mout_title_full');
 
   const main = document.getElementById('main-content');
@@ -34,14 +23,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     .select('organization_id')
     .eq('id', user.id)
     .single();
-
-  // 🔧 تحقق من profile
-  if (!profile?.organization_id) {
-    main.innerHTML = `<div class="alert alert-error">${tr('prod_add_err_org')}</div>`;
-    return;
-  }
-
-  const organizationId = profile.organization_id;
 
   function getSellingPrice(product) {
     const sellPrice = Number(product.sell_price ?? 0);
@@ -54,7 +35,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   const { data: products, error: productsError } = await db
     .from('products')
     .select('*')
-    .eq('organization_id', organizationId)   // 🔧 فلترة بالمؤسسة
     .order('name');
 
   if (productsError) {
@@ -62,19 +42,10 @@ document.addEventListener('DOMContentLoaded', async () => {
       <div class="alert alert-error">
         <strong>${tr('mout_load_err')}</strong>
         <br>
-        <small>${escapeHtml(productsError.message)}</small>
+        <small>${productsError.message}</small>
       </div>
     `;
     return;
-  }
-
-  // 🔧 اكتشاف وجود product_barcodes
-  let hasBarcodeTable = false;
-  try {
-    const { error } = await db.from('product_barcodes').select('id').limit(1);
-    hasBarcodeTable = !error;
-  } catch (e) {
-    hasBarcodeTable = false;
   }
 
   main.innerHTML = `
@@ -194,19 +165,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   let selectedProduct = null;
   let isAdding = false;
   let isSaving = false;
-  let isScanning = false;   // 🔧 guard
-
   let html5QrCode = null;
-
-  // 🔧 يحسب المتاح فعلاً = المخزون − ما في السلة
-  function getRemainingAvailable(product) {
-    if (!product) return 0;
-    const stock = Number(product.qty ?? 0);
-    const inCart = addedProducts
-      .filter(p => p.id === product.id)
-      .reduce((s, p) => s + Number(p.qty), 0);
-    return stock - inCart;
-  }
 
   function showSuggestions(filter) {
     const q = filter.trim().toLowerCase();
@@ -228,13 +187,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     suggestions.innerHTML = filtered.map(p => `
-      <div class="suggestion-card" data-id="${escapeHtml(p.id)}">
+      <div class="suggestion-card" data-id="${p.id}">
         <div class="suggestion-image">
-          ${p.image_url ? `<img src="${escapeHtml(p.image_url)}" alt="${escapeHtml(p.name)}">` : '<i class="fas fa-box-open"></i>'}
+          ${p.image_url ? `<img src="${p.image_url}" alt="${p.name}">` : '<i class="fas fa-box-open"></i>'}
         </div>
         <div class="suggestion-info">
-          <strong>${escapeHtml(p.name ?? tr('products_no_name'))}</strong>
-          <span class="suggestion-sku">${escapeHtml(p.sku ?? '—')}</span>
+          <strong>${p.name ?? tr('products_no_name')}</strong>
+          <span class="suggestion-sku">${p.sku ?? '—'}</span>
         </div>
         <div class="suggestion-stats">
           <span>${tr('products_qty')}: <b class="${(p.qty ?? 0) < 10 ? 'low' : ''}">${p.qty ?? 0}</b></span>
@@ -263,12 +222,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     productInput.value = `${found.name} (${found.sku ?? '—'})`;
     hiddenId.value = found.id;
     quantityInput.value = 1;
-
     const sellingPrice = getSellingPrice(found);
     priceInput.value = sellingPrice.toFixed(2);
-
-    // 🔧 عرض المتاح المتبقي (بعد خصم ما في السلة)
-    availableQtyInput.value = getRemainingAvailable(found);
+    availableQtyInput.value = found.qty ?? 0;
   }
 
   productInput.addEventListener('input', () => {
@@ -295,38 +251,20 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     try {
       html5QrCode = new Html5Qrcode("scanner-reader");
-
-      const qrSize = Math.max(160, Math.min(250, Math.floor(window.innerWidth * 0.7)));
-      const config = {
-        fps: 10,
-        qrbox: { width: qrSize, height: qrSize },
-        aspectRatio: 1.0,
-      };
+      const config = { fps: 10, qrbox: { width: 250, height: 250 }, aspectRatio: 1.0 };
 
       await html5QrCode.start(
         { facingMode: "environment" },
         config,
         async (decodedText) => {
-          // 🔧 guard من الاستدعاء المتكرر
-          if (isScanning) return;
-          isScanning = true;
-          try {
-            await handleScan(decodedText);
-          } finally {
-            await stopScanner();
-            isScanning = false;
-          }
+          await handleScan(decodedText);
+          await stopScanner();
         },
         () => { }
       );
     } catch (err) {
       alert(tr('prod_add_camera_err') + ' ' + err.message);
       scannerModal.style.display = 'none';
-      // 🔧 تصفير
-      if (html5QrCode) {
-        try { await html5QrCode.clear(); } catch (e) {}
-        html5QrCode = null;
-      }
     }
   }
 
@@ -341,20 +279,17 @@ document.addEventListener('DOMContentLoaded', async () => {
     scannerModal.style.display = 'none';
   }
 
-  // ✅ المسح: يملأ فقط، ويبحث في: sku → qr_code → product_barcodes
   async function handleScan(barcode) {
     const value = String(barcode).trim();
     if (!value) return;
 
-    // 1️⃣ من المصفوفة المحلية (sku أو qr_code)
     let found = (products ?? []).find(p => p.sku === value || p.qr_code === value);
 
-    // 2️⃣ من DB بـ sku
     if (!found) {
       const { data: dbFound, error } = await db
         .from('products')
         .select('*')
-        .eq('organization_id', organizationId)
+        .eq('organization_id', profile?.organization_id)
         .eq('sku', value)
         .limit(1)
         .maybeSingle();
@@ -366,24 +301,12 @@ document.addEventListener('DOMContentLoaded', async () => {
       found = dbFound;
     }
 
-    // 3️⃣ من DB بـ qr_code
+    // ✅ جديد: البحث في product_barcodes (باركود بديل)
     if (!found) {
-      const { data: dbFound } = await db
-        .from('products')
-        .select('*')
-        .eq('organization_id', organizationId)
-        .eq('qr_code', value)
-        .limit(1)
-        .maybeSingle();
-      if (dbFound) found = dbFound;
-    }
-
-    // 4️⃣ من product_barcodes (باركود بديل)
-    if (!found && hasBarcodeTable) {
       const { data: aliasRow } = await db
         .from('product_barcodes')
         .select('product_id')
-        .eq('organization_id', organizationId)
+        .eq('organization_id', profile?.organization_id)
         .eq('barcode', value)
         .limit(1)
         .maybeSingle();
@@ -403,9 +326,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       return;
     }
 
-    // 🔧 تحقق من المتاح المتبقي (بعد خصم السلة)
-    const remaining = getRemainingAvailable(found);
-    if (remaining <= 0) {
+    const available = Number(found.qty ?? 0);
+    if (available <= 0) {
       alert(`${tr('mout_no_stock')} "${found.name}"`);
       return;
     }
@@ -435,12 +357,12 @@ document.addEventListener('DOMContentLoaded', async () => {
       <div class="added-product-card">
         <div class="added-product-image">
           ${p.image_url
-            ? `<img src="${escapeHtml(p.image_url)}" alt="${escapeHtml(p.name)}">`
+            ? `<img src="${p.image_url}" alt="${p.name}">`
             : `<i class="fas fa-box-open"></i>`}
         </div>
         <div class="added-product-info">
-          <strong>${escapeHtml(p.name)}</strong>
-          <span>${escapeHtml(p.sku ?? '—')}</span>
+          <strong>${p.name}</strong>
+          <span>${p.sku ?? '—'}</span>
         </div>
         <div class="added-product-stats">
           <div class="stat-mini">
@@ -505,6 +427,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const qty = Number(quantityInput.value);
     const price = Number(priceInput.value) || 0;
+    const available = Number(selectedProduct.qty ?? 0);
 
     if (!qty || qty <= 0) {
       errBox.textContent = tr('prod_add_err_qty');
@@ -515,11 +438,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       return;
     }
 
-    // 🔧 التحقق من المتاح المتبقي (يخصم ما في السلة)
-    const remaining = getRemainingAvailable(selectedProduct);
-
-    if (qty > remaining) {
-      errBox.textContent = `${tr('mout_err_max')} ${remaining}`;
+    if (qty > available) {
+      errBox.textContent = `${tr('mout_err_max')} ${available}`;
       errBox.style.display = 'block';
       quantityInput.focus();
       isAdding = false;
@@ -534,7 +454,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       existing.qty += qty;
       existing.price = price;
       existing.costPrice = costPrice;
-      existing.available = Number(selectedProduct.qty ?? 0);
       renderAddedProducts();
     } else {
       addedProducts.push({
@@ -545,7 +464,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         qty: qty,
         price: price,
         costPrice: costPrice,
-        available: Number(selectedProduct.qty ?? 0),
+        available: available,
       });
       renderAddedProducts();
     }
@@ -604,20 +523,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     saveBtn.querySelector('span').textContent = tr('prod_add_saving');
 
     try {
-      // 🔧 تفكيك آمن
-      const { data: authData, error: authErr } = await db.auth.getUser();
-      const authUser = authData?.user;
-      if (authErr || !authUser) throw new Error(tr('prod_add_err_org'));
-
-      const { data: prof, error: profErr } = await db
+      const { data: { user: authUser } } = await db.auth.getUser();
+      const { data: prof } = await db
         .from('profiles')
         .select('organization_id, full_name')
         .eq('id', authUser.id)
         .single();
 
-      if (profErr || !prof?.organization_id) {
-        throw new Error(tr('prod_add_err_org'));
-      }
+      if (!prof?.organization_id) throw new Error(tr('prod_add_err_org'));
 
       const { data: lastReceipt } = await db
         .from('receipts')
@@ -655,7 +568,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         const qty = Number(p.qty);
         const price = Number(p.price);
         const costPrice = Number(p.costPrice ?? 0);
-
         return {
           receipt_id: newReceipt.id,
           product_id: p.id,
@@ -706,7 +618,6 @@ document.addEventListener('DOMContentLoaded', async () => {
           id: p.id,
           newQty: Number(p.available) - Number(p.qty)
         }));
-
         window.parent.postMessage({
           type: 'PRODUCT_INSTANT_UPDATE_QTY',
           updates: updates
