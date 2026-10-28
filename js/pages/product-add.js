@@ -1,23 +1,18 @@
 // ============================================
 // صفحة إضافة منتجات
-// ✅ دعم باركودات متعددة لنفس المنتج
-// ✅ دمج ذكي (SKU / اسم+سعر) — بدون تضاعف
-// ✅ ربط invoice_items بالمنتجات الصحيحة
-// ✅ حماية من XSS و race condition
-// ✅ حفظ المورد المكتوب يدوياً
+// ✅ زر "تم" = إضافة للسلة فقط (لا يحفظ في DB)
+// ✅ زر "حفظ الكل" = الحفظ في Supabase
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   if (window.__productAddLoaded) return;
   window.__productAddLoaded = true;
 
-  // ========== Auth ==========
   const user = await requireAuth();
   if (!user) return;
 
   renderLayout('products/add.html');
   if (window.applyLanguage) window.applyLanguage();
 
-  // ========== Utilities ==========
   const tr = (key, fallback) => {
     if (window.t) {
       const val = window.t(key);
@@ -29,29 +24,21 @@ document.addEventListener('DOMContentLoaded', async () => {
   const escapeHtml = (str) => {
     if (str == null) return '';
     return String(str)
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#39;');
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
   };
 
   const normalizeName = (s) => String(s || '')
-    .trim()
-    .toLowerCase()
-    .replace(/\s+/g, ' ')
+    .trim().toLowerCase().replace(/\s+/g, ' ')
     .replace(/[\u0640\u064B-\u065F]/g, '');
 
   const pricesEqual = (a, b) => Math.abs(Number(a) - Number(b)) < 0.01;
 
   document.title = tr('prod_add_title_full', 'Add Products');
 
-  // ========== Pre-fetch ==========
   const { data: userProfile, error: profileErr } = await db
-    .from('profiles')
-    .select('organization_id, full_name')
-    .eq('id', user.id)
-    .single();
+    .from('profiles').select('organization_id, full_name')
+    .eq('id', user.id).single();
 
   if (profileErr || !userProfile?.organization_id) {
     alert(tr('prod_add_err_org', 'Organization not found'));
@@ -60,24 +47,16 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   const organizationId = userProfile.organization_id;
 
-  const { data: suppliers, error: suppliersErr } = await db
-    .from('suppliers')
-    .select('*')
-    .eq('organization_id', organizationId)
-    .order('name');
-
-  if (suppliersErr) console.error('Suppliers fetch error:', suppliersErr);
+  const { data: suppliers } = await db
+    .from('suppliers').select('*')
+    .eq('organization_id', organizationId).order('name');
 
   let hasBarcodeTable = false;
   try {
     const { error } = await db.from('product_barcodes').select('id').limit(1);
     hasBarcodeTable = !error;
-    if (error) console.warn('⚠️ product_barcodes غير متاح:', error.message);
-  } catch (e) {
-    hasBarcodeTable = false;
-  }
+  } catch (e) { hasBarcodeTable = false; }
 
-  // ========== Render ==========
   const main = document.getElementById('main-content');
 
   main.innerHTML = `
@@ -91,7 +70,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     <div class="alert alert-error" id="form-error" style="display:none;"></div>
     <div class="alert alert-success" id="form-success" style="display:none;"></div>
-    <div class="alert alert-warning" id="form-warning" style="display:none;"></div>
 
     <div class="add-form">
       <div class="product-input-card card-supplier">
@@ -183,7 +161,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     </div>
   `;
 
-  // ========== Element refs ==========
   const supplierInput = document.getElementById('supplier-input');
   const supplierIdInput = document.getElementById('supplier_id');
   const suggestions = document.getElementById('supplier-suggestions');
@@ -202,9 +179,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const scannerHint = document.getElementById('scanner-hint');
   const errBox = document.getElementById('form-error');
   const successBox = document.getElementById('form-success');
-  const warnBox = document.getElementById('form-warning');
 
-  // ========== State ==========
   const addedProducts = [];
   let selectedSupplier = null;
   let currentSupplierId = null;
@@ -213,36 +188,25 @@ document.addEventListener('DOMContentLoaded', async () => {
   let html5QrCode = null;
   let scannedImageUrl = null;
 
-  // ========== Alerts ==========
   function showErr(msg) {
     errBox.textContent = msg;
     errBox.style.display = 'block';
     successBox.style.display = 'none';
-    warnBox.style.display = 'none';
   }
   function showSuccess(msg) {
     successBox.textContent = msg;
     successBox.style.display = 'block';
     errBox.style.display = 'none';
-    warnBox.style.display = 'none';
   }
   function hideAlerts() {
     errBox.style.display = 'none';
     successBox.style.display = 'none';
-    warnBox.style.display = 'none';
   }
 
-  // ========== Supplier Suggestions ==========
   function showSuggestions(filter) {
     const q = filter.trim().toLowerCase();
-    if (q.length < 1) {
-      suggestions.innerHTML = '';
-      suggestions.style.display = 'none';
-      return;
-    }
-    const filtered = (suppliers ?? [])
-      .filter(s => (s.name ?? '').toLowerCase().includes(q))
-      .slice(0, 5);
+    if (q.length < 1) { suggestions.innerHTML = ''; suggestions.style.display = 'none'; return; }
+    const filtered = (suppliers ?? []).filter(s => (s.name ?? '').toLowerCase().includes(q)).slice(0, 5);
     const exactMatch = (suppliers ?? []).some(s => (s.name ?? '').toLowerCase() === q);
 
     let html = filtered.map(s => `
@@ -258,9 +222,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (!exactMatch && filter.trim()) {
       html += `
         <div class="suggestion-card new-supplier" data-new="true" data-name="${escapeHtml(filter.trim())}">
-          <div class="suggestion-image" style="background:#dcfce7; color:#16a34a;">
-            <i class="fas fa-plus"></i>
-          </div>
+          <div class="suggestion-image" style="background:#dcfce7; color:#16a34a;"><i class="fas fa-plus"></i></div>
           <div class="suggestion-info">
             <strong>${tr('prod_add_new_supplier')}</strong>
             <span class="suggestion-sku">"${escapeHtml(filter.trim())}"</span>
@@ -274,17 +236,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     suggestions.querySelectorAll('.suggestion-card').forEach(card => {
       card.addEventListener('pointerdown', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
+        e.preventDefault(); e.stopPropagation();
         const newId = card.dataset.new === 'true' ? null : card.dataset.id;
         const newName = card.dataset.name;
 
         if (currentSupplierId !== newId && addedProducts.length > 0) {
           const ok = confirm(tr('prod_add_supplier_change_warn', 'تغيير المورد سيمسح المنتجات المضافة. متابعة؟'));
-          if (!ok) {
-            suggestions.style.display = 'none';
-            return;
-          }
+          if (!ok) { suggestions.style.display = 'none'; return; }
           addedProducts.length = 0;
           renderAddedProducts();
         }
@@ -323,7 +281,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (!e.target.closest('.supplier-group')) suggestions.style.display = 'none';
   });
 
-  // ========== Scanner ==========
   async function startScanner() {
     if (typeof Html5Qrcode === 'undefined') {
       showErr(tr('prod_add_scanner_err', 'Scanner library not loaded'));
@@ -335,19 +292,16 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     try {
       html5QrCode = new Html5Qrcode("scanner-reader");
-      const config = { fps: 10, qrbox: { width: 250, height: 250 }, aspectRatio: 1.0 };
+      const qrSize = Math.max(160, Math.min(250, Math.floor(window.innerWidth * 0.7)));
+      const config = { fps: 10, qrbox: { width: qrSize, height: qrSize }, aspectRatio: 1.0 };
       await html5QrCode.start(
         { facingMode: "environment" },
         config,
         async (decodedText) => {
           if (isScanning) return;
           isScanning = true;
-          try {
-            await handleScan(decodedText);
-          } finally {
-            await stopScanner();
-            isScanning = false;
-          }
+          try { await handleScan(decodedText); }
+          finally { await stopScanner(); isScanning = false; }
         },
         () => {}
       );
@@ -363,44 +317,30 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   async function stopScanner() {
     if (html5QrCode) {
-      try {
-        await html5QrCode.stop();
-        await html5QrCode.clear();
-      } catch (e) {}
+      try { await html5QrCode.stop(); await html5QrCode.clear(); } catch (e) {}
       html5QrCode = null;
     }
     scannerModal.style.display = 'none';
   }
 
+  // ✅ المسح يملأ الحقول فقط — لا يضيف للسلة
   async function handleScan(barcode) {
     const value = String(barcode).trim();
     if (!value) return;
-
     hideAlerts();
 
     let { data: localProduct } = await db
-      .from('products')
-      .select('*')
+      .from('products').select('*')
       .eq('organization_id', organizationId)
-      .eq('sku', value)
-      .limit(1)
-      .maybeSingle();
+      .eq('sku', value).limit(1).maybeSingle();
 
     if (!localProduct && hasBarcodeTable) {
       const { data: aliasRow } = await db
-        .from('product_barcodes')
-        .select('product_id')
+        .from('product_barcodes').select('product_id')
         .eq('organization_id', organizationId)
-        .eq('barcode', value)
-        .limit(1)
-        .maybeSingle();
-
+        .eq('barcode', value).limit(1).maybeSingle();
       if (aliasRow?.product_id) {
-        const { data: prod } = await db
-          .from('products')
-          .select('*')
-          .eq('id', aliasRow.product_id)
-          .single();
+        const { data: prod } = await db.from('products').select('*').eq('id', aliasRow.product_id).single();
         if (prod) localProduct = prod;
       }
     }
@@ -436,9 +376,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         nameInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
         return;
       }
-    } catch (err) {
-      console.warn('Open Food Facts error:', err);
-    }
+    } catch (err) { console.warn('Open Food Facts error:', err); }
 
     skuInput.value = value;
     scannedImageUrl = null;
@@ -448,11 +386,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   scanBtn.addEventListener('click', startScanner);
   scannerClose.addEventListener('click', stopScanner);
-  scannerModal.addEventListener('click', (e) => {
-    if (e.target === scannerModal) stopScanner();
-  });
+  scannerModal.addEventListener('click', (e) => { if (e.target === scannerModal) stopScanner(); });
 
-  // ========== Render Added Products ==========
   function renderAddedProducts() {
     if (addedProducts.length === 0) {
       addedContainer.innerHTML = `
@@ -469,7 +404,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       const barcodes = (p.skus && p.skus.length) ? p.skus : (p.sku ? [p.sku] : []);
       const barcodeTags = barcodes.map(b => `<code class="barcode-tag">${escapeHtml(b)}</code>`).join(' ');
       const imgHtml = p.image_url
-        ? `<img src="${escapeHtml(p.image_url)}" alt="${escapeHtml(p.name)}" onerror="this.style.display='none';var n=this.nextElementSibling;if(n)n.style.display='inline';"><i class="fas fa-box-open" style="display:none;"></i>`
+        ? `<img src="${escapeHtml(p.image_url)}" alt="${escapeHtml(p.name)}"><i class="fas fa-box-open" style="display:none;"></i>`
         : `<i class="fas fa-box-open"></i>`;
 
       return `
@@ -477,10 +412,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           <div class="added-product-image">${imgHtml}</div>
           <div class="added-product-info">
             <strong>${escapeHtml(p.name)}</strong>
-            <span>
-              ${p.category ? escapeHtml(p.category) + ' • ' : ''}
-              ${barcodeTags}
-            </span>
+            <span>${p.category ? escapeHtml(p.category) + ' • ' : ''}${barcodeTags}</span>
           </div>
           <div class="added-product-stats">
             <div class="stat-mini"><span>${tr('products_qty')}</span><b>${Number(p.qty)}</b></div>
@@ -496,8 +428,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     addedContainer.querySelectorAll('.added-product-delete').forEach(btn => {
       btn.addEventListener('pointerdown', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
+        e.preventDefault(); e.stopPropagation();
         addedProducts.splice(Number(btn.dataset.index), 1);
         renderAddedProducts();
       });
@@ -516,9 +447,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('sum-total').textContent = totalValue.toFixed(2);
   }
 
-  // ========== Add to Cart (بدون تضاعف) ==========
+  // ✅ زر "تم" — يضيف للسلة المحلية فقط (لا DB)
   function addToCart() {
-    // 🔧 guard قوي بدل setTimeout — يمنع أي استدعاء مكرر
     if (doneBtn.dataset.busy === '1' || doneBtn.disabled) return;
     doneBtn.dataset.busy = '1';
     doneBtn.disabled = true;
@@ -532,18 +462,9 @@ document.addEventListener('DOMContentLoaded', async () => {
       const category = categoryInput.value.trim();
       const skuValue = skuInput.value.trim();
 
-      if (!name) {
-        showErr(tr('prod_add_err_name'));
-        nameInput.focus();
-        return;
-      }
-      if (qty <= 0) {
-        showErr(tr('prod_add_err_qty'));
-        qtyInput.focus();
-        return;
-      }
+      if (!name) { showErr(tr('prod_add_err_name')); nameInput.focus(); return; }
+      if (qty <= 0) { showErr(tr('prod_add_err_qty')); qtyInput.focus(); return; }
 
-      // ✅ منطق الدمج: SKU متطابق OR (اسم + سعر)
       const existingIndex = addedProducts.findIndex(p => {
         const pSkus = (p.skus && p.skus.length) ? p.skus : (p.sku ? [p.sku] : []);
         if (skuValue && pSkus.includes(skuValue)) return true;
@@ -553,28 +474,21 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       if (existingIndex !== -1) {
         const item = addedProducts[existingIndex];
-        // 🔧 Number() صريح — يمنع string concatenation
         item.qty = Number(item.qty || 0) + Number(qty);
         item.skus = item.skus || (item.sku ? [item.sku] : []);
-        if (skuValue && !item.skus.includes(skuValue)) {
-          item.skus.push(skuValue);
-        }
+        if (skuValue && !item.skus.includes(skuValue)) item.skus.push(skuValue);
         if (skuValue) item.sku = skuValue;
         if (scannedImageUrl && !item.image_url) item.image_url = scannedImageUrl;
       } else {
         const finalSku = skuValue || ('SKU-' + Date.now() + '-' + Math.floor(Math.random() * 10000));
         addedProducts.push({
-          name,
-          qty: Number(qty),
-          price: Number(price),
-          category,
+          name, qty: Number(qty), price: Number(price), category,
           sku: finalSku,
           skus: skuValue ? [skuValue] : [finalSku],
           image_url: scannedImageUrl,
         });
       }
 
-      // تفريغ
       nameInput.value = '';
       qtyInput.value = '1';
       priceInput.value = '0';
@@ -583,27 +497,21 @@ document.addEventListener('DOMContentLoaded', async () => {
       nameInput.focus();
       renderAddedProducts();
     } finally {
-      // 🔧 إزالة setTimeout — الـ guard يُحرَّر فوراً
       doneBtn.dataset.busy = '';
       doneBtn.disabled = false;
     }
   }
 
   doneBtn.addEventListener('click', (e) => {
-    e.preventDefault();
-    e.stopPropagation();
+    e.preventDefault(); e.stopPropagation();
     addToCart();
   });
 
-  // ========== Save All ==========
+  // ✅ زر "حفظ الكل" — هنا فقط تُحفظ في Supabase
   saveAllBtn.addEventListener('click', async (e) => {
-    e.preventDefault();
-    e.stopPropagation();
+    e.preventDefault(); e.stopPropagation();
     if (isSaving || saveAllBtn.disabled) return;
-    if (addedProducts.length === 0) {
-      showErr(tr('prod_add_err_empty'));
-      return;
-    }
+    if (addedProducts.length === 0) { showErr(tr('prod_add_err_empty')); return; }
 
     isSaving = true;
     saveAllBtn.disabled = true;
@@ -613,38 +521,25 @@ document.addEventListener('DOMContentLoaded', async () => {
     try {
       const { data: authData, error: authErr } = await db.auth.getUser();
       const authUser = authData?.user;
-      if (authErr || !authUser) {
-        throw new Error(tr('prod_add_err_auth', 'Authentication error'));
-      }
+      if (authErr || !authUser) throw new Error(tr('prod_add_err_auth', 'Authentication error'));
 
       const { data: profile, error: profErr } = await db
-        .from('profiles')
-        .select('organization_id, full_name')
-        .eq('id', authUser.id)
-        .single();
+        .from('profiles').select('organization_id, full_name')
+        .eq('id', authUser.id).single();
 
-      if (profErr || !profile?.organization_id) {
-        throw new Error(tr('prod_add_err_org', 'Organization not found'));
-      }
+      if (profErr || !profile?.organization_id) throw new Error(tr('prod_add_err_org', 'Organization not found'));
 
       let finalSupplierId = supplierIdInput.value || null;
-      let finalSupplierName = null;
-
       const typedSupplierName = supplierInput.value.trim();
       const isNewFlag = supplierInput.dataset.isNew === 'true';
       const savedNewName = supplierInput.dataset.newName || '';
       const candidateNewName = isNewFlag ? (savedNewName || typedSupplierName) : typedSupplierName;
 
       if (!finalSupplierId && candidateNewName) {
-        finalSupplierName = candidateNewName;
-
         const { data: existingSupplier, error: findSupErr } = await db
-          .from('suppliers')
-          .select('id')
+          .from('suppliers').select('id')
           .eq('organization_id', profile.organization_id)
-          .ilike('name', finalSupplierName)
-          .limit(1)
-          .maybeSingle();
+          .ilike('name', candidateNewName).limit(1).maybeSingle();
 
         if (findSupErr) throw new Error(tr('prod_add_err_find') + ' ' + findSupErr.message);
 
@@ -652,16 +547,12 @@ document.addEventListener('DOMContentLoaded', async () => {
           finalSupplierId = existingSupplier.id;
         } else {
           const { data: createdSupplier, error: supErr } = await db
-            .from('suppliers')
-            .insert({
+            .from('suppliers').insert({
               organization_id: profile.organization_id,
-              name: finalSupplierName,
+              name: candidateNewName,
               specialty: categoryInput.value.trim() || null,
               created_by: authUser.id,
-            })
-            .select()
-            .single();
-
+            }).select().single();
           if (supErr) throw new Error(tr('prod_add_err_supplier') + ' ' + supErr.message);
           if (createdSupplier) finalSupplierId = createdSupplier.id;
         }
@@ -675,50 +566,32 @@ document.addEventListener('DOMContentLoaded', async () => {
         let matchedProduct = null;
 
         if (hasBarcodeTable && allBarcodes.length) {
-          const { data: aliasRows, error: aliasErr } = await db
-            .from('product_barcodes')
-            .select('product_id')
+          const { data: aliasRows } = await db
+            .from('product_barcodes').select('product_id')
             .eq('organization_id', profile.organization_id)
-            .in('barcode', allBarcodes)
-            .limit(1);
-
-          if (aliasErr) console.warn('barcode search err:', aliasErr);
+            .in('barcode', allBarcodes).limit(1);
 
           if (aliasRows?.[0]?.product_id) {
-            const { data: prod } = await db
-              .from('products')
-              .select('*')
-              .eq('id', aliasRows[0].product_id)
-              .single();
+            const { data: prod } = await db.from('products').select('*').eq('id', aliasRows[0].product_id).single();
             if (prod) matchedProduct = prod;
           }
         }
 
         if (!matchedProduct && allBarcodes.length) {
-          const { data: bySku, error: skuErr } = await db
-            .from('products')
-            .select('*')
+          const { data: bySku } = await db
+            .from('products').select('*')
             .eq('organization_id', profile.organization_id)
-            .in('sku', allBarcodes)
-            .limit(1);
-
-          if (skuErr) console.warn('sku search err:', skuErr);
+            .in('sku', allBarcodes).limit(1);
           if (bySku?.[0]) matchedProduct = bySku[0];
         }
 
         if (!matchedProduct) {
-          let q = db
-            .from('products')
-            .select('*')
+          let q = db.from('products').select('*')
             .eq('organization_id', profile.organization_id)
             .eq('price', Number(p.price))
             .ilike('name', p.name.trim());
           q = finalSupplierId ? q.eq('supplier_id', finalSupplierId) : q.is('supplier_id', null);
-
-          const { data: byName, error: nameErr } = await q
-            .order('created_at', { ascending: true })
-            .limit(1);
-
+          const { data: byName, error: nameErr } = await q.order('created_at', { ascending: true }).limit(1);
           if (nameErr) throw new Error(tr('prod_add_err_find') + ' ' + nameErr.message);
           if (byName?.[0]) matchedProduct = byName[0];
         }
@@ -728,15 +601,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         if (matchedProduct) {
           productId = matchedProduct.id;
-          const { error: linkErr } = await db
-            .from('products')
-            .update({ invoice_id: invoiceNumber })
-            .eq('id', productId);
-          if (linkErr) throw new Error(tr('prod_add_err_link') + ' ' + linkErr.message);
+          await db.from('products').update({ invoice_id: invoiceNumber }).eq('id', productId);
         } else {
           const { data: newProduct, error: insertError } = await db
-            .from('products')
-            .insert({
+            .from('products').insert({
               organization_id: profile.organization_id,
               name: p.name,
               supplier_id: finalSupplierId,
@@ -747,10 +615,7 @@ document.addEventListener('DOMContentLoaded', async () => {
               image_url: p.image_url || null,
               invoice_id: invoiceNumber,
               created_by: authUser.id,
-            })
-            .select()
-            .single();
-
+            }).select().single();
           if (insertError) throw new Error(tr('prod_add_err_insert') + ' ' + insertError.message);
           productId = newProduct.id;
           inserted = true;
@@ -764,48 +629,35 @@ document.addEventListener('DOMContentLoaded', async () => {
             is_primary: i === 0,
             source: 'scan',
           }));
-          const { error: bcErr } = await db
-            .from('product_barcodes')
+          await db.from('product_barcodes')
             .upsert(aliasRows, { onConflict: 'organization_id,barcode', ignoreDuplicates: true });
-          if (bcErr) console.warn('barcode upsert err:', bcErr);
         }
 
-        const { error: stockErr } = await db
-          .from('stock_movements')
-          .insert({
-            organization_id: profile.organization_id,
-            product_id: productId,
-            type: 'in',
-            method: 'manual',
-            quantity: Number(p.qty),
-            performed_by: authUser.id,
-          });
-        if (stockErr) console.warn('stock movement err:', stockErr);
-
-        itemResults.push({
-          productId,
-          name: p.name,
-          qty: Number(p.qty),
-          price: Number(p.price),
-          inserted,
+        // stock_movement واحد فقط لكل منتج — trigger يزيد qty
+        await db.from('stock_movements').insert({
+          organization_id: profile.organization_id,
+          product_id: productId,
+          type: 'in',
+          method: 'manual',
+          quantity: Number(p.qty),
+          performed_by: authUser.id,
         });
+
+        itemResults.push({ productId, name: p.name, qty: Number(p.qty), price: Number(p.price), inserted });
       }
 
       const totalQty = addedProducts.reduce((s, p) => s + Number(p.qty), 0);
       const totalValue = addedProducts.reduce((s, p) => s + Number(p.qty) * Number(p.price), 0);
 
       const { data: newInvoice, error: invoiceErr } = await db
-        .from('invoices')
-        .insert({
+        .from('invoices').insert({
           invoice_number: invoiceNumber,
           organization_id: profile.organization_id,
           supplier_id: finalSupplierId,
           created_by: authUser.id,
           total_qty: totalQty,
           total_value: totalValue,
-        })
-        .select()
-        .single();
+        }).select().single();
 
       if (invoiceErr) throw new Error(tr('prod_add_err_invoice') + ' ' + invoiceErr.message);
 
@@ -819,9 +671,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       }));
 
       const { error: itemsErr } = await db.from('invoice_items').insert(invoiceItems);
-      if (itemsErr) {
-        throw new Error(tr('prod_add_err_items', 'Failed to save invoice items') + ' ' + itemsErr.message);
-      }
+      if (itemsErr) throw new Error(tr('prod_add_err_items', 'Failed to save invoice items') + ' ' + itemsErr.message);
 
       if (typeof notifyOrganization === 'function') {
         try {
@@ -833,9 +683,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             link: `/invoice.html?id=${encodeURIComponent(invoiceNumber)}`,
             userName: profile.full_name || null,
           });
-        } catch (notifErr) {
-          console.error('Notification error:', notifErr);
-        }
+        } catch (notifErr) { console.error('Notification error:', notifErr); }
       }
 
       const insertedCount = itemResults.filter(r => r.inserted).length;
@@ -869,15 +717,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   });
 
-  // ========== Parent message ==========
   window.addEventListener('message', (event) => {
     const data = event.data;
     if (!data || typeof data !== 'object') return;
     if (data.type === 'PRODUCT_SELECTED' && data.productId) {
       const detailIframe = document.getElementById('detail-iframe');
-      if (detailIframe) {
-        detailIframe.src = `/products/detail.html?id=${encodeURIComponent(data.productId)}`;
-      }
+      if (detailIframe) detailIframe.src = `/products/detail.html?id=${encodeURIComponent(data.productId)}`;
     }
   });
 
