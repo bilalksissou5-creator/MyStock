@@ -1,6 +1,6 @@
 // ============================================
 // صفحة إخراج منتجات (متعددة) + إيصال بيع
-// ✅ طباعة صامتة عبر iframe مخفي (لا صفحة إيصال ظاهرة)
+// ✅ طباعة عبر iframe مخفي — بنفس تصميم receipt.html
 // ✅ خصم qty مباشرة
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
@@ -167,10 +167,109 @@ document.addEventListener('DOMContentLoaded', async () => {
   let html5QrCode = null;
 
   // ============================================
-  // طباعة
+  // الطباعة
   // ============================================
   function isAndroid() { return /Android/i.test(navigator.userAgent); }
 
+  // انتظر محتوى الإيصال الفعلي (ليس "جارٍ التحميل")
+  function waitForReceiptContent(doc, timeoutMs = 12000) {
+    return new Promise((resolve) => {
+      const start = Date.now();
+      const check = () => {
+        const content = doc.getElementById('receipt-content');
+        if (!content) {
+          if (Date.now() - start > timeoutMs) return resolve();
+          return setTimeout(check, 200);
+        }
+        const text = content.textContent || '';
+        const isLoading = text.includes('جارٍ التحميل') || text.includes('Loading');
+        const hasRealContent = content.querySelector(
+          '.receipt-container, .receipt, .receipt-header, .receipt-title, table, h1, h2, .receipt-item, img'
+        );
+        if (!isLoading && hasRealContent) return resolve();
+        if (Date.now() - start > timeoutMs) return resolve();
+        setTimeout(check, 200);
+      };
+      check();
+    });
+  }
+
+  // ✅ طباعة via iframe بنفس تصميم receipt.html
+  function printViaIframe(receiptId) {
+    return new Promise((resolve) => {
+      const iframe = document.createElement('iframe');
+      iframe.id = '__print_frame';
+      // حجم حقيقي خارج الشاشة (لتجنب مشاكل الرسم)
+      iframe.style.cssText =
+        'position:fixed;left:-9999px;top:0;width:80mm;min-height:297mm;border:0;pointer-events:none;';
+      iframe.src = '/receipt.html?id=' + encodeURIComponent(receiptId);
+
+      let done = false;
+      const finish = () => {
+        if (done) return;
+        done = true;
+        setTimeout(() => { try { iframe.remove(); } catch (e) {} }, 2000);
+        resolve();
+      };
+
+      iframe.onload = async () => {
+        try {
+          const win = iframe.contentWindow;
+          const doc = win.document;
+
+          // 1. انتظر تحميل بيانات الإيصال من Supabase
+          await waitForReceiptContent(doc, 12000);
+
+          // 2. انتظر تحميل الخطوط
+          if (doc.fonts && doc.fonts.ready) {
+            try { await doc.fonts.ready; } catch (e) {}
+          }
+
+          // 3. انتظر تحميل الصور
+          const imgs = Array.from(doc.querySelectorAll('img'));
+          await Promise.all(imgs.map(img => {
+            if (img.complete) return Promise.resolve();
+            return new Promise(res => {
+              img.addEventListener('load', res, { once: true });
+              img.addEventListener('error', res, { once: true });
+              setTimeout(res, 2000);
+            });
+          }));
+
+          // 4. انتظر تحميل CSS (stylesheets)
+          const sheets = Array.from(doc.styleSheets || []);
+          await Promise.all(sheets.map(sheet => {
+            try {
+              if (sheet.cssRules) return Promise.resolve();
+              // بعض المتصفحات لا ترمي خطأ عند الوصول
+              return Promise.resolve();
+            } catch (e) {
+              return Promise.resolve();
+            }
+          }));
+
+          // 5. استقرار بسيط قبل الطباعة
+          await new Promise(r => setTimeout(r, 500));
+
+          // ✅ لا حقن CSS مخصص — receipt.css يتولى التصميم والطباعة
+          win.focus();
+          win.print();
+        } catch (err) {
+          console.warn('print error:', err);
+        }
+        finish();
+      };
+
+      iframe.onerror = finish;
+
+      // حماية كاملة
+      setTimeout(() => { if (!done) finish(); }, 20000);
+
+      document.body.appendChild(iframe);
+    });
+  }
+
+  // RawBT — لا يدعم التصميم (ESC/POS نصي فقط)
   function buildRawBTText(receiptNumber, items, totalQty, totalValue) {
     const L = [];
     L.push('\x1B\x61\x01');
@@ -214,38 +313,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     } catch (err) { console.warn('RawBT error:', err); }
   }
 
-  // ✅ الطباعة عبر iframe مخفي فقط (لا صفحة إيصال ظاهرة)
-  function printViaIframe(receiptId) {
-    try {
-      const iframe = document.createElement('iframe');
-      iframe.id = '__print_frame';
-      iframe.style.cssText = 'position:fixed;right:0;bottom:0;width:80mm;height:200mm;border:0;opacity:0;pointer-events:none;z-index:-1;';
-      iframe.src = '/receipt.html?id=' + encodeURIComponent(receiptId);
-
-      iframe.onload = () => {
-        setTimeout(() => {
-          try {
-            const doc = iframe.contentWindow.document;
-            // حقن CSS للطباعة الحرارية 80mm
-            if (doc && doc.head) {
-              const style = doc.createElement('style');
-              style.textContent = '@media print{@page{margin:0;size:80mm auto}body{margin:0!important;padding:0!important}nav,header,footer,button,.no-print,.app-nav,.app-header,.sidebar,.topbar{display:none!important}}';
-              doc.head.appendChild(style);
-            }
-            iframe.contentWindow.focus();
-            iframe.contentWindow.print();
-          } catch (e) { console.warn('iframe print error:', e); }
-          setTimeout(() => { try { iframe.remove(); } catch (e) {} }, 8000);
-        }, 1500);
-      };
-
-      document.body.appendChild(iframe);
-
-      // حماية: احذف الـ iframe إن لم يُطبع
-      setTimeout(() => { try { iframe.remove(); } catch (e) {} }, 20000);
-    } catch (err) { console.warn('iframe setup error:', err); }
-  }
-
   function autoPrintReceipt(receiptId, receiptNumber, items) {
     const totalQty = items.reduce((s, p) => s + Number(p.qty), 0);
     const totalValue = items.reduce((s, p) => s + Number(p.qty) * Number(p.price), 0);
@@ -254,7 +321,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       printViaRawBT(receiptNumber, items, totalQty, totalValue);
       return;
     }
-    // ديسكتوب + iOS: iframe فقط
+    // ديسكتوب: iframe بنفس تصميم receipt.html
     printViaIframe(receiptId);
   }
 
@@ -382,9 +449,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   scannerClose.addEventListener('click', stopScanner);
   scannerModal.addEventListener('click', (e) => { if (e.target === scannerModal) stopScanner(); });
 
-  // ============================================
-  // السلة
-  // ============================================
   function renderAddedProducts() {
     if (addedProducts.length === 0) {
       addedContainer.innerHTML = `<div class="empty-added"><i class="fas fa-box-open"></i><p>${tr('mout_empty')}</p></div>`;
@@ -500,7 +564,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
 
   // ============================================
-  // الحفظ + الطباعة (بدون فتح أي صفحة)
+  // الحفظ + الطباعة
   // ============================================
   saveBtn.addEventListener('click', async (e) => {
     e.preventDefault(); e.stopPropagation();
@@ -614,10 +678,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       const itemsSnapshot = addedProducts.map(p => ({ ...p }));
 
-      // ✅ طباعة عبر iframe مخفي — لا نافذة، لا صفحة إيصال ظاهرة
+      // ✅ طباعة بنفس تصميم receipt.html
       autoPrintReceipt(newReceipt.id, receiptNumber, itemsSnapshot);
 
-      // تفريغ السلة
       addedProducts.length = 0;
       renderAddedProducts();
       document.getElementById('note').value = '';
