@@ -1,6 +1,7 @@
 // ============================================
 // صفحة إخراج منتجات (متعددة) + إيصال بيع
 // ✅ المسح يملأ الحقول فقط، والزر يضيف ويُفرغ
+// ✅ خصم qty مباشرة (بدل trigger)
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   if (window.__movementOutLoaded) return;
@@ -301,7 +302,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       found = dbFound;
     }
 
-    // ✅ جديد: البحث في product_barcodes (باركود بديل)
+    // ✅ البحث في product_barcodes (باركود بديل)
     if (!found) {
       const { data: aliasRow } = await db
         .from('product_barcodes')
@@ -594,6 +595,21 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       const { error: moveError } = await db.from('stock_movements').insert(movements);
       if (moveError) throw new Error(tr('mout_err_movements') + ' ' + moveError.message);
+
+      // ✅ خصم qty مباشرة (بدل trigger)
+      for (const p of addedProducts) {
+        const { data: fresh } = await db
+          .from('products')
+          .select('qty')
+          .eq('id', p.id)
+          .single();
+        const newQty = Math.max(0, Number(fresh?.qty || 0) - Number(p.qty));
+        const { error: qtyErr } = await db
+          .from('products')
+          .update({ qty: newQty })
+          .eq('id', p.id);
+        if (qtyErr) throw new Error(tr('mout_err_movements') + ' ' + qtyErr.message);
+      }
 
       if (typeof notifyOrganization === 'function') {
         try {
