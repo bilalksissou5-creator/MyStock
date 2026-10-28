@@ -2,10 +2,7 @@
 // صفحة إخراج منتجات (متعددة) + إيصال بيع
 // ✅ خصم qty مباشرة
 // ✅ بحث في product_barcodes
-// ✅ طباعة تلقائية:
-//    - أندرويد: RawBT (صامت)
-//    - ديسكتوب: نافذة طباعة الإيصال
-//    - iOS/فشل: تحويل لصفحة الإيصال
+// ✅ طباعة تلقائية بدون تحويل لصفحة الإيصال
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   if (window.__movementOutLoaded) return;
@@ -171,7 +168,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   let html5QrCode = null;
 
   // ============================================
-  // طباعة تلقائية
+  // طباعة
   // ============================================
   function isAndroid() { return /Android/i.test(navigator.userAgent); }
   function isIOS() {
@@ -219,9 +216,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       iframe.src = url;
       document.body.appendChild(iframe);
       setTimeout(() => { try { iframe.remove(); } catch (e) {} }, 3500);
-    } catch (err) {
-      console.warn('RawBT error:', err);
-    }
+    } catch (err) { console.warn('RawBT error:', err); }
   }
 
   function printViaPopup(receiptId, printWin) {
@@ -271,15 +266,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     const totalQty = items.reduce((s, p) => s + Number(p.qty), 0);
     const totalValue = items.reduce((s, p) => s + Number(p.qty) * Number(p.price), 0);
 
-    if (isAndroid()) {
-      printViaRawBT(receiptNumber, items, totalQty, totalValue);
-      return;
-    }
+    if (isAndroid()) { printViaRawBT(receiptNumber, items, totalQty, totalValue); return; }
     if (isIOS()) return;
-
-    if (!printViaPopup(receiptId, printWin)) {
-      printViaIframe(receiptId);
-    }
+    if (!printViaPopup(receiptId, printWin)) printViaIframe(receiptId);
   }
 
   // ============================================
@@ -527,7 +516,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
 
   // ============================================
-  // الحفظ + الطباعة التلقائية
+  // الحفظ + الطباعة (بدون تحويل)
   // ============================================
   saveBtn.addEventListener('click', async (e) => {
     e.preventDefault(); e.stopPropagation();
@@ -545,7 +534,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       return;
     }
 
-    // فتح نافذة الطباعة مسبقاً (قبل async) للديسكتوب فقط
     let printWin = null;
     if (!isAndroid() && !isIOS()) {
       try {
@@ -656,10 +644,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         window.parent.postMessage({ type: 'PRODUCT_INSTANT_UPDATE_QTY', updates }, '*');
       }
 
-      // ✅ لقطة للسلة قبل التفريغ (للطباعة)
       const itemsSnapshot = addedProducts.map(p => ({ ...p }));
 
-      // ✅ الطباعة التلقائية
+      // ✅ طباعة فقط — لا تحويل
       autoPrintReceipt(newReceipt.id, receiptNumber, itemsSnapshot, printWin);
 
       // تفريغ
@@ -667,10 +654,13 @@ document.addEventListener('DOMContentLoaded', async () => {
       renderAddedProducts();
       document.getElementById('note').value = '';
 
-      // التحويل لصفحة الإيصال بعد الطباعة
-      setTimeout(() => {
-        window.location.href = `/receipt.html?id=${newReceipt.id}`;
-      }, isAndroid() ? 2200 : 4000);
+      // ✅ إعادة تفعيل الزر للبيع التالي
+      saveBtn.disabled = false;
+      saveBtn.querySelector('span').textContent = tr('mout_save');
+      isSaving = false;
+
+      // إخفاء رسالة النجاح بعد 5 ثوانٍ
+      setTimeout(() => { successBox.style.display = 'none'; }, 5000);
 
     } catch (error) {
       if (printWin && !printWin.closed) { try { printWin.close(); } catch (e) {} }
