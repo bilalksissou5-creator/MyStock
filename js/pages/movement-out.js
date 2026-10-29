@@ -1,8 +1,8 @@
 // ============================================
 // صفحة إخراج منتجات (متعددة) + إيصال بيع
 // ✅ المسح يملأ الحقول فقط، والزر يضيف ويُفرغ
-// ✅ طباعة تلقائية (iframe بنفس تصميم receipt.html)
-// ✅ خصم qty مباشرة (بدل trigger)
+// ✅ طباعة في الخلفية (iframe مخفي) - لا تحويل للصفحة
+// ✅ خصم qty مباشرة
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   if (window.__movementOutLoaded) return;
@@ -169,7 +169,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   let isSaving = false;
   let html5QrCode = null;
 
-  // ✅ دالة الطباعة التلقائية (iframe بنفس تصميم receipt.html)
+  // ✅ دالة الطباعة التلقائية (iframe مخفي تماماً)
   function printReceipt(receiptId) {
     const iframe = document.createElement('iframe');
     iframe.style.cssText = 'position:fixed;left:-9999px;top:0;width:80mm;height:200mm;border:0;opacity:0;pointer-events:none;';
@@ -650,17 +650,23 @@ document.addEventListener('DOMContentLoaded', async () => {
         }, '*');
       }
 
+      // تفريغ السلة
       addedProducts.length = 0;
       renderAddedProducts();
       document.getElementById('note').value = '';
 
-      // ✅ استدعاء الطباعة التلقائية
+      // ✅ إعادة تفعيل زر الحفظ للعمليات القادمة
+      saveBtn.disabled = false;
+      saveBtn.querySelector('span').textContent = tr('mout_save');
+      isSaving = false;
+
+      // ✅ استدعاء الطباعة (تفتح نافذة الطباعة، لكن لا تحول الصفحة)
       printReceipt(newReceipt.id);
 
-      // ✅ تأخير التحويل لصفحة الإيصال حتى تُطبع الفاتورة
+      // إخفاء رسالة النجاح بعد 5 ثوان
       setTimeout(() => {
-        window.location.href = `/receipt.html?id=${newReceipt.id}`;
-      }, 3500);
+        successBox.style.display = 'none';
+      }, 5000);
 
     } catch (error) {
       errBox.textContent = error.message;
