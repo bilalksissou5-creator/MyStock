@@ -1,10 +1,7 @@
 // ============================================
-// صفحة إخراج منتجات + طباعة حرارية تلقائية شاملة
-// ✅ WebUSB (كمبيوتر/أندرويد)
-// ✅ WebBluetooth (كمبيوتر/أندرويد)
-// ✅ RawBT (أندرويد - بديل)
-// ✅ طباعة المتصفح (iOS/ديسكتوب)
-// ✅ التصميم مطابق 100% لـ receipt.html
+// صفحة إخراج منتجات + إيصال بيع
+// ✅ بدون تطبيقات خارجية (RawBT محذوف)
+// ✅ بدون زر الطابعة في الواجهة
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   if (window.__movementOutLoaded) return;
@@ -18,7 +15,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const tr = (key) => (window.t ? window.t(key) : key);
   document.title = tr('mout_title_full');
 
-  // تحميل html2canvas ديناميكياً
+  // تحميل html2canvas ديناميكياً لتحويل التصميم لصورة (للدعم المستقبلي للطابعات الحرارية)
   async function loadHtml2Canvas() {
     if (window.html2canvas) return;
     return new Promise((resolve, reject) => {
@@ -30,297 +27,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   }
 
-  // ============================================
-  // محرك الطباعة الحرارية الموحد
-  // ============================================
-  class ThermalPrinter {
-    constructor() {
-      this.usbDevice = null;
-      this.btDevice = null;
-      this.btChar = null;
-      this.mode = null; // 'usb', 'bt', 'rawbt', 'native'
-      this.saved = false;
-      this.loadSavedDevices();
-    }
-
-    async loadSavedDevices() {
-      if (navigator.usb) {
-        try {
-          const devices = await navigator.usb.getDevices();
-          if (devices.length > 0) {
-            this.usbDevice = devices[0];
-            this.mode = 'usb';
-            this.saved = true;
-          }
-        } catch (e) {}
-      }
-      if (!this.mode && navigator.bluetooth) {
-        try {
-          const devices = await navigator.bluetooth.getDevices();
-          if (devices.length > 0) {
-            this.btDevice = devices[0];
-            this.mode = 'bt';
-            this.saved = true;
-          }
-        } catch (e) {}
-      }
-    }
-
-    async connectUSB() {
-      if (!navigator.usb) return false;
-      try {
-        this.usbDevice = await navigator.usb.requestDevice({ filters: [] });
-        this.mode = 'usb';
-        return true;
-      } catch (e) { return false; }
-    }
-
-    async connectBluetooth() {
-      if (!navigator.bluetooth) return false;
-      try {
-        this.btDevice = await navigator.bluetooth.requestDevice({
-          acceptAllDevices: true,
-          optionalServices: [
-            0xFF00, 0x18F0, 0xFFE0, 
-            '0000ff00-0000-1000-8000-00805f9b34fb',
-            '000018f0-0000-1000-8000-00805f9b34fb',
-            'e7810a71-73ae-499d-8c15-faa9aef0c3f2'
-          ]
-        });
-        this.mode = 'bt';
-        return true;
-      } catch (e) { return false; }
-    }
-
-    async getBTCharacteristic() {
-      if (this.btChar) return this.btChar;
-      if (!this.btDevice.gatt.connected) await this.btDevice.gatt.connect();
-      const services = await this.btDevice.gatt.getPrimaryServices();
-      for (const s of services) {
-        try {
-          const chars = await s.getCharacteristics();
-          for (const c of chars) {
-            if (c.properties.write || c.properties.writeWithoutResponse) {
-              this.btChar = c;
-              return c;
-            }
-          }
-        } catch(e) {}
-      }
-      throw new Error("No writable characteristic found");
-    }
-
-    // تحويل canvas إلى أوامر ESC/POS (Bitmap)
-    canvasToESCPOS(canvas) {
-      const ctx = canvas.getContext('2d');
-      const width = canvas.width;
-      const height = canvas.height;
-      const imageData = ctx.getImageData(0, 0, width, height).data;
-      
-      const bytesPerRow = Math.ceil(width / 8);
-      const buffer = new Uint8Array(bytesPerRow * height);
-      let offset = 0;
-
-      for (let y = 0; y < height; y++) {
-        for (let x = 0; x < width; x += 8) {
-          let byte = 0;
-          for (let bit = 0; bit < 8; bit++) {
-            if (x + bit < width) {
-              const idx = (y * width + (x + bit)) * 4;
-              const a = imageData[idx + 3];
-              if (a < 128) continue;
-              const r = imageData[idx], g = imageData[idx+1], b = imageData[idx+2];
-              const lum = 0.299*r + 0.587*g + 0.114*b;
-              if (lum < 128) byte |= (1 << (7 - bit));
-            }
-          }
-          buffer[offset++] = byte;
-        }
-      }
-
-      const cmds = [0x1B, 0x40, 0x1B, 0x33, 0x00]; // init + line spacing 0
-      const xL = bytesPerRow & 0xFF, xH = (bytesPerRow >> 8) & 0xFF;
-      const yL = height & 0xFF, yH = (height >> 8) & 0xFF;
-      cmds.push(0x1D, 0x76, 0x30, 0x00, xL, xH, yL, yH);
-      
-      const finalBuffer = new Uint8Array(cmds.length + buffer.length + 5);
-      finalBuffer.set(cmds, 0);
-      finalBuffer.set(buffer, cmds.length);
-      
-      let tailIdx = cmds.length + buffer.length;
-      finalBuffer.set([0x1B, 0x64, 0x03], tailIdx); // feed 3
-      finalBuffer.set([0x1D, 0x56, 0x42, 0x00], tailIdx + 3); // cut
-      
-      return finalBuffer;
-    }
-
-    async printViaUSB(canvas) {
-      if (!this.usbDevice.opened) await this.usbDevice.open();
-      if (this.usbDevice.configuration === null) await this.usbDevice.selectConfiguration(1);
-      
-      let iface = 0, ep = 1;
-      for (const intf of this.usbDevice.configuration.interfaces) {
-        for (const e of intf.alternates[0].endpoints) {
-          if (e.direction === 'out') { iface = intf.interfaceNumber; ep = e.endpointNumber; break; }
-        }
-      }
-      await this.usbDevice.claimInterface(iface);
-      
-      const data = this.canvasToESCPOS(canvas);
-      const CHUNK = 1024;
-      for (let i = 0; i < data.length; i += CHUNK) {
-        await this.usbDevice.transferOut(ep, data.slice(i, i + CHUNK));
-      }
-      await this.usbDevice.close();
-    }
-
-    async printViaBT(canvas) {
-      const char = await this.getBTCharacteristic();
-      const data = this.canvasToESCPOS(canvas);
-      const CHUNK = 100;
-      for (let i = 0; i < data.length; i += CHUNK) {
-        const chunk = data.slice(i, i + CHUNK);
-        if (char.properties.writeWithoutResponse) {
-          await char.writeValueWithoutResponse(chunk);
-        } else {
-          await char.writeValue(chunk);
-        }
-      }
-    }
-
-    printViaRawBT(canvas) {
-      const base64 = canvas.toDataURL('image/png').split(',')[1];
-      const url = `intent:base64,${base64}#Intent;scheme=rawbt;package=ru.a402d.rawbtprinter;S.autoprint=true;end;`;
-      const iframe = document.createElement('iframe');
-      iframe.style.display = 'none';
-      iframe.src = url;
-      document.body.appendChild(iframe);
-      setTimeout(() => { try { iframe.remove(); } catch(e) {} }, 10000);
-    }
-
-    async print(canvas, receiptId) {
-      try {
-        if (this.mode === 'usb' && this.usbDevice) {
-          await this.printViaUSB(canvas);
-          return true;
-        }
-        if (this.mode === 'bt' && this.btDevice) {
-          await this.printViaBT(canvas);
-          return true;
-        }
-      } catch (err) {
-        console.warn("Direct print failed, falling back:", err);
-      }
-      
-      if (/Android/i.test(navigator.userAgent)) {
-        this.printViaRawBT(canvas);
-        return true;
-      }
-      
-      return false; // Fallback to native
-    }
-  }
-
-  const printer = new ThermalPrinter();
-
-  // ============================================
-  // تحويل receipt.html إلى Canvas
-  // ============================================
-  async function renderReceiptToCanvas(receiptId) {
-    await loadHtml2Canvas();
-    return new Promise((resolve, reject) => {
-      const iframe = document.createElement('iframe');
-      // عرض 80mm ليخرج التصميم مطابقاً للطابعة
-      iframe.style.cssText = 'position:fixed;left:-9999px;top:0;width:80mm;min-height:297mm;border:0;pointer-events:none;';
-      iframe.src = '/receipt.html?id=' + encodeURIComponent(receiptId);
-
-      iframe.onload = async () => {
-        try {
-          const doc = iframe.contentDocument || iframe.contentWindow.document;
-          
-          // انتظار حتى ينتهي receipt.js من رسم البيانات
-          const start = Date.now();
-          while (Date.now() - start < 10000) {
-            const content = doc.getElementById('receipt-content');
-            if (content && content.querySelector('.rc-total-row')) break;
-            await new Promise(r => setTimeout(r, 200));
-          }
-
-          // إخفاء أزرار الطباعة والرجوع
-          doc.querySelectorAll('.no-print').forEach(el => el.style.display = 'none');
-          
-          // انتظار الخطوط والصور
-          if (doc.fonts) { try { await doc.fonts.ready; } catch(e) {} }
-          const imgs = Array.from(doc.querySelectorAll('img'));
-          await Promise.all(imgs.map(img => {
-            if (img.complete) return Promise.resolve();
-            return new Promise(res => {
-              img.addEventListener('load', res);
-              img.addEventListener('error', res);
-              setTimeout(res, 2000);
-            });
-          }));
-          
-          await new Promise(r => setTimeout(r, 400)); // استقرار التصميم
-
-          const target = doc.getElementById('receipt-content');
-          if (!target) throw new Error("Target not found");
-
-          const canvas = await html2canvas(target, {
-            backgroundColor: '#ffffff',
-            scale: 2, 
-            useCORS: true,
-            allowTaint: true,
-            logging: false,
-            width: target.scrollWidth,
-            height: target.scrollHeight,
-            windowWidth: target.scrollWidth,
-            windowHeight: target.scrollHeight
-          });
-
-          iframe.remove();
-          resolve(canvas);
-        } catch (err) {
-          iframe.remove();
-          reject(err);
-        }
-      };
-      
-      iframe.onerror = () => { iframe.remove(); reject(new Error("Iframe load failed")); };
-      document.body.appendChild(iframe);
-    });
-  }
-
-  function printNative(receiptId) {
-    const iframe = document.createElement('iframe');
-    iframe.style.cssText = 'position:fixed;left:-9999px;top:0;width:80mm;height:297mm;border:0;opacity:0;pointer-events:none;';
-    iframe.src = '/receipt.html?id=' + encodeURIComponent(receiptId);
-    iframe.onload = () => {
-      setTimeout(() => {
-        try {
-          iframe.contentWindow.focus();
-          iframe.contentWindow.print();
-        } catch (e) { console.warn(e); }
-        setTimeout(() => { try { iframe.remove(); } catch (e) {} }, 5000);
-      }, 1500);
-    };
-    document.body.appendChild(iframe);
-  }
-
-  async function autoPrintReceipt(receiptId) {
-    try {
-      const canvas = await renderReceiptToCanvas(receiptId);
-      const direct = await printer.print(canvas, receiptId);
-      if (!direct) printNative(receiptId);
-    } catch (err) {
-      console.warn("Print failed, using native fallback:", err);
-      printNative(receiptId);
-    }
-  }
-
-  // ============================================
-  // إعدادات الواجهة والمنتجات
-  // ============================================
   const main = document.getElementById('main-content');
   const { data: profile } = await db.from('profiles').select('organization_id').eq('id', user.id).single();
 
@@ -338,17 +44,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     return;
   }
 
+  // ✅ تم حذف زر الطابعة من هنا
   main.innerHTML = `
     <div class="page-header">
       <h2>${tr('mout_title')}</h2>
-      <div style="display:flex; gap:8px;">
-        <button type="button" class="btn-secondary" id="setup-printer-btn" title="ربط الطابعة">
-          <i class="fas fa-print"></i>
-        </button>
-        <button type="button" class="btn-primary scan-btn" id="scan-btn">
-          <i class="fas fa-barcode"></i><span>${tr('mout_scan')}</span>
-        </button>
-      </div>
+      <button type="button" class="btn-primary scan-btn" id="scan-btn">
+        <i class="fas fa-barcode"></i><span>${tr('mout_scan')}</span>
+      </button>
     </div>
     <div class="alert alert-error" id="form-error" style="display:none;"></div>
     <div class="alert alert-success" id="form-success" style="display:none;"></div>
@@ -411,19 +113,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     </div>
   `;
 
-  // ربط الطابعة (مرة واحدة)
-  document.getElementById('setup-printer-btn').addEventListener('click', async () => {
-    if (navigator.usb) {
-      const ok = await printer.connectUSB();
-      if (ok) return alert("تم ربط طابعة USB بنجاح ✅");
-    }
-    if (navigator.bluetooth) {
-      const ok = await printer.connectBluetooth();
-      if (ok) return alert("تم ربط طابعة Bluetooth بنجاح ✅");
-    }
-    alert("لم يتم ربط طابعة. سيتم استخدام نافذة الطباعة العادية عند الحفظ.");
-  });
-
   const addedProducts = [];
   const productInput = document.getElementById('product-input');
   const hiddenId = document.getElementById('product_id');
@@ -440,6 +129,25 @@ document.addEventListener('DOMContentLoaded', async () => {
   const scannerClose = document.getElementById('scanner-close');
 
   let selectedProduct = null, isAdding = false, isSaving = false, html5QrCode = null;
+
+  // ============================================
+  // دالة الطباعة (نافذة المتصفح فقط)
+  // ============================================
+  function printNative(receiptId) {
+    const iframe = document.createElement('iframe');
+    iframe.style.cssText = 'position:fixed;left:-9999px;top:0;width:80mm;height:297mm;border:0;opacity:0;pointer-events:none;';
+    iframe.src = '/receipt.html?id=' + encodeURIComponent(receiptId);
+    iframe.onload = () => {
+      setTimeout(() => {
+        try {
+          iframe.contentWindow.focus();
+          iframe.contentWindow.print();
+        } catch (e) { console.warn(e); }
+        setTimeout(() => { try { iframe.remove(); } catch (e) {} }, 5000);
+      }, 1500);
+    };
+    document.body.appendChild(iframe);
+  }
 
   function showSuggestions(filter) {
     const q = filter.trim().toLowerCase();
@@ -617,7 +325,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         } catch (e) { console.error(e); }
       }
 
-      successBox.textContent = `تم الحفظ بنجاح ✅ — جاري الطباعة...`;
+      successBox.textContent = `تم الحفظ بنجاح ✅ — جاري تجهيز الطباعة...`;
       successBox.style.display = 'block';
 
       if (window.self !== window.top) {
@@ -632,11 +340,10 @@ document.addEventListener('DOMContentLoaded', async () => {
       saveBtn.querySelector('span').textContent = tr('mout_save');
       isSaving = false;
 
-      // ✅ الطباعة
-      await autoPrintReceipt(newReceipt.id);
+      // ✅ الطباعة بنافذة المتصفح
+      printNative(newReceipt.id);
 
-      successBox.textContent = `تم الحفظ بنجاح ✅`;
-      setTimeout(() => { successBox.style.display = 'none'; }, 5000);
+      setTimeout(() => { successBox.style.display = 'none'; }, 4000);
 
     } catch (error) {
       errBox.textContent = error.message;
