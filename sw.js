@@ -1,34 +1,16 @@
-// Service Worker - يجعل التطبيق يعمل بدون إنترنت
-const CACHE_NAME = 'mystock-v1';
-const ASSETS = [
-  '/',
-  '/index.html',
-  '/manifest.json',
-  '/assets/css/common.css',
-  '/assets/css/pages/landing.css'
-];
+// Service Worker
+const CACHE_NAME = 'mystock-v3'; 
 
-// تثبيت Service Worker
 self.addEventListener('install', (event) => {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS))
-  );
   self.skipWaiting();
 });
 
-// تفعيل وتنظيف الكاش القديم
 self.addEventListener('activate', (event) => {
-  event.waitUntil(
-    caches.keys().then((keys) =>
-      Promise.all(keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k)))
-    )
-  );
-  self.clients.claim();
+  event.waitUntil(self.clients.claim());
 });
 
-// استراتيجية: جرب الشبكة أولاً، وإذا فشلت ارجع للكاش
+// معالج fetch (شرط أساسي لكي يقبل المتصفح تثبيت التطبيق)
 self.addEventListener('fetch', (event) => {
-  event.respondWith(
-    fetch(event.request).catch(() => caches.match(event.request))
-  );
+  // تمرير الطلبات للشبكة مباشرة (بدون تعقيدات الكاش لتجنب أي أخطاء)
+  event.respondWith(fetch(event.request));
 });
