@@ -2,18 +2,8 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>MyStock</title>
-
-  <!-- ✅ إعدادات تطبيق الويب التقدمي (PWA) -->
-  <link rel="manifest" href="/manifest.json" crossorigin="use-credentials">
-  <meta name="theme-color" content="#171717">
-
-  <!-- ✅ إعدادات خاصة بنظام آيفون (iOS) -->
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="MyStock">
-  <link rel="apple-touch-icon" href="/assets/img/icon-192.png">
 
   <!-- ✅ وسم Canonical لمحركات البحث -->
   <link rel="canonical" href="https://mystock-1xc.pages.dev/">
@@ -275,17 +265,6 @@
         }
       });
     });
-  </script>
-
-  <!-- ✅ تسجيل Service Worker -->
-  <script>
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/sw.js')
-          .then(reg => console.log('✅ SW registered:', reg.scope))
-          .catch(err => console.warn('❌ SW registration failed:', err));
-      });
-    }
   </script>
 </body>
 </html>
