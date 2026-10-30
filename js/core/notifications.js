@@ -1,6 +1,7 @@
 // ============================================
 // الإشعارات
 // الدور: جلب + إنشاء إشعارات + تحديث فوري بسرعة البرق
+// ✅ تشغيل الصوت والاهتزاز عند وصول إشعار جديد
 // ============================================
 
 // ============================================
@@ -172,9 +173,6 @@ async function updateNotifCounter() {
 let notifRealtimeChannel = null;
 
 function startNotifPolling() {
-  // ملاحظة: احتفظنا باسم الدالة كما هو لكي تعمل مع layout.js
-  // لكننا سنستخدم التحديث الفوري بدلاً من المؤقت الزمني
-  
   if (window.__stopNotifPolling) {
     updateNotifCounter();
     return;
@@ -194,10 +192,24 @@ function startNotifPolling() {
     .on(
       'postgres_changes',
       { event: 'INSERT', schema: 'public', table: 'notifications' },
-      (payload) => {
-        // بمجرد إضافة إشعار جديد، نقوم بتحديث العداد فوراً
+      async (payload) => {
         console.log('⚡ إشعار جديد وصل فوراً:', payload);
+        
+        // ✅ تحديث العداد
         updateNotifCounter();
+
+        // ✅ التحقق: هل هذا الإشعار موجه للمستخدم الحالي؟
+        try {
+          const { data: { user } } = await db.auth.getUser();
+          if (user && payload.new && payload.new.user_id === user.id) {
+            // تشغيل الصوت والاهتزاز
+            if (typeof window.playNotificationAlerts === 'function') {
+              window.playNotificationAlerts();
+            }
+          }
+        } catch (err) {
+          console.warn('Error checking notification user:', err);
+        }
       }
     )
     .subscribe((status) => {

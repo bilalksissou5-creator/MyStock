@@ -2,7 +2,7 @@
 // الهيكل المشترك (Header + Sidebar)
 // ✅ فحص تلقائي + تحذيرات + ترجمة كاملة
 // ✅ دعم iframe (وضع Embed)
-// ✅ محرك الإشعارات (صوت + اهتزاز)
+// ✅ محرك التنبيهات (صوت + اهتزاز)
 // ============================================
 
 const ALLOWED_PAGES = [
@@ -74,7 +74,7 @@ if (document.readyState === 'loading') document.addEventListener('DOMContentLoad
 else autoCheckPaymentBlock();
 
 function renderLayout(activePage) {
-  // ✅ إذا كنا داخل iframe، اعرض Main فقط
+  // ✅ إذا كنا داخل iframe، اعرض Main فقط (لإخفاء الهيدر والسايدبار)
   if (window.self !== window.top) {
     document.documentElement.classList.add('in-iframe');
     const app = document.querySelector('.app');
@@ -145,51 +145,93 @@ function renderLayout(activePage) {
 }
 
 // ============================================
-// ✅ محرك الإشعارات (صوت + اهتزاز)
+// ✅ محرك التنبيهات (صوت + اهتزاز)
 // ============================================
-let audioCtx = null;
+window.__audioCtx = null;
 
-// فك قفل الصوت في المتصفح (يجب أن يلمس المستخدم الشاشة مرة واحدة)
-document.addEventListener('click', () => {
-  if (!audioCtx) {
-    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-  }
-  if (audioCtx.state === 'suspended') {
-    audioCtx.resume();
-  }
-}, { once: true });
-
-// الدالة العالمية التي سيتم استدعاؤها عند وصول إشعار جديد
-window.playNotificationAlerts = function() {
-  // 1. التحقق من المفتاح الرئيسي
-  const masterOn = localStorage.getItem('notif_master') !== 'false';
-  if (!masterOn) return;
-
-  // 2. تشغيل الصوت
-  const soundOn = localStorage.getItem('notif_sound') !== 'false';
-  if (soundOn && audioCtx) {
+function unlockAudio() {
+  if (!window.__audioCtx) {
     try {
-      const osc = audioCtx.createOscillator();
-      const gainNode = audioCtx.createGain();
-      
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(880, audioCtx.currentTime); 
-      osc.frequency.exponentialRampToValueAtTime(1760, audioCtx.currentTime + 0.1);
-      
-      gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime);
-      gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
-      
-      osc.connect(gainNode);
-      gainNode.connect(audioCtx.destination);
-      
-      osc.start();
-      osc.stop(audioCtx.currentTime + 0.3);
-    } catch (e) { console.warn("Audio error:", e); }
+      window.__audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      console.log('🔊 AudioContext created:', window.__audioCtx.state);
+    } catch (e) { console.warn("Audio init failed:", e); return; }
+  }
+  if (window.__audioCtx.state === 'suspended') {
+    window.__audioCtx.resume().then(() => {
+      console.log('🔊 AudioContext resumed:', window.__audioCtx.state);
+    });
+  }
+}
+
+// فك قفل الصوت عند أي تفاعل
+['click', 'touchstart', 'keydown'].forEach(evt => {
+  document.addEventListener(evt, unlockAudio, { passive: true });
+});
+
+window.playNotificationAlerts = async function() {
+  console.log('🎵 playNotificationAlerts called');
+  
+  const masterOn = localStorage.getItem('notif_master') !== 'false';
+  const soundOn = localStorage.getItem('notif_sound') !== 'false';
+  const vibrateOn = localStorage.getItem('notif_vibrate') !== 'false';
+  
+  console.log('⚙️ Settings:', { masterOn, soundOn, vibrateOn });
+  
+  if (!masterOn) {
+    console.log('⏸️ Master switch OFF, skipping');
+    return;
   }
 
-  // 3. الاهتزاز
-  const vibrateOn = localStorage.getItem('notif_vibrate') !== 'false';
-  if (vibrateOn && navigator.vibrate) {
-    navigator.vibrate([200, 100, 200]);
+  // --- تشغيل الصوت ---
+  if (soundOn) {
+    try {
+      if (!window.__audioCtx) {
+        window.__audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        console.log('🔊 AudioContext created inside play:', window.__audioCtx.state);
+      }
+      
+      if (window.__audioCtx.state === 'suspended') {
+        await window.__audioCtx.resume();
+        console.log('🔊 Resumed to:', window.__audioCtx.state);
+      }
+      
+      const now = window.__audioCtx.currentTime;
+      
+      const osc1 = window.__audioCtx.createOscillator();
+      const gain1 = window.__audioCtx.createGain();
+      osc1.type = 'sine';
+      osc1.frequency.setValueAtTime(880, now);
+      gain1.gain.setValueAtTime(0.4, now);
+      gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
+      osc1.connect(gain1);
+      gain1.connect(window.__audioCtx.destination);
+      osc1.start(now);
+      osc1.stop(now + 0.2);
+      
+      const osc2 = window.__audioCtx.createOscillator();
+      const gain2 = window.__audioCtx.createGain();
+      osc2.type = 'sine';
+      osc2.frequency.setValueAtTime(1320, now + 0.15);
+      gain2.gain.setValueAtTime(0.4, now + 0.15);
+      gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
+      osc2.connect(gain2);
+      gain2.connect(window.__audioCtx.destination);
+      osc2.start(now + 0.15);
+      osc2.stop(now + 0.4);
+      
+      console.log('🎵 Sound played successfully');
+    } catch (e) { 
+      console.error("❌ Sound error:", e); 
+    }
+  }
+
+  // --- الاهتزاز ---
+  if (vibrateOn) {
+    if (navigator.vibrate) {
+      navigator.vibrate([200, 100, 200]);
+      console.log('📳 Vibration triggered');
+    } else {
+      console.warn('📳 Vibration not supported');
+    }
   }
 };
