@@ -20,5 +20,14 @@
       "sizes": "2000x2000",
       "type": "image/png"
     }
+  ],
+  "screenshots": [
+    {
+      "src": "/assets/img/icon-512.png",
+      "sizes": "2000x2000",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "لوحة تحكم MyStock"
+    }
   ]
 }
