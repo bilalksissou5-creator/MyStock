@@ -1,11 +1,14 @@
 {
+  "id": "/",
   "name": "MyStock",
   "short_name": "MyStock",
   "description": "نظام إدارة المخزون والمبيعات",
   "start_url": "/index.html",
   "display": "standalone",
+  "orientation": "portrait",
   "background_color": "#ffffff",
   "theme_color": "#171717",
+  "categories": ["business", "productivity", "utilities"],
   "icons": [
     {
       "src": "/assets/img/icon-192.png",
