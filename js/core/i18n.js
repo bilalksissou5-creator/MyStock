@@ -890,6 +890,15 @@ const translations = {
     bc_notif_new_card_msg: 'قام بإضافة بطاقة بنكية جديدة وتفعيل الاشتراك',
     bc_notif_reactivate_title: 'إعادة تفعيل البطاقة',
     bc_notif_reactivate_msg: 'قام بإعادة تفعيل البطاقة البنكية',
+
+    stg_notifications: 'الإشعارات',
+    stg_notifications_sub: 'التحكم في الأصوات والرنات',
+    notif_master_title: 'تفعيل الإشعارات',
+    notif_master_sub: 'إيقاف/تشغيل كل الإشعارات',
+    notif_sound_title: 'صوت الإشعار',
+    notif_sound_sub: 'تشغيل نغمة عند وصول إشعار',
+    notif_vibrate_title: 'الاهتزاز',
+    notif_vibrate_sub: 'اهتزاز الهاتف عند وصول إشعار',
   },
 
   fr: {
@@ -1770,6 +1779,15 @@ const translations = {
     bc_notif_new_card_msg: 'a ajouté une nouvelle carte et activé l\'abonnement',
     bc_notif_reactivate_title: 'Réactivation de la carte',
     bc_notif_reactivate_msg: 'a réactivé la carte bancaire',
+
+    stg_notifications: 'Notifications',
+    stg_notifications_sub: 'Contrôle des sons et des alertes',
+    notif_master_title: 'Activer les notifications',
+    notif_master_sub: 'Activer/désactiver toutes les notifications',
+    notif_sound_title: 'Son de notification',
+    notif_sound_sub: 'Jouer un son à la réception d\'une notification',
+    notif_vibrate_title: 'Vibration',
+    notif_vibrate_sub: 'Vibrer le téléphone à la réception d\'une notification',
   },
 
   en: {
@@ -2650,6 +2668,15 @@ const translations = {
     bc_notif_new_card_msg: 'added a new card and activated the subscription',
     bc_notif_reactivate_title: 'Card Reactivated',
     bc_notif_reactivate_msg: 'reactivated the bank card',
+
+    stg_notifications: 'Notifications',
+    stg_notifications_sub: 'Control sounds and alerts',
+    notif_master_title: 'Enable Notifications',
+    notif_master_sub: 'Turn all notifications on/off',
+    notif_sound_title: 'Notification Sound',
+    notif_sound_sub: 'Play a sound when a notification arrives',
+    notif_vibrate_title: 'Vibration',
+    notif_vibrate_sub: 'Vibrate phone when a notification arrives',
   },
 
   
