@@ -1,61 +1,50 @@
-const CACHE_NAME = 'mystock-cache-v1';
-const ASSETS_TO_CACHE = [
-  '/',
-  '/index.html',
-  '/manifest.json',
-  '/assets/css/common.css',
-  '/assets/css/pages/landing.css'
-];
-
-// 1. تثبيت الـ Service Worker وتخزين الملفات
-self.addEventListener('install', (event) => {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      // تخزين الملفات (إذا فشل ملف واحد، لا يتوقف الباقي)
-      return Promise.all(
-        ASSETS_TO_CACHE.map((url) => {
-          return cache.add(url).catch((err) => console.warn('فشل تخزين:', url));
-        })
-      );
-    }).then(() => self.skipWaiting())
-  );
+// ✅ Service Worker لدعم الإشعارات والعمل بدون إنترنت
+self.addEventListener('install', (e) => {
+  self.skipWaiting();
 });
 
-// 2. تفعيل الـ Service Worker ومسح الكاش القديم
-self.addEventListener('activate', (event) => {
-  event.waitUntil(
-    caches.keys().then((cacheNames) => {
-      return Promise.all(
-        cacheNames.map((cache) => {
-          if (cache !== CACHE_NAME) {
-            return caches.delete(cache);
-          }
-        })
-      );
-    }).then(() => self.clients.claim())
-  );
+self.addEventListener('activate', (e) => {
+  e.waitUntil(self.clients.claim());
 });
 
-// 3. جلب الملفات (الشبكة أولاً، وإذا انقطع الإنترنت نستخدم الكاش)
-self.addEventListener('fetch', (event) => {
-  // تجاهل طلبات قاعدة البيانات (Supabase) لأنها تحتاج إنترنت دائماً
-  if (event.request.url.includes('supabase') || event.request.method !== 'GET') {
-    return;
+self.addEventListener('fetch', (e) => {
+  e.respondWith(fetch(e.request).catch(() => caches.match(e.request)));
+});
+
+// ✅ استقبال الإشعارات من الخادم
+self.addEventListener('push', function(event) {
+  if (event.data) {
+    const data = event.data.json();
+    const options = {
+      body: data.body,
+      icon: '/assets/img/icon-192.png',
+      badge: '/assets/img/icon-192.png',
+      vibrate: [200, 100, 200],
+      data: {
+        url: data.url || '/'
+      }
+    };
+    event.waitUntil(
+      self.registration.showNotification(data.title, options)
+    );
   }
+});
 
-  event.respondWith(
-    fetch(event.request)
-      .then((response) => {
-        // حفظ نسخة جديدة في الكاش إذا نجح الاتصال
-        const responseClone = response.clone();
-        caches.open(CACHE_NAME).then((cache) => {
-          cache.put(event.request, responseClone);
-        });
-        return response;
-      })
-      .catch(() => {
-        // إذا فشل الاتصال، جلب الملف من الكاش
-        return caches.match(event.request);
-      })
+// ✅ عند الضغط على الإشعار، يفتح التطبيق
+self.addEventListener('notificationclick', function(event) {
+  event.notification.close();
+  event.waitUntil(
+    clients.matchAll({ type: 'window', includeUncontrolled: true }).then(function(clientList) {
+      const urlToOpen = new URL(event.notification.data.url, self.location.origin).href;
+      for (let i = 0; i < clientList.length; i++) {
+        const client = clientList[i];
+        if (client.url === urlToOpen && 'focus' in client) {
+          return client.focus();
+        }
+      }
+      if (clients.openWindow) {
+        return clients.openWindow(urlToOpen);
+      }
+    })
   );
 });
