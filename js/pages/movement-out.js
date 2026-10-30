@@ -1,8 +1,5 @@
 // ============================================
-// صفحة إخراج منتجات (متعددة) + إيصال بيع
-// ✅ المسح يملأ الحقول فقط، والزر يضيف ويُفرغ
-// ✅ طباعة في الخلفية (iframe مخفي) - لا تحويل للصفحة
-// ✅ خصم qty مباشرة
+// صفحة إخراج منتجات + طباعة حرارية تلقائية (بدون زر)
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   if (window.__movementOutLoaded) return;
@@ -12,50 +9,189 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (!user) return;
 
   renderLayout('movements/out.html');
-
   if (window.applyLanguage) window.applyLanguage();
   const tr = (key) => (window.t ? window.t(key) : key);
-
   document.title = tr('mout_title_full');
 
+  async function loadHtml2Canvas() {
+    if (window.html2canvas) return;
+    return new Promise((resolve, reject) => {
+      const script = document.createElement('script');
+      script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
+      script.onload = resolve;
+      script.onerror = reject;
+      document.head.appendChild(script);
+    });
+  }
+
+  const Printer = {
+    device: null,
+    char: null,
+    mode: null, // 'bt' أو 'usb'
+
+    // ✅ يحاول الاتصال بالطابعة المحفوظة تلقائياً عند فتح الصفحة
+    async loadSaved() {
+      if (navigator.bluetooth) {
+        try {
+          const devices = await navigator.bluetooth.getDevices();
+          if (devices.length > 0) { 
+            this.device = devices[0]; 
+            this.mode = 'bt'; 
+            return true; 
+          }
+        } catch (e) {}
+      }
+      if (navigator.usb) {
+        try {
+          const devices = await navigator.usb.getDevices();
+          if (devices.length > 0) { 
+            this.device = devices[0]; 
+            this.mode = 'usb'; 
+            return true; 
+          }
+        } catch (e) {}
+      }
+      return false;
+    },
+
+    async pair() {
+      if (navigator.bluetooth) {
+        try {
+          this.device = await navigator.bluetooth.requestDevice({
+            acceptAllDevices: true,
+            optionalServices: [0xFF00, 0x18F0, 0xFFE0, '0000ff00-0000-1000-8000-00805f9b34fb', '000018f0-0000-1000-8000-00805f9b34fb']
+          });
+          this.mode = 'bt';
+          return true;
+        } catch (e) {}
+      }
+      if (navigator.usb) {
+        try {
+          this.device = await navigator.usb.requestDevice({ filters: [] });
+          this.mode = 'usb';
+          return true;
+        } catch (e) {}
+      }
+      return false;
+    },
+
+    canvasToESCPOS(canvas) {
+      const ctx = canvas.getContext('2d');
+      const w = canvas.width, h = canvas.height;
+      const img = ctx.getImageData(0, 0, w, h).data;
+      const bytesPerRow = Math.ceil(w / 8);
+      const buffer = new Uint8Array(bytesPerRow * h);
+      let off = 0;
+      for (let y = 0; y < h; y++) {
+        for (let x = 0; x < w; x += 8) {
+          let b = 0;
+          for (let bit = 0; bit < 8; bit++) {
+            if (x + bit < w) {
+              const i = (y * w + (x + bit)) * 4;
+              if (img[i + 3] < 128) continue;
+              const lum = 0.299 * img[i] + 0.587 * img[i + 1] + 0.114 * img[i + 2];
+              if (lum < 128) b |= (1 << (7 - bit));
+            }
+          }
+          buffer[off++] = b;
+        }
+      }
+      const head = [0x1B, 0x40, 0x1B, 0x33, 0x00, 0x1D, 0x76, 0x30, 0x00, bytesPerRow & 0xFF, (bytesPerRow >> 8) & 0xFF, h & 0xFF, (h >> 8) & 0xFF];
+      const tail = [0x1B, 0x64, 0x04, 0x1D, 0x56, 0x42, 0x00];
+      const out = new Uint8Array(head.length + buffer.length + tail.length);
+      out.set(head, 0); out.set(buffer, head.length); out.set(tail, head.length + buffer.length);
+      return out;
+    },
+
+    async getBTChar() {
+      if (this.char) return this.char;
+      if (!this.device.gatt.connected) await this.device.gatt.connect();
+      const services = await this.device.gatt.getPrimaryServices();
+      for (const s of services) {
+        const chars = await s.getCharacteristics();
+        for (const c of chars) {
+          if (c.properties.write || c.properties.writeWithoutResponse) { this.char = c; return c; }
+        }
+      }
+      throw new Error("No writable characteristic");
+    },
+
+    async print(canvas) {
+      if (!this.mode) throw new Error("No printer paired");
+      const data = this.canvasToESCPOS(canvas);
+      
+      if (this.mode === 'bt') {
+        const char = await this.getBTChar();
+        for (let i = 0; i < data.length; i += 100) {
+          const chunk = data.slice(i, i + 100);
+          if (char.properties.writeWithoutResponse) await char.writeValueWithoutResponse(chunk);
+          else await char.writeValue(chunk);
+        }
+      } else if (this.mode === 'usb') {
+        if (!this.device.opened) await this.device.open();
+        let iface = 0, ep = 1;
+        for (const intf of this.device.configuration.interfaces) {
+          for (const e of intf.alternates[0].endpoints) {
+            if (e.direction === 'out') { iface = intf.interfaceNumber; ep = e.endpointNumber; break; }
+          }
+        }
+        await this.device.claimInterface(iface);
+        for (let i = 0; i < data.length; i += 1024) {
+          await this.device.transferOut(ep, data.slice(i, i + 1024));
+        }
+      }
+    }
+  };
+
+  async function receiptToCanvas(receiptId) {
+    await loadHtml2Canvas();
+    return new Promise((resolve, reject) => {
+      const iframe = document.createElement('iframe');
+      iframe.style.cssText = 'position:fixed;left:-9999px;top:0;width:80mm;border:0;pointer-events:none;';
+      iframe.src = '/receipt.html?id=' + encodeURIComponent(receiptId);
+      iframe.onload = async () => {
+        try {
+          const doc = iframe.contentDocument || iframe.contentWindow.document;
+          const start = Date.now();
+          while (Date.now() - start < 10000) {
+            if (doc.getElementById('receipt-content')?.querySelector('.rc-total-row')) break;
+            await new Promise(r => setTimeout(r, 200));
+          }
+          doc.querySelectorAll('.no-print').forEach(el => el.style.display = 'none');
+          if (doc.fonts) { try { await doc.fonts.ready; } catch (e) {} }
+          
+          const target = doc.getElementById('receipt-content');
+          const canvas = await html2canvas(target, {
+            backgroundColor: '#ffffff', scale: 2, useCORS: true, allowTaint: true,
+            width: target.scrollWidth, height: target.scrollHeight
+          });
+          iframe.remove(); resolve(canvas);
+        } catch (e) { iframe.remove(); reject(e); }
+      };
+      document.body.appendChild(iframe);
+    });
+  }
+
+  // ✅ محاولة الاتصال بالطابعة فور فتح الصفحة
+  const isPaired = await Printer.loadSaved();
+
   const main = document.getElementById('main-content');
-
-  const { data: profile } = await db
-    .from('profiles')
-    .select('organization_id')
-    .eq('id', user.id)
-    .single();
-
+  const { data: profile } = await db.from('profiles').select('organization_id').eq('id', user.id).single();
+  
   function getSellingPrice(product) {
-    const sellPrice = Number(product.sell_price ?? 0);
-    const sellEnabled = product.sell_price_enabled === true;
-    const basePrice = Number(product.price ?? 0);
-    if (sellEnabled && sellPrice > 0) return sellPrice;
-    return basePrice;
+    const s = Number(product.sell_price ?? 0), e = product.sell_price_enabled === true, b = Number(product.price ?? 0);
+    return (e && s > 0) ? s : b;
   }
+  
+  const { data: products, error: productsError } = await db.from('products').select('*').order('name');
+  if (productsError) { main.innerHTML = `<div class="alert alert-error">${productsError.message}</div>`; return; }
 
-  const { data: products, error: productsError } = await db
-    .from('products')
-    .select('*')
-    .order('name');
-
-  if (productsError) {
-    main.innerHTML = `
-      <div class="alert alert-error">
-        <strong>${tr('mout_load_err')}</strong>
-        <br>
-        <small>${productsError.message}</small>
-      </div>
-    `;
-    return;
-  }
-
+  // ✅ تم حذف زر الربط من الواجهة
   main.innerHTML = `
     <div class="page-header">
       <h2>${tr('mout_title')}</h2>
       <button type="button" class="btn-primary scan-btn" id="scan-btn">
-        <i class="fas fa-barcode"></i>
-        <span>${tr('mout_scan')}</span>
+        <i class="fas fa-barcode"></i><span>${tr('mout_scan')}</span>
       </button>
     </div>
 
@@ -63,7 +199,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     <div class="alert alert-success" id="form-success" style="display:none;"></div>
 
     <div class="out-form">
-
       <div class="product-input-card">
         <div class="form-group">
           <label>${tr('mout_note')}</label>
@@ -132,7 +267,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         </button>
         <a href="/movements/list.html" class="btn-secondary">${tr('mout_cancel')}</a>
       </div>
-
     </div>
 
     <div class="scanner-modal" id="scanner-modal" style="display:none;">
@@ -163,510 +297,218 @@ document.addEventListener('DOMContentLoaded', async () => {
   const scannerModal = document.getElementById('scanner-modal');
   const scannerReader = document.getElementById('scanner-reader');
   const scannerClose = document.getElementById('scanner-close');
-
-  let selectedProduct = null;
-  let isAdding = false;
-  let isSaving = false;
-  let html5QrCode = null;
-
-  // ✅ دالة الطباعة التلقائية (iframe مخفي تماماً)
-  function printReceipt(receiptId) {
-    const iframe = document.createElement('iframe');
-    iframe.style.cssText = 'position:fixed;left:-9999px;top:0;width:80mm;height:200mm;border:0;opacity:0;pointer-events:none;';
-    iframe.src = '/receipt.html?id=' + encodeURIComponent(receiptId);
-    iframe.onload = () => {
-      setTimeout(() => {
-        try {
-          iframe.contentWindow.focus();
-          iframe.contentWindow.print();
-        } catch (e) { console.warn(e); }
-        setTimeout(() => { try { iframe.remove(); } catch (e) {} }, 8000);
-      }, 1500);
-    };
-    document.body.appendChild(iframe);
-  }
+  
+  let selectedProduct = null, isAdding = false, isSaving = false, html5QrCode = null;
 
   function showSuggestions(filter) {
     const q = filter.trim().toLowerCase();
-    if (q.length < 1) {
-      suggestions.innerHTML = '';
-      suggestions.style.display = 'none';
-      return;
-    }
-
-    const filtered = (products ?? []).filter(p =>
-      (p.name ?? '').toLowerCase().includes(q) ||
-      (p.sku ?? '').toLowerCase().includes(q)
-    ).slice(0, 5);
-
-    if (filtered.length === 0) {
-      suggestions.innerHTML = `<div class="suggestion-empty">${tr('mout_no_results')}</div>`;
-      suggestions.style.display = 'block';
-      return;
-    }
-
+    if (!q) { suggestions.innerHTML = ''; suggestions.style.display = 'none'; return; }
+    const filtered = (products ?? []).filter(p => (p.name ?? '').toLowerCase().includes(q) || (p.sku ?? '').toLowerCase().includes(q)).slice(0, 5);
+    if (!filtered.length) { suggestions.innerHTML = `<div class="suggestion-empty">${tr('mout_no_results')}</div>`; suggestions.style.display = 'block'; return; }
     suggestions.innerHTML = filtered.map(p => `
       <div class="suggestion-card" data-id="${p.id}">
-        <div class="suggestion-image">
-          ${p.image_url ? `<img src="${p.image_url}" alt="${p.name}">` : '<i class="fas fa-box-open"></i>'}
-        </div>
-        <div class="suggestion-info">
-          <strong>${p.name ?? tr('products_no_name')}</strong>
-          <span class="suggestion-sku">${p.sku ?? '—'}</span>
-        </div>
-        <div class="suggestion-stats">
-          <span>${tr('products_qty')}: <b class="${(p.qty ?? 0) < 10 ? 'low' : ''}">${p.qty ?? 0}</b></span>
-        </div>
-      </div>
-    `).join('');
-
+        <div class="suggestion-image">${p.image_url ? `<img src="${p.image_url}">` : '<i class="fas fa-box-open"></i>'}</div>
+        <div class="suggestion-info"><strong>${p.name ?? tr('products_no_name')}</strong><span class="suggestion-sku">${p.sku ?? '—'}</span></div>
+        <div class="suggestion-stats"><span>${tr('products_qty')}: <b>${p.qty ?? 0}</b></span></div>
+      </div>`).join('');
     suggestions.style.display = 'block';
-
     suggestions.querySelectorAll('.suggestion-card').forEach(card => {
       card.addEventListener('pointerdown', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        const id = card.dataset.id;
-        const found = products.find(p => p.id === id);
-        if (found) {
-          selectProduct(found);
-          suggestions.style.display = 'none';
-        }
+        e.preventDefault(); e.stopPropagation();
+        const found = products.find(p => p.id === card.dataset.id);
+        if (found) { selectProduct(found); suggestions.style.display = 'none'; }
       });
     });
   }
 
-  function selectProduct(found) {
-    selectedProduct = found;
-    productInput.value = `${found.name} (${found.sku ?? '—'})`;
-    hiddenId.value = found.id;
-    quantityInput.value = 1;
-    const sellingPrice = getSellingPrice(found);
-    priceInput.value = sellingPrice.toFixed(2);
-    availableQtyInput.value = found.qty ?? 0;
+  function selectProduct(f) {
+    selectedProduct = f; productInput.value = `${f.name} (${f.sku ?? '—'})`; hiddenId.value = f.id; quantityInput.value = 1; priceInput.value = getSellingPrice(f).toFixed(2); availableQtyInput.value = f.qty ?? 0;
   }
 
-  productInput.addEventListener('input', () => {
-    selectedProduct = null;
-    hiddenId.value = '';
-    availableQtyInput.value = '—';
-    showSuggestions(productInput.value);
-  });
-
-  document.addEventListener('pointerdown', (e) => {
-    if (!e.target.closest('#product-input') && !e.target.closest('#product-suggestions')) {
-      suggestions.style.display = 'none';
-    }
-  });
+  productInput.addEventListener('input', () => { selectedProduct = null; hiddenId.value = ''; availableQtyInput.value = '—'; showSuggestions(productInput.value); });
+  document.addEventListener('pointerdown', (e) => { if (!e.target.closest('#product-input') && !e.target.closest('#product-suggestions')) suggestions.style.display = 'none'; });
 
   async function startScanner() {
-    if (typeof Html5Qrcode === 'undefined') {
-      alert(tr('prod_add_scanner_err'));
-      return;
-    }
-
-    scannerModal.style.display = 'flex';
-    scannerReader.innerHTML = '';
-
+    if (typeof Html5Qrcode === 'undefined') { alert(tr('prod_add_scanner_err')); return; }
+    scannerModal.style.display = 'flex'; scannerReader.innerHTML = '';
     try {
       html5QrCode = new Html5Qrcode("scanner-reader");
-      const config = { fps: 10, qrbox: { width: 250, height: 250 }, aspectRatio: 1.0 };
-
-      await html5QrCode.start(
-        { facingMode: "environment" },
-        config,
-        async (decodedText) => {
-          await handleScan(decodedText);
-          await stopScanner();
-        },
-        () => { }
-      );
-    } catch (err) {
-      alert(tr('prod_add_camera_err') + ' ' + err.message);
-      scannerModal.style.display = 'none';
-    }
+      await html5QrCode.start({ facingMode: "environment" }, { fps: 10, qrbox: { width: 250, height: 250 }, aspectRatio: 1.0 },
+        async (t) => { await handleScan(t); await stopScanner(); }, () => {});
+    } catch (err) { alert(tr('prod_add_camera_err') + ' ' + err.message); scannerModal.style.display = 'none'; }
   }
 
   async function stopScanner() {
-    if (html5QrCode) {
-      try {
-        await html5QrCode.stop();
-        await html5QrCode.clear();
-      } catch (e) { }
-      html5QrCode = null;
-    }
+    if (html5QrCode) { try { await html5QrCode.stop(); await html5QrCode.clear(); } catch (e) {} html5QrCode = null; }
     scannerModal.style.display = 'none';
   }
 
   async function handleScan(barcode) {
-    const value = String(barcode).trim();
-    if (!value) return;
-
-    let found = (products ?? []).find(p => p.sku === value || p.qr_code === value);
-
-    if (!found) {
-      const { data: dbFound, error } = await db
-        .from('products')
-        .select('*')
-        .eq('organization_id', profile?.organization_id)
-        .eq('sku', value)
-        .limit(1)
-        .maybeSingle();
-
-      if (error) {
-        alert(tr('prod_add_err_find') + ' ' + error.message);
-        return;
-      }
-      found = dbFound;
+    const v = String(barcode).trim(); if (!v) return;
+    let f = (products ?? []).find(p => p.sku === v || p.qr_code === v);
+    if (!f) {
+      const { data, error } = await db.from('products').select('*').eq('organization_id', profile?.organization_id).eq('sku', v).limit(1).maybeSingle();
+      if (error) { alert(tr('prod_add_err_find') + ' ' + error.message); return; }
+      f = data;
     }
-
-    if (!found) {
-      const { data: aliasRow } = await db
-        .from('product_barcodes')
-        .select('product_id')
-        .eq('organization_id', profile?.organization_id)
-        .eq('barcode', value)
-        .limit(1)
-        .maybeSingle();
-
-      if (aliasRow?.product_id) {
-        const { data: prod } = await db
-          .from('products')
-          .select('*')
-          .eq('id', aliasRow.product_id)
-          .single();
-        if (prod) found = prod;
-      }
+    if (!f) {
+      const { data: a } = await db.from('product_barcodes').select('product_id').eq('organization_id', profile?.organization_id).eq('barcode', v).limit(1).maybeSingle();
+      if (a?.product_id) { const { data: p } = await db.from('products').select('*').eq('id', a.product_id).single(); if (p) f = p; }
     }
-
-    if (!found) {
-      alert(`${tr('mout_not_found')}\n${value}`);
-      return;
-    }
-
-    const available = Number(found.qty ?? 0);
-    if (available <= 0) {
-      alert(`${tr('mout_no_stock')} "${found.name}"`);
-      return;
-    }
-
-    selectProduct(found);
+    if (!f) { alert(`${tr('mout_not_found')}\n${v}`); return; }
+    if (Number(f.qty ?? 0) <= 0) { alert(`${tr('mout_no_stock')} "${f.name}"`); return; }
+    selectProduct(f);
   }
 
   scanBtn.addEventListener('click', startScanner);
   scannerClose.addEventListener('click', stopScanner);
-  scannerModal.addEventListener('click', (e) => {
-    if (e.target === scannerModal) stopScanner();
-  });
+  scannerModal.addEventListener('click', (e) => { if (e.target === scannerModal) stopScanner(); });
 
   function renderAddedProducts() {
-    if (addedProducts.length === 0) {
-      addedContainer.innerHTML = `
-        <div class="empty-added">
-          <i class="fas fa-box-open"></i>
-          <p>${tr('mout_empty')}</p>
-        </div>
-      `;
-      updateSummary();
-      return;
-    }
-
-    addedContainer.innerHTML = addedProducts.map((p, index) => `
+    if (!addedProducts.length) { addedContainer.innerHTML = `<div class="empty-added"><i class="fas fa-box-open"></i><p>${tr('mout_empty')}</p></div>`; updateSummary(); return; }
+    addedContainer.innerHTML = addedProducts.map((p, i) => `
       <div class="added-product-card">
-        <div class="added-product-image">
-          ${p.image_url
-            ? `<img src="${p.image_url}" alt="${p.name}">`
-            : `<i class="fas fa-box-open"></i>`}
-        </div>
-        <div class="added-product-info">
-          <strong>${p.name}</strong>
-          <span>${p.sku ?? '—'}</span>
-        </div>
+        <div class="added-product-image">${p.image_url ? `<img src="${p.image_url}">` : `<i class="fas fa-box-open"></i>`}</div>
+        <div class="added-product-info"><strong>${p.name}</strong><span>${p.sku ?? '—'}</span></div>
         <div class="added-product-stats">
-          <div class="stat-mini">
-            <span>${tr('products_qty')}</span>
-            <b>${p.qty}</b>
-          </div>
-          <div class="stat-mini">
-            <span>${tr('products_price')}</span>
-            <b>${Number(p.price).toFixed(2)}</b>
-          </div>
-          <div class="stat-mini highlight">
-            <span>${tr('products_total')}</span>
-            <b>${(Number(p.qty) * Number(p.price)).toFixed(2)}</b>
-          </div>
+          <div class="stat-mini"><span>${tr('products_qty')}</span><b>${p.qty}</b></div>
+          <div class="stat-mini"><span>${tr('products_price')}</span><b>${Number(p.price).toFixed(2)}</b></div>
+          <div class="stat-mini highlight"><span>${tr('products_total')}</span><b>${(Number(p.qty) * Number(p.price)).toFixed(2)}</b></div>
         </div>
-        <button type="button" class="added-product-delete" data-index="${index}" title="${tr('prod_add_delete')}">
-          <i class="fas fa-xmark"></i>
-        </button>
-      </div>
-    `).join('');
-
+        <button type="button" class="added-product-delete" data-index="${i}"><i class="fas fa-xmark"></i></button>
+      </div>`).join('');
     addedContainer.querySelectorAll('.added-product-delete').forEach(btn => {
-      btn.addEventListener('pointerdown', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        addedProducts.splice(Number(btn.dataset.index), 1);
-        renderAddedProducts();
-      });
+      btn.addEventListener('pointerdown', (e) => { e.preventDefault(); e.stopPropagation(); addedProducts.splice(Number(btn.dataset.index), 1); renderAddedProducts(); });
     });
-
     updateSummary();
   }
 
   function updateSummary() {
-    let totalQty = 0;
-    let totalValue = 0;
-    addedProducts.forEach(p => {
-      totalQty += Number(p.qty);
-      totalValue += Number(p.qty) * Number(p.price);
-    });
+    let q = 0, v = 0;
+    addedProducts.forEach(p => { q += Number(p.qty); v += Number(p.qty) * Number(p.price); });
     document.getElementById('sum-rows').textContent = addedProducts.length;
-    document.getElementById('sum-qty').textContent = totalQty;
-    document.getElementById('sum-total').textContent = totalValue.toFixed(2);
+    document.getElementById('sum-qty').textContent = q;
+    document.getElementById('sum-total').textContent = v.toFixed(2);
   }
 
   function addProduct() {
     if (isAdding || addBtn.disabled) return;
-    isAdding = true;
-    addBtn.disabled = true;
+    isAdding = true; addBtn.disabled = true;
+    const errBox = document.getElementById('form-error'); errBox.style.display = 'none';
+    if (!selectedProduct) { errBox.textContent = tr('mout_err_select'); errBox.style.display = 'block'; productInput.focus(); isAdding = false; addBtn.disabled = false; return; }
+    const qty = Number(quantityInput.value), price = Number(priceInput.value) || 0, av = Number(selectedProduct.qty ?? 0);
+    if (!qty || qty <= 0) { errBox.textContent = tr('prod_add_err_qty'); errBox.style.display = 'block'; quantityInput.focus(); isAdding = false; addBtn.disabled = false; return; }
+    if (qty > av) { errBox.textContent = `${tr('mout_err_max')} ${av}`; errBox.style.display = 'block'; quantityInput.focus(); isAdding = false; addBtn.disabled = false; return; }
 
-    const errBox = document.getElementById('form-error');
-    errBox.style.display = 'none';
-
-    if (!selectedProduct) {
-      errBox.textContent = tr('mout_err_select');
-      errBox.style.display = 'block';
-      productInput.focus();
-      isAdding = false;
-      addBtn.disabled = false;
-      return;
-    }
-
-    const qty = Number(quantityInput.value);
-    const price = Number(priceInput.value) || 0;
-    const available = Number(selectedProduct.qty ?? 0);
-
-    if (!qty || qty <= 0) {
-      errBox.textContent = tr('prod_add_err_qty');
-      errBox.style.display = 'block';
-      quantityInput.focus();
-      isAdding = false;
-      addBtn.disabled = false;
-      return;
-    }
-
-    if (qty > available) {
-      errBox.textContent = `${tr('mout_err_max')} ${available}`;
-      errBox.style.display = 'block';
-      quantityInput.focus();
-      isAdding = false;
-      addBtn.disabled = false;
-      return;
-    }
-
-    const costPrice = Number(selectedProduct.price ?? 0);
-    const existing = addedProducts.find(p => p.id === selectedProduct.id);
-
-    if (existing) {
-      existing.qty += qty;
-      existing.price = price;
-      existing.costPrice = costPrice;
-      renderAddedProducts();
-    } else {
-      addedProducts.push({
-        id: selectedProduct.id,
-        name: selectedProduct.name,
-        sku: selectedProduct.sku,
-        image_url: selectedProduct.image_url,
-        qty: qty,
-        price: price,
-        costPrice: costPrice,
-        available: available,
-      });
-      renderAddedProducts();
-    }
-
-    productInput.value = '';
-    hiddenId.value = '';
-    availableQtyInput.value = '—';
-    quantityInput.value = '';
-    priceInput.value = '0';
-    selectedProduct = null;
-    productInput.focus();
-
-    setTimeout(() => {
-      isAdding = false;
-      addBtn.disabled = false;
-    }, 400);
+    const cp = Number(selectedProduct.price ?? 0);
+    const ex = addedProducts.find(p => p.id === selectedProduct.id);
+    if (ex) { ex.qty += qty; ex.price = price; ex.costPrice = cp; }
+    else { addedProducts.push({ id: selectedProduct.id, name: selectedProduct.name, sku: selectedProduct.sku, image_url: selectedProduct.image_url, qty, price, costPrice: cp, available: av }); }
+    renderAddedProducts();
+    productInput.value = ''; hiddenId.value = ''; availableQtyInput.value = '—'; quantityInput.value = ''; priceInput.value = '0'; selectedProduct = null; productInput.focus();
+    setTimeout(() => { isAdding = false; addBtn.disabled = false; }, 400);
   }
 
-  addBtn.addEventListener('click', (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    addProduct();
-  });
-
+  addBtn.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); addProduct(); });
   [productInput, quantityInput, priceInput].forEach(input => {
-    input.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') {
-        e.preventDefault();
-        addBtn.click();
-      }
-    });
+    input.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); addBtn.click(); } });
   });
 
   saveBtn.addEventListener('click', async (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-
+    e.preventDefault(); e.stopPropagation();
     if (isSaving || saveBtn.disabled) return;
-    isSaving = true;
-    saveBtn.disabled = true;
 
-    const errBox = document.getElementById('form-error');
-    const successBox = document.getElementById('form-success');
+    const errBox = document.getElementById('form-error'), successBox = document.getElementById('form-success');
+    errBox.style.display = 'none'; successBox.style.display = 'none';
 
-    errBox.style.display = 'none';
-    successBox.style.display = 'none';
-
-    if (addedProducts.length === 0) {
-      errBox.textContent = tr('prod_add_err_empty');
-      errBox.style.display = 'block';
-      isSaving = false;
-      saveBtn.disabled = false;
-      return;
-    }
-
-    saveBtn.querySelector('span').textContent = tr('prod_add_saving');
+    if (!addedProducts.length) { errBox.textContent = tr('prod_add_err_empty'); errBox.style.display = 'block'; return; }
+    isSaving = true; saveBtn.disabled = true; saveBtn.querySelector('span').textContent = tr('prod_add_saving');
 
     try {
+      // ... (نفس كود الحفظ في قاعدة البيانات كما هو بدون تغيير) ...
       const { data: { user: authUser } } = await db.auth.getUser();
-      const { data: prof } = await db
-        .from('profiles')
-        .select('organization_id, full_name')
-        .eq('id', authUser.id)
-        .single();
-
+      const { data: prof } = await db.from('profiles').select('organization_id, full_name').eq('id', authUser.id).single();
       if (!prof?.organization_id) throw new Error(tr('prod_add_err_org'));
 
-      const { data: lastReceipt } = await db
-        .from('receipts')
-        .select('receipt_number')
-        .eq('organization_id', prof.organization_id)
-        .order('created_at', { ascending: false })
-        .limit(1)
-        .maybeSingle();
-
+      const { data: lastReceipt } = await db.from('receipts').select('receipt_number').eq('organization_id', prof.organization_id).order('created_at', { ascending: false }).limit(1).maybeSingle();
       let nextNumber = 1;
-      if (lastReceipt?.receipt_number) {
-        const match = lastReceipt.receipt_number.match(/RCP-(\d+)/);
-        if (match) nextNumber = parseInt(match[1], 10) + 1;
-      }
+      if (lastReceipt?.receipt_number) { const m = lastReceipt.receipt_number.match(/RCP-(\d+)/); if (m) nextNumber = parseInt(m[1], 10) + 1; }
       const receiptNumber = 'RCP-' + String(nextNumber).padStart(3, '0');
 
       const totalQty = addedProducts.reduce((s, p) => s + Number(p.qty), 0);
       const totalValue = addedProducts.reduce((s, p) => s + Number(p.qty) * Number(p.price), 0);
 
-      const { data: newReceipt, error: receiptErr } = await db
-        .from('receipts')
-        .insert({
-          receipt_number: receiptNumber,
-          organization_id: prof.organization_id,
-          total_qty: totalQty,
-          total_value: totalValue,
-          created_by: authUser.id,
-        })
-        .select()
-        .single();
-
+      const { data: newReceipt, error: receiptErr } = await db.from('receipts').insert({ receipt_number: receiptNumber, organization_id: prof.organization_id, total_qty: totalQty, total_value: totalValue, created_by: authUser.id }).select().single();
       if (receiptErr) throw new Error(tr('mout_err_receipt') + ' ' + receiptErr.message);
 
       const receiptItems = addedProducts.map(p => {
-        const qty = Number(p.qty);
-        const price = Number(p.price);
-        const costPrice = Number(p.costPrice ?? 0);
-        return {
-          receipt_id: newReceipt.id,
-          product_id: p.id,
-          product_name: p.name,
-          qty: qty,
-          price: price,
-          cost_price: costPrice,
-          profit: (price - costPrice) * qty,
-          total: qty * price,
-        };
+        const qty = Number(p.qty), price = Number(p.price), costPrice = Number(p.costPrice ?? 0);
+        return { receipt_id: newReceipt.id, product_id: p.id, product_name: p.name, qty, price, cost_price: costPrice, profit: (price - costPrice) * qty, total: qty * price };
       });
-
       const { error: itemsErr } = await db.from('receipt_items').insert(receiptItems);
       if (itemsErr) throw new Error(tr('mout_err_items') + ' ' + itemsErr.message);
 
-      const movements = addedProducts.map(p => ({
-        organization_id: prof.organization_id,
-        product_id: p.id,
-        type: 'out',
-        method: 'manual',
-        quantity: Number(p.qty),
-        performed_by: authUser.id,
-      }));
-
+      const movements = addedProducts.map(p => ({ organization_id: prof.organization_id, product_id: p.id, type: 'out', method: 'manual', quantity: Number(p.qty), performed_by: authUser.id }));
       const { error: moveError } = await db.from('stock_movements').insert(movements);
       if (moveError) throw new Error(tr('mout_err_movements') + ' ' + moveError.message);
 
-      // ✅ خصم qty مباشرة (لأن trigger تم حذفه)
       for (const p of addedProducts) {
         const { data: fresh } = await db.from('products').select('qty').eq('id', p.id).single();
         const newQty = Math.max(0, Number(fresh?.qty || 0) - Number(p.qty));
-        const { error: qtyErr } = await db.from('products').update({ qty: newQty }).eq('id', p.id);
-        if (qtyErr) throw new Error(tr('mout_err_movements') + ' ' + qtyErr.message);
+        await db.from('products').update({ qty: newQty }).eq('id', p.id);
       }
 
       if (typeof notifyOrganization === 'function') {
         try {
-          await notifyOrganization({
-            orgId: prof.organization_id,
-            title: addedProducts.length === 1 ? tr('mout_notif_title_1') : `${tr('mout_notif_title_n')} (${addedProducts.length})`,
-            message: `${prof.full_name || tr('prod_detail_user')} ${tr('mout_notif_msg')} ${totalQty} ${tr('mout_notif_unit')} ${totalValue.toFixed(2)} — ${receiptNumber}`,
-            type: 'warning',
-            link: `/receipt.html?id=${newReceipt.id}`,
-            userName: prof.full_name || null,
-          });
-        } catch (notifErr) {
-          console.error('❌ Notification error:', notifErr);
-        }
+          await notifyOrganization({ orgId: prof.organization_id, title: addedProducts.length === 1 ? tr('mout_notif_title_1') : `${tr('mout_notif_title_n')} (${addedProducts.length})`, message: `${prof.full_name || tr('prod_detail_user')} ${tr('mout_notif_msg')} ${totalQty} ${tr('mout_notif_unit')} ${totalValue.toFixed(2)} — ${receiptNumber}`, type: 'warning', link: `/receipt.html?id=${newReceipt.id}`, userName: prof.full_name || null });
+        } catch (e) {}
       }
 
-      successBox.textContent = `${tr('mout_success')} ${receiptNumber}`;
+      successBox.textContent = `تم الحفظ بنجاح ✅`;
       successBox.style.display = 'block';
 
       if (window.self !== window.top) {
-        const updates = addedProducts.map(p => ({
-          id: p.id,
-          newQty: Number(p.available) - Number(p.qty)
-        }));
-        window.parent.postMessage({
-          type: 'PRODUCT_INSTANT_UPDATE_QTY',
-          updates: updates
-        }, '*');
+        const updates = addedProducts.map(p => ({ id: p.id, newQty: Number(p.available) - Number(p.qty) }));
+        window.parent.postMessage({ type: 'PRODUCT_INSTANT_UPDATE_QTY', updates }, '*');
       }
 
-      // تفريغ السلة
       addedProducts.length = 0;
       renderAddedProducts();
       document.getElementById('note').value = '';
-
-      // ✅ إعادة تفعيل زر الحفظ للعمليات القادمة
       saveBtn.disabled = false;
       saveBtn.querySelector('span').textContent = tr('mout_save');
       isSaving = false;
 
-      // ✅ استدعاء الطباعة (تفتح نافذة الطباعة، لكن لا تحول الصفحة)
-      printReceipt(newReceipt.id);
+      // ✅ هنا يتم فحص الطابعة والطباعة التلقائية
+      if (!Printer.mode) {
+        // إذا لم تكن هناك طابعة مرتبطة، نطلب من المستخدم ربطها الآن
+        const wantToPair = confirm("لم يتم العثور على طابعة. هل تريد ربط طابعة الآن؟");
+        if (wantToPair) {
+          const ok = await Printer.pair();
+          if (!ok) {
+            errBox.textContent = 'لم يتم ربط الطابعة. تم حفظ المنتجات بدون طباعة.';
+            errBox.style.display = 'block';
+            return;
+          }
+        } else {
+          errBox.textContent = 'تم الحفظ بدون طباعة.';
+          errBox.style.display = 'block';
+          return;
+        }
+      }
 
-      // إخفاء رسالة النجاح بعد 5 ثوان
-      setTimeout(() => {
-        successBox.style.display = 'none';
-      }, 5000);
+      // الآن الطابعة مرتبطة (إما مسبقاً أو للتو)
+      try {
+        const canvas = await receiptToCanvas(newReceipt.id);
+        await Printer.print(canvas);
+        successBox.textContent = `تم الحفظ والطباعة ✅ (${receiptNumber})`;
+      } catch (err) {
+        console.error(err);
+        errBox.textContent = 'فشلت الطباعة: ' + err.message;
+        errBox.style.display = 'block';
+      }
+
+      setTimeout(() => { successBox.style.display = 'none'; }, 5000);
 
     } catch (error) {
       errBox.textContent = error.message;
