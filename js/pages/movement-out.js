@@ -1,9 +1,6 @@
 // ============================================
-// صفحة إخراج منتجات + طباعة حرارية (شاملة)
-// ✅ WebBluetooth (طابعات حديثة)
-// ✅ WebUSB (طابعات كابل)
-// ✅ RawBT Fallback (طابعات قديمة Classic)
-// ✅ فتح إعدادات البلوتوث عند الفشل
+// صفحة إخراج منتجات + طباعة حرارية (WebBluetooth/WebUSB)
+// ✅ بدون RawBT
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   if (window.__movementOutLoaded) return;
@@ -50,7 +47,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     },
 
     async pair() {
-      // 1. محاولة البلوتوث (الحديث BLE)
       if (navigator.bluetooth) {
         try {
           this.device = await navigator.bluetooth.requestDevice({
@@ -61,7 +57,6 @@ document.addEventListener('DOMContentLoaded', async () => {
           return 'bt';
         } catch (e) {}
       }
-      // 2. محاولة USB
       if (navigator.usb) {
         try {
           this.device = await navigator.usb.requestDevice({ filters: [] });
@@ -69,7 +64,6 @@ document.addEventListener('DOMContentLoaded', async () => {
           return 'usb';
         } catch (e) {}
       }
-      // 3. لا شيء
       return null;
     },
 
@@ -114,33 +108,20 @@ document.addEventListener('DOMContentLoaded', async () => {
       throw new Error("No writable characteristic");
     },
 
-    // 4. الطباعة عبر RawBT (للطابعات القديمة)
-    printViaRawBT(canvas) {
-      const base64 = canvas.toDataURL('image/png').split(',')[1];
-      // فتح تطبيق RawBT تلقائياً إذا كان مثبتاً
-      const url = `intent:base64,${base64}#Intent;scheme=rawbt;package=ru.a402d.rawbtprinter;end;`;
-      const iframe = document.createElement('iframe');
-      iframe.style.display = 'none';
-      iframe.src = url;
-      document.body.appendChild(iframe);
-      setTimeout(() => { try { iframe.remove(); } catch (e) {} }, 5000);
-    },
-
     async print(canvas) {
-      // إذا كانت الطابعة بلوتوث حديثة
+      const data = this.canvasToESCPOS(canvas);
+
       if (this.mode === 'bt') {
-        const data = this.canvasToESCPOS(canvas);
         const char = await this.getBTChar();
         for (let i = 0; i < data.length; i += 100) {
           const chunk = data.slice(i, i + 100);
           if (char.properties.writeWithoutResponse) await char.writeValueWithoutResponse(chunk);
           else await char.writeValue(chunk);
         }
-        return;
-      }
-      // إذا كانت USB
+        return true;
+      } 
+      
       if (this.mode === 'usb') {
-        const data = this.canvasToESCPOS(canvas);
         if (!this.device.opened) await this.device.open();
         let iface = 0, ep = 1;
         for (const intf of this.device.configuration.interfaces) {
@@ -152,10 +133,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         for (let i = 0; i < data.length; i += 1024) {
           await this.device.transferOut(ep, data.slice(i, i + 1024));
         }
-        return;
+        return true;
       }
-      // إذا فشل كل ما سبق، نستخدم RawBT
-      this.printViaRawBT(canvas);
+
+      throw new Error("لا توجد طابعة متصلة.");
     }
   };
 
@@ -188,9 +169,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   }
 
-  // محاولة الاتصال بالطابعة فور فتح الصفحة
-  const isPaired = await Printer.loadSaved();
-
   const main = document.getElementById('main-content');
   const { data: profile } = await db.from('profiles').select('organization_id').eq('id', user.id).single();
   
@@ -201,6 +179,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   
   const { data: products, error: productsError } = await db.from('products').select('*').order('name');
   if (productsError) { main.innerHTML = `<div class="alert alert-error">${productsError.message}</div>`; return; }
+
+  await Printer.loadSaved(); // محاولة صامتة لتحميل طابعة محفوظة
 
   main.innerHTML = `
     <div class="page-header">
@@ -494,21 +474,20 @@ document.addEventListener('DOMContentLoaded', async () => {
       isSaving = false;
 
       // ==========================================
-      // ✅ منطق الطابعة الشامل الجديد
+      // ✅ منطق الطابعة (بدون RawBT)
       // ==========================================
       
-      // 1. إذا لم تكن هناك طابعة مرتبطة مسبقاً، نطلب من المستخدم
       if (!Printer.mode) {
-        const wantToPair = confirm("لم يتم العثور على طابعة.\n\nهل تريد ربط طابعة الآن؟\n(ملاحظة: الطابعات القديمة جداً لن تظهر، سيتم استخدام RawBT تلقائياً).");
+        const wantToPair = confirm("لم يتم العثور على طابعة.\n\nهل تريد ربط طابعة الآن؟\n(ملاحظة: يجب أن تدعم طابعة البلوتوث تقنية BLE لكي تظهر).");
+        
         if (wantToPair) {
           const pairedMode = await Printer.pair();
+          
           if (!pairedMode) {
-             // فشل الإقران (أو ألغى المستخدم)
              const openSettings = confirm("لم يتم العثور على الطابعة.\n\nهل تريد فتح إعدادات البلوتوث في الهاتف الآن لإقران الطابعة؟");
              if (openSettings) {
-                // محاولة فتح إعدادات البلوتوث في الأندرويد
                 window.location.href = "intent:#Intent;action=android.settings.BLUETOOTH_SETTINGS;end;";
-                return; // نوقف الطباعة هنا حتى يقوم المستخدم بالإقران
+                return;
              } else {
                 errBox.textContent = 'تم الحفظ بدون طباعة. يرجى إقران الطابعة لاحقاً.';
                 errBox.style.display = 'block';
@@ -516,17 +495,14 @@ document.addEventListener('DOMContentLoaded', async () => {
              }
           }
         } else {
-          // المستخدم اختار عدم الربط
           errBox.textContent = 'تم الحفظ بدون طباعة.';
           errBox.style.display = 'block';
           return;
         }
       }
 
-      // 2. إذا وصلنا هنا، إما أن الطابعة مرتبطة مسبقاً، أو تم ربطها للتو
       try {
         const canvas = await receiptToCanvas(newReceipt.id);
-        // دالة print() الداخلية تعرف تلقائياً هل هي BT أم USB أم ستحول إلى RawBT
         await Printer.print(canvas);
         successBox.textContent = `تم الحفظ والطباعة ✅ (${receiptNumber})`;
       } catch (err) {
