@@ -5,6 +5,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>MyStock</title>
 
+  <!-- ✅ إعدادات تطبيق الويب التقدمي (PWA) -->
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#171717">
+
+  <!-- ✅ إعدادات خاصة بنظام آيفون (iOS) ليعمل كتطبيق حقيقي -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="MyStock">
+  <link rel="apple-touch-icon" href="/assets/img/icon-192.png">
+
   <!-- ✅ وسم Canonical لمحركات البحث -->
   <link rel="canonical" href="https://mystock-1xc.pages.dev/">
 
@@ -223,7 +233,6 @@
       <!-- ✅ قسم المصمم (Developer Profile) -->
       <div class="developer-profile">
         <div class="developer-avatar">
-          <!-- ✅ المسار الصحيح بناءً على نتيجة Git: assets/img/developer.jpg -->
           <img src="/assets/img/developer.jpg" alt="Bilal Ksissou" onerror="this.src='https://ui-avatars.com/api/?name=Bilal+Ksissou&background=171717&color=fff&size=128'">
         </div>
         <div class="developer-info">
@@ -265,6 +274,17 @@
         }
       });
     });
+  </script>
+
+  <!-- ✅ تسجيل Service Worker لتثبيت التطبيق -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js')
+          .then(reg => console.log('✅ SW registered:', reg.scope))
+          .catch(err => console.warn('❌ SW registration failed:', err));
+      });
+    }
   </script>
 </body>
 </html>
