@@ -2,7 +2,6 @@
 // الهيكل المشترك (Header + Sidebar)
 // ✅ فحص تلقائي + تحذيرات + ترجمة كاملة
 // ✅ دعم iframe (وضع Embed)
-// ✅ دعم إشعارات الويب (Web Push)
 // ============================================
 
 const ALLOWED_PAGES = [
@@ -147,59 +146,4 @@ function renderLayout(activePage) {
   else bodyEl.classList.add('sidebar-hidden-mobile');
 
   if (typeof startNotifPolling === 'function') startNotifPolling();
-
-  // ✅ تشغيل الإشعارات
-  initPushNotifications();
-}
-
-// ============================================
-// ✅ دالة تفعيل إشعارات الويب (Web Push)
-// ============================================
-async function initPushNotifications() {
-  if (!('serviceWorker' in navigator) || !('PushManager' in window)) return;
-
-  try {
-    // طلب إذن المستخدم
-    const permission = await Notification.requestPermission();
-    if (permission !== 'granted') return;
-
-    // انتظار الـ Service Worker
-    const registration = await navigator.serviceWorker.ready;
-
-    // ⚠️ ضع المفتاح العام (Public Key) هنا
-    const VAPID_PUBLIC_KEY = 'BLKpv3b0iafWUjd2wVBh4DR0T_7Z-vecC0ZoAvzVdlmNFt3v4XSaAwi7Ch5mD4Rw3zHEPI48aBsRVBsHGJBg3Zo';
-
-    // تحويل المفتاح لصيغة يقبلها المتصفح
-    const padding = '='.repeat((4 - VAPID_PUBLIC_KEY.length % 4) % 4);
-    const base64 = (VAPID_PUBLIC_KEY + padding).replace(/\-/g, '+').replace(/_/g, '/');
-    const rawData = window.atob(base64);
-    const outputArray = new Uint8Array(rawData.length);
-    for (let i = 0; i < rawData.length; ++i) {
-      outputArray[i] = rawData.charCodeAt(i);
-    }
-
-    // الاشتراك
-    const subscription = await registration.pushManager.subscribe({
-      userVisibleOnly: true,
-      applicationServerKey: outputArray
-    });
-
-    // حفظ في قاعدة البيانات
-    const { data: { user } } = await db.auth.getUser();
-    if (!user) return;
-
-    const { data: profile } = await db.from('profiles').select('organization_id').eq('id', user.id).single();
-    if (!profile) return;
-
-    await db.from('push_subscriptions').upsert({
-      organization_id: profile.organization_id,
-      user_id: user.id,
-      subscription: subscription.toJSON()
-    }, { onConflict: 'user_id, subscription' });
-
-    console.log("✅ الإشعارات جاهزة!");
-
-  } catch (error) {
-    console.warn("فشل تفعيل الإشعارات:", error);
-  }
 }
