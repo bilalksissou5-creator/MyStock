@@ -33,9 +33,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   // ✅ 3. المقارنة: هل يوجد تحديث جديد؟
   const hasUpdate = serverVersion !== localVersion;
   
-  // تجهيز شكل النص:
-  // إذا كان هناك تحديث (hasUpdate = true) -> لون أزرق "تحديث جديد"
-  // إذا لم يكن هناك تحديث (hasUpdate = false) -> لون أخضر "تم التحديث"
   const versionColor = hasUpdate ? '#2563eb' : '#16a34a'; 
   const versionText = hasUpdate 
     ? `${tr('stg_new_version') || 'تحديث جديد'}: v${serverVersion}` 
@@ -77,8 +74,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         </a>
       </div>
 
+      <!-- ✅ هنا تم تحويل البطاقة إلى رابط -->
       <div class="settings-card">
-        <div class="settings-item" id="notifications-item">
+        <a href="/notifications-settings.html" class="settings-item">
           <div class="settings-item-left">
             <div class="settings-icon icon-red">
               <i class="fas fa-bell"></i>
@@ -88,7 +86,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             </div>
           </div>
           <i class="fas fa-chevron-right settings-arrow"></i>
-        </div>
+        </a>
       </div>
 
       <div class="settings-card">
