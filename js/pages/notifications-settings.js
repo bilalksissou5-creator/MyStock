@@ -106,9 +106,15 @@ document.addEventListener('DOMContentLoaded', async () => {
   soundToggle.addEventListener('change', (e) => {
     localStorage.setItem('notif_sound', e.target.checked);
     
-    // إذا قام بتفعيله، نشغل نغمة تجريبية فوراً (إذا كانت الدالة موجودة)
-    if (e.target.checked && typeof playNotificationSound === 'function') {
-      playNotificationSound(); 
+    // إذا قام بتفعيله، نشغل نغمة تجريبية فوراً
+    if (e.target.checked) {
+      // استدعاء محرك الصوت من layout.js (مع تعطيل الاهتزاز مؤقتاً لتجربة الصوت فقط)
+      const oldVibrate = localStorage.getItem('notif_vibrate');
+      localStorage.setItem('notif_vibrate', 'false');
+      if (typeof window.playNotificationAlerts === 'function') {
+        window.playNotificationAlerts(); 
+      }
+      localStorage.setItem('notif_vibrate', oldVibrate); // إرجاع الإعداد
     }
   });
 

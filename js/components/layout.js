@@ -2,6 +2,7 @@
 // الهيكل المشترك (Header + Sidebar)
 // ✅ فحص تلقائي + تحذيرات + ترجمة كاملة
 // ✅ دعم iframe (وضع Embed)
+// ✅ محرك الإشعارات (صوت + اهتزاز)
 // ============================================
 
 const ALLOWED_PAGES = [
@@ -18,7 +19,6 @@ async function autoCheckPaymentBlock() {
     const { data: { user } } = await db.auth.getUser();
     if (!user) return;
     
-    // ✅ تم جلب card_warning_sent هنا لكي نعرف هل تم إرسال التحذير أم لا
     const { data: profile } = await db.from('profiles').select('role, organization_id, bank_card_last4, bank_card_active, bank_card_deactivated_at, card_warning_sent, full_name').eq('id', user.id).single();
     if (!profile || profile.role !== 'admin' || !profile.organization_id) return;
     
@@ -26,13 +26,11 @@ async function autoCheckPaymentBlock() {
       if (profile.bank_card_active === false && profile.bank_card_deactivated_at) {
         const elapsed = Date.now() - new Date(profile.bank_card_deactivated_at).getTime();
         
-        // 1. حظر الخدمة بعد 3 أيام
         if (elapsed >= 3 * 24 * 60 * 60 * 1000) {
             window.location.replace('/bank-card.html?blocked=1');
             return;
         }
 
-        // 2. ✅ إرسال التحذيرات التلقائية (تبقى يومان، تبقى 12 ساعة)
         const warningSent = profile.card_warning_sent || 0;
         let newWarningLevel = 0;
         let warningTitle = '';
@@ -58,7 +56,6 @@ async function autoCheckPaymentBlock() {
                      link: '/bank-card.html',
                      userName: profile.full_name
                  }).then(() => {
-                     // تحديث حالة التحذير في قاعدة البيانات لكي لا يتكرر
                      db.from('profiles').update({ card_warning_sent: newWarningLevel }).eq('id', user.id);
                  });
              }
@@ -77,7 +74,7 @@ if (document.readyState === 'loading') document.addEventListener('DOMContentLoad
 else autoCheckPaymentBlock();
 
 function renderLayout(activePage) {
-  // ✅ إذا كنا داخل iframe، اعرض Main فقط (لإخفاء الهيدر والسايدبار)
+  // ✅ إذا كنا داخل iframe، اعرض Main فقط
   if (window.self !== window.top) {
     document.documentElement.classList.add('in-iframe');
     const app = document.querySelector('.app');
@@ -90,7 +87,6 @@ function renderLayout(activePage) {
   const navItems = [
     { href: '/dashboard.html', label: tr('nav_dashboard'), icon: 'fa-house' },
     { href: '/products/add-workspace.html', label: tr('nav_add_product'), icon: 'fa-circle-plus' },
-    // ✅ التعديل هنا: تغيير المسار إلى صفحة الـ Workspace للإخراج
     { href: '/movements/out-workspace.html', label: tr('nav_out_product'), icon: 'fa-circle-minus' },
     { href: '/products/list.html', label: tr('nav_products'), icon: 'fa-box' },
     { href: '/movements/list.html', label: tr('nav_movements'), icon: 'fa-right-left' },
@@ -147,3 +143,53 @@ function renderLayout(activePage) {
 
   if (typeof startNotifPolling === 'function') startNotifPolling();
 }
+
+// ============================================
+// ✅ محرك الإشعارات (صوت + اهتزاز)
+// ============================================
+let audioCtx = null;
+
+// فك قفل الصوت في المتصفح (يجب أن يلمس المستخدم الشاشة مرة واحدة)
+document.addEventListener('click', () => {
+  if (!audioCtx) {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  }
+  if (audioCtx.state === 'suspended') {
+    audioCtx.resume();
+  }
+}, { once: true });
+
+// الدالة العالمية التي سيتم استدعاؤها عند وصول إشعار جديد
+window.playNotificationAlerts = function() {
+  // 1. التحقق من المفتاح الرئيسي
+  const masterOn = localStorage.getItem('notif_master') !== 'false';
+  if (!masterOn) return;
+
+  // 2. تشغيل الصوت
+  const soundOn = localStorage.getItem('notif_sound') !== 'false';
+  if (soundOn && audioCtx) {
+    try {
+      const osc = audioCtx.createOscillator();
+      const gainNode = audioCtx.createGain();
+      
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(880, audioCtx.currentTime); 
+      osc.frequency.exponentialRampToValueAtTime(1760, audioCtx.currentTime + 0.1);
+      
+      gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+      
+      osc.connect(gainNode);
+      gainNode.connect(audioCtx.destination);
+      
+      osc.start();
+      osc.stop(audioCtx.currentTime + 0.3);
+    } catch (e) { console.warn("Audio error:", e); }
+  }
+
+  // 3. الاهتزاز
+  const vibrateOn = localStorage.getItem('notif_vibrate') !== 'false';
+  if (vibrateOn && navigator.vibrate) {
+    navigator.vibrate([200, 100, 200]);
+  }
+};
