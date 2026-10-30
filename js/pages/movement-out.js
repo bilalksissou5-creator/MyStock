@@ -1,5 +1,9 @@
 // ============================================
-// صفحة إخراج منتجات + طباعة حرارية تلقائية (بدون زر)
+// صفحة إخراج منتجات + طباعة حرارية (شاملة)
+// ✅ WebBluetooth (طابعات حديثة)
+// ✅ WebUSB (طابعات كابل)
+// ✅ RawBT Fallback (طابعات قديمة Classic)
+// ✅ فتح إعدادات البلوتوث عند الفشل
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   if (window.__movementOutLoaded) return;
@@ -29,32 +33,24 @@ document.addEventListener('DOMContentLoaded', async () => {
     char: null,
     mode: null, // 'bt' أو 'usb'
 
-    // ✅ يحاول الاتصال بالطابعة المحفوظة تلقائياً عند فتح الصفحة
     async loadSaved() {
       if (navigator.bluetooth) {
         try {
           const devices = await navigator.bluetooth.getDevices();
-          if (devices.length > 0) { 
-            this.device = devices[0]; 
-            this.mode = 'bt'; 
-            return true; 
-          }
+          if (devices.length > 0) { this.device = devices[0]; this.mode = 'bt'; return true; }
         } catch (e) {}
       }
       if (navigator.usb) {
         try {
           const devices = await navigator.usb.getDevices();
-          if (devices.length > 0) { 
-            this.device = devices[0]; 
-            this.mode = 'usb'; 
-            return true; 
-          }
+          if (devices.length > 0) { this.device = devices[0]; this.mode = 'usb'; return true; }
         } catch (e) {}
       }
       return false;
     },
 
     async pair() {
+      // 1. محاولة البلوتوث (الحديث BLE)
       if (navigator.bluetooth) {
         try {
           this.device = await navigator.bluetooth.requestDevice({
@@ -62,17 +58,19 @@ document.addEventListener('DOMContentLoaded', async () => {
             optionalServices: [0xFF00, 0x18F0, 0xFFE0, '0000ff00-0000-1000-8000-00805f9b34fb', '000018f0-0000-1000-8000-00805f9b34fb']
           });
           this.mode = 'bt';
-          return true;
+          return 'bt';
         } catch (e) {}
       }
+      // 2. محاولة USB
       if (navigator.usb) {
         try {
           this.device = await navigator.usb.requestDevice({ filters: [] });
           this.mode = 'usb';
-          return true;
+          return 'usb';
         } catch (e) {}
       }
-      return false;
+      // 3. لا شيء
+      return null;
     },
 
     canvasToESCPOS(canvas) {
@@ -116,18 +114,33 @@ document.addEventListener('DOMContentLoaded', async () => {
       throw new Error("No writable characteristic");
     },
 
+    // 4. الطباعة عبر RawBT (للطابعات القديمة)
+    printViaRawBT(canvas) {
+      const base64 = canvas.toDataURL('image/png').split(',')[1];
+      // فتح تطبيق RawBT تلقائياً إذا كان مثبتاً
+      const url = `intent:base64,${base64}#Intent;scheme=rawbt;package=ru.a402d.rawbtprinter;end;`;
+      const iframe = document.createElement('iframe');
+      iframe.style.display = 'none';
+      iframe.src = url;
+      document.body.appendChild(iframe);
+      setTimeout(() => { try { iframe.remove(); } catch (e) {} }, 5000);
+    },
+
     async print(canvas) {
-      if (!this.mode) throw new Error("No printer paired");
-      const data = this.canvasToESCPOS(canvas);
-      
+      // إذا كانت الطابعة بلوتوث حديثة
       if (this.mode === 'bt') {
+        const data = this.canvasToESCPOS(canvas);
         const char = await this.getBTChar();
         for (let i = 0; i < data.length; i += 100) {
           const chunk = data.slice(i, i + 100);
           if (char.properties.writeWithoutResponse) await char.writeValueWithoutResponse(chunk);
           else await char.writeValue(chunk);
         }
-      } else if (this.mode === 'usb') {
+        return;
+      }
+      // إذا كانت USB
+      if (this.mode === 'usb') {
+        const data = this.canvasToESCPOS(canvas);
         if (!this.device.opened) await this.device.open();
         let iface = 0, ep = 1;
         for (const intf of this.device.configuration.interfaces) {
@@ -139,7 +152,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         for (let i = 0; i < data.length; i += 1024) {
           await this.device.transferOut(ep, data.slice(i, i + 1024));
         }
+        return;
       }
+      // إذا فشل كل ما سبق، نستخدم RawBT
+      this.printViaRawBT(canvas);
     }
   };
 
@@ -172,7 +188,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   }
 
-  // ✅ محاولة الاتصال بالطابعة فور فتح الصفحة
+  // محاولة الاتصال بالطابعة فور فتح الصفحة
   const isPaired = await Printer.loadSaved();
 
   const main = document.getElementById('main-content');
@@ -186,7 +202,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   const { data: products, error: productsError } = await db.from('products').select('*').order('name');
   if (productsError) { main.innerHTML = `<div class="alert alert-error">${productsError.message}</div>`; return; }
 
-  // ✅ تم حذف زر الربط من الواجهة
   main.innerHTML = `
     <div class="page-header">
       <h2>${tr('mout_title')}</h2>
@@ -425,7 +440,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     isSaving = true; saveBtn.disabled = true; saveBtn.querySelector('span').textContent = tr('prod_add_saving');
 
     try {
-      // ... (نفس كود الحفظ في قاعدة البيانات كما هو بدون تغيير) ...
       const { data: { user: authUser } } = await db.auth.getUser();
       const { data: prof } = await db.from('profiles').select('organization_id, full_name').eq('id', authUser.id).single();
       if (!prof?.organization_id) throw new Error(tr('prod_add_err_org'));
@@ -479,32 +493,45 @@ document.addEventListener('DOMContentLoaded', async () => {
       saveBtn.querySelector('span').textContent = tr('mout_save');
       isSaving = false;
 
-      // ✅ هنا يتم فحص الطابعة والطباعة التلقائية
+      // ==========================================
+      // ✅ منطق الطابعة الشامل الجديد
+      // ==========================================
+      
+      // 1. إذا لم تكن هناك طابعة مرتبطة مسبقاً، نطلب من المستخدم
       if (!Printer.mode) {
-        // إذا لم تكن هناك طابعة مرتبطة، نطلب من المستخدم ربطها الآن
-        const wantToPair = confirm("لم يتم العثور على طابعة. هل تريد ربط طابعة الآن؟");
+        const wantToPair = confirm("لم يتم العثور على طابعة.\n\nهل تريد ربط طابعة الآن؟\n(ملاحظة: الطابعات القديمة جداً لن تظهر، سيتم استخدام RawBT تلقائياً).");
         if (wantToPair) {
-          const ok = await Printer.pair();
-          if (!ok) {
-            errBox.textContent = 'لم يتم ربط الطابعة. تم حفظ المنتجات بدون طباعة.';
-            errBox.style.display = 'block';
-            return;
+          const pairedMode = await Printer.pair();
+          if (!pairedMode) {
+             // فشل الإقران (أو ألغى المستخدم)
+             const openSettings = confirm("لم يتم العثور على الطابعة.\n\nهل تريد فتح إعدادات البلوتوث في الهاتف الآن لإقران الطابعة؟");
+             if (openSettings) {
+                // محاولة فتح إعدادات البلوتوث في الأندرويد
+                window.location.href = "intent:#Intent;action=android.settings.BLUETOOTH_SETTINGS;end;";
+                return; // نوقف الطباعة هنا حتى يقوم المستخدم بالإقران
+             } else {
+                errBox.textContent = 'تم الحفظ بدون طباعة. يرجى إقران الطابعة لاحقاً.';
+                errBox.style.display = 'block';
+                return;
+             }
           }
         } else {
+          // المستخدم اختار عدم الربط
           errBox.textContent = 'تم الحفظ بدون طباعة.';
           errBox.style.display = 'block';
           return;
         }
       }
 
-      // الآن الطابعة مرتبطة (إما مسبقاً أو للتو)
+      // 2. إذا وصلنا هنا، إما أن الطابعة مرتبطة مسبقاً، أو تم ربطها للتو
       try {
         const canvas = await receiptToCanvas(newReceipt.id);
+        // دالة print() الداخلية تعرف تلقائياً هل هي BT أم USB أم ستحول إلى RawBT
         await Printer.print(canvas);
         successBox.textContent = `تم الحفظ والطباعة ✅ (${receiptNumber})`;
       } catch (err) {
-        console.error(err);
-        errBox.textContent = 'فشلت الطباعة: ' + err.message;
+        console.error("فشلت الطباعة:", err);
+        errBox.textContent = 'تم الحفظ، لكن فشلت الطباعة: ' + err.message;
         errBox.style.display = 'block';
       }
 
