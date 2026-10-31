@@ -1814,6 +1814,8 @@ const translations = {
 
     notif_test_alerts_title: 'Tester les alertes',
     notif_test_alerts_sub: 'Testez le son et la vibration maintenant',
+
+    
   },
 
   en: {

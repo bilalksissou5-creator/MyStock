@@ -9,10 +9,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (window.applyLanguage) window.applyLanguage();
   
   const tr = (key) => (window.t ? window.t(key) : key);
-  document.title = tr('notif_sounds_title');
+  document.title = tr('notif_sounds_title') || 'Notification Sounds';
   const main = document.getElementById('main-content');
 
-  // قائمة النغمات المتاحة (باستخدام مفاتيح الترجمة)
+  // قائمة النغمات المتاحة
   const tones = [
     { id: 'default', name: tr('notif_tone_default') },
     { id: 'chime', name: tr('notif_tone_chime') },
@@ -24,7 +24,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   const currentTone = localStorage.getItem('notif_tone') || 'default';
   let selectedTone = currentTone;
 
-  // دالة لتشغيل الصوت (تجريبي أو حقيقي)
   window.playToneSound = function(toneId) {
     if (toneId === 'none') return;
 
@@ -82,7 +81,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   };
 
-  // بناء واجهة الصفحة
   const optionsHTML = tones.map(tone => `
     <div class="sound-option ${tone.id === selectedTone ? 'selected' : ''}" data-id="${tone.id}">
       <div class="sound-option-left">
@@ -100,7 +98,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   main.innerHTML = `
     <div class="settings-wrapper">
       
-      <!-- ترويسة الصفحة بدون سهم رجوع -->
       <div class="page-header" style="justify-content: flex-start;">
         <h2>${tr('notif_sounds_title')}</h2>
       </div>
@@ -117,7 +114,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     </div>
   `;
 
-  // 1. منطق اختيار النغمة
   const optionElements = document.querySelectorAll('.sound-option');
   optionElements.forEach(opt => {
     opt.addEventListener('click', (e) => {
@@ -133,7 +129,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   });
 
-  // 2. منطق أزرار التجربة
   document.querySelectorAll('.test-sound-btn').forEach(btn => {
     btn.addEventListener('click', (e) => {
       e.stopPropagation();
@@ -149,7 +144,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   });
 
-  // 3. منطق الحفظ
   document.getElementById('save-tone-btn').addEventListener('click', () => {
     localStorage.setItem('notif_tone', selectedTone);
     
