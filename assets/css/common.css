@@ -101,7 +101,7 @@ h6 { font-size: 0.8125rem; font-weight: 600; color: #404040; } /* 13px */
   flex-shrink: 0;
 }
 
-/* ✅ خانة البحث في الهيدر (شكل دائري) */
+/* ✅ خانة البحث في الهيدر (نفس الحجم القديم، زوايا دائرية فقط) */
 .search {
   flex: 1;
   max-width: 500px;
@@ -110,7 +110,7 @@ h6 { font-size: 0.8125rem; font-weight: 600; color: #404040; } /* 13px */
 
 .search i {
   position: absolute;
-  inset-inline-end: 16px;
+  inset-inline-end: 12px; /* تم إرجاعها كما كانت */
   top: 50%;
   transform: translateY(-50%);
   color: #a3a3a3;
@@ -121,10 +121,10 @@ h6 { font-size: 0.8125rem; font-weight: 600; color: #404040; } /* 13px */
 
 .search input {
   width: 100%;
-  padding-block: 9px;
-  padding-inline: 16px 42px;
+  padding-block: 9px; /* نفس الحجم القديم */
+  padding-inline: 12px 38px; /* نفس الحجم القديم */
   border: 1px solid #d4d4d4;
-  border-radius: 50px; /* ✅ شكل دائري */
+  border-radius: 50px; /* ✅ التعديل الوحيد: دائري */
   background: #fafafa;
   outline: none;
   font-size: 14px;
@@ -382,34 +382,34 @@ h6 { font-size: 0.8125rem; font-weight: 600; color: #404040; } /* 13px */
 .btn-danger:active { opacity: 0.8; }
 
 /* ============================================
-   ✅ خانة البحث في صفحة المنتجات (شكل دائري)
+   ✅ خانة البحث في صفحة المنتجات (نفس الحجم القديم، زوايا دائرية فقط)
    ============================================ */
 .search-bar {
   position: relative;
   margin-bottom: 20px;
-  max-width: 100%; /* جعلها تتمدد في صفحة المنتجات */
+  max-width: 400px; /* نفس العرض القديم */
 }
 
 .search-bar i {
   position: absolute;
-  inset-inline-end: 16px;
+  inset-inline-end: 12px; /* نفس الموقع القديم */
   top: 50%;
   transform: translateY(-50%);
   color: #a3a3a3;
-  font-size: 16px;
+  font-size: 14px; /* نفس الحجم القديم */
   z-index: 2;
   pointer-events: none;
 }
 
 .search-bar input {
   width: 100%;
-  padding-block: 14px;
-  padding-inline: 10px 20px;
+  padding-block: 10px; /* نفس الحجم القديم */
+  padding-inline: 12px 36px; /* نفس الحجم القديم */
   border: 1px solid #d4d4d4;
-  border-radius: 50px; /* ✅ شكل دائري */
+  border-radius: 50px; /* ✅ التعديل الوحيد: دائري */
   background: white;
   outline: none;
-  font-size: 15px;
+  font-size: 14px; /* نفس الحجم القديم */
   box-sizing: border-box;
   transition: border-color 0.2s, box-shadow 0.2s;
 }
