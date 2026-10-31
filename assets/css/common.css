@@ -405,7 +405,7 @@ h6 { font-size: 0.8125rem; font-weight: 600; color: #404040; } /* 13px */
   width: 100%;
   padding-block: 10px; /* نفس الحجم القديم */
   padding-inline: 12px 36px; /* نفس الحجم القديم */
-  border: 1px solid #d4d4d4;
+  border: 1.6px solid #171717;
   border-radius: 50px; /* ✅ التعديل الوحيد: دائري */
   background: white;
   outline: none;
@@ -415,7 +415,7 @@ h6 { font-size: 0.8125rem; font-weight: 600; color: #404040; } /* 13px */
 }
 
 .search-bar input:focus {
-  border-color: 1 solid #171717;
+  border-color: 1.6 solid #171717;
   box-shadow: 0 0 0 3px rgba(23, 23, 23, 0.05);
 }
 
