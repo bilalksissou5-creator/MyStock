@@ -405,7 +405,7 @@ h6 { font-size: 0.8125rem; font-weight: 600; color: #404040; } /* 13px */
   width: 100%;
   padding-block: 10px; /* نفس الحجم القديم */
   padding-inline: 12px 36px; /* نفس الحجم القديم */
-  border: 1.6px solid #171717;
+  border: 1px solid #171717;
   border-radius: 50px; /* ✅ التعديل الوحيد: دائري */
   background: white;
   outline: none;
@@ -448,7 +448,7 @@ h6 { font-size: 0.8125rem; font-weight: 600; color: #404040; } /* 13px */
 
 .form-group input:focus,
 .form-group select:focus,
-.form-group textarea:focus { border-color: #171717; }
+.form-group textarea:focus { border-color: 1px solid #171717; }
 
 .form-grid {
   display: grid;
