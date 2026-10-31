@@ -62,55 +62,24 @@ h1, h2, h3, h4, h5, h6 {
   line-height: 1.3;
 }
 
-/* H1 - أكبر عنوان (20px) */
-h1 {
-  font-size: 1.25rem;    /* 20px */
-  font-weight: 900;
-}
+h1 { font-size: 1.25rem; font-weight: 900; } /* 20px */
+h2 { font-size: 1.125rem; font-weight: 800; } /* 18px */
+h3 { font-size: 1rem; font-weight: 700; } /* 16px */
+h4 { font-size: 0.9375rem; font-weight: 700; } /* 15px */
+h5 { font-size: 0.875rem; font-weight: 600; } /* 14px */
+h6 { font-size: 0.8125rem; font-weight: 600; color: #404040; } /* 13px */
 
-/* H2 - عنوان الصفحة الرئيسي (18px) */
-h2 {
-  font-size: 1.125rem;   /* 18px */
-  font-weight: 800;
-}
-
-/* H3 - عنوان القسم (16px) */
-h3 {
-  font-size: 1rem;       /* 16px */
-  font-weight: 700;
-}
-
-/* H4 - عنوان البطاقة (15px) */
-h4 {
-  font-size: 0.9375rem;  /* 15px */
-  font-weight: 700;
-}
-
-/* H5 - عنوان فرعي (14px) */
-h5 {
-  font-size: 0.875rem;   /* 14px */
-  font-weight: 600;
-}
-
-/* H6 - تسمية صغيرة (13px) */
-h6 {
-  font-size: 0.8125rem;  /* 13px */
-  font-weight: 600;
-  color: #404040;
-}
-
-/* ✅ تصغير العناوين تلقائياً على الهواتف */
 @media (max-width: 768px) {
-  h1 { font-size: 1rem; }           /* 16px */
-  h2, .page-header h2 { font-size: 0.9375rem; } /* 15px */
-  h3 { font-size: 0.875rem; }       /* 14px */
-  h4 { font-size: 0.84375rem; }     /* 13.5px */
-  h5 { font-size: 0.8125rem; }      /* 13px */
-  h6 { font-size: 0.75rem; }        /* 12px */
+  h1 { font-size: 1rem; }
+  h2, .page-header h2 { font-size: 0.9375rem; }
+  h3 { font-size: 0.875rem; }
+  h4 { font-size: 0.84375rem; }
+  h5 { font-size: 0.8125rem; }
+  h6 { font-size: 0.75rem; }
 }
 
 /* ============================================
-   ✅ Header - كما كان في الأصل (خلفية بيضاء)
+   ✅ Header - خلفية بيضاء
    ============================================ */
 .header {
   background: #fff;
@@ -132,6 +101,7 @@ h6 {
   flex-shrink: 0;
 }
 
+/* ✅ خانة البحث في الهيدر (شكل دائري) */
 .search {
   flex: 1;
   max-width: 500px;
@@ -140,26 +110,32 @@ h6 {
 
 .search i {
   position: absolute;
-  inset-inline-end: 12px;
+  inset-inline-end: 16px;
   top: 50%;
   transform: translateY(-50%);
   color: #a3a3a3;
   font-size: 14px;
+  z-index: 2;
+  pointer-events: none;
 }
 
 .search input {
   width: 100%;
   padding-block: 9px;
-  padding-inline: 12px 38px;
+  padding-inline: 16px 42px;
   border: 1px solid #d4d4d4;
-  border-radius: 8px;
+  border-radius: 50px; /* ✅ شكل دائري */
   background: #fafafa;
   outline: none;
   font-size: 14px;
   box-sizing: border-box;
+  transition: border-color 0.2s, box-shadow 0.2s;
 }
 
-.search input:focus { border-color: #171717; }
+.search input:focus { 
+  border-color: #171717; 
+  box-shadow: 0 0 0 3px rgba(23, 23, 23, 0.05);
+}
 
 /* ============================================
    زر فتح/إغلاق Sidebar
@@ -406,31 +382,41 @@ h6 {
 .btn-danger:active { opacity: 0.8; }
 
 /* ============================================
-   البحث
+   ✅ خانة البحث في صفحة المنتجات (شكل دائري)
    ============================================ */
 .search-bar {
   position: relative;
   margin-bottom: 20px;
-  max-width: 400px;
+  max-width: 100%; /* جعلها تتمدد في صفحة المنتجات */
 }
+
 .search-bar i {
   position: absolute;
-  inset-inline-end: 12px;
+  inset-inline-end: 16px;
   top: 50%;
   transform: translateY(-50%);
   color: #a3a3a3;
-  font-size: 14px;
+  font-size: 16px;
+  z-index: 2;
+  pointer-events: none;
 }
+
 .search-bar input {
   width: 100%;
-  padding-block: 10px;
-  padding-inline: 12px 36px;
+  padding-block: 14px;
+  padding-inline: 20px 48px;
   border: 1px solid #d4d4d4;
-  border-radius: 25px;
+  border-radius: 50px; /* ✅ شكل دائري */
   background: white;
   outline: none;
-  font-size: 14px;
+  font-size: 15px;
   box-sizing: border-box;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.search-bar input:focus {
+  border-color: #171717;
+  box-shadow: 0 0 0 3px rgba(23, 23, 23, 0.05);
 }
 
 /* ============================================
@@ -599,7 +585,7 @@ h6 {
 @media (orientation: landscape) and (max-height: 500px) {
   .header { height: 45px; padding: 0 12px; gap: 10px; }
   .logo { font-size: 1rem; }
-  .search input { padding-block: 6px; padding-inline: 10px 32px; font-size: 12px; border-radius: 50%;}
+  .search input { padding-block: 6px; padding-inline: 10px 32px; font-size: 12px; }
 
   .sidebar { width: 200px; min-width: 200px; max-width: 200px; }
   .nav { padding: 6px 8px; gap: 2px; }
