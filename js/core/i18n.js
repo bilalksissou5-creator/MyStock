@@ -909,6 +909,9 @@ const translations = {
     notif_save_tone: 'حفظ النغمة',
     notif_tone_saved: 'تم الحفظ بنجاح!',
     notif_test_tone: 'تجربة الصوت',
+
+    notif_test_alerts_title: 'اختبار التنبيه',
+    notif_test_alerts_sub: 'جرّب الصوت والاهتزاز الآن',
   },
 
   fr: {
@@ -1808,6 +1811,9 @@ const translations = {
     notif_save_tone: 'Enregistrer le son',
     notif_tone_saved: 'Enregistré avec succès !',
     notif_test_tone: 'Tester le son',
+
+    notif_test_alerts_title: 'Tester les alertes',
+    notif_test_alerts_sub: 'Testez le son et la vibration maintenant',
   },
 
   en: {
@@ -2707,6 +2713,9 @@ const translations = {
     notif_save_tone: 'Save Tone',
     notif_tone_saved: 'Saved successfully!',
     notif_test_tone: 'Test Sound',
+
+    notif_test_alerts_title: 'Test Alerts',
+    notif_test_alerts_sub: 'Test sound and vibration now',
   },
 
   
