@@ -110,11 +110,11 @@ h6 {
 }
 
 /* ============================================
-   ✅ Header - بتأثير الضباب الزجاجي (Glassmorphism)
+   ✅ Header - خلفية شفافة (بدون تعويم)
    ============================================ */
 .header {
-  background: transparent;
-  border-bottom: none;
+  background: transparent;            /* خلفية شفافة */
+  border-bottom: 1px solid #e5e5e5;   /* حد خفيف للفصل بين الهيدر والمحتوى */
   height: 60px;
   padding: 0 20px;
   display: flex;
@@ -123,8 +123,7 @@ h6 {
   gap: 20px;
   flex-shrink: 0;
   z-index: 100;
-  /* ✅ إضافة ظل خفيف يعزز الإحساس بالعمق */
-  box-shadow: 0 1px 8px rgba(0, 0, 0, 0.04);
+  /* ⚠️ لا يوجد position: absolute أو fixed هنا */
 }
 
 .logo {
@@ -244,6 +243,7 @@ h6 {
   min-height: 0;
   min-width: 0;
   height: 0;
+  /* ⚠️ لا يوجد padding-top هنا (تم حذفه لإصلاح المشكلة) */
 }
 
 /* ============================================
