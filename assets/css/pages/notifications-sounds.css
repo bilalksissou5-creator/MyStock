@@ -1,0 +1,124 @@
+/* ============================================
+   صفحة اختيار نغمة الإشعارات
+   ============================================ */
+
+/* تنسيق خيارات النغمات */
+.sound-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 18px;
+  border-bottom: 1px solid #f2f2f2;
+  cursor: pointer;
+  transition: background 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.sound-option:last-child {
+  border-bottom: none;
+}
+
+.sound-option:hover,
+.sound-option:active {
+  background: #f8f8f8;
+}
+
+/* الجزء الأيسر (زر الاختيار + الاسم) */
+.sound-option-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex: 1;
+}
+
+/* زر الراديو المخصص */
+.custom-radio {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 2px solid #c0c0c0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.2s;
+}
+
+.sound-option.selected .custom-radio {
+  border-color: #16a34a;
+}
+
+.custom-radio::after {
+  content: '';
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #16a34a;
+  transform: scale(0);
+  transition: transform 0.2s;
+}
+
+.sound-option.selected .custom-radio::after {
+  transform: scale(1);
+}
+
+/* اسم النغمة */
+.sound-option-name {
+  font-size: 15px;
+  font-weight: 600;
+  color: #171717;
+}
+
+/* زر تجربة الصوت */
+.test-sound-btn {
+  background: #f3f4f6;
+  border: none;
+  border-radius: 8px;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #4b5563;
+  cursor: pointer;
+  transition: background 0.15s;
+  flex-shrink: 0;
+}
+
+.test-sound-btn:hover,
+.test-sound-btn:active {
+  background: #e5e7eb;
+  color: #171717;
+}
+
+.test-sound-btn i {
+  font-size: 14px;
+}
+
+/* زر الحفظ */
+.save-sound-btn {
+  width: 100%;
+  padding: 14px;
+  border-radius: 12px;
+  background: #16a34a;
+  color: white;
+  font-weight: 700;
+  font-size: 15px;
+  border: none;
+  cursor: pointer;
+  margin-top: 16px;
+  transition: background 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.save-sound-btn:hover {
+  background: #15803d;
+}
+
+.save-sound-btn:disabled {
+  background: #9ca3af;
+  cursor: not-allowed;
+}

@@ -16,6 +16,18 @@ document.addEventListener('DOMContentLoaded', async () => {
   const masterOn = localStorage.getItem('notif_master') !== 'false';
   const soundOn = localStorage.getItem('notif_sound') !== 'false';
   const vibrateOn = localStorage.getItem('notif_vibrate') !== 'false';
+  
+  function getCurrentToneName() {
+    const tones = {
+      'default': 'نغمة افتراضية (دينغ دونغ)',
+      'chime': 'نغمة هادئة (أجراس)',
+      'alert': 'تنبيه سريع (3 صفارات)',
+      'bell': 'جرس طويل',
+      'none': 'صامت (بدون نغمة)'
+    };
+    const current = localStorage.getItem('notif_tone') || 'default';
+    return tones[current] || tones['default'];
+  }
 
   main.innerHTML = `
     <div class="settings-wrapper">
@@ -57,6 +69,18 @@ document.addEventListener('DOMContentLoaded', async () => {
             <span class="toggle-slider"></span>
           </label>
         </div>
+
+        <!-- ✅ رابط اختيار نغمة الإشعار الجديد -->
+        <a href="/notification-sounds.html" class="settings-item">
+          <div class="settings-item-left">
+            <div class="settings-icon icon-teal"><i class="fas fa-music"></i></div>
+            <div class="settings-text">
+              <div class="settings-title">اختيار نغمة الإشعار</div>
+              <div class="settings-subtitle" id="current-tone-name">${getCurrentToneName()}</div>
+            </div>
+          </div>
+          <i class="fas fa-chevron-left settings-arrow"></i>
+        </a>
         
         <div class="settings-item">
           <div class="settings-item-left">
@@ -73,7 +97,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         </div>
       </div>
 
-      <!-- ✅ زر اختبار التنبيه -->
       <div class="settings-card">
         <button type="button" id="test-alerts-btn" class="settings-item" style="width:100%; border:none; background:transparent; cursor:pointer; text-align:start;">
           <div class="settings-item-left">
@@ -95,7 +118,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   const vibrateToggle = document.getElementById('toggle-vibrate');
   const testBtn = document.getElementById('test-alerts-btn');
 
-  // 1. المفتاح الرئيسي
   masterToggle.addEventListener('change', (e) => {
     const isChecked = e.target.checked;
     localStorage.setItem('notif_master', isChecked);
@@ -103,7 +125,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     vibrateToggle.disabled = !isChecked;
   });
 
-  // 2. الصوت
   soundToggle.addEventListener('change', (e) => {
     localStorage.setItem('notif_sound', e.target.checked);
     if (e.target.checked) {
@@ -115,7 +136,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   });
 
-  // 3. الاهتزاز
   vibrateToggle.addEventListener('change', (e) => {
     localStorage.setItem('notif_vibrate', e.target.checked);
     if (e.target.checked && navigator.vibrate) {
@@ -123,13 +143,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   });
 
-  // 4. زر الاختبار
   testBtn.addEventListener('click', () => {
-    console.log('🧪 Test button clicked');
     if (typeof window.playNotificationAlerts === 'function') {
       window.playNotificationAlerts();
-    } else {
-      alert('دالة الصوت غير محمّلة! تحقق من layout.js');
     }
   });
 });

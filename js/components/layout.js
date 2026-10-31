@@ -2,7 +2,7 @@
 // الهيكل المشترك (Header + Sidebar)
 // ✅ فحص تلقائي + تحذيرات + ترجمة كاملة
 // ✅ دعم iframe (وضع Embed)
-// ✅ محرك التنبيهات (صوت + اهتزاز)
+// ✅ محرك التنبيهات (نغمات متعددة + اهتزاز)
 // ============================================
 
 const ALLOWED_PAGES = [
@@ -145,7 +145,7 @@ function renderLayout(activePage) {
 }
 
 // ============================================
-// ✅ محرك التنبيهات (صوت + اهتزاز)
+// ✅ محرك التنبيهات (نغمات متعددة + اهتزاز)
 // ============================================
 window.__audioCtx = null;
 
@@ -163,19 +163,22 @@ function unlockAudio() {
   }
 }
 
-// فك قفل الصوت عند أي تفاعل
+// فك قفل الصوت عند أي تفاعل من المستخدم
 ['click', 'touchstart', 'keydown'].forEach(evt => {
   document.addEventListener(evt, unlockAudio, { passive: true });
 });
 
+// الدالة الرئيسية لتشغيل التنبيه (تقرأ النغمة المختارة)
 window.playNotificationAlerts = async function() {
   console.log('🎵 playNotificationAlerts called');
   
+  // قراءة الإعدادات من ذاكرة الهاتف
   const masterOn = localStorage.getItem('notif_master') !== 'false';
   const soundOn = localStorage.getItem('notif_sound') !== 'false';
   const vibrateOn = localStorage.getItem('notif_vibrate') !== 'false';
+  const selectedTone = localStorage.getItem('notif_tone') || 'default';
   
-  console.log('⚙️ Settings:', { masterOn, soundOn, vibrateOn });
+  console.log('⚙️ Settings:', { masterOn, soundOn, vibrateOn, selectedTone });
   
   if (!masterOn) {
     console.log('⏸️ Master switch OFF, skipping');
@@ -183,55 +186,64 @@ window.playNotificationAlerts = async function() {
   }
 
   // --- تشغيل الصوت ---
-  if (soundOn) {
+  if (soundOn && selectedTone !== 'none') {
     try {
       if (!window.__audioCtx) {
         window.__audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        console.log('🔊 AudioContext created inside play:', window.__audioCtx.state);
       }
-      
       if (window.__audioCtx.state === 'suspended') {
         await window.__audioCtx.resume();
-        console.log('🔊 Resumed to:', window.__audioCtx.state);
       }
       
       const now = window.__audioCtx.currentTime;
-      
-      const osc1 = window.__audioCtx.createOscillator();
-      const gain1 = window.__audioCtx.createGain();
-      osc1.type = 'sine';
-      osc1.frequency.setValueAtTime(880, now);
-      gain1.gain.setValueAtTime(0.4, now);
-      gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
-      osc1.connect(gain1);
-      gain1.connect(window.__audioCtx.destination);
-      osc1.start(now);
-      osc1.stop(now + 0.2);
-      
-      const osc2 = window.__audioCtx.createOscillator();
-      const gain2 = window.__audioCtx.createGain();
-      osc2.type = 'sine';
-      osc2.frequency.setValueAtTime(1320, now + 0.15);
-      gain2.gain.setValueAtTime(0.4, now + 0.15);
-      gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
-      osc2.connect(gain2);
-      gain2.connect(window.__audioCtx.destination);
-      osc2.start(now + 0.15);
-      osc2.stop(now + 0.4);
-      
-      console.log('🎵 Sound played successfully');
+      const osc = window.__audioCtx.createOscillator();
+      const gain = window.__audioCtx.createGain();
+      osc.connect(gain);
+      gain.connect(window.__audioCtx.destination);
+
+      if (selectedTone === 'default') {
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(880, now);
+        osc.frequency.setValueAtTime(1320, now + 0.15);
+        gain.gain.setValueAtTime(0.4, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
+        osc.start(now); osc.stop(now + 0.4);
+      } 
+      else if (selectedTone === 'chime') {
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(600, now);
+        osc.frequency.exponentialRampToValueAtTime(800, now + 0.2);
+        osc.frequency.exponentialRampToValueAtTime(600, now + 0.4);
+        gain.gain.setValueAtTime(0.3, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.6);
+        osc.start(now); osc.stop(now + 0.6);
+      }
+      else if (selectedTone === 'alert') {
+        osc.type = 'square';
+        osc.frequency.setValueAtTime(1000, now);
+        gain.gain.setValueAtTime(0.1, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
+        for (let i = 0; i < 3; i++) {
+          osc.start(now + (i * 0.2));
+          osc.stop(now + (i * 0.2) + 0.1);
+        }
+      }
+      else if (selectedTone === 'bell') {
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(1200, now);
+        gain.gain.setValueAtTime(0.4, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 1.2);
+        osc.start(now); osc.stop(now + 1.2);
+      }
+      console.log('🎵 Sound played successfully:', selectedTone);
     } catch (e) { 
       console.error("❌ Sound error:", e); 
     }
   }
 
   // --- الاهتزاز ---
-  if (vibrateOn) {
-    if (navigator.vibrate) {
-      navigator.vibrate([200, 100, 200]);
-      console.log('📳 Vibration triggered');
-    } else {
-      console.warn('📳 Vibration not supported');
-    }
+  if (vibrateOn && navigator.vibrate) {
+    navigator.vibrate([200, 100, 200]);
+    console.log('📳 Vibration triggered');
   }
 };
