@@ -599,7 +599,7 @@ h6 {
 @media (orientation: landscape) and (max-height: 500px) {
   .header { height: 45px; padding: 0 12px; gap: 10px; }
   .logo { font-size: 1rem; }
-  .search input { padding-block: 6px; padding-inline: 10px 32px; font-size: 12px; }
+  .search input { padding-block: 6px; padding-inline: 10px 32px; font-size: 12px; border-radius: 25px;}
 
   .sidebar { width: 200px; min-width: 200px; max-width: 200px; }
   .nav { padding: 6px 8px; gap: 2px; }
