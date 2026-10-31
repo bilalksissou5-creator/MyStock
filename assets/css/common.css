@@ -62,51 +62,51 @@ h1, h2, h3, h4, h5, h6 {
   line-height: 1.3;
 }
 
-/* H1 - أكبر عنوان (تم تصغيره بحوالي 5px) */
+/* H1 - أكبر عنوان (20px) */
 h1 {
-  font-size: 1.1875rem;  /* 19px بدلاً من 24px */
+  font-size: 1.25rem;    /* 20px */
   font-weight: 900;
 }
 
-/* H2 - عنوان الصفحة الرئيسي */
+/* H2 - عنوان الصفحة الرئيسي (18px) */
 h2 {
-  font-size: 1.75rem;    /* 28px */
+  font-size: 1.125rem;   /* 18px */
   font-weight: 800;
 }
 
-/* H3 - عنوان القسم */
+/* H3 - عنوان القسم (16px) */
 h3 {
-  font-size: 1.375rem;   /* 22px */
-  font-weight: 700;
-}
-
-/* H4 - عنوان البطاقة */
-h4 {
-  font-size: 1.125rem;   /* 18px */
-  font-weight: 700;
-}
-
-/* H5 - عنوان فرعي */
-h5 {
   font-size: 1rem;       /* 16px */
+  font-weight: 700;
+}
+
+/* H4 - عنوان البطاقة (15px) */
+h4 {
+  font-size: 0.9375rem;  /* 15px */
+  font-weight: 700;
+}
+
+/* H5 - عنوان فرعي (14px) */
+h5 {
+  font-size: 0.875rem;   /* 14px */
   font-weight: 600;
 }
 
-/* H6 - تسمية صغيرة */
+/* H6 - تسمية صغيرة (13px) */
 h6 {
-  font-size: 0.875rem;   /* 14px */
+  font-size: 0.8125rem;  /* 13px */
   font-weight: 600;
   color: #404040;
 }
 
 /* ✅ تصغير العناوين تلقائياً على الهواتف */
 @media (max-width: 768px) {
-  h1 { font-size: 0.875rem; }       /* 14px بدلاً من 16px */
-  h2, .page-header h2 { font-size: 1.5rem; } /* 24px */
-  h3 { font-size: 1.25rem; }        /* 20px */
-  h4 { font-size: 1.0625rem; }      /* 17px */
-  h5 { font-size: 0.9375rem; }      /* 15px */
-  h6 { font-size: 0.8125rem; }      /* 13px */
+  h1 { font-size: 1rem; }           /* 16px */
+  h2, .page-header h2 { font-size: 0.9375rem; } /* 15px */
+  h3 { font-size: 0.875rem; }       /* 14px */
+  h4 { font-size: 0.84375rem; }     /* 13.5px */
+  h5 { font-size: 0.8125rem; }      /* 13px */
+  h6 { font-size: 0.75rem; }        /* 12px */
 }
 
 /* ============================================
@@ -345,7 +345,7 @@ h6 {
 
 .page-header h2 {
   margin: 0;
-  font-size: 1.75rem;
+  font-size: 1.125rem;   /* 18px - متوافق مع h2 الجديد */
   font-weight: 800;
 }
 
