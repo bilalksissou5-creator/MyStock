@@ -899,6 +899,16 @@ const translations = {
     notif_sound_sub: 'تشغيل نغمة عند وصول إشعار',
     notif_vibrate_title: 'الاهتزاز',
     notif_vibrate_sub: 'اهتزاز الهاتف عند وصول إشعار',
+
+    notif_sounds_title: 'نغمات الإشعارات',
+    notif_tone_default: 'نغمة افتراضية (دينغ دونغ)',
+    notif_tone_chime: 'نغمة هادئة (أجراس)',
+    notif_tone_alert: 'تنبيه سريع (3 صفارات)',
+    notif_tone_bell: 'جرس طويل',
+    notif_tone_none: 'صامت (بدون نغمة)',
+    notif_save_tone: 'حفظ النغمة',
+    notif_tone_saved: 'تم الحفظ بنجاح!',
+    notif_test_tone: 'تجربة الصوت',
   },
 
   fr: {
@@ -1788,6 +1798,16 @@ const translations = {
     notif_sound_sub: 'Jouer un son à la réception d\'une notification',
     notif_vibrate_title: 'Vibration',
     notif_vibrate_sub: 'Vibrer le téléphone à la réception d\'une notification',
+
+    notif_sounds_title: 'Sons de notification',
+    notif_tone_default: 'Son par défaut (Ding Dong)',
+    notif_tone_chime: 'Son doux (Carillons)',
+    notif_tone_alert: 'Alerte rapide (3 bips)',
+    notif_tone_bell: 'Cloche longue',
+    notif_tone_none: 'Silencieux (Sans son)',
+    notif_save_tone: 'Enregistrer le son',
+    notif_tone_saved: 'Enregistré avec succès !',
+    notif_test_tone: 'Tester le son',
   },
 
   en: {
@@ -2677,6 +2697,16 @@ const translations = {
     notif_sound_sub: 'Play a sound when a notification arrives',
     notif_vibrate_title: 'Vibration',
     notif_vibrate_sub: 'Vibrate phone when a notification arrives',
+
+    notif_sounds_title: 'Notification Sounds',
+    notif_tone_default: 'Default Tone (Ding Dong)',
+    notif_tone_chime: 'Gentle Tone (Chimes)',
+    notif_tone_alert: 'Quick Alert (3 Beeps)',
+    notif_tone_bell: 'Long Bell',
+    notif_tone_none: 'Silent (No Sound)',
+    notif_save_tone: 'Save Tone',
+    notif_tone_saved: 'Saved successfully!',
+    notif_test_tone: 'Test Sound',
   },
 
   

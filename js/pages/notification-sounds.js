@@ -8,16 +8,17 @@ document.addEventListener('DOMContentLoaded', async () => {
   renderLayout('settings.html');
   if (window.applyLanguage) window.applyLanguage();
   
-  document.title = 'نغمات الإشعارات';
+  const tr = (key) => (window.t ? window.t(key) : key);
+  document.title = tr('notif_sounds_title');
   const main = document.getElementById('main-content');
 
-  // قائمة النغمات المتاحة
+  // قائمة النغمات المتاحة (باستخدام مفاتيح الترجمة)
   const tones = [
-    { id: 'default', name: 'نغمة افتراضية (دينغ دونغ)' },
-    { id: 'chime', name: 'نغمة هادئة (أجراس)' },
-    { id: 'alert', name: 'تنبيه سريع (3 صفارات)' },
-    { id: 'bell', name: 'جرس طويل' },
-    { id: 'none', name: 'صامت (بدون نغمة)' }
+    { id: 'default', name: tr('notif_tone_default') },
+    { id: 'chime', name: tr('notif_tone_chime') },
+    { id: 'alert', name: tr('notif_tone_alert') },
+    { id: 'bell', name: tr('notif_tone_bell') },
+    { id: 'none', name: tr('notif_tone_none') }
   ];
 
   const currentTone = localStorage.getItem('notif_tone') || 'default';
@@ -66,7 +67,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       gain.gain.setValueAtTime(0.1, now);
       gain.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
       
-      // 3 صفارات متتالية (محاكاة)
       for (let i = 0; i < 3; i++) {
         osc.start(now + (i * 0.2));
         osc.stop(now + (i * 0.2) + 0.1);
@@ -90,7 +90,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         <div class="sound-option-name">${tone.name}</div>
       </div>
       ${tone.id !== 'none' ? `
-        <button type="button" class="test-sound-btn" data-test="${tone.id}" title="تجربة الصوت">
+        <button type="button" class="test-sound-btn" data-test="${tone.id}" title="${tr('notif_test_tone')}">
           <i class="fas fa-play"></i>
         </button>
       ` : ''}
@@ -100,11 +100,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   main.innerHTML = `
     <div class="settings-wrapper">
       
-      <div class="page-header">
-        <a href="/notifications-settings.html" class="back-btn">
-          <i class="fas fa-arrow-right"></i>
-        </a>
-        <h2>نغمات الإشعارات</h2>
+      <!-- ترويسة الصفحة بدون سهم رجوع -->
+      <div class="page-header" style="justify-content: flex-start;">
+        <h2>${tr('notif_sounds_title')}</h2>
       </div>
 
       <div class="settings-card">
@@ -113,7 +111,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       <button type="button" id="save-tone-btn" class="save-sound-btn">
         <i class="fas fa-check"></i>
-        <span>حفظ النغمة</span>
+        <span>${tr('notif_save_tone')}</span>
       </button>
 
     </div>
@@ -123,17 +121,14 @@ document.addEventListener('DOMContentLoaded', async () => {
   const optionElements = document.querySelectorAll('.sound-option');
   optionElements.forEach(opt => {
     opt.addEventListener('click', (e) => {
-      // إذا ضغط على زر التجربة، لا نغير النغمة
       if (e.target.closest('.test-sound-btn')) return;
 
       const id = opt.dataset.id;
       selectedTone = id;
 
-      // إزالة التحديد من الجميع وإضافته للمختار
       optionElements.forEach(o => o.classList.remove('selected'));
       opt.classList.add('selected');
 
-      // تشغيل النغمة فور اختيارها
       window.playToneSound(id);
     });
   });
@@ -141,11 +136,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   // 2. منطق أزرار التجربة
   document.querySelectorAll('.test-sound-btn').forEach(btn => {
     btn.addEventListener('click', (e) => {
-      e.stopPropagation(); // منع تحديد النغمة عند الضغط على التجربة
+      e.stopPropagation();
       const toneId = btn.dataset.test;
       window.playToneSound(toneId);
       
-      // تأثير بصري بسيط للزر
       btn.style.background = '#dcfce7';
       btn.style.color = '#16a34a';
       setTimeout(() => {
@@ -160,7 +154,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     localStorage.setItem('notif_tone', selectedTone);
     
     const btn = document.getElementById('save-tone-btn');
-    btn.innerHTML = '<i class="fas fa-check"></i> <span>تم الحفظ بنجاح!</span>';
+    btn.innerHTML = `<i class="fas fa-check"></i> <span>${tr('notif_tone_saved')}</span>`;
     btn.style.background = '#15803d';
 
     setTimeout(() => {
