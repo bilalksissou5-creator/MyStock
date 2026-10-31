@@ -110,11 +110,13 @@ h6 {
 }
 
 /* ============================================
-   Header
+   ✅ Header - بتأثير الضباب الزجاجي (Glassmorphism)
    ============================================ */
 .header {
-  background: #fff;
-  border-bottom: 1px solid #e5e5e5;
+  background: rgba(255, 255, 255, 0.7); /* أبيض شبه شفاف */
+  backdrop-filter: blur(16px) saturate(180%); /* ضباب + تشبع الألوان خلفه */
+  -webkit-backdrop-filter: blur(16px) saturate(180%); /* دعم سفاري */
+  border-bottom: 1px solid rgba(229, 229, 229, 0.6);
   height: 60px;
   padding: 0 20px;
   display: flex;
@@ -123,6 +125,8 @@ h6 {
   gap: 20px;
   flex-shrink: 0;
   z-index: 100;
+  /* ✅ إضافة ظل خفيف يعزز الإحساس بالعمق */
+  box-shadow: 0 1px 8px rgba(0, 0, 0, 0.04);
 }
 
 .logo {
@@ -345,7 +349,7 @@ h6 {
 
 .page-header h2 {
   margin: 0;
-  font-size: 1.125rem;   /* 18px - متوافق مع h2 الجديد */
+  font-size: 1.125rem;   /* 18px */
   font-weight: 800;
 }
 
