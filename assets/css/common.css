@@ -110,11 +110,11 @@ h6 {
 }
 
 /* ============================================
-   ✅ Header - خلفية شفافة (بدون تعويم)
+   ✅ Header - كما كان في الأصل (خلفية بيضاء)
    ============================================ */
 .header {
-  background: transparent #ffff;            /* خلفية شفافة */
-  border-bottom: 1px solid #e5e5e5;   /* حد خفيف للفصل بين الهيدر والمحتوى */
+  background: #fff;
+  border-bottom: 1px solid #e5e5e5;
   height: 60px;
   padding: 0 20px;
   display: flex;
@@ -123,7 +123,6 @@ h6 {
   gap: 20px;
   flex-shrink: 0;
   z-index: 100;
-  /* ⚠️ لا يوجد position: absolute أو fixed هنا */
 }
 
 .logo {
@@ -243,7 +242,6 @@ h6 {
   min-height: 0;
   min-width: 0;
   height: 0;
-  /* ⚠️ لا يوجد padding-top هنا (تم حذفه لإصلاح المشكلة) */
 }
 
 /* ============================================
