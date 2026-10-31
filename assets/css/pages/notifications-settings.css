@@ -11,10 +11,11 @@
   gap: 20px;
 }
 
-/* ترويسة الصفحة وزر الرجوع */
-.page-header {
+/* ✅ إصلاح ترويسة الصفحة (منع تباعد العنوان عن السهم) */
+.settings-wrapper .page-header {
   display: flex;
   align-items: center;
+  justify-content: flex-start !important; /* إجبار العناصر على البقاء بجانب بعضها */
   gap: 12px;
   margin-bottom: 8px;
 }
@@ -23,6 +24,7 @@
   margin: 0;
   font-size: 20px;
   font-weight: 700;
+  color: #111827;
 }
 
 .back-btn {
@@ -36,10 +38,21 @@
   color: #111827;
   text-decoration: none;
   transition: background 0.2s;
+  flex-shrink: 0; /* منع الزر من التمدد */
 }
 
 .back-btn:hover {
   background: #e5e7eb;
+}
+
+.back-btn i {
+  font-size: 16px;
+  transition: transform 0.2s;
+}
+
+/* ✅ عكس اتجاه السهم تلقائياً في اللغة العربية */
+html[dir="rtl"] .back-btn i {
+  transform: scaleX(-1);
 }
 
 /* البطاقات */
@@ -101,6 +114,8 @@
 .icon-blue { background: #dbeafe; color: #2563eb; }
 .icon-purple { background: #f3e8ff; color: #9333ea; }
 .icon-gray { background: #f3f4f6; color: #4b5563; }
+.icon-teal { background: #ccfbf1; color: #0d9488; }
+.icon-green { background: #dcfce7; color: #16a34a; }
 
 /* ============================================
    زر التفعيل (Toggle Switch)

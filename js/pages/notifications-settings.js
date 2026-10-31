@@ -1,5 +1,5 @@
 // ============================================
-// صفحة إعدادات الإشعارات (نسخة البطاقة الموحدة)
+// صفحة إعدادات الإشعارات (بدون سهم رجوع)
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   const user = await requireAuth();
@@ -17,7 +17,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   const soundOn = localStorage.getItem('notif_sound') !== 'false';
   const vibrateOn = localStorage.getItem('notif_vibrate') !== 'false';
   
-  // دالة لجلب اسم النغمة الحالية لعرضها في البطاقة
   function getCurrentToneName() {
     const tones = {
       'default': 'نغمة افتراضية (دينغ دونغ)',
@@ -33,14 +32,11 @@ document.addEventListener('DOMContentLoaded', async () => {
   main.innerHTML = `
     <div class="settings-wrapper">
       
-      <div class="page-header">
-        <a href="/settings.html" class="back-btn">
-          <i class="fas fa-arrow-right"></i>
-        </a>
+      <!-- ✅ ترويسة الصفحة بدون سهم الرجوع -->
+      <div class="page-header" style="justify-content: flex-start;">
         <h2>${tr('stg_notifications') || 'الإشعارات'}</h2>
       </div>
 
-      <!-- 1. المفتاح الرئيسي -->
       <div class="settings-card">
         <div class="settings-item">
           <div class="settings-item-left">
@@ -57,20 +53,16 @@ document.addEventListener('DOMContentLoaded', async () => {
         </div>
       </div>
 
-      <!-- 2. الصوت والاهتزاز -->
       <div class="settings-card">
-        
-        <!-- ✅ بطاقة الصوت الموحدة: تنقلك لصفحة النغمات عند النقر، ومفتاح التفعيل يعمل بشكل مستقل -->
+        <!-- بطاقة الصوت -->
         <div class="settings-item" onclick="window.location.href='/notification-sounds.html'">
           <div class="settings-item-left">
             <div class="settings-icon icon-blue"><i class="fas fa-volume-up"></i></div>
             <div class="settings-text">
               <div class="settings-title">${tr('notif_sound_title') || 'صوت الإشعار'}</div>
-              <!-- عرض اسم النغمة الحالية بدلاً من الوصف القديم -->
               <div class="settings-subtitle" id="current-tone-name">${getCurrentToneName()}</div>
             </div>
           </div>
-          <!-- منع الحدث من الانتقال للصفحة عند الضغط على المفتاح -->
           <div onclick="event.stopPropagation();">
             <label class="toggle-switch">
               <input type="checkbox" id="toggle-sound" ${soundOn ? 'checked' : ''} ${!masterOn ? 'disabled' : ''}>
@@ -79,7 +71,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           </div>
         </div>
         
-        <!-- بطاقة الاهتزاز (تبقى كما هي) -->
+        <!-- بطاقة الاهتزاز -->
         <div class="settings-item">
           <div class="settings-item-left">
             <div class="settings-icon icon-purple"><i class="fas fa-mobile-alt"></i></div>
@@ -95,7 +87,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         </div>
       </div>
 
-      <!-- 3. زر الاختبار -->
       <div class="settings-card">
         <button type="button" id="test-alerts-btn" class="settings-item" style="width:100%; border:none; background:transparent; cursor:pointer; text-align:start;">
           <div class="settings-item-left">
@@ -105,20 +96,17 @@ document.addEventListener('DOMContentLoaded', async () => {
               <div class="settings-subtitle">جرّب الصوت والاهتزاز الآن</div>
             </div>
           </div>
-          <i class="fas fa-chevron-left settings-arrow"></i>
         </button>
       </div>
 
     </div>
   `;
 
-  // --- ربط الأزرار بالمنطق ---
   const masterToggle = document.getElementById('toggle-master');
   const soundToggle = document.getElementById('toggle-sound');
   const vibrateToggle = document.getElementById('toggle-vibrate');
   const testBtn = document.getElementById('test-alerts-btn');
 
-  // 1. المفتاح الرئيسي
   masterToggle.addEventListener('change', (e) => {
     const isChecked = e.target.checked;
     localStorage.setItem('notif_master', isChecked);
@@ -126,7 +114,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     vibrateToggle.disabled = !isChecked;
   });
 
-  // 2. الصوت
   soundToggle.addEventListener('change', (e) => {
     localStorage.setItem('notif_sound', e.target.checked);
     if (e.target.checked) {
@@ -138,7 +125,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   });
 
-  // 3. الاهتزاز
   vibrateToggle.addEventListener('change', (e) => {
     localStorage.setItem('notif_vibrate', e.target.checked);
     if (e.target.checked && navigator.vibrate) {
@@ -146,7 +132,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   });
 
-  // 4. زر الاختبار
   testBtn.addEventListener('click', () => {
     if (typeof window.playNotificationAlerts === 'function') {
       window.playNotificationAlerts();
