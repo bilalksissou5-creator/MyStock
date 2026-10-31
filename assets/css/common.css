@@ -113,7 +113,7 @@ h6 {
    ✅ Header - خلفية شفافة (بدون تعويم)
    ============================================ */
 .header {
-  background: transparent;            /* خلفية شفافة */
+  background: transparent #ffff;            /* خلفية شفافة */
   border-bottom: 1px solid #e5e5e5;   /* حد خفيف للفصل بين الهيدر والمحتوى */
   height: 60px;
   padding: 0 20px;
