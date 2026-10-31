@@ -136,7 +136,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       window.playToneSound(toneId);
       
       btn.style.background = '#1a73e8';
-      btn.style.color = '#1a73e8';
+      btn.style.color = '#171717';
       setTimeout(() => {
         btn.style.background = '';
         btn.style.color = '';
