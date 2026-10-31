@@ -45,7 +45,7 @@
 }
 
 .sound-option.selected .custom-radio {
-  border-color: #16a34a;
+  border-color: #1a73e8;
 }
 
 .custom-radio::after {
@@ -53,7 +53,7 @@
   width: 12px;
   height: 12px;
   border-radius: 50%;
-  background: #16a34a;
+  background: #1a73e8;
   transform: scale(0);
   transition: transform 0.2s;
 }
@@ -100,7 +100,7 @@
   width: 100%;
   padding: 14px;
   border-radius: 12px;
-  background: #16a34a;
+  background: #1a73e8;
   color: white;
   font-weight: 700;
   font-size: 15px;
@@ -115,7 +115,7 @@
 }
 
 .save-sound-btn:hover {
-  background: #15803d;
+  background: #1a73e8;
 }
 
 .save-sound-btn:disabled {
