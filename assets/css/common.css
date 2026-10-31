@@ -244,7 +244,7 @@ h6 {
   height: 0;
 }
 
-/* ✅ إغلاق القائمة بسلاسة على الديسكتوب */
+/* ✅ إغلاق القائمة بسلاسة (وسرعة) على الديسكتوب */
 .body.sidebar-closed .sidebar {
   width: 0;
   min-width: 0;
@@ -266,10 +266,10 @@ h6 {
   overflow: hidden;
   height: 100%;
   
-  /* ✅ حركة الانتقال السلسة */
-  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-              opacity 0.25s ease,
-              border-inline-start-width 0.3s ease;
+  /* ✅ تم تقليل المدة إلى 0.2s وجعل الحركة متناسقة في الفتح والإغلاق */
+  transition: width 0.2s ease-in-out,
+              opacity 0.2s ease-in-out,
+              border-inline-start-width 0.2s ease-in-out;
 }
 
 .nav {
@@ -567,11 +567,12 @@ h6 {
 
   .sidebar {
     width: 65px;
-    min-width: 0; /* ✅ تعديل للسماح بالانكماش */
+    min-width: 0;
     max-width: 65px;
-    transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-                opacity 0.25s ease,
-                border-inline-start-width 0.3s ease;
+    /* ✅ نفس سرعة الديسكتوب للهواتف */
+    transition: width 0.2s ease-in-out,
+                opacity 0.2s ease-in-out,
+                border-inline-start-width 0.2s ease-in-out;
   }
 
   .nav { padding: 8px 4px; }
