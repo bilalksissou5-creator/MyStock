@@ -622,17 +622,3 @@ h6 {
   height: 100% !important;
   padding-bottom: 0 !important;
 }
-
-/* ============================================
-   ✅ حل مشكلة عدم تمدد النماذج على الشاشات الكبيرة
-   ============================================ */
-@media (min-width: 992px) {
-  .add-form,
-  .out-form,
-  .settings-wrapper,
-  .receipt-container,
-  .invoice-container {
-    max-width: 100% !important;
-    width: 100% !important;
-  }
-}
