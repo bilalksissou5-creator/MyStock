@@ -59,12 +59,12 @@ h1, h2, h3, h4, h5, h6 {
   margin: 0;
   font-family: inherit;
   color: #171717;
-  line-height: 1.2;
+  line-height: 1.3;
 }
 
-/* H1 - أكبر عنوان (تم تصغيره 4px) */
+/* H1 - أكبر عنوان (تم تصغيره 4px إضافية) */
 h1 {
-  font-size: 1.75rem;    /* 28px بدلاً من 32px */
+  font-size: 1.5rem;     /* 24px بدلاً من 28px */
   font-weight: 900;
 }
 
@@ -101,7 +101,7 @@ h6 {
 
 /* ✅ تصغير العناوين تلقائياً على الهواتف */
 @media (max-width: 768px) {
-  h1 { font-size: 1.25rem; }        /* 20px بدلاً من 24px */
+  h1 { font-size: 1rem; }           /* 16px بدلاً من 20px */
   h2, .page-header h2 { font-size: 1.5rem; } /* 24px */
   h3 { font-size: 1.25rem; }        /* 20px */
   h4 { font-size: 1.0625rem; }      /* 17px */
