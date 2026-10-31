@@ -249,7 +249,7 @@ h6 {
    ============================================ */
 .sidebar {
   width: 240px;
-  min-width: 0; /* ✅ ضروري جداً للسماح بالانكماش بسلاسة */
+  min-width: 0;
   background: #fff;
   border-inline-start: 1px solid #e5e5e5;
   display: flex;
@@ -258,13 +258,11 @@ h6 {
   overflow: hidden;
   height: 100%;
   
-  /* ✅ حركة موحدة للفتح والإغلاق */
   transition: width 0.2s ease-in-out,
               opacity 0.2s ease-in-out,
               border-inline-start-width 0.2s ease-in-out;
 }
 
-/* ✅ حالة الإغلاق: فقط نغير العرض (بدون max-width لإلغاء "النطة") */
 .body.sidebar-closed .sidebar {
   width: 0;
   opacity: 0;
@@ -566,7 +564,7 @@ h6 {
 
   .sidebar {
     width: 65px;
-    min-width: 0; /* ✅ ضروري للسماح بالانكماش بسلاسة */
+    min-width: 0;
     transition: width 0.2s ease-in-out,
                 opacity 0.2s ease-in-out,
                 border-inline-start-width 0.2s ease-in-out;
@@ -588,7 +586,6 @@ h6 {
 
   .main { padding: 12px; padding-bottom: 80px; }
 
-  /* ✅ إغلاق بسلاسة على الموبايل (بدون max-width) */
   .body.sidebar-hidden-mobile .sidebar {
     width: 0;
     opacity: 0;
@@ -604,7 +601,7 @@ h6 {
   .logo { font-size: 1rem; }
   .search input { padding-block: 6px; padding-inline: 10px 32px; font-size: 12px; }
 
-  .sidebar { width: 200px; min-width: 200px; }
+  .sidebar { width: 200px; min-width: 200px; max-width: 200px; }
   .nav { padding: 6px 8px; gap: 2px; }
   .nav-item { padding: 6px 10px; font-size: 12px; gap: 8px; }
   .nav-item i { font-size: 14px; width: 18px; }
@@ -624,4 +621,18 @@ h6 {
   padding: 0 !important;
   height: 100% !important;
   padding-bottom: 0 !important;
+}
+
+/* ============================================
+   ✅ حل مشكلة عدم تمدد النماذج على الشاشات الكبيرة
+   ============================================ */
+@media (min-width: 992px) {
+  .add-form,
+  .out-form,
+  .settings-wrapper,
+  .receipt-container,
+  .invoice-container {
+    max-width: 100% !important;
+    width: 100% !important;
+  }
 }
