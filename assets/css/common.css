@@ -113,10 +113,8 @@ h6 {
    ✅ Header - بتأثير الضباب الزجاجي (Glassmorphism)
    ============================================ */
 .header {
-  background: rgba(255, 255, 255, 0.7); /* أبيض شبه شفاف */
-  backdrop-filter: blur(16px) saturate(180%); /* ضباب + تشبع الألوان خلفه */
-  -webkit-backdrop-filter: blur(16px) saturate(180%); /* دعم سفاري */
-  border-bottom: 1px solid rgba(229, 229, 229, 0.6);
+  background: transparent;
+  border-bottom: none;
   height: 60px;
   padding: 0 20px;
   display: flex;
