@@ -404,7 +404,7 @@ h6 { font-size: 0.8125rem; font-weight: 600; color: #404040; } /* 13px */
 .search-bar input {
   width: 100%;
   padding-block: 14px;
-  padding-inline: 20px 48px;
+  padding-inline: 10px 20px;
   border: 1px solid #d4d4d4;
   border-radius: 50px; /* ✅ شكل دائري */
   background: white;
