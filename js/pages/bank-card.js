@@ -1,6 +1,6 @@
 // ============================================
 // صفحة البطاقة البنكية (Lemon Squeezy)
-// ✅ عرض البطاقة + التحكم الكامل + إشعارات
+// ✅ تقرأ وتكتب من جدول bank_cards المنفصل
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   const user = await requireAuth();
@@ -15,11 +15,19 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   const main = document.getElementById('main-content');
 
+  // ✅ جلب البيانات الأساسية للمستخدم
   const { data: profile } = await db
     .from('profiles')
-    .select('*')
+    .select('organization_id, full_name, role')
     .eq('id', user.id)
     .single();
+
+  // ✅ جلب البطاقة من الجدول الجديد (RLS يمنع أي شخص آخر من قراءتها)
+  const { data: card } = await db
+    .from('bank_cards')
+    .select('*')
+    .eq('profile_id', user.id)
+    .maybeSingle();
 
   let subscription = null;
   if (profile?.organization_id) {
@@ -66,8 +74,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   function render() {
-    const hasCard = !!profile?.bank_card_last4;
-    const isActive = profile?.bank_card_active !== false;
+    // ✅ قراءة من card بدلاً من profile
+    const hasCard = !!card?.last4;
+    const isActive = card?.active !== false;
 
     const params = new URLSearchParams(window.location.search);
     const isBlocked = params.get('blocked') === '1';
@@ -103,10 +112,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     wrapper.className = 'bank-card-wrapper';
 
     if (hasCard) {
-      const last4 = profile.bank_card_last4;
-      const brand = profile.bank_card_brand || 'Card';
-      const holder = profile.bank_card_holder || '—';
-      const expiry = profile.bank_card_expiry || 'MM/YY';
+      // ✅ استخدام أعمدة الجدول الجديد
+      const last4 = card.last4;
+      const brand = card.brand || 'Card';
+      const holder = card.holder || '—';
+      const expiry = card.expiry || 'MM/YY';
 
       const statusBadge = isActive
         ? `<div class="bc-default-badge">
@@ -209,7 +219,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     main.appendChild(wrapper);
 
-    // ✅ زر إلغاء التفعيل (إرسال تحذير 3 أيام)
+    // ✅ زر إلغاء التفعيل - يحدث جدول bank_cards
     document.getElementById('deactivate-btn')?.addEventListener('click', async () => {
       if (!confirm(tr('bc_confirm_deactivate'))) return;
 
@@ -217,25 +227,25 @@ document.addEventListener('DOMContentLoaded', async () => {
       btn.disabled = true;
       btn.querySelector('span').textContent = tr('pe_saving');
 
+      const now = new Date().toISOString();
       const { error } = await db
-        .from('profiles')
+        .from('bank_cards')
         .update({
-          bank_card_active: false,
-          bank_card_deactivated_at: new Date().toISOString(),
-          card_warning_sent: 0,
+          active: false,
+          deactivated_at: now,
+          warning_sent: 0,
         })
-        .eq('id', user.id);
+        .eq('profile_id', user.id);
 
       if (error) {
         showError(error.message);
         btn.disabled = false;
         btn.querySelector('span').textContent = tr('bc_deactivate');
       } else {
-        profile.bank_card_active = false;
-        profile.bank_card_deactivated_at = new Date().toISOString();
-        profile.card_warning_sent = 0;
+        card.active = false;
+        card.deactivated_at = now;
+        card.warning_sent = 0;
 
-        // ✅ إرسال إشعار التحذير الأول (3 أيام)
         if (typeof notifyOrganization === 'function' && profile?.organization_id) {
           try {
             await notifyOrganization({
@@ -254,20 +264,20 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
     });
 
-    // ✅ زر إعادة التفعيل
+    // ✅ زر إعادة التفعيل - يحدث جدول bank_cards
     document.getElementById('reactivate-btn')?.addEventListener('click', async () => {
       const btn = document.getElementById('reactivate-btn');
       btn.disabled = true;
       btn.querySelector('span').textContent = tr('pe_saving');
 
       const { error } = await db
-        .from('profiles')
+        .from('bank_cards')
         .update({
-          bank_card_active: true,
-          bank_card_deactivated_at: null,
-          card_warning_sent: 0,
+          active: true,
+          deactivated_at: null,
+          warning_sent: 0,
         })
-        .eq('id', user.id);
+        .eq('profile_id', user.id);
 
       if (profile?.organization_id) {
         await db
@@ -281,9 +291,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         btn.disabled = false;
         btn.querySelector('span').textContent = tr('bc_reactivate');
       } else {
-        profile.bank_card_active = true;
-        profile.bank_card_deactivated_at = null;
-        profile.card_warning_sent = 0;
+        card.active = true;
+        card.deactivated_at = null;
+        card.warning_sent = 0;
 
         showSuccess(tr('bc_reactivated'));
         setTimeout(() => render(), 800);
