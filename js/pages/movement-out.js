@@ -2,6 +2,7 @@
 // صفحة إخراج منتجات + طباعة حرارية (WebBluetooth/WebUSB)
 // ✅ بدون RawBT
 // ✅ الباركود الممسوح يظهر في خانة الإدخال والسلة
+// ✅ إشعار تلقائي عند انخفاض المخزون
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   if (window.__movementOutLoaded) return;
@@ -295,7 +296,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const scannerClose = document.getElementById('scanner-close');
   
   let selectedProduct = null;
-  let scannedBarcode = null;  // ✅ متغير جديد لحفظ الباركود الممسوح
+  let scannedBarcode = null;
   let isAdding = false;
   let isSaving = false;
   let html5QrCode = null;
@@ -321,7 +322,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   }
 
-  // ✅ التعديل: استقبال الباركود الممسوح وحفظه
   function selectProduct(f, scanned = null) {
     selectedProduct = f;
     scannedBarcode = scanned || f.sku || '—';
@@ -364,7 +364,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
     if (!f) { alert(`${tr('mout_not_found')}\n${v}`); return; }
     if (Number(f.qty ?? 0) <= 0) { alert(`${tr('mout_no_stock')} "${f.name}"`); return; }
-    // ✅ تمرير الباركود الممسوح
     selectProduct(f, v);
   }
 
@@ -409,7 +408,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (qty > av) { errBox.textContent = `${tr('mout_err_max')} ${av}`; errBox.style.display = 'block'; quantityInput.focus(); isAdding = false; addBtn.disabled = false; return; }
 
     const cp = Number(selectedProduct.price ?? 0);
-    // ✅ الباركود الذي سيُحفظ في السلة (الممسوح أو الأساسي)
     const displaySku = scannedBarcode || selectedProduct.sku || '—';
     const ex = addedProducts.find(p => p.id === selectedProduct.id);
     
@@ -417,12 +415,12 @@ document.addEventListener('DOMContentLoaded', async () => {
       ex.qty += qty; 
       ex.price = price; 
       ex.costPrice = cp;
-      ex.sku = displaySku; // ✅ تحديث بالباركود الممسوح
+      ex.sku = displaySku;
     } else { 
       addedProducts.push({ 
         id: selectedProduct.id, 
         name: selectedProduct.name, 
-        sku: displaySku, // ✅ الباركود الممسوح
+        sku: displaySku,
         image_url: selectedProduct.image_url, 
         qty, price, costPrice: cp, available: av 
       }); 
@@ -435,7 +433,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     quantityInput.value = ''; 
     priceInput.value = '0'; 
     selectedProduct = null; 
-    scannedBarcode = null;  // ✅ إعادة تعيين
+    scannedBarcode = null;
     productInput.focus();
     setTimeout(() => { isAdding = false; addBtn.disabled = false; }, 400);
   }
@@ -471,6 +469,9 @@ document.addEventListener('DOMContentLoaded', async () => {
       const { data: newReceipt, error: receiptErr } = await db.from('receipts').insert({ receipt_number: receiptNumber, organization_id: prof.organization_id, total_qty: totalQty, total_value: totalValue, created_by: authUser.id }).select().single();
       if (receiptErr) throw new Error(tr('mout_err_receipt') + ' ' + receiptErr.message);
 
+      // ✅ مصفوفة تتبع المنتجات التي عبرت الحد الأدنى
+      const lowStockAlerts = [];
+
       const receiptItems = addedProducts.map(p => {
         const qty = Number(p.qty), price = Number(p.price), costPrice = Number(p.costPrice ?? 0);
         return { receipt_id: newReceipt.id, product_id: p.id, product_name: p.name, qty, price, cost_price: costPrice, profit: (price - costPrice) * qty, total: qty * price };
@@ -482,10 +483,45 @@ document.addEventListener('DOMContentLoaded', async () => {
       const { error: moveError } = await db.from('stock_movements').insert(movements);
       if (moveError) throw new Error(tr('mout_err_movements') + ' ' + moveError.message);
 
+      // ✅ تحديث qty + فحص عبور الحد الأدنى
       for (const p of addedProducts) {
-        const { data: fresh } = await db.from('products').select('qty').eq('id', p.id).single();
-        const newQty = Math.max(0, Number(fresh?.qty || 0) - Number(p.qty));
+        const { data: fresh } = await db
+          .from('products')
+          .select('qty, low_stock_threshold')
+          .eq('id', p.id)
+          .single();
+
+        const oldQty = Number(fresh?.qty || 0);
+        const newQty = Math.max(0, oldQty - Number(p.qty));
+        const threshold = Number(fresh?.low_stock_threshold ?? 10);
+
         await db.from('products').update({ qty: newQty }).eq('id', p.id);
+
+        if (oldQty > threshold && newQty <= threshold) {
+          lowStockAlerts.push({
+            name: p.name,
+            qty: newQty,
+            threshold: threshold,
+          });
+        }
+      }
+
+      // ✅ إشعار المخزون المنخفض (قبل إشعار الفاتورة العادي)
+      if (lowStockAlerts.length > 0 && typeof notifyOrganization === 'function') {
+        try {
+          const alertLines = lowStockAlerts
+            .map(a => `• "${a.name}" — ${a.qty} قطعة (الحد: ${a.threshold})`)
+            .join('\n');
+
+          await notifyOrganization({
+            orgId: prof.organization_id,
+            title: lowStockAlerts.length === 1 ? '⚠️ مخزون منخفض' : `⚠️ ${lowStockAlerts.length} منتجات بمخزون منخفض`,
+            message: alertLines,
+            type: 'warning',
+            link: '/products/list.html',
+            userName: prof.full_name || null,
+          });
+        } catch (e) { console.warn('low stock alert failed:', e); }
       }
 
       if (typeof notifyOrganization === 'function') {
@@ -494,8 +530,22 @@ document.addEventListener('DOMContentLoaded', async () => {
         } catch (e) {}
       }
 
-      successBox.textContent = `تم الحفظ بنجاح ✅`;
-      successBox.style.display = 'block';
+      // ✅ عرض التحذير إذا وُجد مخزون منخفض
+      if (lowStockAlerts.length > 0) {
+        successBox.style.display = 'none';
+        const warnBox = document.createElement('div');
+        warnBox.className = 'alert alert-error';
+        warnBox.style.background = '#fef3c7';
+        warnBox.style.color = '#92400e';
+        warnBox.style.border = '1px solid #fde68a';
+        warnBox.innerHTML = `⚠️ تحذير: ${lowStockAlerts.length} منتج وصل للحد الأدنى للمخزون`;
+        warnBox.style.display = 'block';
+        successBox.parentNode.insertBefore(warnBox, successBox);
+        setTimeout(() => warnBox.remove(), 8000);
+      } else {
+        successBox.textContent = `تم الحفظ بنجاح ✅`;
+        successBox.style.display = 'block';
+      }
 
       if (window.self !== window.top) {
         const updates = addedProducts.map(p => ({ id: p.id, newQty: Number(p.available) - Number(p.qty) }));
