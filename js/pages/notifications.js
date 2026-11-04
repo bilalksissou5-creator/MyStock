@@ -1,5 +1,5 @@
 // ============================================
-// صفحة الإشعارات (مع تحديد متعدد وحذف)
+// صفحة الإشعارات (مع تحديد متعدد كمدير الملفات)
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   const user = await requireAuth();
@@ -8,35 +8,46 @@ document.addEventListener('DOMContentLoaded', async () => {
   window.__stopNotifPolling = true;
 
   renderLayout('notifications.html');
-
   if (window.applyLanguage) window.applyLanguage();
   const tr = (key) => (window.t ? window.t(key) : key);
-
   document.title = tr('ntf_title_full');
 
   const main = document.getElementById('main-content');
 
   main.innerHTML = `
+    <!-- ترويسة عادية -->
     <div class="notifications-header">
-      <h2 id="notif-header-title">${tr('ntf_title')}</h2>
-      <div class="notif-selection-actions">
-        <button type="button" id="select-all-btn" class="btn-secondary">
-          <i class="fas fa-check-double"></i>
-          <span id="select-all-text">${tr('ntf_select_all')}</span>
-        </button>
-        <button type="button" id="delete-selected-btn" class="btn-danger" disabled>
-          <i class="fas fa-trash"></i>
-          <span id="delete-count">(0)</span>
-        </button>
-        <button type="button" id="cancel-selection-btn" class="btn-secondary">
-          <i class="fas fa-xmark"></i>
-          <span>${tr('ntf_cancel')}</span>
-        </button>
-      </div>
+      <h2>${tr('ntf_title')}</h2>
+    </div>
+
+    <!-- ترويسة وضع التحديد -->
+    <div class="notifications-selection-header">
+      <button type="button" id="cancel-selection-btn" class="selection-cancel-btn">
+        ${tr('ntf_cancel')}
+      </button>
+      <span class="selection-count" id="selection-count">${(tr('ntf_selected') || '').replace('{n}', 0)}</span>
+      <button type="button" id="select-all-btn" class="selection-all-btn">
+        <span class="selection-all-circle" id="select-all-circle">
+          <i class="fas fa-check"></i>
+        </span>
+        <span>${tr('ntf_all')}</span>
+      </button>
     </div>
 
     <div id="notifications-list" class="notifications-list">
       <p style="text-align:center; color:#737373;">${tr('loading')}</p>
+    </div>
+
+    <!-- شريط الإجراءات العائم -->
+    <div class="notifications-action-bar" id="notif-action-bar">
+      <button type="button" id="delete-selected-btn" class="action-bar-btn danger">
+        <i class="fas fa-trash"></i>
+        <span>${tr('ntf_delete')}</span>
+      </button>
+      <button type="button" id="mark-read-btn" class="action-bar-btn">
+        <i class="fas fa-check-double"></i>
+        <span>${tr('ntf_mark_read')}</span>
+      </button>
     </div>
   `;
 
@@ -47,25 +58,23 @@ document.addEventListener('DOMContentLoaded', async () => {
   await markAllAsSeen();
   await loadNotifications();
 
-  // Element refs
-  const headerTitle = document.getElementById('notif-header-title');
+  const selectionCountEl = document.getElementById('selection-count');
+  const selectAllCircle = document.getElementById('select-all-circle');
   const selectAllBtn = document.getElementById('select-all-btn');
-  const selectAllText = document.getElementById('select-all-text');
-  const deleteBtn = document.getElementById('delete-selected-btn');
-  const deleteCount = document.getElementById('delete-count');
   const cancelBtn = document.getElementById('cancel-selection-btn');
+  const deleteBtn = document.getElementById('delete-selected-btn');
+  const markReadBtn = document.getElementById('mark-read-btn');
 
   // ---- UI Helpers ----
   function updateSelectionUI() {
     const count = selectedIds.size;
-    deleteCount.textContent = `(${count})`;
-    deleteBtn.disabled = count === 0;
-    headerTitle.textContent = (tr('ntf_selected_count') || 'Selected: {n}').replace('{n}', count);
+    selectionCountEl.textContent = (tr('ntf_selected') || 'Selected: {n}').replace('{n}', count);
 
+    // تحديث الدائرة
     if (count === currentNotifications.length && count > 0) {
-      selectAllText.textContent = tr('ntf_deselect_all') || 'Deselect All';
+      selectAllCircle.classList.add('active');
     } else {
-      selectAllText.textContent = tr('ntf_select_all') || 'Select All';
+      selectAllCircle.classList.remove('active');
     }
   }
 
@@ -80,7 +89,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     updateSelectionUI();
-
     if (navigator.vibrate) navigator.vibrate(30);
   }
 
@@ -88,7 +96,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     selectionMode = false;
     selectedIds.clear();
     document.body.classList.remove('notif-selection-mode');
-    headerTitle.textContent = tr('ntf_title');
 
     document.querySelectorAll('.notification-item.selected').forEach(el => {
       el.classList.remove('selected');
@@ -111,7 +118,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
 
-  // ---- Select All / Deselect All ----
+  // ---- Select All ----
   selectAllBtn.addEventListener('click', () => {
     if (selectedIds.size === currentNotifications.length) {
       // إلغاء تحديد الكل
@@ -130,6 +137,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   });
 
+  // ---- Cancel ----
+  cancelBtn.addEventListener('click', exitSelectionMode);
+
   // ---- Delete Selected ----
   deleteBtn.addEventListener('click', async () => {
     const count = selectedIds.size;
@@ -139,7 +149,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (!confirm(msg)) return;
 
     deleteBtn.disabled = true;
-    deleteCount.textContent = '...';
 
     try {
       const { error } = await db
@@ -150,10 +159,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       if (error) throw error;
 
-      // إزالة من الذاكرة
       currentNotifications = currentNotifications.filter(n => !selectedIds.has(n.id));
 
-      // إزالة من DOM
       const idsToRemove = Array.from(selectedIds);
       idsToRemove.forEach(id => {
         const el = document.querySelector(`.notification-item[data-id="${id}"]`);
@@ -162,7 +169,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       exitSelectionMode();
 
-      // إذا فرغت القائمة
       if (currentNotifications.length === 0) {
         document.getElementById('notifications-list').innerHTML = `
           <div class="notifications-empty">
@@ -173,13 +179,40 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
     } catch (err) {
       alert((tr('prod_detail_err') || 'Error: ') + err.message);
+    } finally {
       deleteBtn.disabled = false;
-      updateSelectionUI();
     }
   });
 
-  // ---- Cancel ----
-  cancelBtn.addEventListener('click', exitSelectionMode);
+  // ---- Mark as Read ----
+  markReadBtn.addEventListener('click', async () => {
+    const count = selectedIds.size;
+    if (count === 0) return;
+
+    markReadBtn.disabled = true;
+
+    try {
+      const { error } = await db
+        .from('notifications')
+        .update({ is_read: true, seen: true })
+        .in('id', Array.from(selectedIds))
+        .eq('user_id', user.id);
+
+      if (error) throw error;
+
+      // تحديث الواجهة
+      selectedIds.forEach(id => {
+        const el = document.querySelector(`.notification-item[data-id="${id}"]`);
+        if (el) el.classList.add('read', 'seen');
+      });
+
+      exitSelectionMode();
+    } catch (err) {
+      alert((tr('prod_detail_err') || 'Error: ') + err.message);
+    } finally {
+      markReadBtn.disabled = false;
+    }
+  });
 
   // ============================================
   // Long press handler
@@ -220,7 +253,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     item.addEventListener('touchmove', move, { passive: true });
     item.addEventListener('touchend', cancel);
     item.addEventListener('touchcancel', cancel);
-
     item.addEventListener('mousedown', (e) => { if (e.button === 0) start(e); });
     item.addEventListener('mousemove', move);
     item.addEventListener('mouseup', cancel);
@@ -228,7 +260,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   // ============================================
-  // تحميل الإشعارات (updated)
+  // تحميل الإشعارات
   // ============================================
   async function loadNotifications() {
     const lang = window.getCurrentLang ? window.getCurrentLang() : 'ar';
@@ -295,7 +327,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       `;
     }).join('');
 
-    // Attach handlers
     container.querySelectorAll('.notification-item').forEach(item => {
       const id = item.dataset.id;
 
@@ -313,9 +344,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   }
 
-  // ============================================
-  // عند الضغط على إشعار (وضع عادي)
-  // ============================================
   async function handleItemClick(id) {
     const { data } = await db
       .from('notifications')
@@ -325,15 +353,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     if (data && !data.is_read) {
       await db.from('notifications').update({ is_read: true }).eq('id', id);
-
       const item = document.querySelector(`.notification-item[data-id="${id}"]`);
       if (item) item.classList.add('read');
     }
 
     if (data?.link) {
-      setTimeout(() => {
-        window.location.href = data.link;
-      }, 400);
+      setTimeout(() => { window.location.href = data.link; }, 400);
     }
   }
 });
@@ -344,12 +369,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 async function markAllAsSeen() {
   const { data: { user } } = await db.auth.getUser();
   if (!user) return;
-
-  await db
-    .from('notifications')
-    .update({ seen: true })
-    .eq('user_id', user.id)
-    .eq('seen', false);
+  await db.from('notifications').update({ seen: true }).eq('user_id', user.id).eq('seen', false);
 }
 
 // ============================================
@@ -364,6 +384,5 @@ function formatTime(iso, tr, locale) {
   if (diff < 3600) return `${tr('ntf_min_ago')} ${Math.floor(diff / 60)} ${tr('ntf_min')}`;
   if (diff < 86400) return `${tr('ntf_hour_ago')} ${Math.floor(diff / 3600)} ${tr('ntf_hour')}`;
   if (diff < 604800) return `${tr('ntf_day_ago')} ${Math.floor(diff / 86400)} ${tr('ntf_day')}`;
-
   return date.toLocaleDateString(locale);
 }

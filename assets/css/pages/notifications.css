@@ -8,20 +8,93 @@
   align-items: center;
   max-width: 700px;
   margin: 0 auto 20px;
-  gap: 12px;
-  flex-wrap: wrap;
 }
 
 .notifications-header h2 {
   margin: 0;
 }
 
+/* ✅ ترويسة وضع التحديد */
+.notifications-selection-header {
+  display: none;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 700px;
+  margin: 0 auto 20px;
+  padding: 4px;
+}
+
+body.notif-selection-mode .notifications-header {
+  display: none;
+}
+
+body.notif-selection-mode .notifications-selection-header {
+  display: flex;
+}
+
+.selection-cancel-btn {
+  background: none;
+  border: none;
+  color: #171717;
+  font-size: 15px;
+  font-weight: 600;
+  padding: 8px 4px;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.selection-count {
+  font-size: 16px;
+  font-weight: 700;
+  color: #171717;
+  text-align: center;
+  flex: 1;
+}
+
+.selection-all-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  font-family: inherit;
+}
+
+.selection-all-circle {
+  width: 30px;
+  height: 30px;
+  border: 2px solid #171717;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: transparent;
+  transition: all 0.2s;
+  background: transparent;
+}
+
+.selection-all-circle.active {
+  background: #171717;
+  color: white;
+}
+
+.selection-all-btn span:last-child {
+  font-size: 11px;
+  color: #404040;
+  font-weight: 500;
+}
+
+/* القائمة */
 .notifications-list {
   display: flex;
   flex-direction: column;
   gap: 8px;
   max-width: 700px;
   margin: 0 auto;
+  padding-bottom: 100px; /* مساحة لشريط الأسفل */
 }
 
 .notification-item {
@@ -33,8 +106,7 @@
   border-radius: 10px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
   cursor: pointer;
-  transition: box-shadow 0.15s, background 0.15s, border-color 0.15s;
-  border: 2px solid transparent;
+  transition: box-shadow 0.15s, background 0.15s, transform 0.15s;
   -webkit-user-select: none;
   user-select: none;
   -webkit-tap-highlight-color: transparent;
@@ -46,6 +118,13 @@
 
 .notification-item.read {
   background: #fafafa;
+}
+
+/* ✅ البطاقة المحددة */
+.notification-item.selected {
+  background: #e0f2fe;
+  box-shadow: 0 1px 3px rgba(59, 130, 246, 0.3);
+  transform: scale(0.99);
 }
 
 .notification-icon {
@@ -95,16 +174,13 @@
   color: #a3a3a3;
 }
 
-/* ============================================
-   علامتا القراءة (RTL)
-   ============================================ */
+/* علامات القراءة */
 .notification-checks {
   position: relative;
   width: 22px;
   height: 16px;
   flex-shrink: 0;
   margin-right: 4px;
-  transition: opacity 0.15s;
 }
 
 .notification-checks i {
@@ -116,25 +192,76 @@
   transition: color 0.2s;
 }
 
-/* العلامة الأولى (يمين في RTL) */
-.notification-checks i:first-child {
-  right: 6px;
-}
+.notification-checks i:first-child { right: 6px; }
+.notification-checks i:last-child { right: 0; }
 
-/* العلامة الثانية (يسار في RTL) */
-.notification-checks i:last-child {
-  right: 0;
-}
-
-/* عند دخول الصفحة ← العلامة الثانية (اليسار) تُصبِح زرقاء أولاً */
 .notification-item.seen .notification-checks i:last-child {
   color: #3b82f6;
 }
 
-/* عند قراءة الإشعار ← العلامة الأولى (اليمين) تُصبِح زرقاء أيضاً */
 .notification-item.read .notification-checks i:first-child,
 .notification-item.read .notification-checks i:last-child {
   color: #3b82f6;
+}
+
+/* في وضع التحديد: إخفاء علامات القراءة واستبدالها بدائرة */
+.notification-item.selected .notification-checks {
+  opacity: 0;
+}
+
+/* ✅ شريط الإجراءات العائم أسفل الشاشة */
+.notifications-action-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: white;
+  border-top: 1px solid #e5e5e5;
+  box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.08);
+  display: none;
+  justify-content: space-around;
+  align-items: center;
+  padding: 8px 16px 16px;
+  z-index: 1000;
+}
+
+body.notif-selection-mode .notifications-action-bar {
+  display: flex;
+}
+
+.action-bar-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px 12px;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 500;
+  color: #171717;
+  border-radius: 8px;
+  transition: background 0.15s;
+  min-width: 70px;
+}
+
+.action-bar-btn:active {
+  background: #f5f5f5;
+}
+
+.action-bar-btn i {
+  font-size: 20px;
+  color: #404040;
+}
+
+.action-bar-btn.danger i {
+  color: #dc2626;
+}
+
+.action-bar-btn.danger {
+  color: #dc2626;
 }
 
 /* حالة فارغة */
@@ -159,103 +286,10 @@
   font-size: 15px;
 }
 
-/* ============================================
-   ✅ وضع التحديد (Selection Mode)
-   ============================================ */
-
-/* أزرار التحديد (مخفية افتراضياً) */
-.notif-selection-actions {
-  display: none;
-  gap: 6px;
-  align-items: center;
-  flex-wrap: wrap;
-}
-
-/* عند تفعيل وضع التحديد */
-body.notif-selection-mode .notif-selection-actions {
-  display: flex;
-}
-
-/* أزرار أصغر حجماً */
-.notif-selection-actions .btn-primary,
-.notif-selection-actions .btn-secondary,
-.notif-selection-actions .btn-danger {
-  padding: 7px 11px;
-  font-size: 13px;
-  min-height: auto;
-}
-
-.notif-selection-actions .btn-danger:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-/* منع تحديد النص أثناء الضغط المطول */
-body.notif-selection-mode,
-body.notif-selection-mode .notification-item {
-  -webkit-user-select: none;
-  user-select: none;
-}
-
-/* البطاقة المحددة */
-.notification-item.selected {
-  background: #eff6ff;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
-}
-
-/* إخفاء علامات القراءة عند التحديد */
-.notification-item.selected .notification-checks {
-  opacity: 0;
-}
-
-/* في وضع التحديد، تغيّر المؤشر */
-body.notif-selection-mode .notification-item {
-  cursor: pointer;
-}
-
-/* ============================================
-   الهاتف
-   ============================================ */
 @media (max-width: 768px) {
-  .notification-item {
-    padding: 12px;
-    gap: 10px;
-  }
-
-  .notification-icon {
-    width: 36px;
-    height: 36px;
-    font-size: 14px;
-  }
-
-  .notification-title {
-    font-size: 13px;
-  }
-
-  .notification-message {
-    font-size: 12px;
-  }
-
-  /* على الهاتف: إخفاء النصوص من الأزرار لتوفير المساحة */
-  .notif-selection-actions .btn-primary span,
-  .notif-selection-actions .btn-secondary span:not(#delete-count),
-  .notif-selection-actions .btn-danger span {
-    display: none;
-  }
-
-  .notif-selection-actions .btn-primary,
-  .notif-selection-actions .btn-secondary,
-  .notif-selection-actions .btn-danger {
-    padding: 8px 10px;
-    min-width: 36px;
-    justify-content: center;
-  }
-
-  /* إبقاء عدد المحذوفات ظاهراً بجانب أيقونة السلة */
-  .notif-selection-actions .btn-danger span#delete-count {
-    display: inline;
-    margin-left: 2px;
-    font-size: 12px;
-  }
+  .notification-item { padding: 12px; gap: 10px; }
+  .notification-icon { width: 36px; height: 36px; font-size: 14px; }
+  .notification-title { font-size: 13px; }
+  .notification-message { font-size: 12px; }
+  .selection-count { font-size: 15px; }
 }

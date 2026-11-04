@@ -928,6 +928,12 @@ const translations = {
     ntf_cancel: 'إلغاء',
     ntf_confirm_delete: 'هل تريد حذف {n} إشعار؟',
     ntf_selected_count: 'المحددة: {n}',
+
+    ntf_all: 'الكل',
+    ntf_selected: 'تم تحديد {n}',
+    ntf_delete: 'حذف',
+    ntf_mark_read: 'تعليم كمقروء',
+    ntf_confirm_delete: 'هل تريد حذف {n} إشعار؟',
   },
 
   fr: {
@@ -1846,6 +1852,12 @@ const translations = {
     ntf_cancel: 'Annuler',
     ntf_confirm_delete: 'Supprimer {n} notifications ?',
     ntf_selected_count: 'Sélectionnées : {n}',
+
+    ntf_all: 'Tout',
+    ntf_selected: 'Sélectionné : {n}',
+    ntf_delete: 'Supprimer',
+    ntf_mark_read: 'Marquer lu',
+    ntf_confirm_delete: 'Supprimer {n} notifications ?',
   },
 
   en: {
@@ -2764,6 +2776,12 @@ const translations = {
     ntf_cancel: 'Cancel',
     ntf_confirm_delete: 'Delete {n} notifications?',
     ntf_selected_count: 'Selected: {n}',
+
+    ntf_all: 'All',
+    ntf_selected: 'Selected: {n}',
+    ntf_delete: 'Delete',
+    ntf_mark_read: 'Mark read',
+    ntf_confirm_delete: 'Delete {n} notifications?',
   },
 
   
