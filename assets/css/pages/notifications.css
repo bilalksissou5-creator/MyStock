@@ -282,7 +282,7 @@ body.notif-selection-mode .notification-checks {
   display: none;
   justify-content: space-around;
   align-items: center;
-  padding: 15px 5px 5px 5px;
+  padding: 15px 5px 5px 15px;
   z-index: 1000;
   max-width: 250px;
   margin: 0 auto;
