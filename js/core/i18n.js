@@ -934,6 +934,14 @@ const translations = {
     ntf_delete: 'حذف',
     ntf_mark_read: 'تعليم كمقروء',
     ntf_confirm_delete: 'هل تريد حذف {n} إشعار؟',
+
+    search_group_products: 'Products',
+    search_group_suppliers: 'Suppliers',
+    search_group_invoices: 'Invoices',
+    search_group_receipts: 'Receipts',
+    search_group_workers: 'Workers',
+    search_no_results: 'No results for',
+    search_error: 'Search error',
   },
 
   fr: {
@@ -1858,6 +1866,14 @@ const translations = {
     ntf_delete: 'Supprimer',
     ntf_mark_read: 'Marquer lu',
     ntf_confirm_delete: 'Supprimer {n} notifications ?',
+
+    search_group_products: 'Produits',
+    search_group_suppliers: 'Fournisseurs',
+    search_group_invoices: 'Factures',
+    search_group_receipts: 'Reçus',
+    search_group_workers: 'Travailleurs',
+    search_no_results: 'Aucun résultat pour',
+    search_error: 'Erreur de recherche',
   },
 
   en: {
@@ -2782,6 +2798,14 @@ const translations = {
     ntf_delete: 'Delete',
     ntf_mark_read: 'Mark read',
     ntf_confirm_delete: 'Delete {n} notifications?',
+
+    search_group_products: 'Products',
+    search_group_suppliers: 'Suppliers',
+    search_group_invoices: 'Invoices',
+    search_group_receipts: 'Receipts',
+    search_group_workers: 'Workers',
+    search_no_results: 'No results for',
+    search_error: 'Search error',
   },
 
   

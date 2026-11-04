@@ -2,7 +2,7 @@
    ✅ استدعاء خط Nunito (للاتينية) وخط Cairo (للعربية)
    ============================================ */
 @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=:wght@400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap');
 
 /* ============================================
    الأساسيات
@@ -101,7 +101,7 @@ h6 { font-size: 0.8125rem; font-weight: 600; color: #404040; } /* 13px */
   flex-shrink: 0;
 }
 
-/* ✅ خانة البحث في الهيدر (نفس الحجم القديم، زوايا دائرية فقط) */
+/* ✅ خانة البحث في الهيدر (شكل دائري) */
 .search {
   flex: 1;
   max-width: 500px;
@@ -110,7 +110,7 @@ h6 { font-size: 0.8125rem; font-weight: 600; color: #404040; } /* 13px */
 
 .search i {
   position: absolute;
-  inset-inline-end: 12px; /* تم إرجاعها كما كانت */
+  inset-inline-end: 12px;
   top: 50%;
   transform: translateY(-50%);
   color: #a3a3a3;
@@ -121,10 +121,10 @@ h6 { font-size: 0.8125rem; font-weight: 600; color: #404040; } /* 13px */
 
 .search input {
   width: 100%;
-  padding-block: 9px; /* نفس الحجم القديم */
-  padding-inline: 12px 38px; /* نفس الحجم القديم */
+  padding-block: 9px;
+  padding-inline: 12px 38px;
   border: 1px solid #d4d4d4;
-  border-radius: 50px; /* ✅ التعديل الوحيد: دائري */
+  border-radius: 50px;
   background: #fafafa;
   outline: none;
   font-size: 14px;
@@ -135,6 +135,90 @@ h6 { font-size: 0.8125rem; font-weight: 600; color: #404040; } /* 13px */
 .search input:focus { 
   border-color: #171717; 
   box-shadow: 0 0 0 3px rgba(23, 23, 23, 0.05);
+}
+
+/* ============================================
+   ✅ البحث الشامل (Global Search Dropdown)
+   ============================================ */
+.global-search-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  right: 0;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.18);
+  max-height: 70vh;
+  overflow-y: auto;
+  display: none;
+  z-index: 999;
+  border: 1px solid #eee;
+}
+
+.global-search-dropdown.show { display: block; }
+
+.search-result-group { padding: 6px 0; border-bottom: 1px solid #f5f5f5; }
+.search-result-group:last-child { border-bottom: none; }
+
+.search-result-group-title {
+  padding: 6px 16px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #a3a3a3;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.search-result-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px;
+  cursor: pointer;
+  transition: background 0.1s;
+}
+.search-result-item:hover,
+.search-result-item.active { background: #f5f5f5; }
+
+.search-result-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 14px;
+}
+.search-result-icon.product { background: #dbeafe; color: #2563eb; }
+.search-result-icon.supplier { background: #fef3c7; color: #d97706; }
+.search-result-icon.invoice { background: #f3e8ff; color: #9333ea; }
+.search-result-icon.receipt { background: #dcfce7; color: #16a34a; }
+.search-result-icon.worker { background: #fee2e2; color: #dc2626; }
+
+.search-result-info { flex: 1; min-width: 0; }
+.search-result-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #171717;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.search-result-subtitle {
+  font-size: 12px;
+  color: #737373;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.search-no-results,
+.search-loading {
+  padding: 24px 16px;
+  text-align: center;
+  color: #737373;
+  font-size: 13px;
 }
 
 /* ============================================
@@ -321,7 +405,7 @@ h6 { font-size: 0.8125rem; font-weight: 600; color: #404040; } /* 13px */
 
 .page-header h2 {
   margin: 0;
-  font-size: 1.125rem;   /* 18px */
+  font-size: 1.125rem;
   font-weight: 800;
 }
 
@@ -382,34 +466,34 @@ h6 { font-size: 0.8125rem; font-weight: 600; color: #404040; } /* 13px */
 .btn-danger:active { opacity: 0.8; }
 
 /* ============================================
-   ✅ خانة البحث في صفحة المنتجات (نفس الحجم القديم، زوايا دائرية فقط)
+   ✅ خانة البحث في صفحة المنتجات
    ============================================ */
 .search-bar {
   position: relative;
   margin-bottom: 20px;
-  max-width: 400px; /* نفس العرض القديم */
+  max-width: 400px;
 }
 
 .search-bar i {
   position: absolute;
-  inset-inline-end: 12px; /* نفس الموقع القديم */
+  inset-inline-end: 12px;
   top: 50%;
   transform: translateY(-50%);
   color: #a3a3a3;
-  font-size: 14px; /* نفس الحجم القديم */
+  font-size: 14px;
   z-index: 2;
   pointer-events: none;
 }
 
 .search-bar input {
   width: 100%;
-  padding-block: 10px; /* نفس الحجم القديم */
-  padding-inline: 12px 36px; /* نفس الحجم القديم */
+  padding-block: 10px;
+  padding-inline: 12px 36px;
   border: 1px solid #d4d4d4;
-  border-radius: 50px; /* ✅ التعديل الوحيد: دائري */
+  border-radius: 50px;
   background: white;
   outline: none;
-  font-size: 14px; /* نفس الحجم القديم */
+  font-size: 14px;
   box-sizing: border-box;
   transition: border-color 0.2s, box-shadow 0.2s;
 }
@@ -576,6 +660,15 @@ h6 { font-size: 0.8125rem; font-weight: 600; color: #404040; } /* 13px */
     width: 0;
     opacity: 0;
     border-inline-start-width: 0;
+  }
+
+  /* ✅ البحث على الهاتف */
+  .global-search-dropdown {
+    position: fixed;
+    top: 68px;
+    left: 8px;
+    right: 8px;
+    max-height: 60vh;
   }
 }
 

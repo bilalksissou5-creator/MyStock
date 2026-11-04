@@ -3,6 +3,7 @@
 // ✅ فحص تلقائي + تحذيرات + ترجمة كاملة
 // ✅ دعم iframe (وضع Embed)
 // ✅ محرك التنبيهات (نغمات متعددة + اهتزاز)
+// ✅ البحث الذكي الشامل
 // ============================================
 
 const ALLOWED_PAGES = [
@@ -103,11 +104,16 @@ function renderLayout(activePage) {
     </a>
   `).join('');
 
+  // ✅ البحث: أضفنا id و dropdown
   const layout = `
     <header class="header">
       <button type="button" class="sidebar-toggle" id="sidebar-toggle"><i class="fas fa-bars"></i></button>
       <a href="/notifications.html" class="notif" id="notif-btn"><i class="fas fa-bell"></i><span class="notif-count" id="notif-count">0</span></a>
-      <div class="search"><i class="fas fa-search"></i><input type="text" placeholder="${tr('nav_search')}"></div>
+      <div class="search">
+        <i class="fas fa-search"></i>
+        <input type="text" id="global-search-input" placeholder="${tr('nav_search')}" autocomplete="off">
+        <div class="global-search-dropdown" id="global-search-dropdown"></div>
+      </div>
       <h1 class="logo">MyStock</h1>
     </header>
     <div class="body" id="app-body">
@@ -142,6 +148,244 @@ function renderLayout(activePage) {
   else bodyEl.classList.add('sidebar-hidden-mobile');
 
   if (typeof startNotifPolling === 'function') startNotifPolling();
+
+  // ✅ تفعيل البحث الذكي
+  initGlobalSearch();
+}
+
+// ============================================
+// ✅ البحث الذكي الشامل
+// ============================================
+async function initGlobalSearch() {
+  const input = document.getElementById('global-search-input');
+  const dropdown = document.getElementById('global-search-dropdown');
+  if (!input || !dropdown) return;
+  if (input.dataset.searchReady === '1') return;
+  input.dataset.searchReady = '1';
+
+  const tr = (key, fallback) => {
+    if (window.t) {
+      const v = window.t(key);
+      if (v && v !== key) return v;
+    }
+    return fallback || key;
+  };
+
+  let debounceTimer = null;
+  let lastResults = [];
+  let activeIndex = -1;
+  let currentQuery = '';
+
+  const escapeHtml = (str) => {
+    if (str == null) return '';
+    return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  };
+
+  const hideDropdown = () => {
+    dropdown.classList.remove('show');
+    activeIndex = -1;
+  };
+
+  const highlight = (text, q) => {
+    const esc = escapeHtml(text);
+    if (!q) return esc;
+    const eq = escapeHtml(q).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    return esc.replace(new RegExp(eq, 'gi'), m =>
+      `<mark style="background:#fef08a;color:inherit;padding:0 2px;border-radius:2px;">${m}</mark>`
+    );
+  };
+
+  function renderResults(groups) {
+    const total = groups.reduce((s, g) => s + g.items.length, 0);
+    if (total === 0) {
+      dropdown.innerHTML = `<div class="search-no-results">${tr('search_no_results', 'لا توجد نتائج لـ')} "${escapeHtml(currentQuery)}"</div>`;
+      dropdown.classList.add('show');
+      lastResults = [];
+      return;
+    }
+    let html = '';
+    lastResults = [];
+    groups.forEach(g => {
+      if (!g.items.length) return;
+      html += `<div class="search-result-group"><div class="search-result-group-title">${g.title}</div>`;
+      g.items.forEach(item => {
+        const idx = lastResults.length;
+        lastResults.push(item);
+        html += `<div class="search-result-item" data-index="${idx}" data-url="${escapeHtml(item.url)}">
+          <div class="search-result-icon ${item.type}"><i class="fas ${item.icon}"></i></div>
+          <div class="search-result-info">
+            <div class="search-result-title">${item.highlighted}</div>
+            <div class="search-result-subtitle">${escapeHtml(item.subtitle || '')}</div>
+          </div>
+        </div>`;
+      });
+      html += `</div>`;
+    });
+    dropdown.innerHTML = html;
+    dropdown.classList.add('show');
+    dropdown.querySelectorAll('.search-result-item').forEach(el => {
+      el.addEventListener('mousedown', (e) => {
+        e.preventDefault();
+        const url = el.dataset.url;
+        if (url) window.location.href = url;
+      });
+    });
+  }
+
+  async function performSearch(query) {
+    const q = query.trim();
+    if (q.length < 2) { hideDropdown(); return; }
+    currentQuery = q;
+    dropdown.innerHTML = `<div class="search-loading"><i class="fas fa-spinner fa-spin"></i></div>`;
+    dropdown.classList.add('show');
+
+    try {
+      const { data: { user: authUser } } = await db.auth.getUser();
+      if (!authUser) return;
+
+      const { data: profile } = await db.from('profiles')
+        .select('organization_id, role')
+        .eq('id', authUser.id)
+        .single();
+      if (!profile?.organization_id) return;
+
+      const orgId = profile.organization_id;
+      const term = `%${q}%`;
+      const canSeeWorkers = profile.role === 'admin' || profile.role === 'deputy';
+
+      const [productsRes, suppliersRes, invoicesRes, receiptsRes, workersRes] = await Promise.all([
+        db.from('products').select('id, name, sku, qty')
+          .eq('organization_id', orgId)
+          .or(`name.ilike.${term},sku.ilike.${term}`)
+          .limit(5),
+        db.from('suppliers').select('id, name, specialty')
+          .eq('organization_id', orgId)
+          .or(`name.ilike.${term},specialty.ilike.${term}`)
+          .limit(3),
+        db.from('invoices').select('id, invoice_number, created_at')
+          .eq('organization_id', orgId)
+          .ilike('invoice_number', term)
+          .limit(3),
+        db.from('receipts').select('id, receipt_number, created_at')
+          .eq('organization_id', orgId)
+          .ilike('receipt_number', term)
+          .limit(3),
+        canSeeWorkers
+          ? db.from('profiles').select('id, full_name, role')
+              .eq('organization_id', orgId)
+              .ilike('full_name', term)
+              .limit(3)
+          : Promise.resolve({ data: [] })
+      ]);
+
+      const groups = [];
+
+      if (productsRes.data?.length) {
+        groups.push({
+          title: tr('search_group_products', 'المنتجات'),
+          items: productsRes.data.map(p => ({
+            type: 'product', icon: 'fa-box',
+            highlighted: highlight(p.name, q),
+            subtitle: `${p.sku || '—'} • ${p.qty ?? 0}`,
+            url: `/products/detail.html?id=${p.id}`,
+          })),
+        });
+      }
+
+      if (suppliersRes.data?.length) {
+        groups.push({
+          title: tr('search_group_suppliers', 'الموردون'),
+          items: suppliersRes.data.map(s => ({
+            type: 'supplier', icon: 'fa-truck',
+            highlighted: highlight(s.name, q),
+            subtitle: s.specialty || '',
+            url: `/suppliers/detail.html?id=${s.id}`,
+          })),
+        });
+      }
+
+      if (invoicesRes.data?.length) {
+        groups.push({
+          title: tr('search_group_invoices', 'الفواتير'),
+          items: invoicesRes.data.map(inv => ({
+            type: 'invoice', icon: 'fa-file-invoice',
+            highlighted: highlight(inv.invoice_number, q),
+            subtitle: new Date(inv.created_at).toLocaleDateString(),
+            url: `/invoice.html?id=${encodeURIComponent(inv.invoice_number)}`,
+          })),
+        });
+      }
+
+      if (receiptsRes.data?.length) {
+        groups.push({
+          title: tr('search_group_receipts', 'الإيصالات'),
+          items: receiptsRes.data.map(r => ({
+            type: 'receipt', icon: 'fa-receipt',
+            highlighted: highlight(r.receipt_number, q),
+            subtitle: new Date(r.created_at).toLocaleDateString(),
+            url: `/receipt.html?id=${r.id}`,
+          })),
+        });
+      }
+
+      if (workersRes.data?.length) {
+        groups.push({
+          title: tr('search_group_workers', 'العمال'),
+          items: workersRes.data.map(w => ({
+            type: 'worker', icon: 'fa-user',
+            highlighted: highlight(w.full_name, q),
+            subtitle: w.role === 'admin' ? tr('mp_role_admin', 'مدير') : tr('wk_role_worker', 'عامل'),
+            url: `/member-profile.html?id=${w.id}`,
+          })),
+        });
+      }
+
+      renderResults(groups);
+    } catch (err) {
+      console.error('Search error:', err);
+      dropdown.innerHTML = `<div class="search-no-results">${tr('search_error', 'خطأ في البحث')}</div>`;
+    }
+  }
+
+  input.addEventListener('input', (e) => {
+    clearTimeout(debounceTimer);
+    const q = e.target.value;
+    if (q.trim().length < 2) { hideDropdown(); return; }
+    debounceTimer = setTimeout(() => performSearch(q), 250);
+  });
+
+  input.addEventListener('focus', () => {
+    if (input.value.trim().length >= 2 && lastResults.length) dropdown.classList.add('show');
+  });
+
+  document.addEventListener('pointerdown', (e) => {
+    if (!e.target.closest('.search')) hideDropdown();
+  });
+
+  input.addEventListener('keydown', (e) => {
+    const items = dropdown.querySelectorAll('.search-result-item');
+    if (e.key === 'Escape') { hideDropdown(); input.blur(); }
+    else if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      if (!items.length) return;
+      activeIndex = (activeIndex + 1) % items.length;
+      items.forEach((el, i) => el.classList.toggle('active', i === activeIndex));
+      items[activeIndex]?.scrollIntoView({ block: 'nearest' });
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      if (!items.length) return;
+      activeIndex = (activeIndex - 1 + items.length) % items.length;
+      items.forEach((el, i) => el.classList.toggle('active', i === activeIndex));
+      items[activeIndex]?.scrollIntoView({ block: 'nearest' });
+    } else if (e.key === 'Enter') {
+      e.preventDefault();
+      const target = items[activeIndex] || items[0];
+      if (target?.dataset.url) window.location.href = target.dataset.url;
+    }
+  });
+
+  input.value = '';
 }
 
 // ============================================
