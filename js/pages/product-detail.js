@@ -1,5 +1,5 @@
 // ============================================
-// صفحة تفاصيل المنتج (مع إظهار العملة)
+// صفحة تفاصيل المنتج (مع إظهار العملة + حد التنبيه)
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   const user = await requireAuth();
@@ -54,6 +54,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   const total = ((product.qty ?? 0) * (product.price ?? 0)).toFixed(2);
   const sellPrice = Number(product.sell_price ?? 0);
   const sellPriceEnabled = product.sell_price_enabled === true;
+  const lowStockThreshold = Number(product.low_stock_threshold ?? 10);
+  const isLowStock = Number(product.qty ?? 0) <= lowStockThreshold;
 
   main.innerHTML = `
     <div class="page-header">
@@ -85,7 +87,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       <div class="product-stats">
         <div class="stat">
           <div class="stat-label">${tr('products_qty')}</div>
-          <div class="stat-value ${(product.qty ?? 0) < 10 ? 'low' : ''}">
+          <div class="stat-value ${isLowStock ? 'low' : ''}" id="qty-stat-value">
             <span class="edit-field center" id="f-qty" data-value="${product.qty ?? 0}"></span>
           </div>
         </div>
@@ -118,6 +120,17 @@ document.addEventListener('DOMContentLoaded', async () => {
         <div class="row">
           <span>${tr('prod_detail_barcode')}</span>
           <strong class="edit-field" id="f-qr_code" data-value="${product.qr_code ?? ''}"></strong>
+        </div>
+      </div>
+
+      <!-- ✅ قسم حد التنبيه للمخزون المنخفض -->
+      <div class="sell-price-section">
+        <h3 class="sell-price-title">⚠️ حد التنبيه للمخزون</h3>
+
+        <div class="sell-price-input-group">
+          <label>الحد الأدنى للتنبيه (قطعة)</label>
+          <input type="number" id="low-stock-input" value="${lowStockThreshold}" min="0" step="1" dir="ltr" placeholder="10">
+          <small class="field-hint">عندما يصل مخزون المنتج لهذه الكمية أو أقل، يصل إشعار لكل أعضاء المنظمة</small>
         </div>
       </div>
 
@@ -157,6 +170,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     </div>
   `;
 
+  // ✅ تحديث لون الكمية بناءً على الحد الحالي
+  function updateQtyStyle() {
+    const qtyEl = document.getElementById('qty-stat-value');
+    if (!qtyEl) return;
+    const qty = Number(document.getElementById('f-qty').dataset.value ?? 0);
+    const threshold = Number(product.low_stock_threshold ?? 10);
+    if (qty <= threshold) qtyEl.classList.add('low');
+    else qtyEl.classList.remove('low');
+  }
+
   function recalcTotal() {
     const qty = Number(document.getElementById('f-qty').dataset.value ?? 0);
     const price = Number(document.getElementById('f-price').dataset.value ?? 0);
@@ -194,23 +217,86 @@ document.addEventListener('DOMContentLoaded', async () => {
       onSave: async (savedField, newValue) => {
         if (savedField === 'qty' || savedField === 'price') recalcTotal();
 
-        if (typeof notifyOrganization === 'function' && profile?.organization_id) {
-          await notifyOrganization({
-            orgId: profile.organization_id,
-            title: tr('prod_detail_notif_edit_title'),
-            message: `${profile.full_name || tr('prod_detail_user')} ${tr('prod_detail_notif_edit_msg')} ${fieldLabels[savedField] || savedField} "${product.name}" ${tr('prod_detail_to')} "${newValue}"`,
-            type: 'info',
-            link: `/products/detail.html?id=${productId}`,
-            userName: profile.full_name || null,
-          });
+        if (savedField === 'qty') {
+          document.getElementById('f-qty').dataset.value = newValue;
+          updateQtyStyle();
         }
+
+        if (typeof notifyOrganization !== 'function' || !profile?.organization_id) return;
+
+        // ✅ إذا كانت الكمية الجديدة أقل من أو تساوي الحد → إشعار تحذيري بدل الإشعار العادي
+        const threshold = Number(product.low_stock_threshold ?? 10);
+        const isLow = savedField === 'qty' && Number(newValue) <= threshold;
+
+        try {
+          if (isLow) {
+            await notifyOrganization({
+              orgId: profile.organization_id,
+              title: '⚠️ مخزون منخفض',
+              message: `المنتج "${product.name}" وصل إلى ${newValue} قطعة (الحد الأدنى: ${threshold})`,
+              type: 'warning',
+              link: `/products/detail.html?id=${productId}`,
+              userName: profile.full_name || null,
+            });
+          } else {
+            await notifyOrganization({
+              orgId: profile.organization_id,
+              title: tr('prod_detail_notif_edit_title'),
+              message: `${profile.full_name || tr('prod_detail_user')} ${tr('prod_detail_notif_edit_msg')} ${fieldLabels[savedField] || savedField} "${product.name}" ${tr('prod_detail_to')} "${newValue}"`,
+              type: 'info',
+              link: `/products/detail.html?id=${productId}`,
+              userName: profile.full_name || null,
+            });
+          }
+        } catch (e) { console.warn(e); }
       },
     });
   });
 
+  // ✅ حفظ حد التنبيه
+  let lowStockSaveTimeout = null;
+  const lowStockInput = document.getElementById('low-stock-input');
+
+  lowStockInput.addEventListener('input', () => {
+    clearTimeout(lowStockSaveTimeout);
+    lowStockSaveTimeout = setTimeout(async () => {
+      const newThreshold = Math.max(0, Number(lowStockInput.value) || 0);
+
+      try {
+        const { error: updateError } = await db
+          .from('products')
+          .update({ low_stock_threshold: newThreshold })
+          .eq('id', productId);
+
+        if (updateError) throw new Error(updateError.message);
+
+        product.low_stock_threshold = newThreshold;
+        updateQtyStyle();
+
+        // ✅ إذا كانت الكمية الحالية أقل من أو تساوي الحد الجديد → إشعار
+        const currentQty = Number(product.qty ?? 0);
+        if (currentQty <= newThreshold && typeof notifyOrganization === 'function' && profile?.organization_id) {
+          await notifyOrganization({
+            orgId: profile.organization_id,
+            title: '⚠️ مخزون منخفض',
+            message: `المنتج "${product.name}" (${currentQty} قطعة) أقل من أو يساوي الحد الأدنى (${newThreshold})`,
+            type: 'warning',
+            link: `/products/detail.html?id=${productId}`,
+            userName: profile.full_name || null,
+          });
+        }
+      } catch (err) {
+        console.error('فشل حفظ حد التنبيه:', err);
+        alert('فشل حفظ حد التنبيه: ' + err.message);
+      }
+    }, 800);
+  });
+
+  // ✅ رفع الصورة
   const imgContainer = document.getElementById('product-image-container');
   attachImageUpload(productId, imgContainer, product.image_url);
 
+  // ✅ سعر البيع
   const sellPriceToggle = document.getElementById('sell-price-toggle');
   const sellPriceStatus = document.getElementById('sell-price-status');
   const sellPriceInput = document.getElementById('sell-price-input');
@@ -284,6 +370,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }, 800);
   });
 
+  // ✅ زر الحذف
   document.getElementById('delete-btn').addEventListener('click', async () => {
     if (!confirm(tr('prod_detail_confirm_delete'))) return;
 
