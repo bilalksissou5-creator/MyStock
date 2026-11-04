@@ -912,6 +912,16 @@ const translations = {
 
     notif_test_alerts_title: 'اختبار التنبيه',
     notif_test_alerts_sub: 'جرّب الصوت والاهتزاز الآن',
+
+    low_stock_section_title: '⚠️ حد التنبيه للمخزون',
+    low_stock_field_label: 'الحد الأدنى للتنبيه (قطعة)',
+    low_stock_field_hint: 'عندما يصل مخزون المنتج لهذه الكمية أو أقل، يصل إشعار لكل أعضاء المنظمة',
+    low_stock_alert_title: '⚠️ مخزون منخفض',
+    low_stock_alert_multi: '⚠️ {count} منتجات بمخزون منخفض',
+    low_stock_alert_msg: '• "{name}" — {qty} قطعة (الحد: {threshold})',
+    low_stock_alert_single: 'المنتج "{name}" وصل إلى {qty} قطعة (الحد الأدنى: {threshold})',
+    low_stock_alert_already: 'المنتج "{name}" ({qty} قطعة) أقل من أو يساوي الحد الأدنى ({threshold})',
+    low_stock_warning_banner: '⚠️ تحذير: {count} منتج وصل للحد الأدنى للمخزون',
   },
 
   fr: {
@@ -1815,7 +1825,15 @@ const translations = {
     notif_test_alerts_title: 'Tester les alertes',
     notif_test_alerts_sub: 'Testez le son et la vibration maintenant',
 
-    
+    low_stock_section_title: '⚠️ Seuil d\'alerte du stock',
+    low_stock_field_label: 'Seuil minimal (unités)',
+    low_stock_field_hint: 'Lorsque le stock atteint ce seuil ou moins, tous les membres reçoivent une notification',
+    low_stock_alert_title: '⚠️ Stock faible',
+    low_stock_alert_multi: '⚠️ {count} produits en stock faible',
+    low_stock_alert_msg: '• "{name}" — {qty} unités (seuil: {threshold})',
+    low_stock_alert_single: 'Le produit "{name}" a atteint {qty} unités (seuil: {threshold})',
+    low_stock_alert_already: 'Le produit "{name}" ({qty} unités) est au seuil ou en dessous ({threshold})',
+    low_stock_warning_banner: '⚠️ Attention : {count} produit(s) au seuil minimal',
   },
 
   en: {
@@ -2718,6 +2736,16 @@ const translations = {
 
     notif_test_alerts_title: 'Test Alerts',
     notif_test_alerts_sub: 'Test sound and vibration now',
+
+    low_stock_section_title: '⚠️ Low Stock Alert Threshold',
+    low_stock_field_label: 'Minimum threshold (units)',
+    low_stock_field_hint: 'When stock reaches this amount or less, all organization members receive a notification',
+    low_stock_alert_title: '⚠️ Low Stock',
+    low_stock_alert_multi: '⚠️ {count} products low on stock',
+    low_stock_alert_msg: '• "{name}" — {qty} units (threshold: {threshold})',
+    low_stock_alert_single: 'Product "{name}" reached {qty} units (threshold: {threshold})',
+    low_stock_alert_already: 'Product "{name}" ({qty} units) is at or below the threshold ({threshold})',
+    low_stock_warning_banner: '⚠️ Warning: {count} product(s) at minimum stock threshold',
   },
 
   
