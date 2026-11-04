@@ -942,6 +942,9 @@ const translations = {
     search_group_workers: 'Workers',
     search_no_results: 'No results for',
     search_error: 'Search error',
+
+    search_recent: 'عمليات البحث الأخيرة',
+    search_approx: 'قد تقصد',
   },
 
   fr: {
@@ -1874,6 +1877,9 @@ const translations = {
     search_group_workers: 'Travailleurs',
     search_no_results: 'Aucun résultat pour',
     search_error: 'Erreur de recherche',
+
+    search_recent: 'Recherches récentes',
+    search_approx: 'Vouliez-vous dire',
   },
 
   en: {
@@ -2806,6 +2812,9 @@ const translations = {
     search_group_workers: 'Workers',
     search_no_results: 'No results for',
     search_error: 'Search error',
+
+    search_recent: 'Recent searches',
+    search_approx: 'Did you mean',
   },
 
   

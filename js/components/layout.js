@@ -3,7 +3,7 @@
 // ✅ فحص تلقائي + تحذيرات + ترجمة كاملة
 // ✅ دعم iframe (وضع Embed)
 // ✅ محرك التنبيهات (نغمات متعددة + اهتزاز)
-// ✅ البحث الذكي الشامل
+// ✅ البحث الذكي الشامل (دقيق + سجل + تسامح مع الأخطاء)
 // ============================================
 
 const ALLOWED_PAGES = [
@@ -104,7 +104,6 @@ function renderLayout(activePage) {
     </a>
   `).join('');
 
-  // ✅ البحث: أضفنا id و dropdown
   const layout = `
     <header class="header">
       <button type="button" class="sidebar-toggle" id="sidebar-toggle"><i class="fas fa-bars"></i></button>
@@ -172,9 +171,26 @@ async function initGlobalSearch() {
   };
 
   let debounceTimer = null;
-  let lastResults = [];
   let activeIndex = -1;
   let currentQuery = '';
+
+  // ============================================
+  // ✅ تطبيع الحروف العربية
+  // ============================================
+  function normArabic(s) {
+    return String(s || '')
+      .toLowerCase()
+      .replace(/[\u064B-\u065F\u0670]/g, '')   // التشكيل
+      .replace(/[أإآٱ]/g, 'ا')                  // الألف
+      .replace(/ة/g, 'ه')                        // التاء المربوطة
+      .replace(/ى/g, 'ي')                        // الألف المقصورة
+      .replace(/ؤ/g, 'و')                        // الواو
+      .replace(/ئ/g, 'ي')                        // الياء
+      .replace(/ـ/g, '')                         // التطويل
+      .replace(/[^\w\u0600-\u06FF\s]/g, ' ')    // إبقاء العربي والإنجليزي فقط
+      .replace(/\s+/g, ' ')
+      .trim();
+  }
 
   const escapeHtml = (str) => {
     if (str == null) return '';
@@ -187,32 +203,130 @@ async function initGlobalSearch() {
     activeIndex = -1;
   };
 
-  const highlight = (text, q) => {
-    const esc = escapeHtml(text);
-    if (!q) return esc;
-    const eq = escapeHtml(q).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    return esc.replace(new RegExp(eq, 'gi'), m =>
-      `<mark style="background:#fef08a;color:inherit;padding:0 2px;border-radius:2px;">${m}</mark>`
-    );
-  };
+  // ============================================
+  // ✅ حساب درجة الصلة (0-100)
+  // ============================================
+  function scoreMatch(normQuery, text) {
+    if (!text) return 0;
+    const normText = normArabic(text);
+    if (!normText || !normQuery) return 0;
 
+    if (normText === normQuery) return 100;              // تطابق تام
+    if (normText.startsWith(normQuery)) return 85;       // يبدأ بـ
+
+    const words = normText.split(' ');
+    if (words.some(w => w === normQuery)) return 80;     // كلمة كاملة
+    if (words.some(w => w.startsWith(normQuery))) return 70; // بداية كلمة
+
+    if (normText.includes(normQuery)) return 50;         // يحتوي
+
+    // تسامح مع الأخطاء الإملائية (للإنجليزي فقط، طول 3+)
+    if (/^[a-z0-9]+$/.test(normQuery) && normQuery.length >= 3) {
+      if (Math.abs(normText.length - normQuery.length) <= 3) {
+        let i = 0;
+        for (const ch of normText) {
+          if (ch === normQuery[i]) i++;
+          if (i === normQuery.length) return 30;
+        }
+      }
+    }
+
+    return 0;
+  }
+
+  // ============================================
+  // ✅ سجل البحث الأخير
+  // ============================================
+  const HISTORY_KEY = 'global_search_history_v1';
+  const MAX_HISTORY = 5;
+
+  function getHistory() {
+    try {
+      return JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
+    } catch (e) { return []; }
+  }
+
+  function saveToHistory(query) {
+    const q = query.trim();
+    if (q.length < 2) return;
+    let h = getHistory().filter(x => normArabic(x) !== normArabic(q));
+    h.unshift(q);
+    h = h.slice(0, MAX_HISTORY);
+    localStorage.setItem(HISTORY_KEY, JSON.stringify(h));
+  }
+
+  function showHistory() {
+    const h = getHistory();
+    if (!h.length) return;
+
+    let html = `<div class="search-result-group">
+      <div class="search-result-group-title">${tr('search_recent', 'عمليات البحث الأخيرة')}</div>`;
+
+    h.forEach(q => {
+      html += `<div class="search-result-item search-history-item" data-query="${escapeHtml(q)}">
+        <div class="search-result-icon" style="background:#f3f4f6;color:#6b7280;"><i class="fas fa-history"></i></div>
+        <div class="search-result-info">
+          <div class="search-result-title">${escapeHtml(q)}</div>
+        </div>
+        <i class="fas fa-arrow-left" style="color:#d4d4d4;font-size:12px;"></i>
+      </div>`;
+    });
+    html += `</div>`;
+    dropdown.innerHTML = html;
+    dropdown.classList.add('show');
+
+    dropdown.querySelectorAll('.search-history-item').forEach(el => {
+      el.addEventListener('mousedown', (e) => {
+        e.preventDefault();
+        input.value = el.dataset.query;
+        performSearch(el.dataset.query);
+      });
+    });
+  }
+
+  // ============================================
+  // ✅ تمييز النص المطابق
+  // ============================================
+  function highlight(text, query) {
+    if (!text) return '';
+    const esc = escapeHtml(text);
+    if (!query) return esc;
+
+    const normQ = normArabic(query);
+    if (!normQ) return esc;
+
+    const origQ = query.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    if (!origQ) return esc;
+
+    try {
+      return esc.replace(new RegExp(origQ, 'gi'), m =>
+        `<mark style="background:#fef08a;color:inherit;padding:0 2px;border-radius:2px;">${m}</mark>`
+      );
+    } catch (e) {
+      return esc;
+    }
+  }
+
+  // ============================================
+  // ✅ عرض النتائج
+  // ============================================
   function renderResults(groups) {
     const total = groups.reduce((s, g) => s + g.items.length, 0);
     if (total === 0) {
-      dropdown.innerHTML = `<div class="search-no-results">${tr('search_no_results', 'لا توجد نتائج لـ')} "${escapeHtml(currentQuery)}"</div>`;
+      dropdown.innerHTML = `<div class="search-no-results">
+        <i class="fas fa-search" style="display:block;font-size:24px;color:#d4d4d4;margin-bottom:8px;"></i>
+        ${tr('search_no_results', 'لا توجد نتائج لـ')} "${escapeHtml(currentQuery)}"
+      </div>`;
       dropdown.classList.add('show');
-      lastResults = [];
       return;
     }
+
     let html = '';
-    lastResults = [];
     groups.forEach(g => {
       if (!g.items.length) return;
       html += `<div class="search-result-group"><div class="search-result-group-title">${g.title}</div>`;
       g.items.forEach(item => {
-        const idx = lastResults.length;
-        lastResults.push(item);
-        html += `<div class="search-result-item" data-index="${idx}" data-url="${escapeHtml(item.url)}">
+        html += `<div class="search-result-item" data-url="${escapeHtml(item.url)}">
           <div class="search-result-icon ${item.type}"><i class="fas ${item.icon}"></i></div>
           <div class="search-result-info">
             <div class="search-result-title">${item.highlighted}</div>
@@ -222,20 +336,32 @@ async function initGlobalSearch() {
       });
       html += `</div>`;
     });
+
     dropdown.innerHTML = html;
     dropdown.classList.add('show');
+    activeIndex = -1;
+
     dropdown.querySelectorAll('.search-result-item').forEach(el => {
       el.addEventListener('mousedown', (e) => {
         e.preventDefault();
         const url = el.dataset.url;
-        if (url) window.location.href = url;
+        if (url) {
+          saveToHistory(currentQuery);
+          window.location.href = url;
+        }
       });
     });
   }
 
+  // ============================================
+  // ✅ البحث الرئيسي
+  // ============================================
   async function performSearch(query) {
     const q = query.trim();
-    if (q.length < 2) { hideDropdown(); return; }
+    const normQ = normArabic(q);
+
+    if (normQ.length < 1) { hideDropdown(); return; }
+
     currentQuery = q;
     dropdown.innerHTML = `<div class="search-loading"><i class="fas fa-spinner fa-spin"></i></div>`;
     dropdown.classList.add('show');
@@ -251,41 +377,131 @@ async function initGlobalSearch() {
       if (!profile?.organization_id) return;
 
       const orgId = profile.organization_id;
-      const term = `%${q}%`;
       const canSeeWorkers = profile.role === 'admin' || profile.role === 'deputy';
 
-      const [productsRes, suppliersRes, invoicesRes, receiptsRes, workersRes] = await Promise.all([
-        db.from('products').select('id, name, sku, qty')
+      // تنظيف الاستعلام من الرموز الخاصة
+      const safeQ = q.replace(/[%_,()]/g, '').trim();
+      if (!safeQ) { hideDropdown(); return; }
+
+      const term = `%${safeQ}%`;
+      const isNumericQuery = /^\d{4,}$/.test(safeQ);
+
+      const [productsRes, suppliersRes, invoicesRes, receiptsRes, workersRes, barcodesRes] = await Promise.all([
+        db.from('products')
+          .select('id, name, sku, qty, category, price')
           .eq('organization_id', orgId)
-          .or(`name.ilike.${term},sku.ilike.${term}`)
-          .limit(5),
-        db.from('suppliers').select('id, name, specialty')
+          .or(`name.ilike.${term},sku.ilike.${term},category.ilike.${term}`)
+          .limit(15),
+        db.from('suppliers')
+          .select('id, name, specialty, phone')
           .eq('organization_id', orgId)
-          .or(`name.ilike.${term},specialty.ilike.${term}`)
-          .limit(3),
-        db.from('invoices').select('id, invoice_number, created_at')
+          .or(`name.ilike.${term},specialty.ilike.${term},phone.ilike.${term}`)
+          .limit(10),
+        db.from('invoices')
+          .select('id, invoice_number, created_at')
           .eq('organization_id', orgId)
           .ilike('invoice_number', term)
-          .limit(3),
-        db.from('receipts').select('id, receipt_number, created_at')
+          .limit(10),
+        db.from('receipts')
+          .select('id, receipt_number, created_at')
           .eq('organization_id', orgId)
           .ilike('receipt_number', term)
-          .limit(3),
+          .limit(10),
         canSeeWorkers
-          ? db.from('profiles').select('id, full_name, role')
+          ? db.from('profiles')
+              .select('id, full_name, role, phone')
               .eq('organization_id', orgId)
-              .ilike('full_name', term)
-              .limit(3)
+              .or(`full_name.ilike.${term},phone.ilike.${term}`)
+              .limit(10)
+          : Promise.resolve({ data: [] }),
+        isNumericQuery
+          ? db.from('product_barcodes')
+              .select('product_id, barcode')
+              .eq('organization_id', orgId)
+              .ilike('barcode', term)
+              .limit(10)
           : Promise.resolve({ data: [] })
       ]);
 
+      // ============================================
+      // جمع المنتجات + ربط الباركودات
+      // ============================================
+      const productMap = new Map();
+      (productsRes.data || []).forEach(p => {
+        productMap.set(p.id, { ...p, _scores: [] });
+      });
+
+      const missingIds = (barcodesRes.data || [])
+        .map(b => b.product_id)
+        .filter(id => !productMap.has(id));
+
+      if (missingIds.length > 0) {
+        const { data: extraProducts } = await db.from('products')
+          .select('id, name, sku, qty, category, price')
+          .in('id', missingIds);
+        (extraProducts || []).forEach(p => {
+          productMap.set(p.id, { ...p, _scores: [], _viaBarcode: true });
+        });
+      }
+
+      // ============================================
+      // تسجيل درجات الصلة لكل منتج
+      // ============================================
+      const scoredProducts = [];
+      for (const p of productMap.values()) {
+        const scores = [
+          scoreMatch(normQ, p.name) * 1.0,
+          scoreMatch(normQ, p.sku) * 0.9,
+          scoreMatch(normQ, p.category || '') * 0.6,
+        ];
+
+        if (p._viaBarcode) {
+          scores.push(scoreMatch(normQ, (barcodesRes.data || [])
+            .find(b => b.product_id === p.id)?.barcode || '') * 0.9);
+        }
+
+        const best = Math.max(...scores);
+        if (best > 0) {
+          scoredProducts.push({ ...p, score: best });
+        }
+      }
+      scoredProducts.sort((a, b) => b.score - a.score);
+      const topProducts = scoredProducts.slice(0, 5);
+
+      // ============================================
+      // تسجيل درجات الموردين
+      // ============================================
+      const scoredSuppliers = (suppliersRes.data || [])
+        .map(s => ({
+          ...s,
+          score: Math.max(
+            scoreMatch(normQ, s.name) * 1.0,
+            scoreMatch(normQ, s.specialty || '') * 0.6,
+            scoreMatch(normQ, s.phone || '') * 0.7,
+          ),
+        }))
+        .filter(s => s.score > 0)
+        .sort((a, b) => b.score - a.score)
+        .slice(0, 3);
+
+      // ============================================
+      // الفواتير والإيصالات والعمال
+      // ============================================
+      const topInvoices = (invoicesRes.data || []).slice(0, 3);
+      const topReceipts = (receiptsRes.data || []).slice(0, 3);
+      const topWorkers = (workersRes.data || []).slice(0, 3);
+
+      // ============================================
+      // بناء المجموعات
+      // ============================================
       const groups = [];
 
-      if (productsRes.data?.length) {
+      if (topProducts.length) {
         groups.push({
           title: tr('search_group_products', 'المنتجات'),
-          items: productsRes.data.map(p => ({
-            type: 'product', icon: 'fa-box',
+          items: topProducts.map(p => ({
+            type: 'product',
+            icon: 'fa-box',
             highlighted: highlight(p.name, q),
             subtitle: `${p.sku || '—'} • ${p.qty ?? 0}`,
             url: `/products/detail.html?id=${p.id}`,
@@ -293,23 +509,25 @@ async function initGlobalSearch() {
         });
       }
 
-      if (suppliersRes.data?.length) {
+      if (scoredSuppliers.length) {
         groups.push({
           title: tr('search_group_suppliers', 'الموردون'),
-          items: suppliersRes.data.map(s => ({
-            type: 'supplier', icon: 'fa-truck',
+          items: scoredSuppliers.map(s => ({
+            type: 'supplier',
+            icon: 'fa-truck',
             highlighted: highlight(s.name, q),
-            subtitle: s.specialty || '',
+            subtitle: s.specialty || s.phone || '',
             url: `/suppliers/detail.html?id=${s.id}`,
           })),
         });
       }
 
-      if (invoicesRes.data?.length) {
+      if (topInvoices.length) {
         groups.push({
           title: tr('search_group_invoices', 'الفواتير'),
-          items: invoicesRes.data.map(inv => ({
-            type: 'invoice', icon: 'fa-file-invoice',
+          items: topInvoices.map(inv => ({
+            type: 'invoice',
+            icon: 'fa-file-invoice',
             highlighted: highlight(inv.invoice_number, q),
             subtitle: new Date(inv.created_at).toLocaleDateString(),
             url: `/invoice.html?id=${encodeURIComponent(inv.invoice_number)}`,
@@ -317,11 +535,12 @@ async function initGlobalSearch() {
         });
       }
 
-      if (receiptsRes.data?.length) {
+      if (topReceipts.length) {
         groups.push({
           title: tr('search_group_receipts', 'الإيصالات'),
-          items: receiptsRes.data.map(r => ({
-            type: 'receipt', icon: 'fa-receipt',
+          items: topReceipts.map(r => ({
+            type: 'receipt',
+            icon: 'fa-receipt',
             highlighted: highlight(r.receipt_number, q),
             subtitle: new Date(r.created_at).toLocaleDateString(),
             url: `/receipt.html?id=${r.id}`,
@@ -329,16 +548,25 @@ async function initGlobalSearch() {
         });
       }
 
-      if (workersRes.data?.length) {
+      if (topWorkers.length) {
         groups.push({
           title: tr('search_group_workers', 'العمال'),
-          items: workersRes.data.map(w => ({
-            type: 'worker', icon: 'fa-user',
+          items: topWorkers.map(w => ({
+            type: 'worker',
+            icon: 'fa-user',
             highlighted: highlight(w.full_name, q),
-            subtitle: w.role === 'admin' ? tr('mp_role_admin', 'مدير') : tr('wk_role_worker', 'عامل'),
+            subtitle: (w.role === 'admin' ? tr('mp_role_admin', 'مدير') : tr('wk_role_worker', 'عامل')) + (w.phone ? ` • ${w.phone}` : ''),
             url: `/member-profile.html?id=${w.id}`,
           })),
         });
+      }
+
+      // ============================================
+      // Fallback: إذا لم توجد نتائج، حاول بأحرف أقل
+      // ============================================
+      if (groups.length === 0 && safeQ.length > 3) {
+        const shortQ = safeQ.slice(0, Math.max(3, Math.floor(safeQ.length * 0.6)));
+        return performShortSearch(shortQ, q, orgId, canSeeWorkers, groups);
       }
 
       renderResults(groups);
@@ -348,15 +576,59 @@ async function initGlobalSearch() {
     }
   }
 
+  // ============================================
+  // ✅ بحث احتياطي
+  // ============================================
+  async function performShortSearch(shortQ, originalQuery, orgId, canSeeWorkers, existingGroups) {
+    try {
+      const term = `%${shortQ}%`;
+      const { data: products } = await db.from('products')
+        .select('id, name, sku, qty')
+        .eq('organization_id', orgId)
+        .or(`name.ilike.${term},sku.ilike.${term}`)
+        .limit(5);
+
+      if (products?.length) {
+        existingGroups.push({
+          title: tr('search_group_products', 'المنتجات') + ` (${tr('search_approx', 'قد تقصد')})`,
+          items: products.map(p => ({
+            type: 'product',
+            icon: 'fa-box',
+            highlighted: highlight(p.name, originalQuery),
+            subtitle: `${p.sku || '—'} • ${p.qty ?? 0}`,
+            url: `/products/detail.html?id=${p.id}`,
+          })),
+        });
+      }
+      renderResults(existingGroups);
+    } catch (e) {
+      renderResults(existingGroups);
+    }
+  }
+
+  // ============================================
+  // ✅ الأحداث
+  // ============================================
   input.addEventListener('input', (e) => {
     clearTimeout(debounceTimer);
     const q = e.target.value;
-    if (q.trim().length < 2) { hideDropdown(); return; }
+
+    if (q.trim().length === 0) {
+      showHistory();
+      return;
+    }
+
+    if (q.trim().length < 1) { hideDropdown(); return; }
+
     debounceTimer = setTimeout(() => performSearch(q), 250);
   });
 
   input.addEventListener('focus', () => {
-    if (input.value.trim().length >= 2 && lastResults.length) dropdown.classList.add('show');
+    if (input.value.trim().length === 0) {
+      showHistory();
+    } else if (input.value.trim().length >= 1) {
+      performSearch(input.value);
+    }
   });
 
   document.addEventListener('pointerdown', (e) => {
@@ -381,7 +653,16 @@ async function initGlobalSearch() {
     } else if (e.key === 'Enter') {
       e.preventDefault();
       const target = items[activeIndex] || items[0];
-      if (target?.dataset.url) window.location.href = target.dataset.url;
+      if (target) {
+        const url = target.dataset.url;
+        if (url) {
+          saveToHistory(currentQuery || input.value);
+          window.location.href = url;
+        } else if (target.dataset.query) {
+          input.value = target.dataset.query;
+          performSearch(target.dataset.query);
+        }
+      }
     }
   });
 
@@ -416,7 +697,6 @@ function unlockAudio() {
 window.playNotificationAlerts = async function() {
   console.log('🎵 playNotificationAlerts called');
   
-  // قراءة الإعدادات من ذاكرة الهاتف
   const masterOn = localStorage.getItem('notif_master') !== 'false';
   const soundOn = localStorage.getItem('notif_sound') !== 'false';
   const vibrateOn = localStorage.getItem('notif_vibrate') !== 'false';
