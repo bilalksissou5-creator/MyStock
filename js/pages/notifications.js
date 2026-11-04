@@ -21,17 +21,18 @@ document.addEventListener('DOMContentLoaded', async () => {
       <h2>${tr('ntf_title')}</h2>
     </div>
 
-    <!-- ترويسة وضع التحديد -->
+    <!-- ✅ ترويسة وضع التحديد (التصميم الجديد) -->
     <div class="notifications-selection-header">
       <button type="button" id="cancel-selection-btn" class="selection-cancel-btn">
         ${tr('ntf_cancel')}
       </button>
-      <span class="selection-count" id="selection-count"></span>
+      
+      <!-- الزر الأيمن الموحد (العدد + الدائرة) -->
       <button type="button" id="select-all-btn" class="selection-all-btn">
+        <span class="selection-count" id="selection-count">0</span>
         <span class="selection-all-circle" id="select-all-circle">
           <i class="fas fa-check"></i>
         </span>
-        <span>${tr('ntf_all')}</span>
       </button>
     </div>
 
@@ -39,7 +40,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       <p style="text-align:center; color:#737373;">${tr('loading')}</p>
     </div>
 
-    <!-- شريط الإجراءات العائم -->
+    <!-- شريط الإجراءات العائم أسفل الشاشة -->
     <div class="notifications-action-bar" id="notif-action-bar">
       <button type="button" id="mark-read-btn" class="action-bar-btn">
         <i class="fas fa-check-double"></i>
@@ -76,10 +77,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   function updateSelectionUI() {
     const count = selectedIds.size;
-    const template = tr('ntf_selected') || 'Selected: {n}';
-    selectionCountEl.textContent = template.replace('{n}', count);
+    // تحديث رقم العدد فقط
+    selectionCountEl.textContent = count;
 
-    // تحديث دائرة "الكل"
+    // تحديث حالة الدائرة الزرقاء
     if (count === currentNotifications.length && count > 0) {
       selectAllCircle.classList.add('active');
     } else {
@@ -129,15 +130,17 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // ---- أزرار الترويسة ----
 
-  // زر "الكل"
+  // زر "تحديد الكل" (العدد + الدائرة)
   selectAllBtn.addEventListener('click', () => {
     if (selectedIds.size === currentNotifications.length) {
+      // إلغاء تحديد الكل
       selectedIds.clear();
       document.querySelectorAll('.notification-item.selected').forEach(el => {
         el.classList.remove('selected');
       });
       updateSelectionUI();
     } else {
+      // تحديد الكل
       currentNotifications.forEach(n => selectedIds.add(n.id));
       document.querySelectorAll('.notification-item').forEach(el => {
         el.classList.add('selected');
@@ -270,7 +273,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     item.addEventListener('mouseup', cancel);
     item.addEventListener('mouseleave', cancel);
     
-    // حفظ الحالة للاستخدام في النقر
     item._longPressCheck = () => {
       const res = longPressTriggered;
       longPressTriggered = false;
@@ -336,12 +338,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             ${n.message ? `<div class="notification-message">${n.message}</div>` : ''}
             <div class="notification-time">${time}</div>
           </div>
-          <!-- علامات القراءة -->
           <div class="notification-checks">
             <i class="fas fa-check"></i>
             <i class="fas fa-check"></i>
           </div>
-          <!-- ✅ دائرة التحديد -->
+          <!-- دائرة التحديد -->
           <div class="notif-select-circle">
             <i class="fas fa-check"></i>
           </div>
@@ -349,16 +350,12 @@ document.addEventListener('DOMContentLoaded', async () => {
       `;
     }).join('');
 
-    // ربط الأحداث
     container.querySelectorAll('.notification-item').forEach(item => {
       const id = item.dataset.id;
 
-      // ربط الضغط المطول
       attachLongPress(item, id);
 
-      // ربط النقر
       item.addEventListener('click', (e) => {
-        // إذا كان الضغط المطول قد تم تفعيله للتو، لا تفعل شيئاً
         if (item._longPressCheck()) {
           e.preventDefault();
           e.stopPropagation();
@@ -376,7 +373,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   }
 
-  // ---- عند الضغط على إشعار في الوضع العادي ----
   async function handleItemClick(id) {
     const { data } = await db
       .from('notifications')
@@ -396,18 +392,12 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 });
 
-// ============================================
-// تعليم كل الإشعارات كـ "مرئية"
-// ============================================
 async function markAllAsSeen() {
   const { data: { user } } = await db.auth.getUser();
   if (!user) return;
   await db.from('notifications').update({ seen: true }).eq('user_id', user.id).eq('seen', false);
 }
 
-// ============================================
-// تنسيق الوقت
-// ============================================
 function formatTime(iso, tr, locale) {
   const date = new Date(iso);
   const now = new Date();

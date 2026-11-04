@@ -14,23 +14,26 @@
   margin: 0;
 }
 
-/* ✅ ترويسة وضع التحديد (مثبتة أعلى الشاشة) */
+/* ✅ ترويسة وضع التحديد (شريط عائم مطابق للصورة) */
 .notifications-selection-header {
   display: none;
   justify-content: space-between;
   align-items: center;
-  max-width: 700px;
-  margin: -24px auto 20px auto; /* يمتد للأعلى لإلغاء مسافة الحاوية */
-  padding: 16px 4px;
   
-  /* ✅ خصائص التثبيت */
+  /* التثبيت العائم */
   position: sticky;
-  top: 0;
+  top: 12px;
   z-index: 100;
   
-  /* ✅ خلفية تغطي المحتوى خلفها */
-  background: #f5f5f5; 
-  border-bottom: 1px solid #e5e5e5;
+  margin: 0 auto 20px auto;
+  width: calc(100% - 32px);
+  max-width: 700px;
+  padding: 8px;
+  
+  /* شكل الكبسولة */
+  background: #ffffff;
+  border-radius: 50px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
 }
 
 body.notif-selection-mode .notifications-header {
@@ -41,59 +44,58 @@ body.notif-selection-mode .notifications-selection-header {
   display: flex;
 }
 
+/* الزر الأيسر (إلغاء) */
 .selection-cancel-btn {
-  background: none;
+  background: #f3f4f6;
   border: none;
-  color: #171717;
+  border-radius: 50px;
+  padding: 10px 20px;
   font-size: 15px;
-  font-weight: 600;
-  padding: 8px 4px;
-  cursor: pointer;
-  font-family: inherit;
-}
-
-.selection-count {
-  font-size: 16px;
   font-weight: 700;
   color: #171717;
-  text-align: center;
-  flex: 1;
-}
-
-.selection-all-btn {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  background: none;
-  border: none;
   cursor: pointer;
-  padding: 4px;
   font-family: inherit;
 }
 
+/* الزر الأيمن (العدد + علامة الصح) */
+.selection-all-btn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #f3f4f6;
+  border: none;
+  border-radius: 50px;
+  padding: 6px 6px 6px 20px; /* مساحة للنص */
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.2s;
+}
+
+/* العدد */
+.selection-count {
+  font-size: 16px;
+  font-weight: 800;
+  color: #171717;
+}
+
+/* الدائرة الزرقاء */
 .selection-all-circle {
-  width: 20px;
-  height: 20px;
-  border: 2px solid #171717;
+  width: 32px;
+  height: 32px;
+  border: 2px solid #2563eb;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: transparent;
-  transition: all 0.2s;
+  color: transparent; /* إخفاء علامة الصح افتراضياً */
   background: transparent;
+  transition: all 0.2s;
 }
 
+/* حالة "تحديد الكل" نشط */
 .selection-all-circle.active {
-  background: #171717;
+  background: #2563eb;
   color: white;
-}
-
-.selection-all-btn span:last-child {
-  font-size: 11px;
-  color: #404040;
-  font-weight: 500;
 }
 
 /* القائمة */
@@ -219,8 +221,8 @@ body.notif-selection-mode .notifications-selection-header {
 /* ✅ دائرة التحديد على كل بطاقة */
 .notif-select-circle {
   display: none;
-  width: 20px;
-  height: 20px;
+  width: 22px;
+  height: 22px;
   border: 2px solid #d4d4d4;
   border-radius: 50%;
   flex-shrink: 0;
@@ -228,11 +230,11 @@ body.notif-selection-mode .notifications-selection-header {
   justify-content: center;
   color: transparent;
   transition: all 0.2s;
-  margin-inline-start: 4px;
+  margin-inline-start: 8px;
 }
 
 .notif-select-circle i {
-  font-size: 12px;   /* ← الحجم هنا */
+  font-size: 12px;
 }
 
 body.notif-selection-mode .notif-select-circle {
@@ -331,19 +333,9 @@ body.notif-selection-mode .notifications-action-bar {
   font-size: 15px;
 }
 
-/* ============================================
-   الهاتف
-   ============================================ */
 @media (max-width: 768px) {
   .notification-item { padding: 12px; gap: 10px; }
   .notification-icon { width: 36px; height: 36px; font-size: 14px; }
   .notification-title { font-size: 13px; }
   .notification-message { font-size: 12px; }
-  .selection-count { font-size: 15px; }
-  
-  /* ✅ ضبط مسافة الترويسة العلوية في الهواتف */
-  .notifications-selection-header {
-    margin-top: -12px; 
-    padding-top: 12px;
-  }
 }
