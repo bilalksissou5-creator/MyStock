@@ -274,17 +274,17 @@ body.notif-selection-mode .notification-checks {
 .notifications-action-bar {
   position: fixed;
   bottom: 24px;
-  left: 5px;
-  right: 5px;
+  left: 10px;
+  right: 10px;
   background: #ffffff;
   border-radius: 30px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
   display: none;
   justify-content: space-around;
   align-items: center;
-  padding: 12px 0px;
+  padding: 10px 5px;
   z-index: 1000;
-  max-width: 260px;
+  max-width: 250px;
   margin: 0 auto;
 }
 
