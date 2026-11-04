@@ -64,8 +64,8 @@ body.notif-selection-mode .notifications-selection-header {
 }
 
 .selection-all-circle {
-  width: 20px;
-  height: 20px;
+  width: 30px;
+  height: 30px;
   border: 2px solid #171717;
   border-radius: 50%;
   display: flex;
@@ -120,7 +120,6 @@ body.notif-selection-mode .notifications-selection-header {
   background: #fafafa;
 }
 
-/* ✅ البطاقة المحددة */
 .notification-item.selected {
   background: #e0f2fe;
   box-shadow: 0 1px 3px rgba(59, 130, 246, 0.3);
@@ -206,6 +205,36 @@ body.notif-selection-mode .notifications-selection-header {
 
 .notification-item.selected .notification-checks {
   opacity: 0;
+}
+
+/* ✅ دائرة التحديد على كل بطاقة */
+.notif-select-circle {
+  display: none;
+  width: 18px;
+  height: 18px;
+  border: 2px solid #d4d4d4;
+  border-radius: 50%;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  color: transparent;
+  transition: all 0.2s;
+  margin-inline-start: 4px;
+}
+
+body.notif-selection-mode .notif-select-circle {
+  display: flex;
+}
+
+.notification-item.selected .notif-select-circle {
+  background: #2563eb;
+  border-color: #2563eb;
+  color: white;
+}
+
+/* إخفاء علامات القراءة في وضع التحديد */
+body.notif-selection-mode .notification-checks {
+  display: none;
 }
 
 /* ============================================

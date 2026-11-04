@@ -336,8 +336,13 @@ document.addEventListener('DOMContentLoaded', async () => {
             ${n.message ? `<div class="notification-message">${n.message}</div>` : ''}
             <div class="notification-time">${time}</div>
           </div>
+          <!-- علامات القراءة -->
           <div class="notification-checks">
             <i class="fas fa-check"></i>
+            <i class="fas fa-check"></i>
+          </div>
+          <!-- ✅ دائرة التحديد -->
+          <div class="notif-select-circle">
             <i class="fas fa-check"></i>
           </div>
         </div>
