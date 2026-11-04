@@ -14,14 +14,23 @@
   margin: 0;
 }
 
-/* ✅ ترويسة وضع التحديد */
+/* ✅ ترويسة وضع التحديد (مثبتة أعلى الشاشة) */
 .notifications-selection-header {
   display: none;
   justify-content: space-between;
   align-items: center;
   max-width: 700px;
-  margin: 0 auto 20px;
-  padding: 4px;
+  margin: -24px auto 20px auto; /* يمتد للأعلى لإلغاء مسافة الحاوية */
+  padding: 16px 4px;
+  
+  /* ✅ خصائص التثبيت */
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  
+  /* ✅ خلفية تغطي المحتوى خلفها */
+  background: #f5f5f5; 
+  border-bottom: 1px solid #e5e5e5;
 }
 
 body.notif-selection-mode .notifications-header {
@@ -322,10 +331,19 @@ body.notif-selection-mode .notifications-action-bar {
   font-size: 15px;
 }
 
+/* ============================================
+   الهاتف
+   ============================================ */
 @media (max-width: 768px) {
   .notification-item { padding: 12px; gap: 10px; }
   .notification-icon { width: 36px; height: 36px; font-size: 14px; }
   .notification-title { font-size: 13px; }
   .notification-message { font-size: 12px; }
   .selection-count { font-size: 15px; }
+  
+  /* ✅ ضبط مسافة الترويسة العلوية في الهواتف */
+  .notifications-selection-header {
+    margin-top: -12px; 
+    padding-top: 12px;
+  }
 }
