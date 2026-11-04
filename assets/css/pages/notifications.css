@@ -64,8 +64,8 @@ body.notif-selection-mode .notifications-selection-header {
 }
 
 .selection-all-circle {
-  width: 30px;
-  height: 30px;
+  width: 20px;
+  height: 20px;
   border: 2px solid #171717;
   border-radius: 50%;
   display: flex;
@@ -210,8 +210,8 @@ body.notif-selection-mode .notifications-selection-header {
 /* ✅ دائرة التحديد على كل بطاقة */
 .notif-select-circle {
   display: none;
-  width: 18px;
-  height: 18px;
+  width: 20px;
+  height: 20px;
   border: 2px solid #d4d4d4;
   border-radius: 50%;
   flex-shrink: 0;
