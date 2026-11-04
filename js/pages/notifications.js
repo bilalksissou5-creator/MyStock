@@ -14,6 +14,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   const main = document.getElementById('main-content');
 
+  // بناء الواجهة
   main.innerHTML = `
     <!-- ترويسة عادية -->
     <div class="notifications-header">
@@ -25,7 +26,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       <button type="button" id="cancel-selection-btn" class="selection-cancel-btn">
         ${tr('ntf_cancel')}
       </button>
-      <span class="selection-count" id="selection-count">${(tr('ntf_selected') || '').replace('{n}', 0)}</span>
+      <span class="selection-count" id="selection-count"></span>
       <button type="button" id="select-all-btn" class="selection-all-btn">
         <span class="selection-all-circle" id="select-all-circle">
           <i class="fas fa-check"></i>
@@ -40,13 +41,17 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     <!-- شريط الإجراءات العائم -->
     <div class="notifications-action-bar" id="notif-action-bar">
+      <button type="button" id="mark-read-btn" class="action-bar-btn">
+        <i class="fas fa-check-double"></i>
+        <span>${tr('ntf_mark_read')}</span>
+      </button>
       <button type="button" id="delete-selected-btn" class="action-bar-btn danger">
         <i class="fas fa-trash"></i>
         <span>${tr('ntf_delete')}</span>
       </button>
-      <button type="button" id="mark-read-btn" class="action-bar-btn">
-        <i class="fas fa-check-double"></i>
-        <span>${tr('ntf_mark_read')}</span>
+      <button type="button" id="cancel-selection-btn-bar" class="action-bar-btn">
+        <i class="fas fa-xmark"></i>
+        <span>${tr('ntf_cancel')}</span>
       </button>
     </div>
   `;
@@ -55,22 +60,26 @@ document.addEventListener('DOMContentLoaded', async () => {
   let selectionMode = false;
   const selectedIds = new Set();
 
-  await markAllAsSeen();
-  await loadNotifications();
-
+  // عناصر DOM
   const selectionCountEl = document.getElementById('selection-count');
   const selectAllCircle = document.getElementById('select-all-circle');
   const selectAllBtn = document.getElementById('select-all-btn');
   const cancelBtn = document.getElementById('cancel-selection-btn');
+  const cancelBtnBar = document.getElementById('cancel-selection-btn-bar');
   const deleteBtn = document.getElementById('delete-selected-btn');
   const markReadBtn = document.getElementById('mark-read-btn');
 
-  // ---- UI Helpers ----
+  await markAllAsSeen();
+  await loadNotifications();
+
+  // ---- دوال الواجهة ----
+
   function updateSelectionUI() {
     const count = selectedIds.size;
-    selectionCountEl.textContent = (tr('ntf_selected') || 'Selected: {n}').replace('{n}', count);
+    const template = tr('ntf_selected') || 'Selected: {n}';
+    selectionCountEl.textContent = template.replace('{n}', count);
 
-    // تحديث الدائرة
+    // تحديث دائرة "الكل"
     if (count === currentNotifications.length && count > 0) {
       selectAllCircle.classList.add('active');
     } else {
@@ -118,17 +127,17 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
 
-  // ---- Select All ----
+  // ---- أزرار الترويسة ----
+
+  // زر "الكل"
   selectAllBtn.addEventListener('click', () => {
     if (selectedIds.size === currentNotifications.length) {
-      // إلغاء تحديد الكل
       selectedIds.clear();
       document.querySelectorAll('.notification-item.selected').forEach(el => {
         el.classList.remove('selected');
       });
       updateSelectionUI();
     } else {
-      // تحديد الكل
       currentNotifications.forEach(n => selectedIds.add(n.id));
       document.querySelectorAll('.notification-item').forEach(el => {
         el.classList.add('selected');
@@ -137,10 +146,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   });
 
-  // ---- Cancel ----
+  // أزرار الإلغاء
   cancelBtn.addEventListener('click', exitSelectionMode);
+  cancelBtnBar.addEventListener('click', exitSelectionMode);
 
-  // ---- Delete Selected ----
+  // ---- أزرار الشريط السفلي ----
+
+  // حذف
   deleteBtn.addEventListener('click', async () => {
     const count = selectedIds.size;
     if (count === 0) return;
@@ -184,7 +196,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   });
 
-  // ---- Mark as Read ----
+  // تعليم كمقروء
   markReadBtn.addEventListener('click', async () => {
     const count = selectedIds.size;
     if (count === 0) return;
@@ -200,7 +212,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       if (error) throw error;
 
-      // تحديث الواجهة
       selectedIds.forEach(id => {
         const el = document.querySelector(`.notification-item[data-id="${id}"]`);
         if (el) el.classList.add('read', 'seen');
@@ -214,13 +225,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   });
 
-  // ============================================
-  // Long press handler
-  // ============================================
+  // ---- الضغط المطول ----
   function attachLongPress(item, id) {
     let timer = null;
     let startX = 0, startY = 0;
     let moved = false;
+    let longPressTriggered = false;
 
     const start = (e) => {
       if (selectionMode) return;
@@ -228,9 +238,11 @@ document.addEventListener('DOMContentLoaded', async () => {
       startX = point.clientX;
       startY = point.clientY;
       moved = false;
+      longPressTriggered = false;
 
       timer = setTimeout(() => {
         if (!moved && !selectionMode) {
+          longPressTriggered = true;
           enterSelectionMode(id);
         }
       }, 600);
@@ -257,11 +269,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     item.addEventListener('mousemove', move);
     item.addEventListener('mouseup', cancel);
     item.addEventListener('mouseleave', cancel);
+    
+    // حفظ الحالة للاستخدام في النقر
+    item._longPressCheck = () => {
+      const res = longPressTriggered;
+      longPressTriggered = false;
+      return res;
+    };
   }
 
-  // ============================================
-  // تحميل الإشعارات
-  // ============================================
+  // ---- تحميل الإشعارات ----
   async function loadNotifications() {
     const lang = window.getCurrentLang ? window.getCurrentLang() : 'ar';
     const localeMap = { ar: 'ar-MA', fr: 'fr-FR', en: 'en-US' };
@@ -327,10 +344,22 @@ document.addEventListener('DOMContentLoaded', async () => {
       `;
     }).join('');
 
+    // ربط الأحداث
     container.querySelectorAll('.notification-item').forEach(item => {
       const id = item.dataset.id;
 
+      // ربط الضغط المطول
+      attachLongPress(item, id);
+
+      // ربط النقر
       item.addEventListener('click', (e) => {
+        // إذا كان الضغط المطول قد تم تفعيله للتو، لا تفعل شيئاً
+        if (item._longPressCheck()) {
+          e.preventDefault();
+          e.stopPropagation();
+          return;
+        }
+
         if (selectionMode) {
           e.preventDefault();
           e.stopPropagation();
@@ -339,11 +368,10 @@ document.addEventListener('DOMContentLoaded', async () => {
           handleItemClick(id);
         }
       });
-
-      attachLongPress(item, id);
     });
   }
 
+  // ---- عند الضغط على إشعار في الوضع العادي ----
   async function handleItemClick(id) {
     const { data } = await db
       .from('notifications')

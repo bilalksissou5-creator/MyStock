@@ -94,7 +94,7 @@ body.notif-selection-mode .notifications-selection-header {
   gap: 8px;
   max-width: 700px;
   margin: 0 auto;
-  padding-bottom: 100px; /* مساحة لشريط الأسفل */
+  padding-bottom: 100px;
 }
 
 .notification-item {
@@ -204,25 +204,28 @@ body.notif-selection-mode .notifications-selection-header {
   color: #3b82f6;
 }
 
-/* في وضع التحديد: إخفاء علامات القراءة واستبدالها بدائرة */
 .notification-item.selected .notification-checks {
   opacity: 0;
 }
 
-/* ✅ شريط الإجراءات العائم أسفل الشاشة */
+/* ============================================
+   ✅ شريط الإجراءات العائم أسفل الشاشة (تصميم كبسولة)
+   ============================================ */
 .notifications-action-bar {
   position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background: white;
-  border-top: 1px solid #e5e5e5;
-  box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.08);
+  bottom: 24px;
+  left: 20px;
+  right: 20px;
+  background: #ffffff;
+  border-radius: 30px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
   display: none;
   justify-content: space-around;
   align-items: center;
-  padding: 8px 16px 16px;
+  padding: 12px 10px;
   z-index: 1000;
+  max-width: 500px;
+  margin: 0 auto;
 }
 
 body.notif-selection-mode .notifications-action-bar {
@@ -233,18 +236,18 @@ body.notif-selection-mode .notifications-action-bar {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
+  gap: 6px;
   background: none;
   border: none;
   cursor: pointer;
-  padding: 8px 12px;
+  padding: 4px 8px;
   font-family: inherit;
   font-size: 11px;
   font-weight: 500;
-  color: #171717;
-  border-radius: 8px;
+  color: #404040;
+  border-radius: 12px;
   transition: background 0.15s;
-  min-width: 70px;
+  flex: 1;
 }
 
 .action-bar-btn:active {
@@ -253,7 +256,7 @@ body.notif-selection-mode .notifications-action-bar {
 
 .action-bar-btn i {
   font-size: 20px;
-  color: #404040;
+  color: #171717;
 }
 
 .action-bar-btn.danger i {
