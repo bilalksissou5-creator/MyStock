@@ -277,7 +277,7 @@ body.notif-selection-mode .notification-checks {
   left: 25px;
   right: 25px;
   background: #ffffff;
-  border-radius: 50%;
+  border-radius: 25%;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
   display: none;
   justify-content: space-around;
