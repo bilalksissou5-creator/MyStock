@@ -188,6 +188,7 @@ h6 { font-size: 0.8125rem; font-weight: 600; color: #404040; } /* 13px */
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 5px;
   flex-shrink: 0;
   overflow: hidden;
   position: relative;
