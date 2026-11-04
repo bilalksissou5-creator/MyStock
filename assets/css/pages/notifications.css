@@ -222,6 +222,10 @@ body.notif-selection-mode .notifications-selection-header {
   margin-inline-start: 4px;
 }
 
+.notif-select-circle i {
+  font-size: 13px;   /* ← الحجم هنا */
+}
+
 body.notif-selection-mode .notif-select-circle {
   display: flex;
 }
