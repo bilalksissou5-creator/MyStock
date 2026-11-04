@@ -1,7 +1,7 @@
 // ============================================
 // صفحة إخراج منتجات + طباعة حرارية (WebBluetooth/WebUSB)
 // ✅ بدون RawBT
-// ✅ الباركود الممسوح يظهر في خانة الإدخال، والسلة تحفظ الباركود الأساسي
+// ✅ الباركود الممسوح يظهر في خانة الإدخال والسلة
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   if (window.__movementOutLoaded) return;
@@ -294,7 +294,11 @@ document.addEventListener('DOMContentLoaded', async () => {
   const scannerReader = document.getElementById('scanner-reader');
   const scannerClose = document.getElementById('scanner-close');
   
-  let selectedProduct = null, isAdding = false, isSaving = false, html5QrCode = null;
+  let selectedProduct = null;
+  let scannedBarcode = null;  // ✅ متغير جديد لحفظ الباركود الممسوح
+  let isAdding = false;
+  let isSaving = false;
+  let html5QrCode = null;
 
   function showSuggestions(filter) {
     const q = filter.trim().toLowerCase();
@@ -317,18 +321,18 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   }
 
-  // ✅ التعديل: استقبال الباركود الممسوح لعرضه في خانة الإدخال
-  function selectProduct(f, scannedBarcode = null) {
+  // ✅ التعديل: استقبال الباركود الممسوح وحفظه
+  function selectProduct(f, scanned = null) {
     selectedProduct = f;
-    const displaySku = scannedBarcode || f.sku || '—';
-    productInput.value = `${f.name} (${displaySku})`;
+    scannedBarcode = scanned || f.sku || '—';
+    productInput.value = `${f.name} (${scannedBarcode})`;
     hiddenId.value = f.id;
     quantityInput.value = 1;
     priceInput.value = getSellingPrice(f).toFixed(2);
     availableQtyInput.value = f.qty ?? 0;
   }
 
-  productInput.addEventListener('input', () => { selectedProduct = null; hiddenId.value = ''; availableQtyInput.value = '—'; showSuggestions(productInput.value); });
+  productInput.addEventListener('input', () => { selectedProduct = null; scannedBarcode = null; hiddenId.value = ''; availableQtyInput.value = '—'; showSuggestions(productInput.value); });
   document.addEventListener('pointerdown', (e) => { if (!e.target.closest('#product-input') && !e.target.closest('#product-suggestions')) suggestions.style.display = 'none'; });
 
   async function startScanner() {
@@ -360,7 +364,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
     if (!f) { alert(`${tr('mout_not_found')}\n${v}`); return; }
     if (Number(f.qty ?? 0) <= 0) { alert(`${tr('mout_no_stock')} "${f.name}"`); return; }
-    // ✅ التعديل: تمرير الباركود الممسوح
+    // ✅ تمرير الباركود الممسوح
     selectProduct(f, v);
   }
 
@@ -405,11 +409,34 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (qty > av) { errBox.textContent = `${tr('mout_err_max')} ${av}`; errBox.style.display = 'block'; quantityInput.focus(); isAdding = false; addBtn.disabled = false; return; }
 
     const cp = Number(selectedProduct.price ?? 0);
+    // ✅ الباركود الذي سيُحفظ في السلة (الممسوح أو الأساسي)
+    const displaySku = scannedBarcode || selectedProduct.sku || '—';
     const ex = addedProducts.find(p => p.id === selectedProduct.id);
-    if (ex) { ex.qty += qty; ex.price = price; ex.costPrice = cp; }
-    else { addedProducts.push({ id: selectedProduct.id, name: selectedProduct.name, sku: selectedProduct.sku, image_url: selectedProduct.image_url, qty, price, costPrice: cp, available: av }); }
+    
+    if (ex) { 
+      ex.qty += qty; 
+      ex.price = price; 
+      ex.costPrice = cp;
+      ex.sku = displaySku; // ✅ تحديث بالباركود الممسوح
+    } else { 
+      addedProducts.push({ 
+        id: selectedProduct.id, 
+        name: selectedProduct.name, 
+        sku: displaySku, // ✅ الباركود الممسوح
+        image_url: selectedProduct.image_url, 
+        qty, price, costPrice: cp, available: av 
+      }); 
+    }
+    
     renderAddedProducts();
-    productInput.value = ''; hiddenId.value = ''; availableQtyInput.value = '—'; quantityInput.value = ''; priceInput.value = '0'; selectedProduct = null; productInput.focus();
+    productInput.value = ''; 
+    hiddenId.value = ''; 
+    availableQtyInput.value = '—'; 
+    quantityInput.value = ''; 
+    priceInput.value = '0'; 
+    selectedProduct = null; 
+    scannedBarcode = null;  // ✅ إعادة تعيين
+    productInput.focus();
     setTimeout(() => { isAdding = false; addBtn.disabled = false; }, 400);
   }
 
