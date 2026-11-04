@@ -123,14 +123,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         </div>
       </div>
 
-      <!-- ✅ قسم حد التنبيه للمخزون المنخفض -->
+      <!-- ✅ قسم حد التنبيه للمخزون -->
       <div class="sell-price-section">
-        <h3 class="sell-price-title">⚠️ حد التنبيه للمخزون</h3>
+        <h3 class="sell-price-title">${tr('low_stock_section_title')}</h3>
 
         <div class="sell-price-input-group">
-          <label>الحد الأدنى للتنبيه (قطعة)</label>
+          <label>${tr('low_stock_field_label')}</label>
           <input type="number" id="low-stock-input" value="${lowStockThreshold}" min="0" step="1" dir="ltr" placeholder="10">
-          <small class="field-hint">عندما يصل مخزون المنتج لهذه الكمية أو أقل، يصل إشعار لكل أعضاء المنظمة</small>
+          <small class="field-hint">${tr('low_stock_field_hint')}</small>
         </div>
       </div>
 
@@ -170,7 +170,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     </div>
   `;
 
-  // ✅ تحديث لون الكمية بناءً على الحد الحالي
+  // ✅ تحديث لون الكمية
   function updateQtyStyle() {
     const qtyEl = document.getElementById('qty-stat-value');
     if (!qtyEl) return;
@@ -224,7 +224,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         if (typeof notifyOrganization !== 'function' || !profile?.organization_id) return;
 
-        // ✅ إذا كانت الكمية الجديدة أقل من أو تساوي الحد → إشعار تحذيري بدل الإشعار العادي
+        // ✅ إذا كانت الكمية الجديدة أقل من أو تساوي الحد → إشعار تحذيري
         const threshold = Number(product.low_stock_threshold ?? 10);
         const isLow = savedField === 'qty' && Number(newValue) <= threshold;
 
@@ -232,8 +232,11 @@ document.addEventListener('DOMContentLoaded', async () => {
           if (isLow) {
             await notifyOrganization({
               orgId: profile.organization_id,
-              title: '⚠️ مخزون منخفض',
-              message: `المنتج "${product.name}" وصل إلى ${newValue} قطعة (الحد الأدنى: ${threshold})`,
+              title: tr('low_stock_alert_title'),
+              message: tr('low_stock_alert_single')
+                .replace('{name}', product.name)
+                .replace('{qty}', newValue)
+                .replace('{threshold}', threshold),
               type: 'warning',
               link: `/products/detail.html?id=${productId}`,
               userName: profile.full_name || null,
@@ -273,13 +276,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         product.low_stock_threshold = newThreshold;
         updateQtyStyle();
 
-        // ✅ إذا كانت الكمية الحالية أقل من أو تساوي الحد الجديد → إشعار
         const currentQty = Number(product.qty ?? 0);
         if (currentQty <= newThreshold && typeof notifyOrganization === 'function' && profile?.organization_id) {
           await notifyOrganization({
             orgId: profile.organization_id,
-            title: '⚠️ مخزون منخفض',
-            message: `المنتج "${product.name}" (${currentQty} قطعة) أقل من أو يساوي الحد الأدنى (${newThreshold})`,
+            title: tr('low_stock_alert_title'),
+            message: tr('low_stock_alert_already')
+              .replace('{name}', product.name)
+              .replace('{qty}', currentQty)
+              .replace('{threshold}', newThreshold),
             type: 'warning',
             link: `/products/detail.html?id=${productId}`,
             userName: profile.full_name || null,
@@ -287,7 +292,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
       } catch (err) {
         console.error('فشل حفظ حد التنبيه:', err);
-        alert('فشل حفظ حد التنبيه: ' + err.message);
+        alert(tr('prod_detail_err') + ' ' + err.message);
       }
     }, 800);
   });
