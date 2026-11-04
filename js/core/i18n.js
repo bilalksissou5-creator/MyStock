@@ -922,6 +922,12 @@ const translations = {
     low_stock_alert_single: 'المنتج "{name}" وصل إلى {qty} قطعة (الحد الأدنى: {threshold})',
     low_stock_alert_already: 'المنتج "{name}" ({qty} قطعة) أقل من أو يساوي الحد الأدنى ({threshold})',
     low_stock_warning_banner: '⚠️ تحذير: {count} منتج وصل للحد الأدنى للمخزون',
+
+    ntf_select_all: 'تحديد الكل',
+    ntf_deselect_all: 'إلغاء تحديد الكل',
+    ntf_cancel: 'إلغاء',
+    ntf_confirm_delete: 'هل تريد حذف {n} إشعار؟',
+    ntf_selected_count: 'المحددة: {n}',
   },
 
   fr: {
@@ -1834,6 +1840,12 @@ const translations = {
     low_stock_alert_single: 'Le produit "{name}" a atteint {qty} unités (seuil: {threshold})',
     low_stock_alert_already: 'Le produit "{name}" ({qty} unités) est au seuil ou en dessous ({threshold})',
     low_stock_warning_banner: '⚠️ Attention : {count} produit(s) au seuil minimal',
+
+    ntf_select_all: 'Tout sélectionner',
+    ntf_deselect_all: 'Tout désélectionner',
+    ntf_cancel: 'Annuler',
+    ntf_confirm_delete: 'Supprimer {n} notifications ?',
+    ntf_selected_count: 'Sélectionnées : {n}',
   },
 
   en: {
@@ -2746,6 +2758,12 @@ const translations = {
     low_stock_alert_single: 'Product "{name}" reached {qty} units (threshold: {threshold})',
     low_stock_alert_already: 'Product "{name}" ({qty} units) is at or below the threshold ({threshold})',
     low_stock_warning_banner: '⚠️ Warning: {count} product(s) at minimum stock threshold',
+
+    ntf_select_all: 'Select All',
+    ntf_deselect_all: 'Deselect All',
+    ntf_cancel: 'Cancel',
+    ntf_confirm_delete: 'Delete {n} notifications?',
+    ntf_selected_count: 'Selected: {n}',
   },
 
   
@@ -2819,10 +2837,16 @@ function applyLanguage() {
 }
 
 function setLanguage(lang) {
-  currentLang = lang;
+  if (lang === currentLang) return; // لا تفعل شيئاً إن كانت نفس اللغة
   localStorage.setItem('app_lang', lang);
-  applyLanguage();
+  window.location.reload(); // ✅ إعادة تحميل الصفحة بالكامل لتطبيق الترجمة على كل العناصر
 }
+
+window.addEventListener('storage', (e) => {
+  if (e.key === 'app_lang' && e.newValue && e.newValue !== currentLang) {
+    window.location.reload();
+  }
+});
 
 window.t = t;
 window.tCountry = tCountry;
