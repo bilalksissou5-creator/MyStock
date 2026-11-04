@@ -1,6 +1,7 @@
 // ============================================
 // صفحة إخراج منتجات + طباعة حرارية (WebBluetooth/WebUSB)
 // ✅ بدون RawBT
+// ✅ الباركود الممسوح يظهر في خانة الإدخال، والسلة تحفظ الباركود الأساسي
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   if (window.__movementOutLoaded) return;
@@ -28,7 +29,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const Printer = {
     device: null,
     char: null,
-    mode: null, // 'bt' أو 'usb'
+    mode: null,
 
     async loadSaved() {
       if (navigator.bluetooth) {
@@ -180,7 +181,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const { data: products, error: productsError } = await db.from('products').select('*').order('name');
   if (productsError) { main.innerHTML = `<div class="alert alert-error">${productsError.message}</div>`; return; }
 
-  await Printer.loadSaved(); // محاولة صامتة لتحميل طابعة محفوظة
+  await Printer.loadSaved();
 
   main.innerHTML = `
     <div class="page-header">
@@ -316,8 +317,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   }
 
-  function selectProduct(f) {
-    selectedProduct = f; productInput.value = `${f.name} (${f.sku ?? '—'})`; hiddenId.value = f.id; quantityInput.value = 1; priceInput.value = getSellingPrice(f).toFixed(2); availableQtyInput.value = f.qty ?? 0;
+  // ✅ التعديل: استقبال الباركود الممسوح لعرضه في خانة الإدخال
+  function selectProduct(f, scannedBarcode = null) {
+    selectedProduct = f;
+    const displaySku = scannedBarcode || f.sku || '—';
+    productInput.value = `${f.name} (${displaySku})`;
+    hiddenId.value = f.id;
+    quantityInput.value = 1;
+    priceInput.value = getSellingPrice(f).toFixed(2);
+    availableQtyInput.value = f.qty ?? 0;
   }
 
   productInput.addEventListener('input', () => { selectedProduct = null; hiddenId.value = ''; availableQtyInput.value = '—'; showSuggestions(productInput.value); });
@@ -352,7 +360,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
     if (!f) { alert(`${tr('mout_not_found')}\n${v}`); return; }
     if (Number(f.qty ?? 0) <= 0) { alert(`${tr('mout_no_stock')} "${f.name}"`); return; }
-    selectProduct(f);
+    // ✅ التعديل: تمرير الباركود الممسوح
+    selectProduct(f, v);
   }
 
   scanBtn.addEventListener('click', startScanner);
@@ -473,10 +482,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       saveBtn.querySelector('span').textContent = tr('mout_save');
       isSaving = false;
 
-      // ==========================================
-      // ✅ منطق الطابعة (بدون RawBT)
-      // ==========================================
-      
       if (!Printer.mode) {
         const wantToPair = confirm("لم يتم العثور على طابعة.\n\nهل تريد ربط طابعة الآن؟\n(ملاحظة: يجب أن تدعم طابعة البلوتوث تقنية BLE لكي تظهر).");
         
