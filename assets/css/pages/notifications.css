@@ -97,8 +97,8 @@ body.notif-selection-mode .notifications-selection-header {
 
 /* الدائرة الزرقاء */
 .selection-all-circle {
-  width: 32px;
-  height: 32px;
+  width: 25px;
+  height: 25px;
   border: 2px solid #2563eb;
   border-radius: 50%;
   display: flex;
