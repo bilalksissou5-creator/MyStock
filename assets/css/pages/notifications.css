@@ -14,7 +14,7 @@
   margin: 0;
 }
 
-/* ✅ ترويسة وضع التحديد (شريط عائم مطابق للصورة) */
+/* ✅ ترويسة وضع التحديد (شريط عائم) */
 .notifications-selection-header {
   display: none;
   justify-content: space-between;
@@ -26,27 +26,22 @@
   z-index: 100;
   
   margin: 0 auto 20px auto;
-  width: calc(100% - 32px);
+  width: calc(100% - 16px);
   max-width: 700px;
-  padding: 8px;
+  padding: 0 8px;
   
-  /* شكل الكبسولة */
-  background: #ffffff;
-  border-radius: 50px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
-}
-
-body.notif-selection-mode .notifications-header {
-  display: none;
+  /* نسمح بمرور النقرات في المساحة الفارغة */
+  pointer-events: none; 
 }
 
 body.notif-selection-mode .notifications-selection-header {
   display: flex;
 }
 
-/* الزر الأيسر (إلغاء) */
-.selection-cancel-btn {
-  background: #f3f4f6;
+/* ✅ الأزرار (شكل الكبسولة) */
+.selection-pill-btn {
+  pointer-events: auto; /* تفعيل النقر على الأزرار فقط */
+  background: transparent; /* مسطحة في البداية */
   border: none;
   border-radius: 50px;
   padding: 10px 20px;
@@ -54,28 +49,38 @@ body.notif-selection-mode .notifications-selection-header {
   font-weight: 700;
   color: #171717;
   cursor: pointer;
-  font-family: inherit;
-}
-
-/* الزر الأيمن (العدد + علامة الصح) */
-.selection-all-btn {
   display: flex;
   align-items: center;
   gap: 12px;
-  background: #f3f4f6;
-  border: none;
-  border-radius: 50px;
-  padding: 6px 6px 6px 20px; /* مساحة للنص */
-  cursor: pointer;
-  font-family: inherit;
-  transition: background 0.2s;
+  transition: background 0.3s, box-shadow 0.3s;
 }
 
-/* العدد */
-.selection-count {
+/* ✅ النص الأوسط */
+.selection-center-text {
+  pointer-events: auto;
+  font-size: 15px;
+  font-weight: 700;
+  color: #171717;
+  transition: background 0.3s, box-shadow 0.3s;
+  padding: 10px 16px;
+  border-radius: 50px;
+}
+
+/* ✅ عند التمرير: تتحول الأزرار والنص إلى كبسولات بيضاء عائمة */
+.notifications-selection-header.is-scrolled .selection-pill-btn,
+.notifications-selection-header.is-scrolled .selection-center-text {
+  background: #ffffff;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* الزر الأيمن (العدد + الدائرة) */
+.right-pill {
+  padding: 6px 6px 6px 20px;
+}
+
+.pill-count {
   font-size: 16px;
   font-weight: 800;
-  color: #171717;
 }
 
 /* الدائرة الزرقاء */
@@ -87,12 +92,11 @@ body.notif-selection-mode .notifications-selection-header {
   display: flex;
   align-items: center;
   justify-content: center;
-  color: transparent; /* إخفاء علامة الصح افتراضياً */
+  color: transparent;
   background: transparent;
   transition: all 0.2s;
 }
 
-/* حالة "تحديد الكل" نشط */
 .selection-all-circle.active {
   background: #2563eb;
   color: white;
@@ -233,13 +237,9 @@ body.notif-selection-mode .notifications-selection-header {
   margin-inline-start: 8px;
 }
 
-.notif-select-circle i {
-  font-size: 12px;
-}
+.notif-select-circle i { font-size: 12px; }
 
-body.notif-selection-mode .notif-select-circle {
-  display: flex;
-}
+body.notif-selection-mode .notif-select-circle { display: flex; }
 
 .notification-item.selected .notif-select-circle {
   background: #2563eb;
@@ -247,13 +247,10 @@ body.notif-selection-mode .notif-select-circle {
   color: white;
 }
 
-/* إخفاء علامات القراءة في وضع التحديد */
-body.notif-selection-mode .notification-checks {
-  display: none;
-}
+body.notif-selection-mode .notification-checks { display: none; }
 
 /* ============================================
-   ✅ شريط الإجراءات العائم أسفل الشاشة (تصميم كبسولة)
+   ✅ شريط الإجراءات العائم أسفل الشاشة
    ============================================ */
 .notifications-action-bar {
   position: fixed;
@@ -272,9 +269,7 @@ body.notif-selection-mode .notification-checks {
   margin: 0 auto;
 }
 
-body.notif-selection-mode .notifications-action-bar {
-  display: flex;
-}
+body.notif-selection-mode .notifications-action-bar { display: flex; }
 
 .action-bar-btn {
   display: flex;
@@ -294,22 +289,10 @@ body.notif-selection-mode .notifications-action-bar {
   flex: 1;
 }
 
-.action-bar-btn:active {
-  background: #f5f5f5;
-}
-
-.action-bar-btn i {
-  font-size: 20px;
-  color: #171717;
-}
-
-.action-bar-btn.danger i {
-  color: #dc2626;
-}
-
-.action-bar-btn.danger {
-  color: #dc2626;
-}
+.action-bar-btn:active { background: #f5f5f5; }
+.action-bar-btn i { font-size: 20px; color: #171717; }
+.action-bar-btn.danger i { color: #dc2626; }
+.action-bar-btn.danger { color: #dc2626; }
 
 /* حالة فارغة */
 .notifications-empty {
@@ -323,15 +306,8 @@ body.notif-selection-mode .notifications-action-bar {
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
 }
 
-.notifications-empty i {
-  font-size: 3.5rem;
-  color: #d4d4d4;
-  margin-bottom: 16px;
-}
-
-.notifications-empty p {
-  font-size: 15px;
-}
+.notifications-empty i { font-size: 3.5rem; color: #d4d4d4; margin-bottom: 16px; }
+.notifications-empty p { font-size: 15px; }
 
 @media (max-width: 768px) {
   .notification-item { padding: 12px; gap: 10px; }

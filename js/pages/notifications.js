@@ -1,5 +1,5 @@
 // ============================================
-// صفحة الإشعارات (مع تحديد متعدد كمدير الملفات)
+// صفحة الإشعارات (مع تحديد متعدد وتأثير التمرير)
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   const user = await requireAuth();
@@ -21,15 +21,18 @@ document.addEventListener('DOMContentLoaded', async () => {
       <h2>${tr('ntf_title')}</h2>
     </div>
 
-    <!-- ✅ ترويسة وضع التحديد (التصميم الجديد) -->
-    <div class="notifications-selection-header">
-      <button type="button" id="cancel-selection-btn" class="selection-cancel-btn">
+    <!-- ✅ ترويسة وضع التحديد الجديدة -->
+    <div class="notifications-selection-header" id="selection-header">
+      <button type="button" id="cancel-selection-btn" class="selection-pill-btn">
         ${tr('ntf_cancel')}
       </button>
       
-      <!-- الزر الأيمن الموحد (العدد + الدائرة) -->
-      <button type="button" id="select-all-btn" class="selection-all-btn">
-        <span class="selection-count" id="selection-count">0</span>
+      <div class="selection-center-text" id="selection-center-text">
+        ${(tr('ntf_selected') || 'Selected: {n}').replace('{n}', 0)}
+      </div>
+      
+      <button type="button" id="select-all-btn" class="selection-pill-btn right-pill">
+        <span class="pill-count" id="pill-count">0</span>
         <span class="selection-all-circle" id="select-all-circle">
           <i class="fas fa-check"></i>
         </span>
@@ -62,23 +65,47 @@ document.addEventListener('DOMContentLoaded', async () => {
   const selectedIds = new Set();
 
   // عناصر DOM
-  const selectionCountEl = document.getElementById('selection-count');
+  const selectionHeader = document.getElementById('selection-header');
+  const centerText = document.getElementById('selection-center-text');
+  const pillCount = document.getElementById('pill-count');
   const selectAllCircle = document.getElementById('select-all-circle');
   const selectAllBtn = document.getElementById('select-all-btn');
   const cancelBtn = document.getElementById('cancel-selection-btn');
   const cancelBtnBar = document.getElementById('cancel-selection-btn-bar');
   const deleteBtn = document.getElementById('delete-selected-btn');
   const markReadBtn = document.getElementById('mark-read-btn');
+  
+  // حاوية التمرير الرئيسية
+  const scrollContainer = document.querySelector('.main');
 
   await markAllAsSeen();
   await loadNotifications();
+
+  // ============================================
+  // ✅ تأثير التمرير (تحويل الأزرار إلى كبسولات)
+  // ============================================
+  if (scrollContainer) {
+    scrollContainer.addEventListener('scroll', () => {
+      // إذا تم التمرير لأسفل أكثر من 20 بكسل، أضف الكلاس
+      if (scrollContainer.scrollTop > 20) {
+        selectionHeader.classList.add('is-scrolled');
+      } else {
+        selectionHeader.classList.remove('is-scrolled');
+      }
+    });
+  }
 
   // ---- دوال الواجهة ----
 
   function updateSelectionUI() {
     const count = selectedIds.size;
-    // تحديث رقم العدد فقط
-    selectionCountEl.textContent = count;
+    
+    // تحديث النص في المنتصف
+    const template = tr('ntf_selected') || 'Selected: {n}';
+    centerText.textContent = template.replace('{n}', count);
+    
+    // تحديث العدد في الزر الأيمن
+    pillCount.textContent = count;
 
     // تحديث حالة الدائرة الزرقاء
     if (count === currentNotifications.length && count > 0) {
@@ -91,6 +118,12 @@ document.addEventListener('DOMContentLoaded', async () => {
   function enterSelectionMode(initialId = null) {
     selectionMode = true;
     document.body.classList.add('notif-selection-mode');
+    
+    // إزالة تأثير التمرير عند الدخول (لتبدأ الترويسة مسطحة)
+    if (scrollContainer) {
+      scrollContainer.scrollTop = 0; 
+      selectionHeader.classList.remove('is-scrolled');
+    }
 
     if (initialId) {
       selectedIds.add(initialId);
@@ -130,17 +163,15 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // ---- أزرار الترويسة ----
 
-  // زر "تحديد الكل" (العدد + الدائرة)
+  // زر "الكل"
   selectAllBtn.addEventListener('click', () => {
     if (selectedIds.size === currentNotifications.length) {
-      // إلغاء تحديد الكل
       selectedIds.clear();
       document.querySelectorAll('.notification-item.selected').forEach(el => {
         el.classList.remove('selected');
       });
       updateSelectionUI();
     } else {
-      // تحديد الكل
       currentNotifications.forEach(n => selectedIds.add(n.id));
       document.querySelectorAll('.notification-item').forEach(el => {
         el.classList.add('selected');
@@ -149,13 +180,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   });
 
-  // أزرار الإلغاء
   cancelBtn.addEventListener('click', exitSelectionMode);
   cancelBtnBar.addEventListener('click', exitSelectionMode);
 
   // ---- أزرار الشريط السفلي ----
 
-  // حذف
   deleteBtn.addEventListener('click', async () => {
     const count = selectedIds.size;
     if (count === 0) return;
@@ -199,7 +228,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   });
 
-  // تعليم كمقروء
   markReadBtn.addEventListener('click', async () => {
     const count = selectedIds.size;
     if (count === 0) return;
@@ -342,7 +370,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             <i class="fas fa-check"></i>
             <i class="fas fa-check"></i>
           </div>
-          <!-- دائرة التحديد -->
           <div class="notif-select-circle">
             <i class="fas fa-check"></i>
           </div>
