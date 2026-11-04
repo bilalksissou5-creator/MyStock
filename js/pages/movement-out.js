@@ -2,7 +2,7 @@
 // صفحة إخراج منتجات + طباعة حرارية (WebBluetooth/WebUSB)
 // ✅ بدون RawBT
 // ✅ الباركود الممسوح يظهر في خانة الإدخال والسلة
-// ✅ إشعار تلقائي عند انخفاض المخزون
+// ✅ إشعار تلقائي عند انخفاض المخزون (مترجم)
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   if (window.__movementOutLoaded) return;
@@ -506,16 +506,23 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
       }
 
-      // ✅ إشعار المخزون المنخفض (قبل إشعار الفاتورة العادي)
+      // ✅ إشعار المخزون المنخفض (مترجم)
       if (lowStockAlerts.length > 0 && typeof notifyOrganization === 'function') {
         try {
           const alertLines = lowStockAlerts
-            .map(a => `• "${a.name}" — ${a.qty} قطعة (الحد: ${a.threshold})`)
+            .map(a => tr('low_stock_alert_msg')
+              .replace('{name}', a.name)
+              .replace('{qty}', a.qty)
+              .replace('{threshold}', a.threshold))
             .join('\n');
+
+          const title = lowStockAlerts.length === 1
+            ? tr('low_stock_alert_title')
+            : tr('low_stock_alert_multi').replace('{count}', lowStockAlerts.length);
 
           await notifyOrganization({
             orgId: prof.organization_id,
-            title: lowStockAlerts.length === 1 ? '⚠️ مخزون منخفض' : `⚠️ ${lowStockAlerts.length} منتجات بمخزون منخفض`,
+            title: title,
             message: alertLines,
             type: 'warning',
             link: '/products/list.html',
@@ -530,7 +537,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         } catch (e) {}
       }
 
-      // ✅ عرض التحذير إذا وُجد مخزون منخفض
+      // ✅ عرض التحذير إذا وُجد مخزون منخفض (مترجم)
       if (lowStockAlerts.length > 0) {
         successBox.style.display = 'none';
         const warnBox = document.createElement('div');
@@ -538,7 +545,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         warnBox.style.background = '#fef3c7';
         warnBox.style.color = '#92400e';
         warnBox.style.border = '1px solid #fde68a';
-        warnBox.innerHTML = `⚠️ تحذير: ${lowStockAlerts.length} منتج وصل للحد الأدنى للمخزون`;
+        warnBox.innerHTML = tr('low_stock_warning_banner').replace('{count}', lowStockAlerts.length);
         warnBox.style.display = 'block';
         successBox.parentNode.insertBefore(warnBox, successBox);
         setTimeout(() => warnBox.remove(), 8000);
