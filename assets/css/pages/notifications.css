@@ -223,7 +223,7 @@ body.notif-selection-mode .notifications-selection-header {
 }
 
 .notif-select-circle i {
-  font-size: 13px;   /* ← الحجم هنا */
+  font-size: 12px;   /* ← الحجم هنا */
 }
 
 body.notif-selection-mode .notif-select-circle {
