@@ -2824,7 +2824,14 @@ const countries = {
 let currentLang = localStorage.getItem('app_lang') || 'ar';
 
 function t(key) {
-  return translations[currentLang]?.[key] || translations.ar[key] || key;
+  // نتحقق أولاً من وجود المفتاح في اللغة الحالية (حتى لو كان نصاً فارغاً)
+  const currentTranslation = translations[currentLang]?.[key];
+  if (currentTranslation !== undefined && currentTranslation !== null) {
+    return currentTranslation;
+  }
+  
+  // إذا لم يوجد المفتاح نهائياً، نرجع للعربية
+  return translations.ar[key] || key;
 }
 
 function tCountry(code) {
