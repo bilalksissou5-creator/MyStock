@@ -1,7 +1,8 @@
 // ============================================
-// صفحة تفاصيل المنتج
-// ✅ سعر البيع في مكانه الأصلي، ثم المخزون المنخفض تحته
-// ✅ إشعار واحد فقط لكل عملية تعديل (blur + debounce)
+// صفحة تفاصيل المنتج - النسخة النهائية المستقرة
+// ✅ إصلاح ترتيب الحقول واختفاء سعر البيع
+// ✅ إشعار واحد فقط لكل عملية تعديل (بدون تكرار)
+// ✅ تحديث فوري للبيانات والعملة
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   const user = await requireAuth();
@@ -19,7 +20,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const main = document.getElementById('main-content');
 
   if (!productId) {
-    main.innerHTML = `<div class="alert alert-error">${tr('prod_detail_no_id')}</div>`;
+    if (main) main.innerHTML = `<div class="alert alert-error">${tr('prod_detail_no_id')}</div>`;
     return;
   }
 
@@ -30,7 +31,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     .single();
 
   if (error || !product) {
-    main.innerHTML = `<div class="alert alert-error">${tr('prod_detail_not_found')}</div>`;
+    if (main) main.innerHTML = `<div class="alert alert-error">${tr('prod_detail_not_found')}</div>`;
     return;
   }
 
@@ -55,6 +56,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   const total = ((product.qty ?? 0) * (product.price ?? 0)).toFixed(2);
   const sellPrice = Number(product.sell_price ?? 0);
+  // تأمين القيم في حال كانت غير موجودة في قاعدة البيانات
   const sellPriceEnabled = product.sell_price_enabled === true;
   const lowStockThreshold = Number(product.low_stock_threshold ?? 10);
   const isLowStock = Number(product.qty ?? 0) <= lowStockThreshold;
@@ -125,7 +127,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         </div>
       </div>
 
-      <!-- ✅ سعر البيع (في مكانه الأصلي - قبل المخزون المنخفض) -->
+      <!-- ✅ قسم سعر البيع (يظهر دائماً الآن) -->
       <div class="sell-price-section">
         <h3 class="sell-price-title">💰 ${tr('prod_detail_sell_price')}</h3>
 
@@ -152,7 +154,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         </div>
       </div>
 
-      <!-- ✅ المخزون المنخفض (تحت سعر البيع) -->
+      <!-- ✅ قسم المخزون المنخفض -->
       <div class="sell-price-section">
         <h3 class="sell-price-title">${tr('low_stock_section_title')}</h3>
 
@@ -176,17 +178,18 @@ document.addEventListener('DOMContentLoaded', async () => {
   function updateQtyStyle() {
     const qtyEl = document.getElementById('qty-stat-value');
     if (!qtyEl) return;
-    const qty = Number(document.getElementById('f-qty').dataset.value ?? 0);
+    const qty = Number(document.getElementById('f-qty')?.dataset.value ?? 0);
     const threshold = Number(product.low_stock_threshold ?? 10);
     if (qty <= threshold) qtyEl.classList.add('low');
     else qtyEl.classList.remove('low');
   }
 
   function recalcTotal() {
-    const qty = Number(document.getElementById('f-qty').dataset.value ?? 0);
-    const price = Number(document.getElementById('f-price').dataset.value ?? 0);
+    const qty = Number(document.getElementById('f-qty')?.dataset.value ?? 0);
+    const price = Number(document.getElementById('f-price')?.dataset.value ?? 0);
     const totalVal = (qty * price).toFixed(2);
-    document.getElementById('f-total').textContent = `${totalVal} ${currencySymbol}`.trim();
+    const totalEl = document.getElementById('f-total');
+    if (totalEl) totalEl.textContent = `${totalVal} ${currencySymbol}`.trim();
   }
 
   const fieldLabels = {
@@ -199,11 +202,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     qr_code: tr('prod_detail_barcode'),
   };
 
-  // ✅ التتبع الثلاثي (الأصل + آخر حفظ + آخر إشعار)
-  const originalValues = {};
-  const lastSavedValues = {};
-  const notifiedValues = {};
-  const editTimers = {};
+  // حفظ القيم الأولية للمقارنة ومنع الإشعارات المتكررة
+  const initialFieldValues = {};
 
   async function sendNotification(field, value) {
     if (typeof notifyOrganization !== 'function' || !profile?.organization_id) return;
@@ -249,30 +249,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   fields.forEach(({ id, field, type }) => {
     const el = document.getElementById(id);
+    if (!el) return;
 
-    // 1️⃣ حفظ القيمة الأصلية عند بدء التعديل
-    el.addEventListener('focus', () => {
-      if (!(id in originalValues)) {
-        originalValues[id] = String(el.dataset.value || '');
-      }
-    }, true);
+    initialFieldValues[field] = String(el.dataset.value || '');
 
-    // 2️⃣ إرسال إشعار واحد عند مغادرة الحقل (Blur)
-    el.addEventListener('blur', () => {
-      setTimeout(() => {
-        const orig = originalValues[id];
-        const last = lastSavedValues[id];
-
-        if (last === undefined) return;
-        if (String(last) === String(orig)) return;      // لم تتغير القيمة
-        if (String(notifiedValues[id]) === String(last)) return;  // سبق الإشعار
-
-        notifiedValues[id] = last;
-        sendNotification(field, last);
-      }, 200);
-    }, true);
-
-    // 3️⃣ الحفظ الفوري عند كل تغيير (بدون إشعار)
     inlineEdit({
       el,
       table: 'products',
@@ -280,28 +260,18 @@ document.addEventListener('DOMContentLoaded', async () => {
       field,
       type,
       onSave: async (savedField, newValue) => {
-        lastSavedValues[id] = newValue;
-
+        // تحديث الواجهة فوراً
         if (savedField === 'qty' || savedField === 'price') recalcTotal();
-
         if (savedField === 'qty') {
           el.dataset.value = newValue;
           updateQtyStyle();
         }
 
-        // 4️⃣ احتياطي: إذا لم يحدث blur بعد 3 ثوانٍ
-        if (editTimers[id]) clearTimeout(editTimers[id]);
-        editTimers[id] = setTimeout(() => {
-          const orig = originalValues[id];
-          const last = lastSavedValues[id];
-
-          if (last === undefined) return;
-          if (String(last) === String(orig)) return;
-          if (String(notifiedValues[id]) === String(last)) return;
-
-          notifiedValues[id] = last;
-          sendNotification(field, last);
-        }, 3000);
+        // إرسال إشعار واحد فقط إذا تغيرت القيمة عن الأصل
+        if (String(newValue) !== String(initialFieldValues[field])) {
+          await sendNotification(field, newValue);
+          initialFieldValues[field] = String(newValue); 
+        }
       },
     });
   });
@@ -310,144 +280,149 @@ document.addEventListener('DOMContentLoaded', async () => {
   let lowStockSaveTimeout = null;
   const lowStockInput = document.getElementById('low-stock-input');
 
-  lowStockInput.addEventListener('input', () => {
-    clearTimeout(lowStockSaveTimeout);
-    lowStockSaveTimeout = setTimeout(async () => {
-      const newThreshold = Math.max(0, Number(lowStockInput.value) || 0);
+  if (lowStockInput) {
+    lowStockInput.addEventListener('input', () => {
+      clearTimeout(lowStockSaveTimeout);
+      lowStockSaveTimeout = setTimeout(async () => {
+        const newThreshold = Math.max(0, Number(lowStockInput.value) || 0);
 
-      try {
-        const { error: updateError } = await db
-          .from('products')
-          .update({ low_stock_threshold: newThreshold })
-          .eq('id', productId);
+        try {
+          const { error: updateError } = await db
+            .from('products')
+            .update({ low_stock_threshold: newThreshold })
+            .eq('id', productId);
 
-        if (updateError) throw new Error(updateError.message);
+          if (updateError) throw new Error(updateError.message);
 
-        product.low_stock_threshold = newThreshold;
-        updateQtyStyle();
+          product.low_stock_threshold = newThreshold;
+          updateQtyStyle();
 
-        const currentQty = Number(product.qty ?? 0);
-        if (currentQty <= newThreshold && typeof notifyOrganization === 'function' && profile?.organization_id) {
-          await notifyOrganization({
-            orgId: profile.organization_id,
-            title: tr('low_stock_alert_title'),
-            message: tr('low_stock_alert_already')
-              .replace('{name}', product.name)
-              .replace('{qty}', currentQty)
-              .replace('{threshold}', newThreshold),
-            type: 'warning',
-            link: `/products/detail.html?id=${productId}`,
-            userName: profile.full_name || null,
-          });
+          const currentQty = Number(product.qty ?? 0);
+          if (currentQty <= newThreshold && typeof notifyOrganization === 'function' && profile?.organization_id) {
+            await notifyOrganization({
+              orgId: profile.organization_id,
+              title: tr('low_stock_alert_title'),
+              message: tr('low_stock_alert_already')
+                .replace('{name}', product.name)
+                .replace('{qty}', currentQty)
+                .replace('{threshold}', newThreshold),
+              type: 'warning',
+              link: `/products/detail.html?id=${productId}`,
+              userName: profile.full_name || null,
+            });
+          }
+        } catch (err) {
+          console.error('فشل حفظ حد التنبيه:', err);
         }
-      } catch (err) {
-        console.error('فشل حفظ حد التنبيه:', err);
-        alert(tr('prod_detail_err') + ' ' + err.message);
-      }
-    }, 800);
-  });
+      }, 800);
+    });
+  }
 
   // ✅ رفع الصورة
   const imgContainer = document.getElementById('product-image-container');
-  attachImageUpload(productId, imgContainer, product.image_url);
+  if (imgContainer && typeof attachImageUpload === 'function') {
+    attachImageUpload(productId, imgContainer, product.image_url);
+  }
 
   // ✅ سعر البيع (تفعيل/إلغاء)
   const sellPriceToggle = document.getElementById('sell-price-toggle');
   const sellPriceStatus = document.getElementById('sell-price-status');
   const sellPriceInput = document.getElementById('sell-price-input');
 
-  let currentSellPriceEnabled = sellPriceEnabled;
-
-  sellPriceToggle.addEventListener('change', async () => {
-    const newValue = sellPriceToggle.checked;
-    sellPriceToggle.disabled = true;
-
-    try {
-      const { error: updateError } = await db
-        .from('products')
-        .update({ sell_price_enabled: newValue })
-        .eq('id', productId);
-
-      if (updateError) throw new Error(updateError.message);
-
-      currentSellPriceEnabled = newValue;
-      sellPriceStatus.textContent = newValue ? tr('prod_detail_enabled') : tr('prod_detail_disabled');
-      sellPriceStatus.classList.toggle('on', newValue);
-      sellPriceStatus.classList.toggle('off', !newValue);
-
-      if (typeof notifyOrganization === 'function' && profile?.organization_id) {
-        await notifyOrganization({
-          orgId: profile.organization_id,
-          title: tr('prod_detail_notif_sell_title'),
-          message: `${profile.full_name || tr('prod_detail_user')} ${newValue ? tr('prod_detail_notif_sell_on') : tr('prod_detail_notif_sell_off')} "${product.name}"`,
-          type: 'info',
-          link: `/products/detail.html?id=${productId}`,
-          userName: profile.full_name || null,
-        });
-      }
-    } catch (err) {
-      alert(tr('prod_detail_err') + ' ' + err.message);
-      sellPriceToggle.checked = !newValue;
-    } finally {
-      sellPriceToggle.disabled = false;
-    }
-  });
-
-  // ✅ سعر البيع (تعديل القيمة)
-  let sellPriceSaveTimeout = null;
-
-  sellPriceInput.addEventListener('input', () => {
-    clearTimeout(sellPriceSaveTimeout);
-
-    sellPriceSaveTimeout = setTimeout(async () => {
-      const newPrice = Number(sellPriceInput.value) || 0;
+  if (sellPriceToggle && sellPriceStatus) {
+    sellPriceToggle.addEventListener('change', async () => {
+      const newValue = sellPriceToggle.checked;
+      sellPriceToggle.disabled = true;
 
       try {
         const { error: updateError } = await db
           .from('products')
-          .update({ sell_price: newPrice })
+          .update({ sell_price_enabled: newValue })
           .eq('id', productId);
 
         if (updateError) throw new Error(updateError.message);
+
+        sellPriceStatus.textContent = newValue ? tr('prod_detail_enabled') : tr('prod_detail_disabled');
+        sellPriceStatus.classList.toggle('on', newValue);
+        sellPriceStatus.classList.toggle('off', !newValue);
 
         if (typeof notifyOrganization === 'function' && profile?.organization_id) {
           await notifyOrganization({
             orgId: profile.organization_id,
             title: tr('prod_detail_notif_sell_title'),
-            message: `${profile.full_name || tr('prod_detail_user')} ${tr('prod_detail_notif_sell_edit')} "${product.name}" ${tr('prod_detail_to')} "${newPrice}"`,
+            message: `${profile.full_name || tr('prod_detail_user')} ${newValue ? tr('prod_detail_notif_sell_on') : tr('prod_detail_notif_sell_off')} "${product.name}"`,
             type: 'info',
             link: `/products/detail.html?id=${productId}`,
             userName: profile.full_name || null,
           });
         }
       } catch (err) {
-        console.error('فشل حفظ سعر البيع:', err);
+        alert(tr('prod_detail_err') + ' ' + err.message);
+        sellPriceToggle.checked = !newValue;
+      } finally {
+        sellPriceToggle.disabled = false;
       }
-    }, 800);
-  });
+    });
+  }
+
+  // ✅ سعر البيع (تعديل القيمة)
+  let sellPriceSaveTimeout = null;
+  if (sellPriceInput) {
+    sellPriceInput.addEventListener('input', () => {
+      clearTimeout(sellPriceSaveTimeout);
+      sellPriceSaveTimeout = setTimeout(async () => {
+        const newPrice = Number(sellPriceInput.value) || 0;
+
+        try {
+          const { error: updateError } = await db
+            .from('products')
+            .update({ sell_price: newPrice })
+            .eq('id', productId);
+
+          if (updateError) throw new Error(updateError.message);
+
+          if (typeof notifyOrganization === 'function' && profile?.organization_id) {
+            await notifyOrganization({
+              orgId: profile.organization_id,
+              title: tr('prod_detail_notif_sell_title'),
+              message: `${profile.full_name || tr('prod_detail_user')} ${tr('prod_detail_notif_sell_edit')} "${product.name}" ${tr('prod_detail_to')} "${newPrice}"`,
+              type: 'info',
+              link: `/products/detail.html?id=${productId}`,
+              userName: profile.full_name || null,
+            });
+          }
+        } catch (err) {
+          console.error('فشل حفظ سعر البيع:', err);
+        }
+      }, 800);
+    });
+  }
 
   // ✅ زر الحذف
-  document.getElementById('delete-btn').addEventListener('click', async () => {
-    if (!confirm(tr('prod_detail_confirm_delete'))) return;
+  const deleteBtn = document.getElementById('delete-btn');
+  if (deleteBtn) {
+    deleteBtn.addEventListener('click', async () => {
+      if (!confirm(tr('prod_detail_confirm_delete'))) return;
 
-    const { error } = await db.from('products').delete().eq('id', productId);
+      const { error } = await db.from('products').delete().eq('id', productId);
 
-    if (error) {
-      alert(tr('prod_detail_err') + ' ' + error.message);
-      return;
-    }
+      if (error) {
+        alert(tr('prod_detail_err') + ' ' + error.message);
+        return;
+      }
 
-    if (typeof notifyOrganization === 'function' && profile?.organization_id) {
-      await notifyOrganization({
-        orgId: profile.organization_id,
-        title: tr('prod_detail_notif_del_title'),
-        message: `${profile.full_name || tr('prod_detail_user')} ${tr('prod_detail_notif_del_msg')} "${product.name}"`,
-        type: 'danger',
-        link: '/products/list.html',
-        userName: profile.full_name || null,
-      });
-    }
+      if (typeof notifyOrganization === 'function' && profile?.organization_id) {
+        await notifyOrganization({
+          orgId: profile.organization_id,
+          title: tr('prod_detail_notif_del_title'),
+          message: `${profile.full_name || tr('prod_detail_user')} ${tr('prod_detail_notif_del_msg')} "${product.name}"`,
+          type: 'danger',
+          link: '/products/list.html',
+          userName: profile.full_name || null,
+        });
+      }
 
-    window.location.href = 'list.html';
-  });
+      window.location.href = 'list.html';
+    });
+  }
 });

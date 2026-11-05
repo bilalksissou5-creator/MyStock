@@ -1,5 +1,5 @@
 /* ============================================
-   صفحة تفاصيل المنتج
+   صفحة تفاصيل المنتج - النسخة النهائية المستقرة
    ============================================ */
 .product-card-detail {
   background: white;
@@ -66,14 +66,34 @@
 .product-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 18px; }
 .stat { background: #fafafa; border-radius: 10px; padding: 12px 8px; text-align: center; }
 .stat-label { font-size: 11px; color: #737373; margin-bottom: 6px; font-weight: 500; }
-.stat-value { font-size: 1.05rem; font-weight: 700; color: #171717; display: flex; align-items: center; justify-content: center; gap: 4px; }
+
+/* ✅ تم إضافة السطرين التاليين لمنع انزياح العملة أو خروج الأرقام */
+.stat-value { 
+  font-size: 1.05rem; 
+  font-weight: 700; 
+  color: #171717; 
+  display: flex; 
+  align-items: center; 
+  justify-content: center; 
+  gap: 4px; 
+  white-space: nowrap; 
+  overflow: hidden;
+}
 .stat-value.low { color: #dc2626; }
 
 .product-extra { border-top: 1px solid #f0f0f0; padding-top: 8px; margin-bottom: 18px; }
 .product-extra .row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #f5f5f5; font-size: 14px; }
 .product-extra .row:last-child { border-bottom: none; }
 .product-extra .row > span { color: #737373; flex-shrink: 0; text-align: start; }
-.product-extra .row > strong { font-weight: 500; color: #171717; text-align: end; min-width: 0; }
+
+/* ✅ تم إضافة السطر التالي لمنع خروج النصوص الطويلة (مثل الباركود) عن الإطار */
+.product-extra .row > strong { 
+  font-weight: 500; 
+  color: #171717; 
+  text-align: end; 
+  min-width: 0; 
+  word-break: break-word;
+}
 
 .sell-price-section { border-top: 2px solid #f0f0f0; padding-top: 16px; margin-top: 16px; margin-bottom: 18px; }
 .sell-price-title { font-size: 14px; font-weight: 700; color: #171717; margin: 0 0 12px; display: flex; align-items: center; gap: 6px; text-align: start; }
