@@ -1,7 +1,7 @@
 /* ============================================
    صفحة Landing (الصفحة الرئيسية)
    ✅ تصميم One UI عصري + بطاقة المصمم
-   ✅ هيدر ثابت + زر إنشاء حساب + اختيار اللغة
+   ✅ توحيد ارتفاع أزرار الهيدر بدقة متناهية
    ============================================ */
 
 /* ✅ إصلاح الارتفاع (تجاوز common.css) */
@@ -66,13 +66,25 @@ body.landing-page {
   gap: 8px;
 }
 
-.landing-nav a {
-  padding: 8px 16px;
+/* ✅ توحيد ارتفاع ومقاسات الأزرار الثلاثة بدقة */
+.landing-nav a,
+.lang-switcher {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 38px;              /* ✅ الارتفاع الثابت والمشترك */
+  padding: 0 12px;           /* ✅ إلغاء أي مساحة علوية أو سفلية تسبب اختلاف الطول */
+  box-sizing: border-box;    /* ✅ لضمان أن الإطار لا يزيد من الحجم */
   border-radius: 10px;
-  text-decoration: none;
-  color: #404040;
   font-size: 14px;
   font-weight: 600;
+  line-height: 1;            /* ✅ منع الخط من تمديد الزر */
+  text-decoration: none;
+}
+
+/* تنسيقات الروابط النصية العادية (الميزات، الأسعار) */
+.landing-nav a {
+  color: #404040;
   transition: background 0.15s, color 0.15s;
 }
 
@@ -81,17 +93,19 @@ body.landing-page {
   color: #171717;
 }
 
-/* ✅ تنسيق زر تسجيل الدخول */
+/* ✅ زر تسجيل الدخول */
 .landing-btn-login {
   background: #171717 !important;
   color: #ffffff !important;
+  border: 2px solid #171717 !important;
 }
 
 .landing-btn-login:hover {
   background: #404040 !important;
+  border-color: #404040 !important;
 }
 
-/* ✅ تنسيق زر إنشاء حساب */
+/* ✅ زر إنشاء حساب */
 .landing-btn-register {
   background: transparent !important;
   color: #171717 !important;
@@ -102,16 +116,11 @@ body.landing-page {
   background: #f5f5f5 !important;
 }
 
-/* ✅ تنسيق قائمة اختيار اللغة (أيقونة + اختصارات) */
+/* ✅ زر اختيار اللغة */
 .lang-switcher {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  background: transparent;
   border: 2px solid #e5e5e5;
-  border-radius: 10px;
-  padding: 0 12px;
-  height: 40px; 
+  gap: 6px;
+  cursor: pointer;
   transition: all 0.15s ease;
 }
 
@@ -138,6 +147,7 @@ body.landing-page {
   outline: none;
   padding: 0;
   margin: 0;
+  height: 100%;              /* ✅ ملء ارتفاع الحاوية بالكامل */
   text-align: center;
 }
 
@@ -149,7 +159,7 @@ body.landing-page {
    Hero
    ══════════════════════════════════════════ */
 .landing-hero {
-  padding: 130px 24px 100px; /* ✅ تعويض مساحة الهيدر الثابت */
+  padding: 130px 24px 100px;
   text-align: center;
   background: linear-gradient(180deg, #ffffff 0%, #fafafa 100%);
   position: relative;
@@ -240,7 +250,7 @@ body.landing-page {
 }
 
 /* ══════════════════════════════════════════
-   Buttons
+   Buttons (داخل الصفحة)
    ══════════════════════════════════════════ */
 .landing-btn {
   display: inline-flex;
@@ -432,7 +442,6 @@ body.landing-page {
   text-align: center;
 }
 
-/* ✅ إضافة white-space: nowrap لمنع نزول العملة لسطر جديد */
 .landing-price {
   display: flex;
   align-items: baseline;
@@ -667,7 +676,7 @@ body.landing-page {
    Responsive
    ══════════════════════════════════════════ */
 @media (max-width: 768px) {
-  /* إخفاء روابط الميزات والأسعار فقط، مع إبقاء أزرار الدخول واللغة */
+  /* إخفاء الروابط النصية فقط، مع إبقاء أزرار الدخول واللغة */
   .landing-nav a:not(.landing-btn-login):not(.landing-btn-register) {
     display: none;
   }
@@ -723,50 +732,61 @@ body.landing-page {
   .landing-footer {
     padding: 32px 20px 24px;
   }
-  
-  .lang-switcher {
+
+  /* ✅ تصغير الأزرار بشكل موحد ومتطابق للجوال */
+  .landing-nav a, .lang-switcher {
     height: 34px;
-    padding: 0 8px;
-    gap: 4px;
+    padding: 0 10px;
   }
-  .lang-switcher select {
+  
+  .landing-nav a {
     font-size: 13px;
   }
-  .lang-switcher i {
-    font-size: 12px;
+  
+  .lang-switcher {
+    gap: 4px;
+  }
+  
+  .lang-switcher select, .lang-switcher i {
+    font-size: 13px;
   }
 }
 
 @media (max-width: 480px) {
   .landing-header-inner {
     padding: 12px 16px;
-    gap: 8px;
+    gap: 6px; 
   }
 
   .landing-logo {
-    font-size: 17px;
+    font-size: 16px;
   }
 
   .landing-nav {
     gap: 4px;
   }
 
-  /* تصغير الأزرار لتناسب الشاشات الصغيرة جداً */
-  .landing-btn-login, .landing-btn-register {
-    padding: 6px 10px !important;
+  /* ✅ تصغير الأزرار بشكل موحد ومتطابق للشاشات الصغيرة جداً */
+  .landing-nav a, .lang-switcher {
+    height: 30px !important; 
+    padding: 0 8px !important;
+  }
+
+  .landing-nav a {
     font-size: 11px !important;
   }
 
+  .landing-btn-login, .landing-btn-register {
+    border-width: 1.5px !important; /* تقليل سمك الإطار قليلاً للشاشات الصغيرة */
+  }
+
   .lang-switcher {
-    height: 30px;
-    padding: 0 6px;
     gap: 3px;
+    border-width: 1.5px !important;
   }
-  .lang-switcher select {
-    font-size: 11px;
-  }
-  .lang-switcher i {
-    font-size: 11px;
+  
+  .lang-switcher select, .lang-switcher i {
+    font-size: 11px !important;
   }
 
   .landing-hero-title {
