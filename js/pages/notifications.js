@@ -1,438 +1,451 @@
 // ============================================
-// صفحة الإشعارات (مع تحديد متعدد وتأثير التمرير)
+// صفحة تفاصيل المنتج (مع إشعارات ذكية)
+// ✅ إرسال إشعار واحد فقط بعد انتهاء التعديل
+// ✅ الإشعارات تصل للمستخدم نفسه (بعد انتهاء العملية)
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   const user = await requireAuth();
   if (!user) return;
 
-  window.__stopNotifPolling = true;
+  renderLayout('products/detail.html');
 
-  renderLayout('notifications.html');
   if (window.applyLanguage) window.applyLanguage();
   const tr = (key) => (window.t ? window.t(key) : key);
-  document.title = tr('ntf_title_full');
 
+  document.title = tr('prod_detail_title_full');
+
+  const params = new URLSearchParams(window.location.search);
+  const productId = params.get('id');
   const main = document.getElementById('main-content');
 
-  // بناء الواجهة
+  if (!productId) {
+    main.innerHTML = `<div class="alert alert-error">${tr('prod_detail_no_id')}</div>`;
+    return;
+  }
+
+  const { data: product, error } = await db
+    .from('products')
+    .select('*, suppliers(name, specialty)')
+    .eq('id', productId)
+    .single();
+
+  if (error || !product) {
+    main.innerHTML = `<div class="alert alert-error">${tr('prod_detail_not_found')}</div>`;
+    return;
+  }
+
+  const { data: profile } = await db
+    .from('profiles')
+    .select('organization_id, full_name')
+    .eq('id', user.id)
+    .single();
+
+  let currencySymbol = '';
+  if (profile?.organization_id) {
+    const { data: org } = await db
+      .from('organizations')
+      .select('currency_symbol, show_currency')
+      .eq('id', profile.organization_id)
+      .single();
+
+    if (org?.show_currency !== false) {
+      currencySymbol = org?.currency_symbol || '';
+    }
+  }
+
+  const total = ((product.qty ?? 0) * (product.price ?? 0)).toFixed(2);
+  const sellPrice = Number(product.sell_price ?? 0);
+  const sellPriceEnabled = product.sell_price_enabled === true;
+  const lowStockThreshold = Number(product.low_stock_threshold ?? 10);
+  const isLowStock = Number(product.qty ?? 0) <= lowStockThreshold;
+
   main.innerHTML = `
-    <!-- ترويسة عادية -->
-    <div class="notifications-header">
-      <h2>${tr('ntf_title')}</h2>
+    <div class="page-header">
+      <h2>${tr('prod_detail_title')}</h2>
+      <a href="list.html" class="btn-secondary">
+        <i class="fas fa-arrow-right"></i>
+        <span>${tr('prod_detail_back')}</span>
+      </a>
     </div>
 
-    <!-- ✅ ترويسة وضع التحديد الجديدة -->
-    <div class="notifications-selection-header" id="selection-header">
-      <button type="button" id="cancel-selection-btn" class="selection-pill-btn">
-        ${tr('ntf_cancel')}
-      </button>
-      
-      <div class="selection-center-text" id="selection-center-text">
-        ${(tr('ntf_selected') || 'Selected: {n}').replace('{n}', 0)}
+    <div class="product-card-detail">
+
+      <div class="product-image" id="product-image-container">
+        ${product.image_url
+          ? `<img src="${product.image_url}" alt="${product.name ?? tr('products_no_name')}">`
+          : `<i class="fas fa-box-open"></i>`}
+        <button class="image-edit-btn" title="${tr('prod_detail_edit_image')}">
+          <i class="fas fa-camera"></i>
+        </button>
       </div>
-      
-      <button type="button" id="select-all-btn" class="selection-pill-btn right-pill">
-        <span class="pill-count" id="pill-count">0</span>
-        <span class="selection-all-circle" id="select-all-circle">
-          <i class="fas fa-check"></i>
-        </span>
-      </button>
-    </div>
 
-    <div id="notifications-list" class="notifications-list">
-      <p style="text-align:center; color:#737373;">${tr('loading')}</p>
-    </div>
+      <h1 class="detail-title">
+        <span class="edit-field" id="f-name" data-value="${product.name ?? ''}"></span>
+      </h1>
+      <p class="detail-sku">
+        <span class="edit-field" id="f-sku" data-value="${product.sku ?? ''}"></span>
+      </p>
 
-    <!-- شريط الإجراءات العائم أسفل الشاشة -->
-    <div class="notifications-action-bar" id="notif-action-bar">
-      <button type="button" id="mark-read-btn" class="action-bar-btn">
-        <i class="fas fa-check-double"></i>
-        <span>${tr('ntf_mark_read')}</span>
-      </button>
-      <button type="button" id="delete-selected-btn" class="action-bar-btn danger">
-        <i class="fas fa-trash"></i>
-        <span>${tr('ntf_delete')}</span>
-      </button>
-      <button type="button" id="cancel-selection-btn-bar" class="action-bar-btn">
-        <i class="fas fa-xmark"></i>
-        <span>${tr('ntf_cancel')}</span>
-      </button>
+      <div class="product-stats">
+        <div class="stat">
+          <div class="stat-label">${tr('products_qty')}</div>
+          <div class="stat-value ${isLowStock ? 'low' : ''}" id="qty-stat-value">
+            <span class="edit-field center" id="f-qty" data-value="${product.qty ?? 0}"></span>
+          </div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">${tr('prod_detail_buy_price')}</div>
+          <div class="stat-value">
+            <span class="edit-field center" id="f-price" data-value="${product.price ?? 0}"></span>
+            ${currencySymbol ? `<span style="font-size: 0.9em; color: #171717; font-weight: 500;">${currencySymbol}</span>` : ''}
+          </div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">${tr('products_total')}</div>
+          <div class="stat-value" id="f-total">${total} ${currencySymbol}</div>
+        </div>
+      </div>
+
+      <div class="product-extra">
+        <div class="row">
+          <span>${tr('prod_detail_category')}</span>
+          <strong class="edit-field" id="f-category" data-value="${product.category ?? product.suppliers?.specialty ?? ''}"></strong>
+        </div>
+        <div class="row">
+          <span>${tr('prod_detail_supplier')}</span>
+          <strong>${product.suppliers?.name ?? '—'}</strong>
+        </div>
+        <div class="row">
+          <span>${tr('prod_detail_unit')}</span>
+          <strong class="edit-field" id="f-unit" data-value="${product.unit ?? ''}"></strong>
+        </div>
+        <div class="row">
+          <span>${tr('prod_detail_barcode')}</span>
+          <strong class="edit-field" id="f-qr_code" data-value="${product.qr_code ?? ''}"></strong>
+        </div>
+      </div>
+
+      <div class="sell-price-section">
+        <h3 class="sell-price-title">${tr('low_stock_section_title')}</h3>
+
+        <div class="sell-price-input-group">
+          <label>${tr('low_stock_field_label')}</label>
+          <input type="number" id="low-stock-input" value="${lowStockThreshold}" min="0" step="1" dir="ltr" placeholder="10">
+          <small class="field-hint">${tr('low_stock_field_hint')}</small>
+        </div>
+      </div>
+
+      <div class="sell-price-section">
+        <h3 class="sell-price-title">💰 ${tr('prod_detail_sell_price')}</h3>
+
+        <div class="switch-item">
+          <div class="switch-content">
+            <div class="switch-header">
+              <strong class="switch-title">${tr('prod_detail_enable_sell')}</strong>
+              <span class="switch-status ${sellPriceEnabled ? 'on' : 'off'}" id="sell-price-status">
+                ${sellPriceEnabled ? tr('prod_detail_enabled') : tr('prod_detail_disabled')}
+              </span>
+            </div>
+            <p class="switch-desc">${tr('prod_detail_sell_desc')}</p>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="sell-price-toggle" ${sellPriceEnabled ? 'checked' : ''}>
+            <span class="switch-slider"></span>
+          </label>
+        </div>
+
+        <div class="sell-price-input-group">
+          <label>${tr('prod_detail_sell_input')} (${currencySymbol || 'DH'})</label>
+          <input type="number" id="sell-price-input" value="${sellPrice}" min="0" step="0.01" dir="ltr" placeholder="0.00">
+          <small class="field-hint">${tr('prod_detail_sell_hint')}</small>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="btn-danger" id="delete-btn">
+          <i class="fas fa-trash"></i>
+          <span>${tr('prod_detail_delete')}</span>
+        </button>
+      </div>
+
     </div>
   `;
 
-  let currentNotifications = [];
-  let selectionMode = false;
-  const selectedIds = new Set();
+  function updateQtyStyle() {
+    const qtyEl = document.getElementById('qty-stat-value');
+    if (!qtyEl) return;
+    const qty = Number(document.getElementById('f-qty').dataset.value ?? 0);
+    const threshold = Number(product.low_stock_threshold ?? 10);
+    if (qty <= threshold) qtyEl.classList.add('low');
+    else qtyEl.classList.remove('low');
+  }
 
-  // عناصر DOM
-  const selectionHeader = document.getElementById('selection-header');
-  const centerText = document.getElementById('selection-center-text');
-  const pillCount = document.getElementById('pill-count');
-  const selectAllCircle = document.getElementById('select-all-circle');
-  const selectAllBtn = document.getElementById('select-all-btn');
-  const cancelBtn = document.getElementById('cancel-selection-btn');
-  const cancelBtnBar = document.getElementById('cancel-selection-btn-bar');
-  const deleteBtn = document.getElementById('delete-selected-btn');
-  const markReadBtn = document.getElementById('mark-read-btn');
-  
-  // حاوية التمرير الرئيسية
-  const scrollContainer = document.querySelector('.main');
+  function recalcTotal() {
+    const qty = Number(document.getElementById('f-qty').dataset.value ?? 0);
+    const price = Number(document.getElementById('f-price').dataset.value ?? 0);
+    const totalVal = (qty * price).toFixed(2);
+    document.getElementById('f-total').textContent = `${totalVal} ${currencySymbol}`.trim();
+  }
 
-  await markAllAsSeen();
-  await loadNotifications();
+  const fieldLabels = {
+    name: tr('prod_detail_field_name'),
+    sku: tr('prod_detail_field_sku'),
+    qty: tr('products_qty'),
+    price: tr('prod_detail_buy_price'),
+    category: tr('prod_detail_category'),
+    unit: tr('prod_detail_unit'),
+    qr_code: tr('prod_detail_barcode'),
+  };
 
-  // ============================================
-  // ✅ تأثير التمرير (تحويل الأزرار إلى كبسولات)
-  // ============================================
-  if (scrollContainer) {
-    scrollContainer.addEventListener('scroll', () => {
-      // إذا تم التمرير لأسفل أكثر من 20 بكسل، أضف الكلاس
-      if (scrollContainer.scrollTop > 20) {
-        selectionHeader.classList.add('is-scrolled');
+  // ✅ تتبع القيم لمنع تكرار الإشعارات
+  const originalValues = {};
+  const lastSavedValues = {};
+  const notifiedValues = {};
+  const editTimers = {};
+
+  async function sendEditNotification(field, newValue) {
+    if (typeof notifyOrganization !== 'function' || !profile?.organization_id) return;
+
+    const threshold = Number(product.low_stock_threshold ?? 10);
+    const isLow = field === 'qty' && Number(newValue) <= threshold;
+
+    try {
+      if (isLow) {
+        await notifyOrganization({
+          orgId: profile.organization_id,
+          title: tr('low_stock_alert_title'),
+          message: tr('low_stock_alert_single')
+            .replace('{name}', product.name)
+            .replace('{qty}', newValue)
+            .replace('{threshold}', threshold),
+          type: 'warning',
+          link: `/products/detail.html?id=${productId}`,
+          userName: profile.full_name || null,
+        });
       } else {
-        selectionHeader.classList.remove('is-scrolled');
+        await notifyOrganization({
+          orgId: profile.organization_id,
+          title: tr('prod_detail_notif_edit_title'),
+          message: `${profile.full_name || tr('prod_detail_user')} ${tr('prod_detail_notif_edit_msg')} ${fieldLabels[field] || field} "${product.name}" ${tr('prod_detail_to')} "${newValue}"`,
+          type: 'info',
+          link: `/products/detail.html?id=${productId}`,
+          userName: profile.full_name || null,
+        });
       }
-    });
+    } catch (e) { console.warn(e); }
   }
 
-  // ---- دوال الواجهة ----
+  const fields = [
+    { id: 'f-name', field: 'name', type: 'text' },
+    { id: 'f-sku', field: 'sku', type: 'text' },
+    { id: 'f-qty', field: 'qty', type: 'number' },
+    { id: 'f-price', field: 'price', type: 'number' },
+    { id: 'f-category', field: 'category', type: 'text' },
+    { id: 'f-unit', field: 'unit', type: 'text' },
+    { id: 'f-qr_code', field: 'qr_code', type: 'text' },
+  ];
 
-  function updateSelectionUI() {
-    const count = selectedIds.size;
-    
-    // تحديث النص في المنتصف
-    const template = tr('ntf_selected') || 'Selected: {n}';
-    centerText.textContent = template.replace('{n}', count);
-    
-    // تحديث العدد في الزر الأيمن
-    pillCount.textContent = count;
+  fields.forEach(({ id, field, type }) => {
+    const el = document.getElementById(id);
 
-    // تحديث حالة الدائرة الزرقاء
-    if (count === currentNotifications.length && count > 0) {
-      selectAllCircle.classList.add('active');
-    } else {
-      selectAllCircle.classList.remove('active');
-    }
-  }
-
-  function enterSelectionMode(initialId = null) {
-    selectionMode = true;
-    document.body.classList.add('notif-selection-mode');
-    
-    // إزالة تأثير التمرير عند الدخول (لتبدأ الترويسة مسطحة)
-    if (scrollContainer) {
-      scrollContainer.scrollTop = 0; 
-      selectionHeader.classList.remove('is-scrolled');
-    }
-
-    if (initialId) {
-      selectedIds.add(initialId);
-      const el = document.querySelector(`.notification-item[data-id="${initialId}"]`);
-      if (el) el.classList.add('selected');
-    }
-
-    updateSelectionUI();
-    if (navigator.vibrate) navigator.vibrate(30);
-  }
-
-  function exitSelectionMode() {
-    selectionMode = false;
-    selectedIds.clear();
-    document.body.classList.remove('notif-selection-mode');
-
-    document.querySelectorAll('.notification-item.selected').forEach(el => {
-      el.classList.remove('selected');
-    });
-  }
-
-  function toggleSelection(id, item) {
-    if (selectedIds.has(id)) {
-      selectedIds.delete(id);
-      item.classList.remove('selected');
-    } else {
-      selectedIds.add(id);
-      item.classList.add('selected');
-    }
-
-    if (selectedIds.size === 0) {
-      exitSelectionMode();
-    } else {
-      updateSelectionUI();
-    }
-  }
-
-  // ---- أزرار الترويسة ----
-
-  // زر "الكل"
-  selectAllBtn.addEventListener('click', () => {
-    if (selectedIds.size === currentNotifications.length) {
-      selectedIds.clear();
-      document.querySelectorAll('.notification-item.selected').forEach(el => {
-        el.classList.remove('selected');
-      });
-      updateSelectionUI();
-    } else {
-      currentNotifications.forEach(n => selectedIds.add(n.id));
-      document.querySelectorAll('.notification-item').forEach(el => {
-        el.classList.add('selected');
-      });
-      updateSelectionUI();
-    }
-  });
-
-  cancelBtn.addEventListener('click', exitSelectionMode);
-  cancelBtnBar.addEventListener('click', exitSelectionMode);
-
-  // ---- أزرار الشريط السفلي ----
-
-  deleteBtn.addEventListener('click', async () => {
-    const count = selectedIds.size;
-    if (count === 0) return;
-
-    const msg = (tr('ntf_confirm_delete') || 'Delete {n} notifications?').replace('{n}', count);
-    if (!confirm(msg)) return;
-
-    deleteBtn.disabled = true;
-
-    try {
-      const { error } = await db
-        .from('notifications')
-        .delete()
-        .in('id', Array.from(selectedIds))
-        .eq('user_id', user.id);
-
-      if (error) throw error;
-
-      currentNotifications = currentNotifications.filter(n => !selectedIds.has(n.id));
-
-      const idsToRemove = Array.from(selectedIds);
-      idsToRemove.forEach(id => {
-        const el = document.querySelector(`.notification-item[data-id="${id}"]`);
-        if (el) el.remove();
-      });
-
-      exitSelectionMode();
-
-      if (currentNotifications.length === 0) {
-        document.getElementById('notifications-list').innerHTML = `
-          <div class="notifications-empty">
-            <i class="fas fa-bell-slash"></i>
-            <p>${tr('ntf_empty')}</p>
-          </div>
-        `;
+    // 1️⃣ حفظ القيمة الأصلية عند فتح الحقل
+    el.addEventListener('focus', () => {
+      if (!(id in originalValues)) {
+        originalValues[id] = String(el.dataset.value || '');
       }
-    } catch (err) {
-      alert((tr('prod_detail_err') || 'Error: ') + err.message);
-    } finally {
-      deleteBtn.disabled = false;
-    }
-  });
+    }, true);
 
-  markReadBtn.addEventListener('click', async () => {
-    const count = selectedIds.size;
-    if (count === 0) return;
+    // 2️⃣ إرسال إشعار واحد عند الخروج من الحقل
+    el.addEventListener('blur', () => {
+      setTimeout(() => {
+        const original = originalValues[id];
+        const lastSaved = lastSavedValues[id];
 
-    markReadBtn.disabled = true;
+        if (lastSaved === undefined) return;
+        if (String(lastSaved) === String(original)) return;
+        if (String(notifiedValues[id]) === String(lastSaved)) return;
 
-    try {
-      const { error } = await db
-        .from('notifications')
-        .update({ is_read: true, seen: true })
-        .in('id', Array.from(selectedIds))
-        .eq('user_id', user.id);
+        notifiedValues[id] = lastSaved;
+        sendEditNotification(field, lastSaved);
+      }, 300);
+    }, true);
 
-      if (error) throw error;
+    // 3️⃣ الحفظ الفوري (بدون إشعار) عند كل تغيير
+    inlineEdit({
+      el,
+      table: 'products',
+      id: productId,
+      field,
+      type,
+      onSave: async (savedField, newValue) => {
+        lastSavedValues[id] = newValue;
 
-      selectedIds.forEach(id => {
-        const el = document.querySelector(`.notification-item[data-id="${id}"]`);
-        if (el) el.classList.add('read', 'seen');
-      });
+        if (savedField === 'qty' || savedField === 'price') recalcTotal();
 
-      exitSelectionMode();
-    } catch (err) {
-      alert((tr('prod_detail_err') || 'Error: ') + err.message);
-    } finally {
-      markReadBtn.disabled = false;
-    }
-  });
-
-  // ---- الضغط المطول ----
-  function attachLongPress(item, id) {
-    let timer = null;
-    let startX = 0, startY = 0;
-    let moved = false;
-    let longPressTriggered = false;
-
-    const start = (e) => {
-      if (selectionMode) return;
-      const point = e.touches ? e.touches[0] : e;
-      startX = point.clientX;
-      startY = point.clientY;
-      moved = false;
-      longPressTriggered = false;
-
-      timer = setTimeout(() => {
-        if (!moved && !selectionMode) {
-          longPressTriggered = true;
-          enterSelectionMode(id);
+        if (savedField === 'qty') {
+          el.dataset.value = newValue;
+          updateQtyStyle();
         }
-      }, 600);
-    };
 
-    const cancel = () => {
-      if (timer) { clearTimeout(timer); timer = null; }
-    };
+        // 4️⃣ بديل احتياطي: إذا لم يحدث blur (المستخدم بقي في الحقل)
+        if (editTimers[id]) clearTimeout(editTimers[id]);
+        editTimers[id] = setTimeout(() => {
+          const original = originalValues[id];
+          const lastSaved = lastSavedValues[id];
 
-    const move = (e) => {
-      if (!timer) return;
-      const point = e.touches ? e.touches[0] : e;
-      if (Math.abs(point.clientX - startX) > 10 || Math.abs(point.clientY - startY) > 10) {
-        moved = true;
-        cancel();
+          if (lastSaved === undefined) return;
+          if (String(lastSaved) === String(original)) return;
+          if (String(notifiedValues[id]) === String(lastSaved)) return;
+
+          notifiedValues[id] = lastSaved;
+          sendEditNotification(field, lastSaved);
+        }, 2000);
+      },
+    });
+  });
+
+  // ✅ حفظ حد التنبيه
+  let lowStockSaveTimeout = null;
+  const lowStockInput = document.getElementById('low-stock-input');
+
+  lowStockInput.addEventListener('input', () => {
+    clearTimeout(lowStockSaveTimeout);
+    lowStockSaveTimeout = setTimeout(async () => {
+      const newThreshold = Math.max(0, Number(lowStockInput.value) || 0);
+
+      try {
+        const { error: updateError } = await db
+          .from('products')
+          .update({ low_stock_threshold: newThreshold })
+          .eq('id', productId);
+
+        if (updateError) throw new Error(updateError.message);
+
+        product.low_stock_threshold = newThreshold;
+        updateQtyStyle();
+
+        const currentQty = Number(product.qty ?? 0);
+        if (currentQty <= newThreshold && typeof notifyOrganization === 'function' && profile?.organization_id) {
+          await notifyOrganization({
+            orgId: profile.organization_id,
+            title: tr('low_stock_alert_title'),
+            message: tr('low_stock_alert_already')
+              .replace('{name}', product.name)
+              .replace('{qty}', currentQty)
+              .replace('{threshold}', newThreshold),
+            type: 'warning',
+            link: `/products/detail.html?id=${productId}`,
+            userName: profile.full_name || null,
+          });
+        }
+      } catch (err) {
+        console.error('فشل حفظ حد التنبيه:', err);
+        alert(tr('prod_detail_err') + ' ' + err.message);
       }
-    };
+    }, 800);
+  });
 
-    item.addEventListener('touchstart', start, { passive: true });
-    item.addEventListener('touchmove', move, { passive: true });
-    item.addEventListener('touchend', cancel);
-    item.addEventListener('touchcancel', cancel);
-    item.addEventListener('mousedown', (e) => { if (e.button === 0) start(e); });
-    item.addEventListener('mousemove', move);
-    item.addEventListener('mouseup', cancel);
-    item.addEventListener('mouseleave', cancel);
-    
-    item._longPressCheck = () => {
-      const res = longPressTriggered;
-      longPressTriggered = false;
-      return res;
-    };
-  }
+  // ✅ رفع الصورة
+  const imgContainer = document.getElementById('product-image-container');
+  attachImageUpload(productId, imgContainer, product.image_url);
 
-  // ---- تحميل الإشعارات ----
-  async function loadNotifications() {
-    const lang = window.getCurrentLang ? window.getCurrentLang() : 'ar';
-    const localeMap = { ar: 'ar-MA', fr: 'fr-FR', en: 'en-US' };
-    const locale = localeMap[lang] || 'en-US';
+  // ✅ سعر البيع (المفتاح)
+  const sellPriceToggle = document.getElementById('sell-price-toggle');
+  const sellPriceStatus = document.getElementById('sell-price-status');
+  const sellPriceInput = document.getElementById('sell-price-input');
 
-    const { data: { user: authUser } } = await db.auth.getUser();
-    const container = document.getElementById('notifications-list');
+  let currentSellPriceEnabled = sellPriceEnabled;
 
-    const { data, error } = await db
-      .from('notifications')
-      .select('*')
-      .eq('user_id', authUser.id)
-      .order('created_at', { ascending: false })
-      .limit(50);
+  sellPriceToggle.addEventListener('change', async () => {
+    const newValue = sellPriceToggle.checked;
+    sellPriceToggle.disabled = true;
+
+    try {
+      const { error: updateError } = await db
+        .from('products')
+        .update({ sell_price_enabled: newValue })
+        .eq('id', productId);
+
+      if (updateError) throw new Error(updateError.message);
+
+      currentSellPriceEnabled = newValue;
+      sellPriceStatus.textContent = newValue ? tr('prod_detail_enabled') : tr('prod_detail_disabled');
+      sellPriceStatus.classList.toggle('on', newValue);
+      sellPriceStatus.classList.toggle('off', !newValue);
+
+      if (typeof notifyOrganization === 'function' && profile?.organization_id) {
+        await notifyOrganization({
+          orgId: profile.organization_id,
+          title: tr('prod_detail_notif_sell_title'),
+          message: `${profile.full_name || tr('prod_detail_user')} ${newValue ? tr('prod_detail_notif_sell_on') : tr('prod_detail_notif_sell_off')} "${product.name}"`,
+          type: 'info',
+          link: `/products/detail.html?id=${productId}`,
+          userName: profile.full_name || null,
+        });
+      }
+    } catch (err) {
+      alert(tr('prod_detail_err') + ' ' + err.message);
+      sellPriceToggle.checked = !newValue;
+    } finally {
+      sellPriceToggle.disabled = false;
+    }
+  });
+
+  // ✅ سعر البيع (القيمة)
+  let sellPriceSaveTimeout = null;
+
+  sellPriceInput.addEventListener('input', () => {
+    clearTimeout(sellPriceSaveTimeout);
+
+    sellPriceSaveTimeout = setTimeout(async () => {
+      const newPrice = Number(sellPriceInput.value) || 0;
+
+      try {
+        const { error: updateError } = await db
+          .from('products')
+          .update({ sell_price: newPrice })
+          .eq('id', productId);
+
+        if (updateError) throw new Error(updateError.message);
+
+        if (typeof notifyOrganization === 'function' && profile?.organization_id) {
+          await notifyOrganization({
+            orgId: profile.organization_id,
+            title: tr('prod_detail_notif_sell_title'),
+            message: `${profile.full_name || tr('prod_detail_user')} ${tr('prod_detail_notif_sell_edit')} "${product.name}" ${tr('prod_detail_to')} "${newPrice}"`,
+            type: 'info',
+            link: `/products/detail.html?id=${productId}`,
+            userName: profile.full_name || null,
+          });
+        }
+      } catch (err) {
+        console.error('فشل حفظ سعر البيع:', err);
+      }
+    }, 800);
+  });
+
+  // ✅ زر الحذف
+  document.getElementById('delete-btn').addEventListener('click', async () => {
+    if (!confirm(tr('prod_detail_confirm_delete'))) return;
+
+    const { error } = await db.from('products').delete().eq('id', productId);
 
     if (error) {
-      container.innerHTML = `<div class="alert alert-error">${tr('prod_detail_err')} ${error.message}</div>`;
+      alert(tr('prod_detail_err') + ' ' + error.message);
       return;
     }
 
-    currentNotifications = data || [];
-
-    if (!currentNotifications.length) {
-      container.innerHTML = `
-        <div class="notifications-empty">
-          <i class="fas fa-bell-slash"></i>
-          <p>${tr('ntf_empty')}</p>
-        </div>
-      `;
-      return;
-    }
-
-    container.innerHTML = currentNotifications.map(n => {
-      const icons = {
-        info: 'fa-circle-info',
-        success: 'fa-circle-check',
-        warning: 'fa-triangle-exclamation',
-        danger: 'fa-circle-exclamation',
-      };
-      const icon = icons[n.type] || icons.info;
-      const time = formatTime(n.created_at, tr, locale);
-      const seenClass = n.seen ? 'seen' : '';
-      const readClass = n.is_read ? 'read' : '';
-
-      return `
-        <div class="notification-item ${seenClass} ${readClass}" data-id="${n.id}">
-          <div class="notification-icon ${n.type || 'info'}">
-            <i class="fas ${icon}"></i>
-          </div>
-          <div class="notification-content">
-            <div class="notification-title">
-              ${n.title}
-              ${n.user_name ? `<span class="notification-user">• ${n.user_name}</span>` : ''}
-            </div>
-            ${n.message ? `<div class="notification-message">${n.message}</div>` : ''}
-            <div class="notification-time">${time}</div>
-          </div>
-          <div class="notification-checks">
-            <i class="fas fa-check"></i>
-            <i class="fas fa-check"></i>
-          </div>
-          <div class="notif-select-circle">
-            <i class="fas fa-check"></i>
-          </div>
-        </div>
-      `;
-    }).join('');
-
-    container.querySelectorAll('.notification-item').forEach(item => {
-      const id = item.dataset.id;
-
-      attachLongPress(item, id);
-
-      item.addEventListener('click', (e) => {
-        if (item._longPressCheck()) {
-          e.preventDefault();
-          e.stopPropagation();
-          return;
-        }
-
-        if (selectionMode) {
-          e.preventDefault();
-          e.stopPropagation();
-          toggleSelection(id, item);
-        } else {
-          handleItemClick(id);
-        }
+    if (typeof notifyOrganization === 'function' && profile?.organization_id) {
+      await notifyOrganization({
+        orgId: profile.organization_id,
+        title: tr('prod_detail_notif_del_title'),
+        message: `${profile.full_name || tr('prod_detail_user')} ${tr('prod_detail_notif_del_msg')} "${product.name}"`,
+        type: 'danger',
+        link: '/products/list.html',
+        userName: profile.full_name || null,
       });
-    });
-  }
-
-  async function handleItemClick(id) {
-    const { data } = await db
-      .from('notifications')
-      .select('link, is_read')
-      .eq('id', id)
-      .single();
-
-    if (data && !data.is_read) {
-      await db.from('notifications').update({ is_read: true }).eq('id', id);
-      const item = document.querySelector(`.notification-item[data-id="${id}"]`);
-      if (item) item.classList.add('read');
     }
 
-    if (data?.link) {
-      setTimeout(() => { window.location.href = data.link; }, 400);
-    }
-  }
+    window.location.href = 'list.html';
+  });
 });
-
-async function markAllAsSeen() {
-  const { data: { user } } = await db.auth.getUser();
-  if (!user) return;
-  await db.from('notifications').update({ seen: true }).eq('user_id', user.id).eq('seen', false);
-}
-
-function formatTime(iso, tr, locale) {
-  const date = new Date(iso);
-  const now = new Date();
-  const diff = Math.floor((now - date) / 1000);
-
-  if (diff < 60) return tr('ntf_now');
-  if (diff < 3600) return `${tr('ntf_min_ago')} ${Math.floor(diff / 60)} ${tr('ntf_min')}`;
-  if (diff < 86400) return `${tr('ntf_hour_ago')} ${Math.floor(diff / 3600)} ${tr('ntf_hour')}`;
-  if (diff < 604800) return `${tr('ntf_day_ago')} ${Math.floor(diff / 86400)} ${tr('ntf_day')}`;
-  return date.toLocaleDateString(locale);
-}
