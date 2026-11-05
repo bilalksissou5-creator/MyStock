@@ -1,5 +1,7 @@
 // ============================================
-// صفحة تفاصيل المنتج (مع إظهار العملة + حد التنبيه)
+// صفحة تفاصيل المنتج (مع إشعارات ذكية)
+// ✅ إرسال إشعار واحد فقط بعد انتهاء التعديل
+// ✅ عدم إرسال إشعارات للمستخدم الذي قام بالتعديل
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   const user = await requireAuth();
@@ -123,7 +125,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         </div>
       </div>
 
-      <!-- ✅ قسم حد التنبيه للمخزون -->
       <div class="sell-price-section">
         <h3 class="sell-price-title">${tr('low_stock_section_title')}</h3>
 
@@ -197,6 +198,46 @@ document.addEventListener('DOMContentLoaded', async () => {
     qr_code: tr('prod_detail_barcode'),
   };
 
+  // ✅ تتبع القيم لمنع تكرار الإشعارات
+  const originalValues = {};
+  const lastSavedValues = {};
+  const notifiedValues = {};
+  const editTimers = {};
+
+  async function sendEditNotification(field, newValue) {
+    if (typeof notifyOrganization !== 'function' || !profile?.organization_id) return;
+
+    const threshold = Number(product.low_stock_threshold ?? 10);
+    const isLow = field === 'qty' && Number(newValue) <= threshold;
+
+    try {
+      if (isLow) {
+        await notifyOrganization({
+          orgId: profile.organization_id,
+          title: tr('low_stock_alert_title'),
+          message: tr('low_stock_alert_single')
+            .replace('{name}', product.name)
+            .replace('{qty}', newValue)
+            .replace('{threshold}', threshold),
+          type: 'warning',
+          link: `/products/detail.html?id=${productId}`,
+          userName: profile.full_name || null,
+          excludeUserId: user.id,
+        });
+      } else {
+        await notifyOrganization({
+          orgId: profile.organization_id,
+          title: tr('prod_detail_notif_edit_title'),
+          message: `${profile.full_name || tr('prod_detail_user')} ${tr('prod_detail_notif_edit_msg')} ${fieldLabels[field] || field} "${product.name}" ${tr('prod_detail_to')} "${newValue}"`,
+          type: 'info',
+          link: `/products/detail.html?id=${productId}`,
+          userName: profile.full_name || null,
+          excludeUserId: user.id,
+        });
+      }
+    } catch (e) { console.warn(e); }
+  }
+
   const fields = [
     { id: 'f-name', field: 'name', type: 'text' },
     { id: 'f-sku', field: 'sku', type: 'text' },
@@ -208,50 +249,60 @@ document.addEventListener('DOMContentLoaded', async () => {
   ];
 
   fields.forEach(({ id, field, type }) => {
+    const el = document.getElementById(id);
+
+    // 1️⃣ حفظ القيمة الأصلية عند فتح الحقل
+    el.addEventListener('focus', () => {
+      if (!(id in originalValues)) {
+        originalValues[id] = String(el.dataset.value || '');
+      }
+    }, true);
+
+    // 2️⃣ إرسال إشعار واحد عند الخروج من الحقل
+    el.addEventListener('blur', () => {
+      setTimeout(() => {
+        const original = originalValues[id];
+        const lastSaved = lastSavedValues[id];
+
+        if (lastSaved === undefined) return;
+        if (String(lastSaved) === String(original)) return;
+        if (String(notifiedValues[id]) === String(lastSaved)) return;
+
+        notifiedValues[id] = lastSaved;
+        sendEditNotification(field, lastSaved);
+      }, 300);
+    }, true);
+
+    // 3️⃣ الحفظ الفوري (بدون إشعار) عند كل تغيير
     inlineEdit({
-      el: document.getElementById(id),
+      el,
       table: 'products',
       id: productId,
       field,
       type,
       onSave: async (savedField, newValue) => {
+        lastSavedValues[id] = newValue;
+
         if (savedField === 'qty' || savedField === 'price') recalcTotal();
 
         if (savedField === 'qty') {
-          document.getElementById('f-qty').dataset.value = newValue;
+          el.dataset.value = newValue;
           updateQtyStyle();
         }
 
-        if (typeof notifyOrganization !== 'function' || !profile?.organization_id) return;
+        // 4️⃣ بديل احتياطي: إذا لم يحدث blur (المستخدم بقي في الحقل)
+        if (editTimers[id]) clearTimeout(editTimers[id]);
+        editTimers[id] = setTimeout(() => {
+          const original = originalValues[id];
+          const lastSaved = lastSavedValues[id];
 
-        // ✅ إذا كانت الكمية الجديدة أقل من أو تساوي الحد → إشعار تحذيري
-        const threshold = Number(product.low_stock_threshold ?? 10);
-        const isLow = savedField === 'qty' && Number(newValue) <= threshold;
+          if (lastSaved === undefined) return;
+          if (String(lastSaved) === String(original)) return;
+          if (String(notifiedValues[id]) === String(lastSaved)) return;
 
-        try {
-          if (isLow) {
-            await notifyOrganization({
-              orgId: profile.organization_id,
-              title: tr('low_stock_alert_title'),
-              message: tr('low_stock_alert_single')
-                .replace('{name}', product.name)
-                .replace('{qty}', newValue)
-                .replace('{threshold}', threshold),
-              type: 'warning',
-              link: `/products/detail.html?id=${productId}`,
-              userName: profile.full_name || null,
-            });
-          } else {
-            await notifyOrganization({
-              orgId: profile.organization_id,
-              title: tr('prod_detail_notif_edit_title'),
-              message: `${profile.full_name || tr('prod_detail_user')} ${tr('prod_detail_notif_edit_msg')} ${fieldLabels[savedField] || savedField} "${product.name}" ${tr('prod_detail_to')} "${newValue}"`,
-              type: 'info',
-              link: `/products/detail.html?id=${productId}`,
-              userName: profile.full_name || null,
-            });
-          }
-        } catch (e) { console.warn(e); }
+          notifiedValues[id] = lastSaved;
+          sendEditNotification(field, lastSaved);
+        }, 2000);
       },
     });
   });
@@ -288,6 +339,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             type: 'warning',
             link: `/products/detail.html?id=${productId}`,
             userName: profile.full_name || null,
+            excludeUserId: user.id,
           });
         }
       } catch (err) {
@@ -301,7 +353,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const imgContainer = document.getElementById('product-image-container');
   attachImageUpload(productId, imgContainer, product.image_url);
 
-  // ✅ سعر البيع
+  // ✅ سعر البيع (المفتاح)
   const sellPriceToggle = document.getElementById('sell-price-toggle');
   const sellPriceStatus = document.getElementById('sell-price-status');
   const sellPriceInput = document.getElementById('sell-price-input');
@@ -333,6 +385,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           type: 'info',
           link: `/products/detail.html?id=${productId}`,
           userName: profile.full_name || null,
+          excludeUserId: user.id,
         });
       }
     } catch (err) {
@@ -343,6 +396,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   });
 
+  // ✅ سعر البيع (القيمة)
   let sellPriceSaveTimeout = null;
 
   sellPriceInput.addEventListener('input', () => {
@@ -367,6 +421,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             type: 'info',
             link: `/products/detail.html?id=${productId}`,
             userName: profile.full_name || null,
+            excludeUserId: user.id,
           });
         }
       } catch (err) {
@@ -394,6 +449,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         type: 'danger',
         link: '/products/list.html',
         userName: profile.full_name || null,
+        excludeUserId: user.id,
       });
     }
 
