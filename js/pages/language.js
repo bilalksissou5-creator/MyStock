@@ -5,7 +5,7 @@
 // ✅ إعادة تحميل الصفحة لضمان تطبيق الترجمة على كل التطبيق
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
-  if (window.applyLanguage) window.applyLanguage();
+  if (window.applyLanguage) await window.applyLanguage();
   const tr = (key) => (window.t ? window.t(key) : key);
 
   document.title = tr('lang_title_full');
@@ -69,7 +69,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       </button>
     `;
 
-    // ✅ اختيار اللغة
     container.querySelectorAll('.lang-item').forEach(item => {
       item.addEventListener('click', () => {
         selectedLang = item.dataset.lang;
@@ -77,54 +76,45 @@ document.addEventListener('DOMContentLoaded', async () => {
       });
     });
 
-    // ✅ زر "تطبيق"
     document.getElementById('apply-btn')?.addEventListener('click', async () => {
       if (selectedLang === currentLang) return;
 
-      // 1. تحديث الواجهة محلياً
-      if (window.setLanguage) {
-        window.setLanguage(selectedLang);
-      } else {
-        localStorage.setItem('app_lang', selectedLang);
-      }
-
-      // 2. حفظ في قاعدة البيانات (للمزامنة)
       if (user && typeof db !== 'undefined') {
         try {
           await db.from('profiles').update({ app_lang: selectedLang }).eq('id', user.id);
         } catch (e) { console.warn(e); }
       }
 
-      // 3. إعادة تحميل الصفحة لضمان تطبيق الترجمة على كامل التطبيق
+      if (window.setLanguage) {
+        await window.setLanguage(selectedLang);
+      } else {
+        localStorage.setItem('app_lang', selectedLang);
+      }
+
       window.location.reload();
     });
 
-    // ✅ زر "تعديل"
     document.getElementById('edit-btn')?.addEventListener('click', async () => {
       if (selectedLang === currentLang) return;
       
-      if (window.setLanguage) {
-        window.setLanguage(selectedLang);
-      } else {
-        localStorage.setItem('app_lang', selectedLang);
-      }
-
       if (user && typeof db !== 'undefined') {
         try {
           await db.from('profiles').update({ app_lang: selectedLang }).eq('id', user.id);
         } catch (e) { console.warn(e); }
       }
 
-      // إعادة تحميل الصفحة
+      if (window.setLanguage) {
+        await window.setLanguage(selectedLang);
+      } else {
+        localStorage.setItem('app_lang', selectedLang);
+      }
+
       window.location.reload();
     });
   }
 
   render();
 
-  // ═══════════════════════════════════════════
-  // ✅ التحديث الفوري (Realtime)
-  // ═══════════════════════════════════════════
   if (user && typeof db !== 'undefined') {
     try {
       db.channel('lang-sync-' + user.id)
@@ -138,8 +128,6 @@ document.addEventListener('DOMContentLoaded', async () => {
           if (newLang && newLang !== currentLang) {
             console.log('⚡ تم تغيير اللغة من جهاز آخر:', newLang);
             if (window.setLanguage) window.setLanguage(newLang);
-            
-            // إعادة تحميل الصفحة فوراً لتطبيق الترجمة
             window.location.reload();
           }
         })

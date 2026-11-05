@@ -15,7 +15,7 @@ async function login(email, password) {
 
   await setOnline(data.user.id);
 
-  // ✅ جلب اللغة المفضلة للمستخدم من قاعدة البيانات وتطبيقها
+  // ✅ إصلاح: احترام اللغة المختارة محلياً أولاً
   try {
     const { data: profile } = await db
       .from('profiles')
@@ -23,14 +23,20 @@ async function login(email, password) {
       .eq('id', data.user.id)
       .single();
 
-    if (profile?.app_lang) {
-      const localLang = localStorage.getItem('app_lang') || 'ar';
-      if (localLang !== profile.app_lang) {
-        localStorage.setItem('app_lang', profile.app_lang);
+    const localLang = localStorage.getItem('app_lang');
+
+    if (localLang) {
+      // المستخدم لديه لغة محفوظة في الهاتف (ربما اختارها من الصفحة الرئيسية)
+      // إذا اختلفت عن قاعدة البيانات، نحدث قاعدة البيانات لتتزامن
+      if (profile?.app_lang !== localLang) {
+        await db.from('profiles').update({ app_lang: localLang }).eq('id', data.user.id);
       }
+    } else if (profile?.app_lang) {
+      // إذا لم يكن هناك لغة محفوظة في الهاتف، نأخذ من قاعدة البيانات
+      localStorage.setItem('app_lang', profile.app_lang);
     }
   } catch (e) {
-    console.warn('خطأ في جلب لغة المستخدم:', e);
+    console.warn('خطأ في جلب أو تحديث لغة المستخدم:', e);
   }
 
   return { ok: true, user: data.user };
@@ -228,7 +234,7 @@ document.addEventListener('DOMContentLoaded', () => {
       btn.disabled = false;
       btn.querySelector('span').textContent = 'دخول';
     } else {
-      // التحويل إلى لوحة التحكم (سيتم تحميلها باللغة الجديدة تلقائياً)
+      // التحويل إلى لوحة التحكم
       window.location.href = '/dashboard.html';
     }
   });
