@@ -1,6 +1,7 @@
 /* ============================================
    صفحة Landing (الصفحة الرئيسية)
    ✅ تصميم One UI عصري + بطاقة المصمم
+   ✅ هيدر ثابت (Fixed) مع تعويض المسافة
    ============================================ */
 
 /* ✅ إصلاح الارتفاع (تجاوز common.css) */
@@ -27,13 +28,15 @@ body.landing-page {
    Header
    ══════════════════════════════════════════ */
 .landing-header {
-  position: sticky;
+  position: fixed; /* ✅ جعل الهيدر ثابتاً */
   top: 0;
+  left: 0;
+  width: 100%;     /* ✅ يغطي كامل العرض */
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border-bottom: 1px solid #f0f0f0;
-  z-index: 100;
+  z-index: 1000;   /* ✅ لضمان بقائه فوق جميع العناصر */
 }
 
 .landing-header-inner {
@@ -111,7 +114,7 @@ body.landing-page {
    Hero
    ══════════════════════════════════════════ */
 .landing-hero {
-  padding: 80px 24px 100px;
+  padding: 130px 24px 100px; /* ✅ زيادة المسافة العلوية لتعويض حجم الهيدر الثابت */
   text-align: center;
   background: linear-gradient(180deg, #ffffff 0%, #fafafa 100%);
   position: relative;
@@ -258,6 +261,11 @@ body.landing-page {
    ══════════════════════════════════════════ */
 .landing-section {
   padding: 80px 24px;
+}
+
+/* ✅ إضافة مسافة عند الانتقال للقسم عبر الروابط لعدم تغطيته بالهيدر الثابت */
+#features, #pricing {
+  scroll-margin-top: 90px; 
 }
 
 .landing-section-gray {
@@ -662,7 +670,7 @@ body.landing-page {
   }
 
   .landing-hero {
-    padding: 60px 20px 80px;
+    padding: 100px 20px 80px; /* ✅ مسافة علوية مناسبة للهاتف */
   }
 
   .landing-hero-title {
