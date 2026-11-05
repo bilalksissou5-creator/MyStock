@@ -1,7 +1,7 @@
 /* ============================================
    صفحة Landing (الصفحة الرئيسية)
    ✅ تصميم One UI عصري + بطاقة المصمم
-   ✅ هيدر ثابت (Fixed) + زر إنشاء حساب
+   ✅ هيدر ثابت (Fixed) + زر إنشاء حساب + اختيار اللغة
    ============================================ */
 
 /* ✅ إصلاح الارتفاع (تجاوز common.css) */
@@ -28,15 +28,15 @@ body.landing-page {
    Header (ثابت في الأعلى)
    ══════════════════════════════════════════ */
 .landing-header {
-  position: fixed; /* ✅ جعل الهيدر ثابتاً */
+  position: fixed;
   top: 0;
   left: 0;
-  width: 100%;     /* ✅ يغطي كامل العرض */
+  width: 100%;
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border-bottom: 1px solid #f0f0f0;
-  z-index: 1000;   /* ✅ لضمان بقائه فوق جميع العناصر */
+  z-index: 1000;
 }
 
 .landing-header-inner {
@@ -58,26 +58,6 @@ body.landing-page {
   font-size: 20px;
   font-weight: 800;
   letter-spacing: -0.5px;
-}
-
-.landing-logo-icon {
-  width: 40px;
-  height: 40px;
-  background: linear-gradient(135deg, #171717 0%, #404040 100%);
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #ffffff;
-  font-size: 18px;
-  flex-shrink: 0;
-}
-
-.landing-logo-icon.small {
-  width: 32px;
-  height: 32px;
-  border-radius: 10px;
-  font-size: 14px;
 }
 
 .landing-nav {
@@ -111,7 +91,7 @@ body.landing-page {
   background: #404040 !important;
 }
 
-/* ✅ تنسيق زر إنشاء حساب الجديد */
+/* ✅ تنسيق زر إنشاء حساب */
 .landing-btn-register {
   background: transparent !important;
   color: #171717 !important;
@@ -122,11 +102,47 @@ body.landing-page {
   background: #f5f5f5 !important;
 }
 
+/* ✅ تنسيق قائمة اختيار اللغة */
+.lang-switcher {
+  display: flex;
+  align-items: center;
+}
+
+.lang-switcher select {
+  appearance: none;
+  -webkit-appearance: none;
+  padding: 8px 30px 8px 12px;
+  border-radius: 10px;
+  border: 1px solid #e5e5e5;
+  background-color: #fafafa;
+  background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23404040%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
+  background-repeat: no-repeat;
+  background-position: left 10px center; /* السهم على اليسار */
+  background-size: 10px;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  color: #171717;
+  cursor: pointer;
+  outline: none;
+  transition: all 0.15s;
+}
+
+[dir="rtl"] .lang-switcher select {
+  background-position: right 10px center; /* في العربية السهم على اليمين */
+  padding: 8px 12px 8px 30px;
+}
+
+.lang-switcher select:hover {
+  background-color: #f5f5f5;
+  border-color: #d4d4d4;
+}
+
 /* ══════════════════════════════════════════
    Hero
    ══════════════════════════════════════════ */
 .landing-hero {
-  padding: 130px 24px 100px; /* ✅ زيادة المسافة العلوية لتعويض حجم الهيدر الثابت */
+  padding: 130px 24px 100px;
   text-align: center;
   background: linear-gradient(180deg, #ffffff 0%, #fafafa 100%);
   position: relative;
@@ -259,30 +275,15 @@ body.landing-page {
   transform: translateY(-2px);
 }
 
-.landing-btn-full {
-  width: 100%;
-}
-
-.landing-btn-large {
-  padding: 18px 40px;
-  font-size: 17px;
-}
+.landing-btn-full { width: 100%; }
+.landing-btn-large { padding: 18px 40px; font-size: 17px; }
 
 /* ══════════════════════════════════════════
    Section
    ══════════════════════════════════════════ */
-.landing-section {
-  padding: 80px 24px;
-}
-
-/* ✅ إضافة مسافة عند الانتقال للقسم عبر الروابط لعدم تغطيته بالهيدر الثابت */
-#features, #pricing {
-  scroll-margin-top: 90px; 
-}
-
-.landing-section-gray {
-  background: #fafafa;
-}
+.landing-section { padding: 80px 24px; }
+#features, #pricing { scroll-margin-top: 90px; }
+.landing-section-gray { background: #fafafa; }
 
 .landing-section-header {
   max-width: 700px;
@@ -424,7 +425,6 @@ body.landing-page {
   text-align: center;
 }
 
-/* ✅ إضافة white-space: nowrap لمنع نزول العملة لسطر جديد */
 .landing-price {
   display: flex;
   align-items: baseline;
@@ -486,9 +486,7 @@ body.landing-page {
 /* ══════════════════════════════════════════
    CTA Section
    ══════════════════════════════════════════ */
-.landing-cta-section {
-  padding: 60px 24px 80px;
-}
+.landing-cta-section { padding: 60px 24px 80px; }
 
 .landing-cta-box {
   max-width: 720px;
@@ -572,20 +570,6 @@ body.landing-page {
   color: #171717;
 }
 
-.landing-footer-contact a {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  color: #6b7280;
-  text-decoration: none;
-  font-size: 14px;
-  font-weight: 600;
-}
-
-.landing-footer-contact a:hover {
-  color: #171717;
-}
-
 .landing-footer-copy {
   color: #a3a3a3;
   font-size: 13px;
@@ -633,9 +617,7 @@ body.landing-page {
   display: block;
 }
 
-.developer-info {
-  flex: 1;
-}
+.developer-info { flex: 1; }
 
 .developer-info h4 {
   margin: 0 0 4px 0;
@@ -677,13 +659,13 @@ body.landing-page {
    Responsive
    ══════════════════════════════════════════ */
 @media (max-width: 768px) {
-  /* ✅ إخفاء روابط الميزات والأسعار فقط، مع إبقاء زري تسجيل الدخول وإنشاء حساب */
+  /* إخفاء روابط الميزات والأسعار فقط، مع إبقاء أزرار الدخول واللغة */
   .landing-nav a:not(.landing-btn-login):not(.landing-btn-register) {
     display: none;
   }
 
   .landing-hero {
-    padding: 100px 20px 80px; /* ✅ مسافة علوية مناسبة للهاتف */
+    padding: 100px 20px 80px;
   }
 
   .landing-hero-title {
@@ -733,15 +715,46 @@ body.landing-page {
   .landing-footer {
     padding: 32px 20px 24px;
   }
+  
+  .lang-switcher select {
+    font-size: 13px;
+    padding: 6px 26px 6px 10px;
+  }
+  [dir="rtl"] .lang-switcher select {
+    padding: 6px 10px 6px 26px;
+  }
 }
 
 @media (max-width: 480px) {
   .landing-header-inner {
     padding: 12px 16px;
+    gap: 10px;
   }
 
   .landing-logo {
     font-size: 18px;
+  }
+
+  .landing-nav {
+    gap: 6px;
+  }
+
+  .landing-nav a {
+    padding: 6px 10px;
+    font-size: 12px;
+  }
+
+  .landing-btn-login, .landing-btn-register {
+    padding: 6px 12px !important;
+    font-size: 12px !important;
+  }
+
+  .lang-switcher select {
+    font-size: 12px;
+    padding: 6px 24px 6px 8px;
+  }
+  [dir="rtl"] .lang-switcher select {
+    padding: 6px 8px 6px 24px;
   }
 
   .landing-hero-title {
@@ -762,7 +775,6 @@ body.landing-page {
     font-size: 36px;
   }
   
-  /* ✅ التجاوب مع الهاتف لبطاقة المصمم */
   .developer-profile {
     flex-direction: column;
     text-align: center;

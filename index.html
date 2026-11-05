@@ -46,6 +46,15 @@
         <a href="#features" data-i18n="landing_nav_features">الميزات</a>
         <a href="#pricing" data-i18n="landing_nav_pricing">الأسعار</a>
         
+        <!-- ✅ قائمة اختيار اللغة الجديدة -->
+        <div class="lang-switcher">
+          <select id="lang-select" onchange="changeLanguage(this.value)">
+            <option value="ar">العربية</option>
+            <option value="fr">Français</option>
+            <option value="en">English</option>
+          </select>
+        </div>
+
         <!-- ✅ الزر الجديد: إنشاء حساب -->
         <a href="/register.html" class="landing-btn-register" data-i18n="landing_nav_register">إنشاء حساب</a>
         
@@ -107,49 +116,37 @@
 
     <div class="landing-features-grid">
       <div class="landing-feature-card">
-        <div class="landing-feature-icon icon-blue">
-          <i class="fas fa-box"></i>
-        </div>
+        <div class="landing-feature-icon icon-blue"><i class="fas fa-box"></i></div>
         <h3 data-i18n="landing_feat_products">إدارة المنتجات</h3>
         <p data-i18n="landing_feat_products_desc">أضف منتجاتك، صورها، أسعارها، ومعلوماتها بسهولة.</p>
       </div>
 
       <div class="landing-feature-card">
-        <div class="landing-feature-icon icon-green">
-          <i class="fas fa-right-left"></i>
-        </div>
+        <div class="landing-feature-icon icon-green"><i class="fas fa-right-left"></i></div>
         <h3 data-i18n="landing_feat_stock">حركات المخزون</h3>
         <p data-i18n="landing_feat_stock_desc">تتبع كل عملية إدخال وإخراج مع سجل كامل.</p>
       </div>
 
       <div class="landing-feature-card">
-        <div class="landing-feature-icon icon-orange">
-          <i class="fas fa-receipt"></i>
-        </div>
+        <div class="landing-feature-icon icon-orange"><i class="fas fa-receipt"></i></div>
         <h3 data-i18n="landing_feat_sales">إيصالات البيع</h3>
         <p data-i18n="landing_feat_sales_desc">أنشئ إيصالات احترافية واطبعها بضغطة واحدة.</p>
       </div>
 
       <div class="landing-feature-card">
-        <div class="landing-feature-icon icon-purple">
-          <i class="fas fa-file-invoice"></i>
-        </div>
+        <div class="landing-feature-icon icon-purple"><i class="fas fa-file-invoice"></i></div>
         <h3 data-i18n="landing_feat_invoices">الفواتير</h3>
         <p data-i18n="landing_feat_invoices_desc">فواتير تلقائية من الموردين مع حساب الإجماليات.</p>
       </div>
 
       <div class="landing-feature-card">
-        <div class="landing-feature-icon icon-red">
-          <i class="fas fa-chart-line"></i>
-        </div>
+        <div class="landing-feature-icon icon-red"><i class="fas fa-chart-line"></i></div>
         <h3 data-i18n="landing_feat_reports">التقارير</h3>
         <p data-i18n="landing_feat_reports_desc">تقارير مفصلة عن المبيعات والأرباح والحركات.</p>
       </div>
 
       <div class="landing-feature-card">
-        <div class="landing-feature-icon icon-teal">
-          <i class="fas fa-users"></i>
-        </div>
+        <div class="landing-feature-icon icon-teal"><i class="fas fa-users"></i></div>
         <h3 data-i18n="landing_feat_team">إدارة الفريق</h3>
         <p data-i18n="landing_feat_team_desc">أضف عمالاً، حدد أدوارهم، وتابع أنشطتهم.</p>
       </div>
@@ -166,7 +163,6 @@
     <div class="landing-pricing-grid">
       <div class="landing-price-card">
         <h3 data-i18n="sub_plan_basic">الباقة الأساسية</h3>
-        <!-- ✅ إصلاح اتجاه السعر -->
         <div class="landing-price" dir="ltr">
           <span class="landing-price-value">20</span>
           <span class="landing-price-currency">$</span>
@@ -185,7 +181,6 @@
       <div class="landing-price-card featured">
         <div class="landing-price-badge" data-i18n="sub_most_popular">الأكثر شيوعاً</div>
         <h3 data-i18n="sub_plan_pro">الباقة الاحترافية</h3>
-        <!-- ✅ إصلاح اتجاه السعر -->
         <div class="landing-price" dir="ltr">
           <span class="landing-price-value">30</span>
           <span class="landing-price-currency">$</span>
@@ -203,7 +198,6 @@
 
       <div class="landing-price-card">
         <h3 data-i18n="sub_plan_advanced">الباقة المتقدمة</h3>
-        <!-- ✅ إصلاح اتجاه السعر -->
         <div class="landing-price" dir="ltr">
           <span class="landing-price-value">50</span>
           <span class="landing-price-currency">$</span>
@@ -236,8 +230,6 @@
   <!-- ════════ Footer ════════ -->
   <footer class="landing-footer">
     <div class="landing-footer-inner">
-      
-      <!-- ✅ قسم المصمم (Developer Profile) -->
       <div class="developer-profile">
         <div class="developer-avatar">
           <img src="/assets/img/developer.jpg" alt="Bilal Ksissou" onerror="this.src='https://ui-avatars.com/api/?name=Bilal+Ksissou&background=171717&color=fff&size=128'">
@@ -256,9 +248,7 @@
         </div>
       </div>
 
-      <div class="landing-footer-brand" style="margin-top: 20px;">
-        <span>MyStock</span>
-      </div>
+      <div class="landing-footer-brand" style="margin-top: 20px;"><span>MyStock</span></div>
 
       <div class="landing-footer-links">
         <a href="/terms.html" data-i18n="legal_terms_title">شروط الخدمة</a>
@@ -275,12 +265,23 @@
     document.addEventListener('DOMContentLoaded', () => {
       if (window.applyLanguage) applyLanguage();
 
+      // ✅ ضبط القيمة الافتراضية للغة في القائمة المنسدلة
+      const currentLang = localStorage.getItem('app_lang') || 'ar';
+      const langSelect = document.getElementById('lang-select');
+      if (langSelect) langSelect.value = currentLang;
+
       document.querySelectorAll('.landing-price-period').forEach(el => {
         if (el.textContent.includes('{{شهر}}')) {
           el.textContent = '/ ' + (window.t ? window.t('sub_per_month').replace('/ ', '') : 'شهرياً');
         }
       });
     });
+
+    // ✅ دالة تغيير اللغة
+    function changeLanguage(lang) {
+      localStorage.setItem('app_lang', lang);
+      window.location.reload();
+    }
   </script>
 
   <!-- ✅ تسجيل Service Worker لتثبيت التطبيق -->
@@ -289,7 +290,7 @@
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('/sw.js')
           .then(reg => console.log('✅ SW registered:', reg.scope))
-          .catch(err => console.warn('❌ SW registration failed:', err));
+          .catch(err => console.warn('❌ SW Registration failed:', err));
       });
     }
   </script>
