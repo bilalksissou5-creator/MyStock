@@ -1,5 +1,6 @@
 /* ============================================
    صفحة المنتجات (التصميم الأصلي)
+   ✅ إصلاح اتجاه العملة ومنع نزولها لسطر جديد
    ============================================ */
 
 .products {
@@ -79,9 +80,13 @@
   margin-bottom: 4px;
 }
 
+/* ✅ تم إضافة أوامر لمنع نزول العملة لسطر جديد */
 .stat-value {
   font-size: 14px;
   font-weight: 600;
+  white-space: nowrap; /* يمنع كسر السطر */
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .stat-value.low {
@@ -114,8 +119,12 @@
     font-size: 10px;
   }
 
+  /* ✅ نفس الإصلاح لشاشات الجوال */
   .stat-value {
     font-size: 12px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 }
 
