@@ -1,6 +1,6 @@
 // ============================================
 // الهيكل المشترك (Header + Sidebar)
-// ✅ فحص تلقائي + تحذيرات + ترجمة كاملة
+// ✅ فحص تلقائي + تحذيرات + ترجمة كاملة (تحديث ديناميكي)
 // ✅ دعم iframe (وضع Embed)
 // ✅ محرك التنبيهات (نغمات متعددة + اهتزاز)
 // ✅ البحث الذكي الشامل (دقيق + سجل + تسامح مع الأخطاء)
@@ -85,22 +85,24 @@ function renderLayout(activePage) {
 
   const tr = (key) => (window.t ? window.t(key) : key);
   
+  // ✅ إضافة labelKey لاستخدامها في data-i18n
   const navItems = [
-    { href: '/dashboard.html', label: tr('nav_dashboard'), icon: 'fa-house' },
-    { href: '/products/add-workspace.html', label: tr('nav_add_product'), icon: 'fa-circle-plus' },
-    { href: '/movements/out-workspace.html', label: tr('nav_out_product'), icon: 'fa-circle-minus' },
-    { href: '/products/list.html', label: tr('nav_products'), icon: 'fa-box' },
-    { href: '/movements/list.html', label: tr('nav_movements'), icon: 'fa-right-left' },
-    { href: '/workers/list.html', label: tr('nav_workers'), icon: 'fa-users' },
-    { href: '/suppliers/list.html', label: tr('nav_suppliers'), icon: 'fa-truck' },
-    { href: '/invoices/list.html', label: tr('nav_invoices'), icon: 'fa-file-invoice' },
-    { href: '/settings.html', label: tr('nav_settings'), icon: 'fa-gear' },
+    { href: '/dashboard.html', labelKey: 'nav_dashboard', icon: 'fa-house' },
+    { href: '/products/add-workspace.html', labelKey: 'nav_add_product', icon: 'fa-circle-plus' },
+    { href: '/movements/out-workspace.html', labelKey: 'nav_out_product', icon: 'fa-circle-minus' },
+    { href: '/products/list.html', labelKey: 'nav_products', icon: 'fa-box' },
+    { href: '/movements/list.html', labelKey: 'nav_movements', icon: 'fa-right-left' },
+    { href: '/workers/list.html', labelKey: 'nav_workers', icon: 'fa-users' },
+    { href: '/suppliers/list.html', labelKey: 'nav_suppliers', icon: 'fa-truck' },
+    { href: '/invoices/list.html', labelKey: 'nav_invoices', icon: 'fa-file-invoice' },
+    { href: '/settings.html', labelKey: 'nav_settings', icon: 'fa-gear' },
   ];
 
+  // ✅ استخدام data-i18n بجانب tr() لضمان التحديث لاحقاً
   const navHTML = navItems.map(item => `
     <a href="${item.href}" class="nav-item ${activePage === item.href ? 'active' : ''}">
       <i class="fas ${item.icon}"></i>
-      <span>${item.label}</span>
+      <span data-i18n="${item.labelKey}">${tr(item.labelKey)}</span>
     </a>
   `).join('');
 
@@ -110,7 +112,8 @@ function renderLayout(activePage) {
       <a href="/notifications.html" class="notif" id="notif-btn"><i class="fas fa-bell"></i><span class="notif-count" id="notif-count">0</span></a>
       <div class="search">
         <i class="fas fa-search"></i>
-        <input type="text" id="global-search-input" placeholder="${tr('nav_search')}" autocomplete="off">
+        <!-- ✅ استخدام data-i18n-placeholder -->
+        <input type="text" id="global-search-input" data-i18n-placeholder="nav_search" placeholder="${tr('nav_search')}" autocomplete="off">
         <div class="global-search-dropdown" id="global-search-dropdown"></div>
       </div>
       <h1 class="logo">MyStock</h1>
@@ -119,8 +122,8 @@ function renderLayout(activePage) {
       <aside class="sidebar" id="app-sidebar">
         <nav class="nav">${navHTML}</nav>
         <div class="sidebar-footer">
-          <a href="/profile.html" class="nav-item ${activePage === '/profile.html' ? 'active' : ''}"><i class="fas fa-user"></i><span>${tr('nav_profile')}</span></a>
-          <button class="nav-item logout" id="logout-btn"><i class="fas fa-right-from-bracket"></i><span>${tr('nav_logout')}</span></button>
+          <a href="/profile.html" class="nav-item ${activePage === '/profile.html' ? 'active' : ''}"><i class="fas fa-user"></i><span data-i18n="nav_profile">${tr('nav_profile')}</span></a>
+          <button class="nav-item logout" id="logout-btn"><i class="fas fa-right-from-bracket"></i><span data-i18n="nav_logout">${tr('nav_logout')}</span></button>
         </div>
       </aside>
       <main class="main" id="main-content"></main>
@@ -129,6 +132,9 @@ function renderLayout(activePage) {
 
   const app = document.querySelector('.app');
   if (app) app.innerHTML = layout;
+
+  // ✅ إعادة تطبيق الترجمة فوراً بعد رسم القائمة
+  if (window.applyLanguage) window.applyLanguage();
 
   document.querySelectorAll('.logout').forEach(b => {
     b.addEventListener('click', async (e) => {
