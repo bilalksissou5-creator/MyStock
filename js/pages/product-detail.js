@@ -1,8 +1,7 @@
 // ============================================
 // صفحة تفاصيل المنتج - النسخة النهائية المستقرة
-// ✅ إصلاح ترتيب الحقول واختفاء سعر البيع
+// ✅ إصلاح اتجاه العملة (LTR) لتظهر 30.00 DH بدلاً من DH 30.00
 // ✅ إشعار واحد فقط لكل عملية تعديل (بدون تكرار)
-// ✅ تحديث فوري للبيانات والعملة
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   const user = await requireAuth();
@@ -56,7 +55,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   const total = ((product.qty ?? 0) * (product.price ?? 0)).toFixed(2);
   const sellPrice = Number(product.sell_price ?? 0);
-  // تأمين القيم في حال كانت غير موجودة في قاعدة البيانات
   const sellPriceEnabled = product.sell_price_enabled === true;
   const lowStockThreshold = Number(product.low_stock_threshold ?? 10);
   const isLowStock = Number(product.qty ?? 0) <= lowStockThreshold;
@@ -97,14 +95,18 @@ document.addEventListener('DOMContentLoaded', async () => {
         </div>
         <div class="stat">
           <div class="stat-label">${tr('prod_detail_buy_price')}</div>
+          <!-- ✅ تم إضافة dir="ltr" هنا لإصلاح اتجاه العملة -->
           <div class="stat-value">
-            <span class="edit-field center" id="f-price" data-value="${product.price ?? 0}"></span>
-            ${currencySymbol ? `<span style="font-size: 0.9em; color: #171717; font-weight: 500;">${currencySymbol}</span>` : ''}
+            <span dir="ltr" style="display: inline-flex; align-items: center; gap: 4px;">
+              <span class="edit-field center" id="f-price" data-value="${product.price ?? 0}"></span>
+              ${currencySymbol ? `<span style="font-size: 0.9em; color: #171717; font-weight: 500;">${currencySymbol}</span>` : ''}
+            </span>
           </div>
         </div>
         <div class="stat">
           <div class="stat-label">${tr('products_total')}</div>
-          <div class="stat-value" id="f-total">${total} ${currencySymbol}</div>
+          <!-- ✅ تم إضافة dir="ltr" هنا أيضاً -->
+          <div class="stat-value" id="f-total"><span dir="ltr">${total} ${currencySymbol}</span></div>
         </div>
       </div>
 
@@ -127,7 +129,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         </div>
       </div>
 
-      <!-- ✅ قسم سعر البيع (يظهر دائماً الآن) -->
+      <!-- ✅ قسم سعر البيع -->
       <div class="sell-price-section">
         <h3 class="sell-price-title">💰 ${tr('prod_detail_sell_price')}</h3>
 
@@ -189,7 +191,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     const price = Number(document.getElementById('f-price')?.dataset.value ?? 0);
     const totalVal = (qty * price).toFixed(2);
     const totalEl = document.getElementById('f-total');
-    if (totalEl) totalEl.textContent = `${totalVal} ${currencySymbol}`.trim();
+    // ✅ تحديث الإجمالي مع الحفاظ على اتجاه LTR
+    if (totalEl) totalEl.innerHTML = `<span dir="ltr">${totalVal} ${currencySymbol}</span>`;
   }
 
   const fieldLabels = {
@@ -202,7 +205,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     qr_code: tr('prod_detail_barcode'),
   };
 
-  // حفظ القيم الأولية للمقارنة ومنع الإشعارات المتكررة
   const initialFieldValues = {};
 
   async function sendNotification(field, value) {
@@ -260,14 +262,12 @@ document.addEventListener('DOMContentLoaded', async () => {
       field,
       type,
       onSave: async (savedField, newValue) => {
-        // تحديث الواجهة فوراً
         if (savedField === 'qty' || savedField === 'price') recalcTotal();
         if (savedField === 'qty') {
           el.dataset.value = newValue;
           updateQtyStyle();
         }
 
-        // إرسال إشعار واحد فقط إذا تغيرت القيمة عن الأصل
         if (String(newValue) !== String(initialFieldValues[field])) {
           await sendNotification(field, newValue);
           initialFieldValues[field] = String(newValue); 
@@ -276,7 +276,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   });
 
-  // ✅ حفظ حد التنبيه للمخزون
   let lowStockSaveTimeout = null;
   const lowStockInput = document.getElementById('low-stock-input');
 
@@ -318,13 +317,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   }
 
-  // ✅ رفع الصورة
   const imgContainer = document.getElementById('product-image-container');
   if (imgContainer && typeof attachImageUpload === 'function') {
     attachImageUpload(productId, imgContainer, product.image_url);
   }
 
-  // ✅ سعر البيع (تفعيل/إلغاء)
   const sellPriceToggle = document.getElementById('sell-price-toggle');
   const sellPriceStatus = document.getElementById('sell-price-status');
   const sellPriceInput = document.getElementById('sell-price-input');
@@ -365,7 +362,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   }
 
-  // ✅ سعر البيع (تعديل القيمة)
   let sellPriceSaveTimeout = null;
   if (sellPriceInput) {
     sellPriceInput.addEventListener('input', () => {
@@ -398,7 +394,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   }
 
-  // ✅ زر الحذف
   const deleteBtn = document.getElementById('delete-btn');
   if (deleteBtn) {
     deleteBtn.addEventListener('click', async () => {
