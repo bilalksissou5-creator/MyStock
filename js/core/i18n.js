@@ -2873,22 +2873,66 @@ const countries = {
 };
 
 let currentLang = localStorage.getItem('app_lang') || 'ar';
+let dbTranslations = {}; 
 
+// 1. جلب الترجمات من Supabase
+async function fetchSupabaseTranslations() {
+  if (!window.db) {
+    console.warn("Supabase غير متصل، سيتم استخدام الترجمات المحلية.");
+    return; 
+  }
+
+  const cacheKey = `app_translations_${currentLang}`;
+  const cachedData = localStorage.getItem(cacheKey);
+
+  // استخدام الكاش لتسريع التطبيق
+  if (cachedData) {
+    dbTranslations = JSON.parse(cachedData);
+    applyLanguage(); 
+  }
+
+  try {
+    // جلب البيانات من جدول translations
+    const { data, error } = await window.db.from('translations').select('key, ar, fr, en');
+    
+    if (!error && data) {
+      dbTranslations = {};
+      data.forEach(row => {
+        dbTranslations[row.key] = row[currentLang];
+      });
+      
+      // حفظ الترجمة في الكاش
+      localStorage.setItem(cacheKey, JSON.stringify(dbTranslations));
+      applyLanguage(); 
+    }
+  } catch (err) {
+    console.warn("فشل جلب الترجمات من Supabase، سيتم استخدام الترجمات المحلية.", err);
+  }
+}
+
+// 2. دالة الترجمة t()
 function t(key) {
-  // نتحقق أولاً من وجود المفتاح في اللغة الحالية (حتى لو كان نصاً فارغاً)
+  // أولاً: البحث في ترجمات Supabase
+  if (dbTranslations[key] !== undefined && dbTranslations[key] !== null) {
+    return dbTranslations[key];
+  }
+  
+  // ثانياً: البحث في الترجمات المحلية (كخطة بديلة)
   const currentTranslation = translations[currentLang]?.[key];
   if (currentTranslation !== undefined && currentTranslation !== null) {
     return currentTranslation;
   }
   
-  // إذا لم يوجد المفتاح نهائياً، نرجع للعربية
+  // ثالثاً: العودة للعربية
   return translations.ar[key] || key;
 }
 
+// 3. دالة ترجمة البلدان
 function tCountry(code) {
   return countries[code]?.[currentLang] || countries[code]?.ar || code;
 }
 
+// 4. تطبيق الترجمة على الصفحة
 function applyLanguage() {
   const html = document.documentElement;
   html.lang = currentLang;
@@ -2912,10 +2956,11 @@ function applyLanguage() {
   });
 }
 
+// 5. تغيير اللغة
 function setLanguage(lang) {
-  if (lang === currentLang) return; // لا تفعل شيئاً إن كانت نفس اللغة
+  if (lang === currentLang) return; 
   localStorage.setItem('app_lang', lang);
-  window.location.reload(); // ✅ إعادة تحميل الصفحة بالكامل لتطبيق الترجمة على كل العناصر
+  window.location.reload(); 
 }
 
 window.addEventListener('storage', (e) => {
@@ -2924,6 +2969,12 @@ window.addEventListener('storage', (e) => {
   }
 });
 
+// تشغيل جلب الترجمات عند التحميل
+document.addEventListener('DOMContentLoaded', () => {
+    fetchSupabaseTranslations();
+});
+
+// تصدير الدوال
 window.t = t;
 window.tCountry = tCountry;
 window.applyLanguage = applyLanguage;

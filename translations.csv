@@ -1,0 +1,851 @@
+key,ar,fr,en
+app_name,MyStock,MyStock,MyStock
+app_tagline,نظام إدارة المخزون,Système de gestion de stock,Inventory Management System
+loading,جارٍ التحميل...,Chargement...,Loading...
+welcome_language,اللغة,Langue,Language
+welcome_country,البلد,Pays,Country
+welcome_continue,متابعة,Continuer,Continue
+welcome_select_country,-- اختر البلد --,-- Choisir un pays --,-- Select a country --
+login_title,تسجيل الدخول,Connexion,Login
+login_email,البريد الإلكتروني,Email,Email
+login_password,كلمة السر,Mot de passe,Password
+login_button,دخول,Se connecter,Login
+login_no_account,ليس لديك حساب؟,Vous n'avez pas de compte ?,Don't have an account?
+login_create_account,إنشاء حساب جديد,Créer un compte,Create new account
+register_title,إنشاء حساب جديد,Créer un compte,Create Account
+register_personal_info,المعلومات الشخصية,Informations personnelles,Personal Information
+register_first_name,الإسم الشخصي,Prénom,First Name
+register_last_name,الإسم العائلي,Nom,Last Name
+register_org_name,إسم المنظمة,Nom de l'organisation,Organization Name
+register_email,البريد الإلكتروني,Email,Email
+register_password,كلمة السر,Mot de passe,Password
+register_password_confirm,تأكيد كلمة السر,Confirmer le mot de passe,Confirm Password
+register_or,أو,Ou,Or
+register_google,المتابعة باستخدام Google (قريباً),Continuer avec Google (bientôt),Continue with Google (soon)
+register_button,تسجيل,S'inscrire,Register
+register_have_account,لديك حساب؟,Vous avez un compte ?,Already have an account?
+register_login,تسجيل الدخول,Se connecter,Login
+subscription_title,الاشتراك - MyStock,Abonnement - MyStock,Subscription - MyStock
+sub_no_org,لا يمكن تحديد المنظمة,Impossible d'identifier l'organisation,Cannot identify organization
+sub_logout,تسجيل الخروج,Déconnexion,Logout
+sub_wait_title,بانتظار تفعيل الاشتراك,En attente d'activation,Waiting for activation
+sub_wait_text,مدير المنظمة لم يُفعّل الاشتراك بعد. يرجى التواصل معه.,L'administrateur n'a pas encore activé l'abonnement. Veuillez le contacter.,The administrator has not activated the subscription yet. Please contact them.
+sub_plan_title,اشترك في MyStock,Abonnez-vous à MyStock,Subscribe to MyStock
+sub_plan_text,للاستفادة من جميع الميزات، يرجى تفعيل الاشتراك الشهري.,"Pour profiter de toutes les fonctionnalités, activez votre abonnement mensuel.","To enjoy all features, please activate your monthly subscription."
+sub_plan_name,الخطة الأساسية,Plan de base,Basic Plan
+sub_plan_price,DH / شهرياً,DH / mois,DH / month
+sub_feature_1,عدد غير محدود من العمال,Nombre illimité de travailleurs,Unlimited workers
+sub_feature_2,عدد غير محدود من المنتجات,Nombre illimité de produits,Unlimited products
+sub_feature_3,إيصالات بيع غير محدودة,Reçus illimités,Unlimited receipts
+sub_feature_4,إدارة الموردين والفواتير,Gestion des fournisseurs et factures,Suppliers & invoices management
+sub_feature_5,إشعارات فورية,Notifications instantanées,Instant notifications
+sub_feature_6,دعم فني,Support technique,Technical support
+sub_subscribe_now,اشترك الآن,S'abonner,Subscribe Now
+sub_pending_title,طلبك قيد المراجعة,Votre demande est en cours,Your request is pending
+sub_pending_text,تم استلام طلب الاشتراك بنجاح. سيتم التواصل معك في أقرب وقت.,Votre demande a bien été reçue. Nous vous contacterons bientôt.,Your subscription request has been received. We will contact you soon.
+sub_pending_order,رقم الطلب:,N° de commande :,Order number:
+sub_pending_plan,الخطة:,Plan :,Plan:
+sub_pending_amount,المبلغ:,Montant :,Amount:
+sub_pending_date,تاريخ الطلب:,Date :,Date:
+sub_pay_now,إتمام الدفع الآن,Payer maintenant,Pay now
+pay_admin_only,هذه الصفحة للمدير فقط,Cette page est réservée à l'administrateur,This page is for administrators only
+pay_back,العودة,Retour,Back
+pay_title,إتمام الدفع الآمن,Paiement sécurisé,Secure Payment
+pay_subtitle,أدخل بيانات بطاقتك البنكية لتفعيل الاشتراك,Entrez les détails de votre carte pour activer l'abonnement,Enter your card details to activate the subscription
+pay_step_summary,الملخص,Résumé,Summary
+pay_step_payment,الدفع,Paiement,Payment
+pay_step_confirm,التأكيد,Confirmation,Confirm
+pay_summary_title,اشتراك MyStock,Abonnement MyStock,MyStock Subscription
+pay_summary_subscription,الاشتراك الشهري,Abonnement mensuel,Monthly subscription
+pay_summary_fees,رسوم الدفع,Frais,Fees
+pay_summary_total,الإجمالي,Total,Total
+pay_card_label,بطاقة بنكية,Carte bancaire,Bank card
+pay_card_holder,حامل البطاقة,Titulaire,Card Holder
+pay_card_holder_ph,الاسم هنا,Nom ici,Name here
+pay_card_expires,تاريخ الانتهاء,Expiration,Expires
+pay_card_test_note,هذه البطاقة للاختبار فقط,Carte de test uniquement,Test card only
+pay_card_data,بيانات البطاقة,Données de la carte,Card Details
+pay_card_number,رقم البطاقة,Numéro de carte,Card Number
+pay_card_expiry,تاريخ الانتهاء,Date d'expiration,Expiry Date
+pay_card_name,اسم حامل البطاقة,Nom du titulaire,Cardholder Name
+pay_card_name_ph,الاسم كما هو على البطاقة,Nom tel qu'il figure sur la carte,Name as shown on card
+pay_email_title,البريد الإلكتروني,Email,Email
+pay_email_subtitle,سيصلك إشعار على هذا البريد,Vous recevrez une notification à cet email,You will receive a notification at this email
+pay_agree,أوافق على الاشتراك الشهري والخصم التلقائي بمبلغ,J'accepte l'abonnement mensuel et le prélèvement automatique de,I agree to the monthly subscription and automatic charge of
+pay_or_pay_with,أو ادفع بـ,Ou payez avec,Or pay with
+pay_button,دفع الاشتراك,Payer l'abonnement,Pay Subscription
+pay_cancel,إلغاء والعودة,Annuler et retourner,Cancel and return
+pay_warning,هذه صفحة تجريبية — لن يتم خصم أي مبلغ فعلياً,Page de démonstration — aucun montant ne sera débité,Demo page — no actual charge will be made
+pay_processing,جارٍ معالجة الدفع...,Traitement du paiement...,Processing payment...
+pay_success,✅ تم الدفع بنجاح! جارٍ تحويلك...,✅ Paiement réussi ! Redirection...,✅ Payment successful! Redirecting...
+pay_success_btn,تم الدفع بنجاح,Paiement réussi,Payment successful
+pay_success_short,بنجاح!,réussi !,successful!
+pay_via,جارٍ الدفع عبر,Paiement via,Paying via
+pay_err_agree,يجب الموافقة على شروط الاشتراك,Vous devez accepter les conditions,You must accept the terms
+pay_err_card,رقم البطاقة غير صحيح,Numéro de carte invalide,Invalid card number
+pay_err_expiry,تاريخ الانتهاء غير صحيح,Date d'expiration invalide,Invalid expiry date
+pay_err_cvv,CVV غير صحيح,CVV invalide,Invalid CVV
+pay_err_name,اسم حامل البطاقة مطلوب,Nom du titulaire requis,Cardholder name required
+pay_err_email,البريد الإلكتروني غير صحيح,Email invalide,Invalid email
+pay_err_generic,خطأ: ,Erreur : ,Error: 
+pay_confirm_apple,"تأكيد الدفع عبر Apple Pay؟
+(محاكاة)","Confirmer le paiement via Apple Pay ?
+(simulation)","Confirm payment via Apple Pay?
+(simulation)"
+pay_confirm_google,"تأكيد الدفع عبر Google Pay؟
+(محاكاة)","Confirmer le paiement via Google Pay ?
+(simulation)","Confirm payment via Google Pay?
+(simulation)"
+dash_title,لوحة التحكم,Tableau de bord,Dashboard
+dash_stock_moves,حركات المخزون,Mouvements de stock,Stock Movements
+dash_last_30,آخر 30 يوم,30 derniers jours,Last 30 days
+dash_in_qty,إضافة (كمية),Entrée (qté),In (qty)
+dash_total_moves,إجمالي الحركات,Total mouvements,Total movements
+dash_out_qty,إخراج (كمية),Sortie (qté),Out (qty)
+dash_in,إضافة,Entrée,In
+dash_out,إخراج,Sortie,Out
+dash_day,يوم,Jour,Day
+dash_7days,7 أيام,7 jours,7 days
+dash_30days,30 يوم,30 jours,30 days
+dash_year,سنة,Année,Year
+dash_profit,الأرباح,Profits,Profits
+dash_min_period,أدنى فترة,Minimum,Minimum
+dash_avg_period,متوسط الفترة,Moyenne,Average
+dash_max_period,أعلى فترة,Maximum,Maximum
+dash_total_profit,إجمالي الربح,Profit total,Total profit
+dash_profit_evolution,تطور الأرباح,Évolution des profits,Profit Evolution
+dash_products,المنتجات,Produits,Products
+dash_movements,الحركات,Mouvements,Movements
+dash_users,المستخدمون,Utilisateurs,Users
+dash_low_stock,قاربت على النفاد,Stock faible,Low Stock
+dash_today_moves,حركات اليوم,Mouvements d'aujourd'hui,Today's movements
+dash_qty,الكمية,Quantité,Quantity
+dash_periods,فترة,période(s),period(s)
+dash_no_moves,لا توجد حركات في هذه الفترة,Aucun mouvement sur cette période,No movements in this period
+dash_no_profit,لا توجد أرباح في هذه الفترة,Aucun profit sur cette période,No profits in this period
+dash_sub_1,حركات اليوم (كل عملية = نقطة),Mouvements d'aujourd'hui (chaque op = point),Today's movements (each op = point)
+dash_sub_7,آخر 7 أيام (مجموع يومي),7 derniers jours (total journalier),Last 7 days (daily total)
+dash_sub_30,آخر 30 يوم (مجموع يومي),30 derniers jours (total journalier),Last 30 days (daily total)
+dash_sub_365,آخر سنة (مجموع شهري),Dernière année (total mensuel),Last year (monthly total)
+dash_prof_sub_1,أرباح اليوم (كل ساعة),Profits d'aujourd'hui (par heure),Today's profits (hourly)
+dash_prof_sub_7,آخر 7 أيام (يومي),7 derniers jours (journalier),Last 7 days (daily)
+dash_prof_sub_30,آخر 30 يوم (يومي),30 derniers jours (journalier),Last 30 days (daily)
+dash_prof_sub_365,آخر سنة (شهري),Dernière année (mensuel),Last year (monthly)
+products_title,المنتجات,Produits,Products
+products_title_full,MyStock - المنتجات,MyStock - Produits,MyStock - Products
+products_add,إضافة منتج,Ajouter un produit,Add Product
+products_search_ph,بحث بالاسم أو SKU...,Rechercher par nom ou SKU...,Search by name or SKU...
+products_empty,لا توجد منتجات بعد,Aucun produit pour le moment,No products yet
+products_error,خطأ:,Erreur :,Error:
+products_no_name,بدون اسم,Sans nom,No name
+products_qty,الكمية,Quantité,Quantity
+products_price,الثمن,Prix,Price
+products_total,المجموع,Total,Total
+prod_detail_title,تفاصيل المنتج,Détails du produit,Product Details
+prod_detail_title_full,MyStock - تفاصيل المنتج,MyStock - Détails,MyStock - Details
+prod_detail_back,العودة,Retour,Back
+prod_detail_no_id,لم يتم تحديد المنتج,Produit non spécifié,Product not specified
+prod_detail_not_found,المنتج غير موجود,Produit introuvable,Product not found
+prod_detail_buy_price,سعر الشراء,Prix d'achat,Buy Price
+prod_detail_category,الفئة,Catégorie,Category
+prod_detail_supplier,المورد,Fournisseur,Supplier
+prod_detail_unit,الوحدة,Unité,Unit
+prod_detail_barcode,الباركود,Code-barres,Barcode
+prod_detail_sell_price,سعر البيع,Prix de vente,Sell Price
+prod_detail_enable_sell,تفعيل سعر بيع خاص,Activer le prix de vente,Enable special sell price
+prod_detail_enabled,مفعّل,Activé,Enabled
+prod_detail_disabled,غير مفعّل,Désactivé,Disabled
+prod_detail_sell_desc,عند التفعيل يُستخدم هذا السعر في إيصال البيع (بدلاً من سعر الشراء),"Une fois activé, ce prix sera utilisé dans le reçu (au lieu du prix d'achat)","When enabled, this price will be used in the receipt (instead of buy price)"
+prod_detail_sell_input,سعر البيع,Prix de vente,Sell Price
+prod_detail_sell_hint,أدخل السعر الذي تريد بيع المنتج به,Entrez le prix de vente,Enter the price you want to sell at
+prod_detail_delete,حذف المنتج,Supprimer le produit,Delete Product
+prod_detail_edit_image,تعديل الصورة,Modifier l'image,Edit Image
+prod_detail_confirm_delete,هل أنت متأكد من حذف هذا المنتج؟,Êtes-vous sûr de vouloir supprimer ce produit ?,Are you sure you want to delete this product?
+prod_detail_err,خطأ:,Erreur :,Error:
+prod_detail_to,إلى,à,to
+prod_detail_user,مستخدم,Utilisateur,User
+prod_detail_field_name,الاسم,Nom,Name
+prod_detail_field_sku,SKU,SKU,SKU
+prod_detail_notif_edit_title,تعديل منتج,Modification produit,Product modified
+prod_detail_notif_edit_msg,عدّل,a modifié,modified
+prod_detail_notif_sell_title,تعديل سعر البيع,Prix de vente modifié,Sell price modified
+prod_detail_notif_sell_on,فعّل سعر البيع الخاص بـ,a activé le prix de vente pour,enabled the sell price for
+prod_detail_notif_sell_off,أوقف سعر البيع الخاص بـ,a désactivé le prix de vente pour,disabled the sell price for
+prod_detail_notif_sell_edit,عدّل سعر البيع الخاص بـ,a modifié le prix de vente de,modified the sell price of
+prod_detail_notif_del_title,حذف منتج,Produit supprimé,Product deleted
+prod_detail_notif_del_msg,حذف,a supprimé,deleted
+prod_add_title,إضافة منتجات,Ajouter des produits,Add Products
+prod_add_title_full,MyStock - إضافة منتجات,MyStock - Ajouter des produits,MyStock - Add Products
+prod_add_scan,مسح,Scanner,Scan
+prod_add_supplier,المورد (لكل المنتجات),Fournisseur (pour tous les produits),Supplier (for all products)
+prod_add_supplier_ph,اكتب اسم المورد...,Tapez le nom du fournisseur...,Type supplier name...
+prod_add_name,اسم المنتج *,Nom du produit *,Product Name *
+prod_add_name_ph,اسم المنتج...,Nom du produit...,Product name...
+prod_add_qty,الكمية *,Quantité *,Quantity *
+prod_add_price,السعر *,Prix *,Price *
+prod_add_category,الفئة (تلقائياً من إختصاص المورد),Catégorie (auto depuis le fournisseur),Category (auto from supplier)
+prod_add_category_ph,الفئة...,Catégorie...,Category...
+prod_add_barcode,الباركود (SKU),Code-barres (SKU),Barcode (SKU)
+prod_add_barcode_ph,امسح الباركود أو اكتبه...,Scannez ou tapez le code...,Scan or type barcode...
+prod_add_done,تم,Terminé,Done
+prod_add_added,المنتجات المضافة,Produits ajoutés,Added Products
+prod_add_empty,لم تتم إضافة منتجات بعد,Aucun produit ajouté,No products added yet
+prod_add_sum_count,عدد المنتجات,Nombre de produits,Products count
+prod_add_sum_qty,إجمالي الكمية,Quantité totale,Total quantity
+prod_add_sum_total,القيمة الإجمالية,Valeur totale,Total value
+prod_add_save,حفظ المنتجات,Enregistrer,Save Products
+prod_add_saving,جارٍ الحفظ...,Enregistrement...,Saving...
+prod_add_cancel,إلغاء,Annuler,Cancel
+prod_add_scan_title,امسح الباركود,Scanner le code-barres,Scan Barcode
+prod_add_scan_hint,وجّه الكاميرا نحو الباركود,Pointez la caméra vers le code-barres,Point camera at barcode
+prod_add_searching,🔍 جارٍ البحث في قاعدة البيانات العالمية...,🔍 Recherche dans la base mondiale...,🔍 Searching global database...
+prod_add_new_supplier,إضافة مورد جديد,Ajouter un nouveau fournisseur,Add new supplier
+prod_add_no_results,لا توجد نتائج,Aucun résultat,No results
+prod_add_delete,حذف,Supprimer,Delete
+prod_add_scanner_err,مكتبة الماسح غير محمّلة,Bibliothèque scanner non chargée,Scanner library not loaded
+prod_add_camera_err,تعذّر فتح الكاميرا:,Impossible d'ouvrir la caméra :,Cannot open camera:
+prod_add_err_name,اسم المنتج مطلوب,Nom du produit requis,Product name required
+prod_add_err_qty,الكمية يجب أن تكون أكبر من صفر,La quantité doit être supérieure à zéro,Quantity must be greater than zero
+prod_add_err_empty,أضف منتجاً واحداً على الأقل,Ajoutez au moins un produit,Add at least one product
+prod_add_err_org,لا يمكن تحديد المنظمة,Impossible d'identifier l'organisation,Cannot identify organization
+prod_add_err_supplier,فشل إنشاء المورد:,Échec de création du fournisseur :,Failed to create supplier:
+prod_add_err_find,فشل البحث:,Échec de recherche :,Search failed:
+prod_add_err_link,فشل ربط المنتج بالفاتورة:,Échec de liaison du produit :,Failed to link product:
+prod_add_err_insert,فشل إدراج المنتج:,Échec d'insertion du produit :,Failed to insert product:
+prod_add_err_invoice,فشل إنشاء الفاتورة:,Échec de création de la facture :,Failed to create invoice:
+prod_add_notif_title,فاتورة جديدة,Nouvelle facture,New invoice
+prod_add_notif_msg,أنشأ فاتورة,a créé la facture,created invoice
+prod_add_new_count,✅ جديد:,✅ Nouveau :,✅ New:
+prod_add_upd_count,محدّث:,Mis à jour :,Updated:
+prod_add_invoice_count,فاتورة:,Facture :,Invoice:
+mout_title,إخراج منتجات,Sortie de produits,Product Output
+mout_title_full,MyStock - إخراج منتجات,MyStock - Sortie de produits,MyStock - Product Output
+mout_scan,مسح,Scanner,Scan
+mout_note,ملاحظة عامة (اختياري),Note générale (optionnel),General note (optional)
+mout_note_ph,سبب الإخراج...,Raison de la sortie...,Reason for output...
+mout_product,المنتج *,Produit *,Product *
+mout_product_ph,اكتب اسم المنتج...,Tapez le nom du produit...,Type product name...
+mout_qty,الكمية *,Quantité *,Quantity *
+mout_price,السعر *,Prix *,Price *
+mout_available,المتوفر,Disponible,Available
+mout_add_product,إضافة المنتج,Ajouter le produit,Add Product
+mout_added,المنتجات المُخرَجة,Produits sortis,Output Products
+mout_empty,لم تتم إضافة منتجات بعد,Aucun produit ajouté,No products added yet
+mout_sum_count,عدد المنتجات,Nombre de produits,Products count
+mout_sum_qty,إجمالي الكمية,Quantité totale,Total quantity
+mout_sum_total,القيمة الإجمالية,Valeur totale,Total value
+mout_save,حفظ الإخراج,Enregistrer la sortie,Save Output
+mout_cancel,إلغاء,Annuler,Cancel
+mout_scan_title,امسح الباركود,Scanner le code-barres,Scan Barcode
+mout_scan_hint,وجّه الكاميرا نحو الباركود,Pointez la caméra vers le code-barres,Point camera at barcode
+mout_load_err,خطأ في تحميل المنتجات:,Erreur de chargement des produits :,Error loading products:
+mout_no_results,لا توجد نتائج,Aucun résultat,No results
+mout_not_found,منتج غير موجود بهذا الباركود:,Produit introuvable avec ce code-barres :,Product not found with this barcode:
+mout_no_stock,المنتج غير متوفر في المخزون:,Produit non disponible en stock :,Product not available in stock:
+mout_err_select,اختر منتجاً من القائمة,Sélectionnez un produit,Select a product from the list
+mout_err_max,الكمية المتوفرة فقط:,Quantité disponible uniquement :,Available quantity only:
+mout_err_receipt,فشل إنشاء الإيصال:,Échec de création du reçu :,Failed to create receipt:
+mout_err_items,فشل حفظ عناصر الإيصال:,Échec de sauvegarde des articles :,Failed to save items:
+mout_err_movements,فشل تسجيل الحركات:,Échec d'enregistrement des mouvements :,Failed to record movements:
+mout_notif_title_1,إيصال بيع,Reçu de vente,Sale Receipt
+mout_notif_title_n,إيصال بيع,Reçu de vente,Sale Receipt
+mout_notif_msg,أخرج,a sorti,output
+mout_notif_unit,وحدة بقيمة,unités pour,units worth
+mout_success,✅ تم إنشاء الإيصال,✅ Reçu créé,✅ Receipt created
+inv_title,الفواتير,Factures,Invoices
+inv_title_full,MyStock - الفواتير,MyStock - Factures,MyStock - Invoices
+inv_add_products,إضافة منتجات,Ajouter des produits,Add Products
+inv_search_ph,بحث برقم الفاتورة أو اسم المورد...,Rechercher par numéro ou fournisseur...,Search by invoice number or supplier...
+inv_empty,لا توجد فواتير بعد,Aucune facture pour le moment,No invoices yet
+inv_empty_hint,أضف منتجات ← ستُنشأ الفواتير تلقائياً,Ajoutez des produits ← les factures seront créées automatiquement,Add products ← invoices will be created automatically
+inv_no_supplier,بدون مورد,Sans fournisseur,No supplier
+inv_stat_products,المنتجات,Produits,Products
+inv_stat_total,الإجمالي,Total,Total
+inv_notif_title,إنشاء فاتورة,Création de facture,Invoice created
+inv_notif_msg,أنشأ فاتورة,a créé la facture,created invoice
+inv_notif_unit,قطعة,pièces,items
+inv_page_title_full,MyStock - فاتورة,MyStock - Facture,MyStock - Invoice
+inv_page_no_id,لم يتم تحديد الفاتورة,Aucune facture spécifiée,No invoice specified
+inv_page_not_found,الفاتورة غير موجودة,Facture introuvable,Invoice not found
+inv_page_info_title,بيانات الفاتورة,Informations de la facture,Invoice Details
+inv_page_number,رقم الفاتورة:,N° de facture :,Invoice No:
+inv_page_date,التاريخ:,Date :,Date:
+inv_page_time,الوقت:,Heure :,Time:
+inv_page_supplier_title,بيانات المورد,Informations du fournisseur,Supplier Details
+inv_page_supplier_name,الاسم:,Nom :,Name:
+inv_page_supplier_phone,الهاتف:,Téléphone :,Phone:
+inv_page_supplier_specialty,الإختصاص:,Spécialité :,Specialty:
+inv_page_col_product,المنتج,Produit,Product
+inv_page_col_qty,الكمية,Qté,Qty
+inv_page_col_price,السعر,Prix,Price
+inv_page_col_total,المجموع,Total,Total
+inv_page_no_items,لا توجد عناصر,Aucun article,No items
+inv_page_page_total,مجموع الصفحة,Total page,Page Total
+inv_page_grand_total,المجموع الكلي,Total général,Grand Total
+inv_page_responsible,الموظف المسؤول:,Employé responsable :,Responsible Employee:
+inv_page_supplier_sign,توقيع المورد:,Signature fournisseur :,Supplier Signature:
+inv_page_page,الصفحة,Page,Page
+inv_page_of,من,sur,of
+inv_page_print,طباعة,Imprimer,Print
+inv_page_invoices,الفواتير,Factures,Invoices
+inv_page_delete,حذف الفاتورة,Supprimer la facture,Delete Invoice
+inv_page_deleting,جارٍ الحذف...,Suppression...,Deleting...
+inv_page_confirm_del,هل أنت متأكد من حذف الفاتورة,Êtes-vous sûr de vouloir supprimer la facture,Are you sure you want to delete invoice
+inv_page_confirm_del_msg,"سيتم حذف الفاتورة وجميع المنتجات المرتبطة بها.
+لا يمكن التراجع بسهولة.","La facture et tous les produits associés seront supprimés.
+Action difficilement réversible.","The invoice and all associated products will be deleted.
+Hard to reverse."
+inv_page_deleted,✅ تم حذف الفاتورة بنجاح,✅ Facture supprimée avec succès,✅ Invoice deleted successfully
+inv_page_err_items,فشل حذف عناصر الفاتورة:,Échec suppression articles :,Failed to delete items:
+inv_page_err_products,فشل حذف المنتجات:,Échec suppression produits :,Failed to delete products:
+inv_page_err_invoice,فشل حذف الفاتورة:,Échec suppression facture :,Failed to delete invoice:
+rcpt_title_full,MyStock - إيصال,MyStock - Reçu,MyStock - Receipt
+rcpt_no_id,لم يتم تحديد الإيصال,Aucun reçu spécifié,No receipt specified
+rcpt_not_found,الإيصال غير موجود,Reçu introuvable,Receipt not found
+rcpt_number,إيصال رقم:,Reçu n° :,Receipt No:
+rcpt_no_items,لا توجد عناصر,Aucun article,No items
+rcpt_total,المجموع الكلي:,Total général :,Grand Total:
+rcpt_date,التاريخ:,Date :,Date:
+rcpt_time,الوقت:,Heure :,Time:
+rcpt_thanks,شكراً لزيارتكم,Merci de votre visite,Thank you for your visit
+rcpt_print,طباعة,Imprimer,Print
+rcpt_back,العودة,Retour,Back
+rpt_title_full,MyStock - طباعة الإيصالات,MyStock - Imprimer les reçus,MyStock - Print Receipts
+rpt_no_new,لا توجد إيصالات جديدة,Aucun nouveau reçu,No new receipts
+rpt_no_new_msg,جميع الإيصالات السابقة تمت طباعتها,Tous les reçus ont déjà été imprimés,All previous receipts have been printed
+rpt_count,عدد الإيصالات,Nombre de reçus,Receipts count
+rpt_total_qty,إجمالي الكمية,Quantité totale,Total quantity
+rpt_print_all,طباعة الكل,Tout imprimer,Print All
+mv_title,الحركات,Mouvements,Movements
+mv_title_full,MyStock - الحركات,MyStock - Mouvements,MyStock - Movements
+mv_out_product,إخراج منتج,Sortir un produit,Output Product
+mv_empty,لا توجد حركات بعد,Aucun mouvement,No movements yet
+mv_in,إدخال,Entrée,In
+mv_out,إخراج,Sortie,Out
+mv_deleted,منتج محذوف,Produit supprimé,Deleted product
+wk_title,العمال,Travailleurs,Workers
+wk_title_full,MyStock - العمال,MyStock - Travailleurs,MyStock - Workers
+wk_deputies,النواب,Adjoints,Deputies
+wk_workers,العمال,Travailleurs,Workers
+wk_no_deputies,لا يوجد نواب,Aucun adjoint,No deputies
+wk_no_workers,لا يوجد عمال,Aucun travailleur,No workers
+wk_role_deputy,نائب,Adjoint,Deputy
+wk_role_worker,عامل,Travailleur,Worker
+wk_online,متصل,En ligne,Online
+wk_offline,غير متصل,Hors ligne,Offline
+aw_title,إضافة عامل جديد,Ajouter un travailleur,Add New Worker
+aw_title_full,MyStock - إضافة عامل,MyStock - Ajouter un travailleur,MyStock - Add Worker
+aw_no_permission,ليس لديك صلاحية إضافة عمال,Vous n'avez pas la permission d'ajouter des travailleurs,You do not have permission to add workers
+aw_choose_method,اختر طريقة الإضافة:,Choisissez la méthode d'ajout :,Choose addition method:
+aw_email_method,بالبريد الإلكتروني,Par email,By Email
+aw_email_method_desc,إرسال رابط دعوة تلقائياً,Envoi automatique d'un lien d'invitation,Auto-send invite link
+aw_qr_method,QR Code,QR Code,QR Code
+aw_qr_method_desc,امسح الرمز للانضمام,Scannez le code pour rejoindre,Scan code to join
+aw_change_method,تغيير الطريقة,Changer de méthode,Change method
+aw_send_email_title,إرسال دعوة بالبريد,Envoyer une invitation par email,Send Email Invitation
+aw_worker_email,البريد الإلكتروني للعامل *,Email du travailleur *,Worker's Email *
+aw_send_invite,إرسال الدعوة,Envoyer l'invitation,Send Invitation
+aw_sending,جارٍ الإرسال...,Envoi...,Sending...
+aw_invalid_email,بريد إلكتروني غير صالح,Email invalide,Invalid email
+aw_send_failed,فشل إرسال الدعوة,Échec de l'envoi,Failed to send invitation
+aw_sent_to,تم إرسال الدعوة إلى,Invitation envoyée à,Invitation sent to
+aw_qr_title,رمز QR للانضمام,Code QR pour rejoindre,QR Code to Join
+aw_qr_loading,جارٍ توليد الرمز...,Génération du code...,Generating code...
+aw_qr_note,⚠️ صالح لعامل واحد فقط,⚠️ Valable pour un seul travailleur,⚠️ Valid for one worker only
+aw_qr_gen_failed,فشل توليد الرمز:,Échec de génération :,Generation failed:
+aw_qr_lib_missing,مكتبة QR غير محمّلة,Bibliothèque QR non chargée,QR library not loaded
+aw_copy_link,نسخ الرابط,Copier le lien,Copy Link
+aw_share,مشاركة,Partager,Share
+aw_copied,تم النسخ,Copié,Copied
+aw_link,الرابط:,Lien :,Link:
+aw_generate_new,توليد QR جديد,Générer un nouveau QR,Generate New QR
+aw_add_another,إضافة عامل آخر,Ajouter un autre,Add Another
+aw_share_title,دعوة للانضمام إلى MyStock,Invitation à rejoindre MyStock,Invitation to join MyStock
+aw_share_text,انضم إلى فريقي على MyStock:,Rejoignez mon équipe sur MyStock :,Join my team on MyStock:
+rw_title_full,MyStock - الانضمام إلى الفريق,MyStock - Rejoindre l'équipe,MyStock - Join Team
+rw_subtitle,الانضمام إلى الفريق,Rejoindre l'équipe,Join the Team
+rw_personal_info,معلوماتك الشخصية,Vos informations personnelles,Your Personal Information
+rw_phone,رقم الهاتف *,Téléphone *,Phone *
+rw_email_locked,🔒 مُملَّأ من الدعوة,🔒 Rempli depuis l'invitation,🔒 Filled from invitation
+rw_create_account,إنشاء حسابي,Créer mon compte,Create My Account
+rw_creating,جارٍ إنشاء الحساب...,Création du compte...,Creating account...
+rw_success,✅ تم إنشاء حسابك! جارٍ تحويلك...,✅ Compte créé ! Redirection...,✅ Account created! Redirecting...
+rw_err_token,رابط الدعوة غير صالح,Lien d'invitation invalide,Invalid invitation link
+rw_err_invite,الدعوة غير صالحة أو منتهية,Invitation invalide ou expirée,Invalid or expired invitation
+rw_err_expired,انتهت صلاحية الدعوة,Invitation expirée,Invitation expired
+rw_err_name,الاسم الكامل مطلوب,Nom complet requis,Full name required
+rw_err_phone,رقم الهاتف مطلوب,Téléphone requis,Phone required
+rw_err_pwd_short,كلمة السر يجب أن تكون 6 أحرف على الأقل,Le mot de passe doit contenir au moins 6 caractères,Password must be at least 6 characters
+rw_err_signup,فشل إنشاء الحساب:,Échec de création du compte :,Failed to create account:
+mm_title,إدارة العضو,Gestion du membre,Manage Member
+mm_title_full,MyStock - إدارة العضو,MyStock - Gestion du membre,MyStock - Manage Member
+mm_no_permission,ليس لديك صلاحية إدارة الأعضاء,Vous n'avez pas la permission,You do not have permission
+mm_no_id,لم يتم تحديد العضو,Aucun membre spécifié,No member specified
+mm_not_found,لم يتم العثور على العضو,Membre introuvable,Member not found
+mm_not_in_org,هذا العضو ليس في منظمتك,Ce membre n'est pas dans votre organisation,This member is not in your organization
+mm_cant_manage_admin,لا يمكن إدارة المدير,Impossible de gérer l'admin,Cannot manage admin
+mm_change_role_title,🔄 تغيير الدور,🔄 Changer le rôle,🔄 Change Role
+mm_change_role_hint,يمكنك ترقية العامل إلى نائب، أو إرجاع النائب إلى عامل.,"Vous pouvez promouvoir un travailleur en adjoint, ou rétrograder un adjoint.","You can promote a worker to deputy, or demote a deputy back."
+mm_promote,ترقية إلى نائب,Promouvoir en adjoint,Promote to Deputy
+mm_demote,إرجاع إلى عامل,Rétrograder en travailleur,Demote to Worker
+mm_changing,جارٍ التغيير...,Changement...,Changing...
+mm_remove_title,🚫 إخراج من المنظمة,🚫 Retirer de l'organisation,🚫 Remove from Organization
+mm_remove_hint,سيتم إخراج العضو من المنظمة فوراً. تبقى بياناته التاريخية محفوظة في النظام.,Le membre sera retiré immédiatement. Ses données historiques sont conservées.,The member will be removed immediately. Historical data is preserved.
+mm_remove_btn,إخراج من المنظمة,Retirer de l'organisation,Remove from Organization
+mm_removing,جارٍ الإخراج...,Retrait...,Removing...
+mm_confirm_role,تحويل,Convertir,Convert
+mm_confirm_remove_1,هل أنت متأكد من إخراج,Êtes-vous sûr de retirer,Are you sure you want to remove
+mm_confirm_remove_1b,"من المنظمة؟
+لا يمكن التراجع بسهولة.","de l'organisation ?
+Action difficilement réversible.","from the organization?
+Hard to reverse."
+mm_confirm_remove_2,تأكيد نهائي: سيتم إخراج,Confirmation finale : retirer,Final confirmation: remove
+mm_success_role,✅ تم التحويل إلى,✅ Converti en,✅ Converted to
+mm_success_remove,✅ تم إخراج العضو بنجاح,✅ Membre retiré avec succès,✅ Member removed successfully
+mp_title_full,MyStock - ملف العضو,MyStock - Profil du membre,MyStock - Member Profile
+mp_not_found,لم يتم العثور على العضو,Membre introuvable,Member not found
+mp_role_admin,مدير,Admin,Admin
+mp_email_protected,محمي 🔒,Protégé 🔒,Protected 🔒
+mp_online_now,🟢 متصل الآن,🟢 En ligne,🟢 Online now
+mp_offline_now,⚪ غير متصل,⚪ Hors ligne,⚪ Offline
+mp_manage,إدارة,Gérer,Manage
+mp_personal_info,المعلومات الشخصية,Informations personnelles,Personal Information
+mp_admin,المدير,Admin,Admin
+mp_log,السجل,Journal,Log
+mp_invoices,الفواتير,Factures,Invoices
+mp_out,إخراج,Sorties,Outputs
+mp_no_out,لا توجد عمليات إخراج بعد,Aucune sortie pour le moment,No outputs yet
+pf_title_full,MyStock - الملف الشخصي,MyStock - Profil,MyStock - Profile
+pf_add_worker,إضافة عامل,Ajouter un travailleur,Add Worker
+pf_dashboard,لوحة المعلومات,Tableau de bord,Dashboard
+pf_print_all,طباعة الكل,Tout imprimer,Print All
+pf_new,جديد,nouveau,new
+pf_all_printed,جميع الإيصالات مطبوعة,Tous les reçus sont imprimés,All receipts are printed
+pf_printed,مطبوع,Imprimé,Printed
+pd_title,لوحة المعلومات,Tableau de bord,Dashboard
+pd_title_full,MyStock - لوحة المعلومات,MyStock - Tableau de bord,MyStock - Dashboard
+pd_title_of,لوحة,Tableau de,Dashboard of
+pd_no_permission,ليس لديك صلاحية,Pas de permission,No permission
+pd_org,المنظمة,Organisation,Organization
+pd_my_org,منظمتي,Mon organisation,My Organization
+pd_cover,صورة الغلاف,Image de couverture,Cover Image
+pd_avatar,صورة المستخدم,Photo de profil,Profile Picture
+pd_name,الاسم,Nom,Name
+pd_email_pwd,البريد وكلمة المرور,Email et mot de passe,Email & Password
+pd_phone,رقم الهاتف,Téléphone,Phone
+pd_edited,مُعدَّلة,Modifiée,Edited
+pd_not_edited,غير مُعدَّلة,Non modifiée,Not edited
+pd_not_set,لم يُحدَّد,Non défini,Not set
+pd_protected,محمي,Protégé,Protected
+pd_team_member,عضو في الفريق,Membre de l'équipe,Team member
+pe_title,تعديل الملف,Modifier le profil,Edit Profile
+pe_title_full,MyStock - تعديل الملف,MyStock - Modifier le profil,MyStock - Edit Profile
+pe_save,حفظ التعديلات,Enregistrer,Save Changes
+pe_saving,جارٍ الحفظ...,Enregistrement...,Saving...
+pe_uploading,جارٍ الرفع...,Envoi...,Uploading...
+pe_choose_image,اختيار صورة,Choisir une image,Choose Image
+pe_no_cover,لا يوجد غلاف,Pas de couverture,No cover
+pe_hint_cover,اختر صورة جديدة (الحد الأقصى 5 ميغا),Choisissez une nouvelle image (max 5 Mo),Choose a new image (max 5MB)
+pe_hint_avatar,اختر صورة جديدة (الحد الأقصى 5 ميغا),Choisissez une nouvelle image (max 5 Mo),Choose a new image (max 5MB)
+pe_hint_name,سيظهر هذا الاسم لكل أعضاء الفريق,Ce nom sera visible par toute l'équipe,This name will be visible to all team members
+pe_hint_email,لا يمكن تغيير البريد حالياً,Impossible de modifier l'email,Cannot change email currently
+pe_hint_password,أدخل كلمة المرور الجديدة (6 أحرف على الأقل),Entrez le nouveau mot de passe (min 6 caractères),Enter new password (min 6 characters)
+pe_hint_phone,أدخل رقم هاتفك بصيغة دولية,Entrez votre numéro au format international,Enter your phone number in international format
+pe_full_name,الاسم الكامل,Nom complet,Full Name
+pe_name_ph,أدخل اسمك,Entrez votre nom,Enter your name
+pe_new_password,كلمة المرور الجديدة,Nouveau mot de passe,New Password
+pe_confirm_password,تأكيد كلمة المرور,Confirmer le mot de passe,Confirm Password
+pe_err_no_image,لم يتم اختيار صورة,Aucune image sélectionnée,No image selected
+pe_err_size,حجم الصورة يتجاوز 5 ميغابايت,L'image dépasse 5 Mo,Image exceeds 5MB
+pe_err_not_image,الملف ليس صورة,Le fichier n'est pas une image,File is not an image
+pe_err_upload,فشل الرفع:,Échec de l'envoi :,Upload failed:
+pe_err_choose,اختر صورة أولاً,Choisissez d'abord une image,Choose an image first
+pe_err_name,الاسم لا يمكن أن يكون فارغاً,Le nom ne peut pas être vide,Name cannot be empty
+pe_err_pwd_match,كلمتا المرور غير متطابقتين,Les mots de passe ne correspondent pas,Passwords do not match
+pe_success_cover,✅ تم تحديث صورة الغلاف,✅ Couverture mise à jour,✅ Cover updated
+pe_success_avatar,✅ تم تحديث الصورة الشخصية,✅ Photo de profil mise à jour,✅ Profile picture updated
+pe_success_name,✅ تم تحديث الاسم,✅ Nom mis à jour,✅ Name updated
+pe_success_password,✅ تم تغيير كلمة المرور,✅ Mot de passe modifié,✅ Password changed
+pe_success_phone,✅ تم تحديث رقم الهاتف,✅ Téléphone mis à jour,✅ Phone updated
+pe_unknown_section,قسم غير معروف:,Section inconnue :,Unknown section:
+oe_title,تعديل المنظمة,Modifier l'organisation,Edit Organization
+oe_title_full,MyStock - تعديل المنظمة,MyStock - Modifier l'organisation,MyStock - Edit Organization
+oe_no_permission,ليس لديك صلاحية تعديل المنظمة,Vous n'avez pas la permission,You do not have permission
+oe_not_found,لم يتم العثور على المنظمة,Organisation introuvable,Organization not found
+oe_logo_title,شعار المنظمة,Logo de l'organisation,Organization Logo
+oe_shape_circle,دائري,Cercle,Circle
+oe_shape_square,مربع,Carré,Square
+oe_shape_rectangle,مستطيل,Rectangle,Rectangle
+oe_name_title,اسم المنظمة,Nom de l'organisation,Organization Name
+oe_name_ph,اسم المنظمة,Nom de l'organisation,Organization name
+oe_show_name,إظهار اسم المنظمة في الفواتير,Afficher le nom dans les factures,Show organization name in invoices
+oe_show_name_desc,سيظهر الاسم في الفواتير والإيصالات المطبوعة,Le nom apparaîtra dans les factures et reçus imprimés,The name will appear in printed invoices and receipts
+oe_currency_title,العملة,Devise,Currency
+oe_currency_hint,اختر العملة ورمزها المستخدم في الفواتير,Choisissez la devise et son symbole,Choose the currency and its symbol
+oe_currency,العملة,Devise,Currency
+oe_symbol,رمز العملة (قابل للتعديل),Symbole de la devise (modifiable),Currency symbol (editable)
+oe_symbol_hint,مثال: DH، $، €، ر.س,"Ex: DH, $, €, SAR","Ex: DH, $, €, SAR"
+oe_show_currency,إظهار رمز العملة في الفواتير,Afficher le symbole dans les factures,Show currency symbol in invoices
+oe_show_currency_desc,سيظهر الرمز بجانب السعر والمجموع (بدون الكمية),Le symbole apparaîtra à côté du prix et du total,The symbol will appear next to price and total
+oe_preview,معاينة:,Aperçu :,Preview:
+oe_err_name,اسم المنظمة مطلوب,Nom de l'organisation requis,Organization name required
+oe_err_symbol,رمز العملة مطلوب,Symbole de devise requis,Currency symbol required
+oe_success,✅ تم حفظ التعديلات بنجاح,✅ Modifications enregistrées,✅ Changes saved successfully
+stg_title,الإعدادات,Paramètres,Settings
+stg_title_full,MyStock - الإعدادات,MyStock - Paramètres,MyStock - Settings
+stg_profile,الملف الشخصي,Profil,Profile
+stg_profile_sub,تعديل معلوماتك الشخصية,Modifier vos informations,Edit your personal information
+stg_admin_panel,الإدارة العامة,Administration,Admin Panel
+stg_notifications,الإشعارات,Notifications,Notifications
+stg_update,تحديث التطبيق,Mettre à jour,Update App
+stg_about,حول التطبيق,À propos de l'application,About App
+ntf_title,الإشعارات,Notifications,Notifications
+ntf_title_full,MyStock - الإشعارات,MyStock - Notifications,MyStock - Notifications
+ntf_empty,لا توجد إشعارات,Aucune notification,No notifications
+ntf_now,الآن,À l'instant,Just now
+ntf_min_ago,قبل,Il y a,
+ntf_min,دقيقة,min,min ago
+ntf_hour_ago,قبل,Il y a,
+ntf_hour,ساعة,h,h ago
+ntf_day_ago,قبل,Il y a,
+ntf_day,يوم,j,d ago
+sup_title,الموردون,Fournisseurs,Suppliers
+sup_title_full,MyStock - الموردون,MyStock - Fournisseurs,MyStock - Suppliers
+sup_add,إضافة مورد,Ajouter un fournisseur,Add Supplier
+sup_search_ph,بحث باسم المورد...,Rechercher par nom...,Search by supplier name...
+sup_empty,لا يوجد موردون بعد,Aucun fournisseur,No suppliers yet
+sup_add_title,إضافة مورد,Ajouter un fournisseur,Add Supplier
+sup_add_title_full,MyStock - إضافة مورد,MyStock - Ajouter un fournisseur,MyStock - Add Supplier
+sup_name,اسم المورد *,Nom du fournisseur *,Supplier Name *
+sup_specialty,الإختصاص,Spécialité,Specialty
+sup_specialty_ph,مثال: مواد غذائية، إلكترونيات، ملابس...,"Ex: Alimentaire, Électronique, Vêtements...","Ex: Food, Electronics, Clothing..."
+sup_address,العنوان,Adresse,Address
+sup_notes,ملاحظات,Notes,Notes
+sup_notes_ph,أي ملاحظات إضافية...,Notes supplémentaires...,Any additional notes...
+sup_save,حفظ المورد,Enregistrer,Save Supplier
+sup_err_name,اسم المورد مطلوب,Nom du fournisseur requis,Supplier name required
+sup_notif_title,مورد جديد,Nouveau fournisseur,New supplier
+sup_notif_msg,أضاف المورد,a ajouté le fournisseur,added supplier
+sup_success,✅ تم إضافة المورد بنجاح!,✅ Fournisseur ajouté avec succès!,✅ Supplier added successfully!
+sup_det_title,تفاصيل المورد,Détails du fournisseur,Supplier Details
+sup_det_title_full,MyStock - تفاصيل المورد,MyStock - Détails du fournisseur,MyStock - Supplier Details
+sup_det_no_id,لم يتم تحديد المورد,Aucun fournisseur spécifié,No supplier specified
+sup_det_not_found,المورد غير موجود,Fournisseur introuvable,Supplier not found
+sup_det_delete,حذف المورد,Supprimer le fournisseur,Delete Supplier
+sup_det_invoices,فواتير المورد,Factures du fournisseur,Supplier Invoices
+sup_det_no_invoices,لا توجد فواتير لهذا المورد,Aucune facture pour ce fournisseur,No invoices for this supplier
+sup_det_confirm_del,هل أنت متأكد من حذف هذا المورد؟,Êtes-vous sûr de vouloir supprimer ce fournisseur ?,Are you sure you want to delete this supplier?
+sup_det_notif_del_title,حذف مورد,Fournisseur supprimé,Supplier deleted
+sup_det_notif_del_msg,حذف المورد,a supprimé le fournisseur,deleted supplier
+jn_title,الانضمام للفريق,Rejoindre l'équipe,Join the Team
+jn_title_full,MyStock - الانضمام للفريق,MyStock - Rejoindre l'équipe,MyStock - Join the Team
+jn_subtitle,أدخل الكود المُرسل إليك من المدير,Entrez le code envoyé par le gestionnaire,Enter the code sent by the manager
+jn_code,كود الدعوة *,Code d'invitation *,Invitation Code *
+jn_err_code,الكود يجب أن يكون 6 أرقام,Le code doit contenir 6 chiffres,Code must be 6 digits
+jn_err_verify,فشل التحقق:,Échec de vérification :,Verification failed:
+jn_err_invalid_code,كود الدعوة غير صالح أو مستخدم مسبقاً,Code invalide ou déjà utilisé,Invalid or already used invitation code
+pd_bank_card,البطاقة البنكية,Carte bancaire,Bank Card
+pe_bank_title,البطاقة البنكية,Carte bancaire,Bank Card
+pe_bank_hint,أضف بطاقتك (يُعرض آخر 4 أرقام فقط),Ajoutez votre carte (seuls les 4 derniers chiffres sont affichés),Add your card (only last 4 digits are shown)
+pe_bank_holder,اسم حامل البطاقة,Nom du titulaire,Cardholder Name
+pe_bank_holder_ph,الاسم كما على البطاقة,Nom tel qu'il figure sur la carte,Name as shown on card
+pe_bank_number,رقم البطاقة,Numéro de carte,Card Number
+pe_bank_number_ph,0000 0000 0000 0000,0000 0000 0000 0000,0000 0000 0000 0000
+pe_bank_expiry,تاريخ الانتهاء,Date d'expiration,Expiry Date
+pe_bank_expiry_ph,MM/YY,MM/AA,MM/YY
+pe_bank_save,حفظ البطاقة,Enregistrer la carte,Save Card
+pe_bank_err_number,رقم البطاقة غير صحيح,Numéro de carte invalide,Invalid card number
+pe_bank_err_holder,اسم حامل البطاقة مطلوب,Nom du titulaire requis,Cardholder name required
+pe_bank_err_expiry,تاريخ الانتهاء مطلوب,Date d'expiration requise,Expiry date required
+pe_success_bank,✅ تم حفظ البطاقة البنكية,✅ Carte bancaire enregistrée,✅ Bank card saved
+pe_bank_remove,حذف البطاقة,Supprimer la carte,Delete Card
+pe_bank_confirm_remove,هل أنت متأكد من حذف البطاقة البنكية؟,Êtes-vous sûr de vouloir supprimer la carte bancaire ?,Are you sure you want to delete the bank card?
+pe_success_bank_remove,✅ تم حذف البطاقة البنكية,✅ Carte bancaire supprimée,✅ Bank card deleted
+bc_title,البطاقة البنكية,Carte bancaire,Bank Card
+bc_title_full,MyStock - البطاقة البنكية,MyStock - Carte bancaire,MyStock - Bank Card
+bc_default,البطاقة الافتراضية,Carte par défaut,Default Card
+bc_empty,لا توجد بطاقة بنكية,Aucune carte bancaire,No bank card
+bc_empty_hint,أضف بطاقتك لعرضها هنا,Ajoutez votre carte pour la voir ici,Add your card to see it here
+bc_add,إضافة بطاقة,Ajouter une carte,Add Card
+bc_deactivate,إلغاء تفعيل هذه البطاقة,Désactiver cette carte,Deactivate this card
+bc_confirm_deactivate,"هل أنت متأكد من إلغاء تفعيل هذه البطاقة؟
+لديك 3 أيام لإعادة تفعيلها قبل إيقاف التطبيق.","Êtes-vous sûr de vouloir désactiver cette carte ?
+Vous avez 3 jours pour la réactiver avant la suspension.","Are you sure you want to deactivate this card?
+You have 3 days to reactivate it before suspension."
+bc_deactivated,✅ تم إلغاء تفعيل البطاقة,✅ Carte désactivée,✅ Card deactivated
+bc_reactivate,إعادة تفعيل البطاقة,Réactiver la carte,Reactivate Card
+bc_add_new,إضافة بطاقة جديدة,Ajouter une nouvelle carte,Add New Card
+bc_reactivated,✅ تم إعادة تفعيل البطاقة,✅ Carte réactivée,✅ Card reactivated
+bc_inactive,غير مفعّلة,Inactive,Inactive
+bc_blocked_msg,تم إيقاف التطبيق بسبب عدم وجود بطاقة بنكية مفعّلة. يرجى إعادة تفعيل بطاقتك أو إضافة بطاقة جديدة.,L'application est suspendue en raison d'une carte bancaire inactive. Veuillez réactiver votre carte ou en ajouter une nouvelle.,The application is suspended due to an inactive bank card. Please reactivate your card or add a new one.
+nav_dashboard,لوحة التحكم,Tableau de bord,Dashboard
+nav_add_product,إضافة منتج,Ajouter un produit,Add Product
+nav_out_product,إخراج منتج,Sortir un produit,Output Product
+nav_products,المنتجات,Produits,Products
+nav_movements,الحركات,Mouvements,Movements
+nav_workers,العمال,Travailleurs,Workers
+nav_suppliers,الموردون,Fournisseurs,Suppliers
+nav_invoices,الفواتير,Factures,Invoices
+nav_settings,الإعدادات,Paramètres,Settings
+nav_profile,الملف الشخصي,Profil,Profile
+nav_logout,تسجيل الخروج,Déconnexion,Logout
+nav_menu,القائمة,Menu,Menu
+nav_notifications,الإشعارات,Notifications,Notifications
+nav_search,بحث...,Rechercher...,Search...
+warn_title_1,⚠️ بطاقتك غير مفعّلة,⚠️ Carte inactive,⚠️ Card inactive
+warn_title_2,🔔 تبقى يومان,🔔 2 jours restants,🔔 2 days left
+warn_title_3,🚨 تبقى 12 ساعة,🚨 12 heures restantes,🚨 12 hours left
+warn_msg_1,لقد ألغيت تفعيل بطاقتك البنكية. لديك 3 أيام لإعادة تفعيلها أو إضافة بطاقة جديدة قبل إيقاف التطبيق.,Vous avez désactivé votre carte bancaire. Vous avez 3 jours pour la réactiver ou ajouter une nouvelle carte.,You deactivated your bank card. You have 3 days to reactivate it or add a new card before suspension.
+warn_msg_2,مرّ يوم على إلغاء تفعيل بطاقتك. تبقى يومان قبل إيقاف التطبيق.,Un jour s'est écoulé. Il vous reste 2 jours avant la suspension.,A day has passed. 2 days left before suspension.
+warn_msg_3,تبقى 12 ساعة فقط! أعد تفعيل بطاقتك أو أضف بطاقة جديدة الآن.,Il ne reste que 12 heures ! Réactivez votre carte ou ajoutez-en une nouvelle.,Only 12 hours left! Reactivate your card or add a new one now.
+lang_page_title,اللغة,Langue,Language
+lang_title_full,MyStock - اللغة,MyStock - Langue,MyStock - Language
+lang_edit,تعديل,Modifier,Edit
+lang_apply,تطبيق,Appliquer,Apply
+lang_page_desc,سيتم استخدام اللغة الموجودة في أعلى القائمة بشكل افتراضي. إذا لم يكن أحد التطبيقات يدعم لغتك الافتراضية، فسيتم استخدام اللغة التالية في القائمة كبديل.,"La langue en haut de la liste sera utilisée par défaut. Si une application ne prend pas en charge votre langue par défaut, la langue suivante dans la liste sera utilisée à la place.","The language at the top of the list will be used by default. If an application does not support your default language, the next language in the list will be used instead."
+sub_title_full,MyStock - الاشتراك,MyStock - Abonnement,MyStock - Subscription
+currency_symbol,$,$,$
+sub_choose_plan,اختر باقة الاشتراك,Choisissez votre forfait,Choose Your Plan
+sub_choose_plan_desc,اختر الباقة المناسبة لاحتياجاتك. يمكنك الترقية أو التخفيض في أي وقت.,Choisissez le forfait adapté à vos besoins. Vous pouvez changer à tout moment.,Choose the plan that fits your needs. You can upgrade or downgrade anytime.
+sub_plan_basic,الباقة الأساسية,Forfait de base,Basic Plan
+sub_plan_pro,الباقة الاحترافية,Forfait professionnel,Professional Plan
+sub_plan_advanced,الباقة المتقدمة,Forfait avancé,Advanced Plan
+sub_most_popular,الأكثر شيوعاً,Le plus populaire,Most Popular
+sub_per_month,/ شهرياً,/ mois,/ month
+sub_feat_users,عدد المستخدمين,Utilisateurs,Users
+sub_feat_products,عدد المنتجات,Produits,Products
+sub_feat_invoices,الفواتير الشهرية,Factures mensuelles,Monthly Invoices
+sub_feat_export,تصدير التقارير,Export des rapports,Export Reports
+sub_feat_support,الدعم الفني,Support technique,Support
+sub_support_email,بريد,Email,Email
+sub_support_email_wa,بريد + واتساب,Email + WhatsApp,Email + WhatsApp
+sub_unlimited,غير محدود,Illimité,Unlimited
+sub_link_missing,⚠️ رابط الدفع غير مُعدّ. يرجى التواصل مع الإدارة.,⚠️ Lien de paiement non configuré. Contactez l'administrateur.,⚠️ Payment link not configured. Contact administrator.
+bc_sub_status,حالة الاشتراك,Statut de l'abonnement,Subscription Status
+bc_sub_active,نشط,Actif,Active
+bc_sub_expires,ينتهي في,Expire le,Expires on
+bc_manage_subscription,إدارة الاشتراك,Gérer l'abonnement,Manage Subscription
+bc_subscribe_now,اشترك الآن,S'abonner maintenant,Subscribe Now
+sub_change_plan,تغيير الباقة,Changer de forfait,Change Plan
+sub_change_plan_desc,اختر باقة جديدة. سيتم استبدال بطاقتك الحالية.,Choisissez un nouveau forfait. Votre carte actuelle sera remplacée.,Choose a new plan. Your current card will be replaced.
+legal_terms_title,شروط الخدمة,Conditions d'utilisation,Terms of Service
+legal_privacy_title,سياسة الخصوصية,Politique de confidentialité,Privacy Policy
+legal_refund_title,سياسة الاسترجاع,Politique de remboursement,Refund Policy
+legal_last_updated,آخر تحديث: 16 أكتوبر 2026,Dernière mise à jour : 16 octobre 2026,"Last updated: October 16, 2026"
+legal_footer_copyright,© 2026 MyStock. جميع الحقوق محفوظة.,© 2026 MyStock. Tous droits réservés.,© 2026 MyStock. All rights reserved.
+legal_terms_s1_title,1. القبول بالشروط,1. Acceptation des conditions,1. Acceptance of Terms
+legal_terms_s1_body,"باستخدامك لتطبيق MyStock (""الخدمة"")، فإنك توافق على هذه الشروط والأحكام. إذا كنت لا توافق على أي جزء منها، يرجى عدم استخدام الخدمة.","En utilisant MyStock (le « Service »), vous acceptez ces conditions. Si vous n'acceptez pas une partie de ces conditions, veuillez ne pas utiliser le Service.","By using MyStock (the ""Service""), you agree to these terms and conditions. If you do not agree with any part, please do not use the Service."
+legal_terms_s2_title,2. الوصف,2. Description,2. Description
+legal_terms_s2_body,MyStock هو نظام لإدارة المخزون والمبيعات للمتاجر الصغيرة. يوفر الميزات التالية: إدارة المنتجات، تسجيل حركات المخزون، إصدار الفواتير وإيصالات البيع، إدارة الموردين، وتقارير المبيعات والأرباح.,"MyStock est un système de gestion de stock et de ventes pour les petits commerces. Il offre : gestion des produits, mouvements de stock, factures et reçus de vente, gestion des fournisseurs, et rapports de ventes et bénéfices.","MyStock is an inventory and sales management system for small businesses. It provides: product management, stock movements, invoices and sales receipts, supplier management, and sales/profit reports."
+legal_terms_s3_title,3. الحساب,3. Compte,3. Account
+legal_terms_s3_body,أنت مسؤول عن الحفاظ على سرية معلومات حسابك وكلمة المرور. أنت مسؤول عن جميع الأنشطة التي تحدث تحت حسابك.,Vous êtes responsable de la confidentialité de vos identifiants. Vous êtes responsable de toutes les activités effectuées sous votre compte.,You are responsible for maintaining the confidentiality of your account information and password. You are responsible for all activities that occur under your account.
+legal_terms_s4_title,4. الاشتراك والدفع,4. Abonnement et paiement,4. Subscription and Payment
+legal_terms_s4_body,يتم تقديم الخدمة عبر اشتراك شهري أو سنوي. تتم جميع المدفوعات عبر منصة Lemon Squeezy الآمنة. يتم تجديد الاشتراك تلقائياً في نهاية كل دورة ما لم تقم بإلغائه.,Le service est proposé via un abonnement mensuel ou annuel. Tous les paiements sont traités par la plateforme sécurisée Lemon Squeezy. L'abonnement est renouvelé automatiquement sauf annulation.,The Service is provided via monthly or annual subscription. All payments are processed through the secure Lemon Squeezy platform. Subscriptions renew automatically at the end of each cycle unless cancelled.
+legal_terms_s5_title,5. الإلغاء والاسترجاع,5. Annulation et remboursement,5. Cancellation and Refund
+legal_terms_s5_body,يمكنك إلغاء الاشتراك في أي وقت من إعدادات التطبيق. لن يتم استرداد المبالغ المدفوعة عن الفترات السابقة، لكنك ستحتفظ بإمكانية الوصول حتى نهاية الفترة المدفوعة.,"Vous pouvez annuler à tout moment depuis les paramètres. Les paiements précédents ne sont pas remboursés, mais vous conservez l'accès jusqu'à la fin de la période payée.","You can cancel your subscription at any time from the app settings. Previous payments are not refunded, but you retain access until the end of the paid period."
+legal_terms_s6_title,6. الاستخدام المقبول,6. Utilisation acceptable,6. Acceptable Use
+legal_terms_s6_body,توافق على عدم استخدام الخدمة في أي نشاط غير قانوني أو احتيالي، أو محاولة الوصول غير المصرح به إلى أنظمتنا.,"Vous acceptez de ne pas utiliser le Service à des fins illégales ou frauduleuses, ni de tenter d'accéder sans autorisation à nos systèmes.","You agree not to use the Service for any illegal or fraudulent activity, or attempt unauthorized access to our systems."
+legal_terms_s7_title,7. الملكية الفكرية,7. Propriété intellectuelle,7. Intellectual Property
+legal_terms_s7_body,جميع حقوق الملكية الفكرية في تطبيق MyStock مملوكة لنا. لا يحق لك نسخ أو تعديل أو توزيع أي جزء من التطبيق دون إذن مسبق.,"Tous les droits de propriété intellectuelle de MyStock nous appartiennent. Vous ne pouvez pas copier, modifier ou distribuer l'application sans autorisation.","All intellectual property rights in MyStock belong to us. You may not copy, modify, or distribute any part of the application without prior permission."
+legal_terms_s8_title,8. إخلاء المسؤولية,8. Avis de non-responsabilité,8. Disclaimer
+legal_terms_s8_body,"يتم تقديم الخدمة ""كما هي"" دون أي ضمانات. لا نتحمل مسؤولية أي خسائر ناتجة عن استخدام أو عدم القدرة على استخدام الخدمة.",Le Service est fourni « tel quel » sans garanties. Nous ne sommes pas responsables des pertes résultant de l'utilisation ou de l'impossibilité d'utiliser le Service.,"The Service is provided ""as is"" without warranties. We are not responsible for any losses resulting from the use or inability to use the Service."
+legal_terms_s9_title,9. التعديلات,9. Modifications,9. Modifications
+legal_terms_s9_body,نحتفظ بالحق في تعديل هذه الشروط في أي وقت. سيتم إخطارك بأي تغييرات جوهرية عبر البريد الإلكتروني أو إشعار داخل التطبيق.,Nous nous réservons le droit de modifier ces conditions à tout moment. Vous serez informé des changements majeurs par email ou notification dans l'application.,We reserve the right to modify these terms at any time. You will be notified of major changes via email or in-app notification.
+legal_terms_s10_title,10. التواصل,10. Contact,10. Contact
+legal_terms_s10_body,لأي استفسار بخصوص هذه الشروط، يمكنك التواصل معنا عبر البريد الإلكتروني: support@mystock.app,"Pour toute question concernant ces conditions, contactez-nous à : support@mystock.app","For any questions about these terms, contact us at: support@mystock.app"
+legal_privacy_s1_title,1. مقدمة,1. Introduction,1. Introduction
+legal_privacy_s1_body,نحن في MyStock نحترم خصوصيتك ونلتزم بحماية بياناتك الشخصية. توضح هذه السياسة كيفية جمعنا واستخدامنا وحمايتنا لمعلوماتك.,"Chez MyStock, nous respectons votre vie privée et nous nous engageons à protéger vos données personnelles. Cette politique explique comment nous collectons, utilisons et protégeons vos informations.","At MyStock, we respect your privacy and are committed to protecting your personal data. This policy explains how we collect, use, and protect your information."
+legal_privacy_s2_title,2. المعلومات التي نجمعها,2. Informations collectées,2. Information We Collect
+legal_privacy_s2_body,نجمع الأنواع التالية من المعلومات:,Nous collectons les types d'informations suivants :,We collect the following types of information:
+legal_privacy_s2_l1,معلومات الحساب: الاسم، البريد الإلكتروني، رقم الهاتف، البلد.,"Informations de compte : nom, email, téléphone, pays.","Account information: name, email, phone, country."
+legal_privacy_s2_l2,معلومات المنظمة: اسم المتجر، المنتجات، الموردين، الفواتير.,"Informations d'organisation : nom du magasin, produits, fournisseurs, factures.","Organization information: store name, products, suppliers, invoices."
+legal_privacy_s2_l3,معلومات الدفع: تتم معالجتها من قبل Lemon Squeezy (لا نحتفظ ببيانات بطاقتك).,Informations de paiement : traitées par Lemon Squeezy (nous ne stockons pas vos données bancaires).,Payment information: processed by Lemon Squeezy (we do not store your card data).
+legal_privacy_s2_l4,معلومات الاستخدام: عنوان IP، نوع الجهاز، المتصفح.,"Informations d'utilisation : adresse IP, type d'appareil, navigateur.","Usage information: IP address, device type, browser."
+legal_privacy_s3_title,3. كيف نستخدم معلوماتك,3. Utilisation de vos informations,3. How We Use Your Information
+legal_privacy_s3_body,نستخدم معلوماتك من أجل:,Nous utilisons vos informations pour :,We use your information to:
+legal_privacy_s3_l1,توفير الخدمة وتحسينها.,Fournir et améliorer le service.,Provide and improve the service.
+legal_privacy_s3_l2,إدارة حسابك واشتراكك.,Gérer votre compte et votre abonnement.,Manage your account and subscription.
+legal_privacy_s3_l3,إرسال إشعارات مهمة عن التطبيق.,Envoyer des notifications importantes.,Send important app notifications.
+legal_privacy_s3_l4,الرد على استفساراتك ودعمك.,Répondre à vos questions et vous assister.,Respond to your inquiries and support you.
+legal_privacy_s4_title,4. مشاركة المعلومات,4. Partage des informations,4. Information Sharing
+legal_privacy_s4_body,لا نبيع أو نؤجر معلوماتك الشخصية لأي طرف ثالث. قد نشاركها فقط مع مزودي الخدمة الذين يساعدوننا في تشغيل التطبيق، مثل Supabase (قاعدة البيانات) و Lemon Squeezy (الدفع).,Nous ne vendons ni ne louons vos informations personnelles à des tiers. Nous pouvons les partager uniquement avec des fournisseurs de services tels que Supabase (base de données) et Lemon Squeezy (paiement).,"We do not sell or rent your personal information to third parties. We may share it only with service providers that help us operate the app, such as Supabase (database) and Lemon Squeezy (payment)."
+legal_privacy_s5_title,5. أمان البيانات,5. Sécurité des données,5. Data Security
+legal_privacy_s5_body,نستخدم إجراءات أمنية معيارية لحماية بياناتك، بما في ذلك التشفير أثناء النقل (SSL/TLS) وكلمات المرور المشفرة. لكن لا يمكن ضمان أمان أي نظام بنسبة 100%.,"Nous utilisons des mesures de sécurité standard pour protéger vos données, notamment le chiffrement SSL/TLS et les mots de passe hachés. Aucun système ne peut être garanti à 100 %.","We use standard security measures to protect your data, including SSL/TLS encryption and hashed passwords. However, no system can be 100% guaranteed."
+legal_privacy_s6_title,6. الاحتفاظ بالبيانات,6. Conservation des données,6. Data Retention
+legal_privacy_s6_body,نحتفظ ببياناتك طالما حسابك نشط. إذا قمت بحذف حسابك، سنحذف بياناتك من أنظمتنا خلال 30 يوماً، إلا إذا كان القانون يلزمنا بالاحتفاظ بها.,"Nous conservons vos données tant que votre compte est actif. En cas de suppression, vos données seront effacées dans les 30 jours, sauf obligation légale.","We retain your data as long as your account is active. If you delete your account, we will erase your data within 30 days, unless legally required to retain it."
+legal_privacy_s7_title,7. ملفات تعريف الارتباط (Cookies),7. Cookies,7. Cookies
+legal_privacy_s7_body,نستخدم ملفات تعريف ارتباط أساسية للحفاظ على تسجيل دخولك وتفضيلاتك. لا نستخدم Cookies لتتبع سلوكك عبر المواقع الأخرى.,Nous utilisons des cookies essentiels pour maintenir votre connexion et vos préférences. Nous ne les utilisons pas pour vous suivre sur d'autres sites.,We use essential cookies to maintain your login and preferences. We do not use cookies to track you across other websites.
+legal_privacy_s8_title,8. حقوقك,8. Vos droits,8. Your Rights
+legal_privacy_s8_body,لديك الحق في:,Vous avez le droit de :,You have the right to:
+legal_privacy_s8_l1,الوصول إلى بياناتك الشخصية.,Accéder à vos données personnelles.,Access your personal data.
+legal_privacy_s8_l2,طلب تصحيح البيانات غير الصحيحة.,Demander la correction de données inexactes.,Request correction of inaccurate data.
+legal_privacy_s8_l3,طلب حذف حسابك وبياناتك.,Demander la suppression de votre compte.,Request deletion of your account and data.
+legal_privacy_s8_l4,الاعتراض على استخدام بياناتك.,Vous opposer à l'utilisation de vos données.,Object to the use of your data.
+legal_privacy_s9_title,9. الأطفال,9. Enfants,9. Children
+legal_privacy_s9_body,خدمتنا غير موجهة للأطفال تحت 13 عاماً. لا نجمع عن قصد معلومات من الأطفال. إذا اكتشفنا ذلك، سنحذفها فوراً.,Notre service n'est pas destiné aux enfants de moins de 13 ans. Nous ne collectons pas sciemment leurs données.,Our service is not directed to children under 13. We do not knowingly collect information from children.
+legal_privacy_s10_title,10. التعديلات,10. Modifications,10. Modifications
+legal_privacy_s10_body,قد نحدّث سياسة الخصوصية من وقت لآخر. سنخطرك بأي تغييرات جوهرية عبر البريد الإلكتروني أو داخل التطبيق.,Nous pouvons mettre à jour cette politique. Vous serez informé des changements majeurs par email ou dans l'application.,We may update this privacy policy from time to time. You will be notified of major changes via email or in-app notification.
+legal_privacy_s11_title,11. التواصل,11. Contact,11. Contact
+legal_privacy_s11_body,لأي استفسار بخصوص سياسة الخصوصية، تواصل معنا على: privacy@mystock.app,"Pour toute question concernant la confidentialité, contactez-nous à : privacy@mystock.app","For any questions regarding privacy, contact us at: privacy@mystock.app"
+legal_refund_s1_title,1. نظرة عامة,1. Aperçu,1. Overview
+legal_refund_s1_body,نحن في MyStock نريدك أن تكون راضياً عن خدمتنا. توضح هذه السياسة شروط استرجاع المبالغ المدفوعة مقابل الاشتراكات الشهرية أو السنوية.,"Chez MyStock, nous voulons que vous soyez satisfait de notre service. Cette politique décrit les conditions de remboursement des abonnements mensuels ou annuels.","At MyStock, we want you to be satisfied with our service. This policy outlines the conditions for refunding monthly or annual subscriptions."
+legal_refund_s2_title,2. فترة الإلغاء المجاني,2. Période d'annulation gratuite,2. Free Cancellation Period
+legal_refund_s2_body,يمكنك إلغاء اشتراكك واسترداد المبلغ كاملاً خلال 14 يوماً من تاريخ أول عملية دفع. لطلب الاسترجاع، تواصل معنا على refund@mystock.app خلال هذه الفترة.,"Vous pouvez annuler votre abonnement et obtenir un remboursement complet dans les 14 jours suivant le premier paiement. Pour demander un remboursement, contactez-nous à refund@mystock.app pendant cette période.","You can cancel your subscription and get a full refund within 14 days of the first payment. To request a refund, contact us at refund@mystock.app during this period."
+legal_refund_s3_title,3. بعد فترة الـ 14 يوماً,3. Après les 14 jours,3. After 14 Days
+legal_refund_s3_body,بعد مرور 14 يوماً من الدفع الأول، لا يمكن استرجاع المبالغ المدفوعة. ومع ذلك، يمكنك:,"Après 14 jours suivant le premier paiement, les paiements ne sont plus remboursables. Cependant, vous pouvez :","After 14 days from the first payment, payments are non-refundable. However, you can:"
+legal_refund_s3_l1,إلغاء الاشتراك في أي وقت (لن يتم تجديده).,Annuler à tout moment (aucun renouvellement).,Cancel at any time (no renewal).
+legal_refund_s3_l2,الاحتفاظ بإمكانية الوصول حتى نهاية الفترة المدفوعة.,Conserver l'accès jusqu'à la fin de la période payée.,Retain access until the end of the paid period.
+legal_refund_s4_title,4. حالات الاسترجاع الخاصة,4. Cas de remboursement spéciaux,4. Special Refund Cases
+legal_refund_s4_body,قد ننظر في طلبات الاسترجاع بعد الفترة المحددة في الحالات التالية:,Nous pouvons examiner les demandes de remboursement après la période spécifiée dans les cas suivants :,We may consider refund requests after the specified period in the following cases:
+legal_refund_s4_l1,خطأ في الفاتورة (دفع مزدوج، مبلغ خاطئ).,"Erreur de facturation (double paiement, montant incorrect).","Billing error (double payment, incorrect amount)."
+legal_refund_s4_l2,عطل تقني خطير منع استخدام الخدمة لأكثر من 7 أيام.,Panne technique majeure empêchant l'utilisation du service pendant plus de 7 jours.,Major technical failure preventing use of the service for more than 7 days.
+legal_refund_s4_l3,ظروف استثنائية (مرض، كارثة).,"Circonstances exceptionnelles (maladie, catastrophe).","Exceptional circumstances (illness, disaster)."
+legal_refund_s5_title,5. كيفية طلب الاسترجاع,5. Comment demander un remboursement,5. How to Request a Refund
+legal_refund_s5_body,لطلب استرجاع، أرسل بريداً إلكترونياً إلى refund@mystock.app يتضمن:,"Pour demander un remboursement, envoyez un email à refund@mystock.app incluant :","To request a refund, send an email to refund@mystock.app including:"
+legal_refund_s5_l1,الاسم والبريد المسجل في التطبيق.,Nom et email enregistrés dans l'application.,Name and email registered in the app.
+legal_refund_s5_l2,رقم الفاتورة أو رقم العملية.,Numéro de facture ou de transaction.,Invoice or transaction number.
+legal_refund_s5_l3,سبب طلب الاسترجاع.,Raison de la demande de remboursement.,Reason for the refund request.
+legal_refund_s6_title,6. مدة معالجة الطلب,6. Délai de traitement,6. Processing Time
+legal_refund_s6_body,سنراجع طلبك خلال 3-5 أيام عمل. إذا تمت الموافقة، سيتم تحويل المبلغ إلى نفس وسيلة الدفع خلال 5-10 أيام عمل إضافية.,"Nous examinerons votre demande dans les 3 à 5 jours ouvrables. En cas d'approbation, le montant sera remboursé sur le même moyen de paiement dans les 5 à 10 jours ouvrables supplémentaires.","We will review your request within 3-5 business days. If approved, the amount will be refunded to the same payment method within an additional 5-10 business days."
+legal_refund_s7_title,7. طريقة الاسترجاع,7. Méthode de remboursement,7. Refund Method
+legal_refund_s7_body,تتم جميع عمليات الاسترجاع عبر Lemon Squeezy، وسيتم إرجاع المبلغ إلى نفس وسيلة الدفع التي استخدمتها (بطاقة بنكية، PayPal، إلخ).,"Tous les remboursements sont effectués via Lemon Squeezy, et le montant sera retourné sur le même moyen de paiement que vous avez utilisé (carte bancaire, PayPal, etc.).","All refunds are processed via Lemon Squeezy, and the amount will be returned to the same payment method you used (bank card, PayPal, etc.)."
+legal_refund_s8_title,8. الاشتراكات السنوية,8. Abonnements annuels,8. Annual Subscriptions
+legal_refund_s8_body,للاشتراكات السنوية، يمكنك استرداد المبلغ كاملاً خلال 14 يوماً من تاريخ الدفع. بعد ذلك، لا يمكن الاسترجاع، لكن الاشتراك يبقى نشطاً حتى نهاية السنة.,"Pour les abonnements annuels, vous pouvez obtenir un remboursement complet dans les 14 jours suivant le paiement. Après cela, aucun remboursement n'est possible, mais l'abonnement reste actif jusqu'à la fin de l'année.","For annual subscriptions, you can get a full refund within 14 days of payment. After that, no refund is possible, but the subscription remains active until the end of the year."
+legal_refund_s9_title,9. التواصل,9. Contact,9. Contact
+legal_refund_s9_body,لأي استفسار بخصوص سياسة الاسترجاع، تواصل معنا على: refund@mystock.app,"Pour toute question concernant la politique de remboursement, contactez-nous à : refund@mystock.app","For any questions about the refund policy, contact us at: refund@mystock.app"
+landing_nav_features,الميزات,Fonctionnalités,Features
+landing_nav_pricing,الأسعار,Tarifs,Pricing
+landing_nav_login,تسجيل الدخول,Connexion,Login
+landing_hero_badge,للمتاجر الصغيرة,Pour les petits commerces,For Small Businesses
+landing_hero_title,أدر مخزونك بذكاء وسهولة,Gérez votre stock intelligemment,Manage Your Inventory Smartly
+landing_hero_subtitle,نظام متكامل لإدارة المنتجات، المبيعات، الفواتير، والموردين. يعمل على الهاتف والحاسوب، بالعربية والفرنسية والإنجليزية.,"Un système complet pour gérer produits, ventes, factures et fournisseurs. Fonctionne sur mobile et ordinateur, en arabe, français et anglais.","A complete system to manage products, sales, invoices, and suppliers. Works on mobile and desktop, in Arabic, French, and English."
+landing_hero_cta_start,ابدأ الآن مجاناً,Commencer gratuitement,Start Free Now
+landing_hero_cta_learn,اكتشف الميزات,Découvrir les fonctionnalités,Discover Features
+landing_trust_secure,آمن 100%,100% sécurisé,100% Secure
+landing_trust_langs,3 لغات,3 langues,3 Languages
+landing_trust_mobile,يعمل على الهاتف,Fonctionne sur mobile,Works on Mobile
+landing_features_title,كل ما تحتاجه لإدارة متجرك,Tout pour gérer votre boutique,Everything to Manage Your Store
+landing_features_subtitle,أدوات بسيطة وقوية صُممت خصيصاً للمتاجر الصغيرة,Des outils simples et puissants conçus pour les petits commerces,Simple and powerful tools designed for small businesses
+landing_feat_products,إدارة المنتجات,Gestion des produits,Product Management
+landing_feat_products_desc,أضف منتجاتك، صورها، أسعارها، ومعلوماتها بسهولة.,"Ajoutez vos produits, images, prix et informations en toute simplicité.","Add your products, images, prices, and info with ease."
+landing_feat_stock,حركات المخزون,Mouvements de stock,Stock Movements
+landing_feat_stock_desc,تتبع كل عملية إدخال وإخراج مع سجل كامل.,Suivez chaque entrée et sortie avec un historique complet.,Track every entry and exit with a complete history.
+landing_feat_sales,إيصالات البيع,Reçus de vente,Sales Receipts
+landing_feat_sales_desc,أنشئ إيصالات احترافية واطبعها بضغطة واحدة.,Créez des reçus professionnels et imprimez-les en un clic.,Create professional receipts and print them in one click.
+landing_feat_invoices,الفواتير,Factures,Invoices
+landing_feat_invoices_desc,فواتير تلقائية من الموردين مع حساب الإجماليات.,Factures automatiques des fournisseurs avec calcul des totaux.,Automatic invoices from suppliers with total calculations.
+landing_feat_reports,التقارير,Rapports,Reports
+landing_feat_reports_desc,تقارير مفصلة عن المبيعات والأرباح والحركات.,"Rapports détaillés sur les ventes, bénéfices et mouvements.","Detailed reports on sales, profits, and movements."
+landing_feat_team,إدارة الفريق,Gestion d'équipe,Team Management
+landing_feat_team_desc,أضف عمالاً، حدد أدوارهم، وتابع أنشطتهم.,"Ajoutez des employés, définissez leurs rôles et suivez leurs activités.","Add employees, set their roles, and track their activities."
+landing_pricing_title,اختر الباقة المناسبة,Choisissez votre forfait,Choose Your Plan
+landing_pricing_subtitle,يمكنك الترقية أو التخفيض في أي وقت,Vous pouvez changer à tout moment,You can upgrade or downgrade anytime
+landing_choose,اختر,Choisir,Choose
+landing_cta_title,جاهز لإدارة متجرك بذكاء؟,Prêt à gérer votre boutique intelligemment ?,Ready to manage your store smartly?
+landing_cta_subtitle,انضم إلى MyStock اليوم. لا تحتاج بطاقة بنكية للبدء.,Rejoignez MyStock aujourd'hui. Aucune carte bancaire requise.,Join MyStock today. No credit card required to start.
+landing_cta_start,ابدأ الآن مجاناً,Commencer gratuitement,Start Free Now
+sub_feat_users_10,10 مستخدمين,10 utilisateurs,10 users
+sub_feat_users_30,30 مستخدم,30 utilisateurs,30 users
+sub_feat_users_unlimited,مستخدمون غير محدودين,Utilisateurs illimités,Unlimited users
+sub_feat_products_500,500 منتج,500 produits,500 products
+sub_feat_products_5000,"5,000 منتج",5 000 produits,"5,000 products"
+sub_feat_products_unlimited,منتجات غير محدودة,Produits illimités,Unlimited products
+sub_feat_invoices_100,100 فاتورة/شهر,100 factures/mois,100 invoices/month
+sub_feat_invoices_500,500 فاتورة/شهر,500 factures/mois,500 invoices/month
+sub_feat_invoices_unlimited,فواتير غير محدودة,Factures illimitées,Unlimited invoices
+sub_support_247,دعم 24/7,Support 24/7,24/7 Support
+adm_title_full,MyStock - الإدارة العامة,MyStock - Administration,MyStock - Administration
+adm_title,الإدارة العامة,Administration,Administration
+lang_ar,العربية,Arabe,Arabic
+lang_fr,الفرنسية,Français,French
+lang_en,الإنجليزية,Anglais,English
+adm_language,اللغة,Langue,Language
+adm_app_languages,لغات التطبيق,Langues de l'application,App Languages
+adm_app_languages_desc,إدارة اللغات المتاحة في التطبيق,Gérer les langues disponibles dans l'application,Manage available languages in the app
+adm_date_time,التاريخ والوقت,Date et heure,Date & Time
+adm_date_time_desc,إعدادات المنطقة الزمنية وتنسيق التاريخ,Paramètres de fuseau horaire et de format de date,Timezone and date format settings
+time_settings_title,التاريخ و الوقت,Date et heure,Date & Time
+time_auto,التاريخ والوقت التلقائي,Date et heure automatiques,Automatic date and time
+time_auto_desc,استخدم التاريخ والوقت اللذين توفرهما شبكتك.,Utiliser l'heure fournie par le réseau.,Use time provided by network.
+time_set_date,ضبط التاريخ,Régler la date,Set date
+time_set_time,ضبط الوقت,Régler l'heure,Set time
+time_zone_auto,منطقة زمنية تلقائية,Fuseau horaire automatique,Automatic time zone
+time_zone_auto_desc,استخدم المنطقة الزمنية التي تم توفيرها بواسطة شبكة الهاتف المحمول لديك.,Utiliser le fuseau horaire fourni par le réseau mobile.,Use time zone provided by mobile network.
+time_zone_location,ضبط المنطقة الزمنية حسب الموقع,Définir le fuseau horaire selon la position,Set time zone based on location
+time_zone_location_desc,قم بتشغيل الموقع لاستخدام هذه الميزة.,Activez la localisation pour utiliser cette fonctionnalité.,Turn on location to use this feature.
+time_use_24h,استخدام تنسيق 24 ساعة,Format 24 heures,Use 24-hour format
+oe_notif_title,تحديث المنظمة,Mise à jour de l'organisation,Organization Updated
+oe_notif_msg,قام بتحديث إعدادات المنظمة,a mis à jour les paramètres de l'organisation,updated the organization settings
+inv_page_share,مشاركة,Partager,Share
+link_copied,تم نسخ الرابط!,Lien copié !,Link copied!
+register_phone,رقم الهاتف *,Numéro de téléphone *,Phone Number *
+update_title,تحديث التطبيق,Mettre à jour l'application,Update App
+update_page_title,هل تريد تحديث التطبيق؟,Voulez-vous mettre à jour ?,Want to update the app?
+update_page_desc,إذا كنت تواجه مشاكل أو لا ترى أحدث الميزات، اضغط على الزر أدناه لتحديث التطبيق.,"Si vous rencontrez des problèmes ou ne voyez pas les nouvelles fonctionnalités, cliquez sur le bouton ci-dessous.","If you are facing issues or missing the latest features, click the button below to update the app."
+update_current_version,الإصدار الحالي:,Version actuelle :,Current version:
+update_now,تحديث الآن,Mettre à jour,Update Now
+update_checking,جارٍ التحديث...,Mise à jour...,Updating...
+update_success,✅ تم التحديث بنجاح! جارٍ إعادة التشغيل...,✅ Mise à jour réussie ! Redémarrage...,✅ Update successful! Restarting...
+update_error,❌ حدث خطأ أثناء التحديث. حاول مرة أخرى.,❌ Erreur lors de la mise à jour. Réessayez.,❌ Update error. Please try again.
+update_checking_size,جارٍ حساب الحجم...,Calcul de la taille...,Calculating size...
+update_downloading,جارٍ التحميل...,Téléchargement...,Downloading...
+update_installing,جارٍ تثبيت التحديث...,Installation de la mise à jour...,Installing update...
+update_restarting,جارٍ إعادة التشغيل...,Redémarrage...,Restarting...
+stg_current_version,الإصدار الحالي,Version actuelle,Current version
+stg_new_version,تحديث جديد,Nouvelle mise à jour,New update
+stg_updated,تم التحديث,À jour,Updated
+update_up_to_date,التطبيق محدث لآخر إصدار,L'application est à jour,App is up to date
+dev_role,مطور ومصمم تطبيق MyStock. أسعى لدمج التكنولوجيا في إدارة الأعمال اليومية.,Développeur et concepteur de MyStock. Je m'efforce d'intégrer la technologie dans la gestion quotidienne des entreprises.,Developer and designer of MyStock. Striving to integrate technology into daily business management.
+bc_notif_new_card_title,بطاقة بنكية جديدة,Nouvelle carte bancaire,New Bank Card
+bc_notif_new_card_msg,قام بإضافة بطاقة بنكية جديدة وتفعيل الاشتراك,a ajouté une nouvelle carte et activé l'abonnement,added a new card and activated the subscription
+bc_notif_reactivate_title,إعادة تفعيل البطاقة,Réactivation de la carte,Card Reactivated
+bc_notif_reactivate_msg,قام بإعادة تفعيل البطاقة البنكية,a réactivé la carte bancaire,reactivated the bank card
+stg_notifications_sub,التحكم في الأصوات والرنات,Contrôle des sons et des alertes,Control sounds and alerts
+notif_master_title,تفعيل الإشعارات,Activer les notifications,Enable Notifications
+notif_master_sub,إيقاف/تشغيل كل الإشعارات,Activer/désactiver toutes les notifications,Turn all notifications on/off
+notif_sound_title,صوت الإشعار,Son de notification,Notification Sound
+notif_sound_sub,تشغيل نغمة عند وصول إشعار,Jouer un son à la réception d'une notification,Play a sound when a notification arrives
+notif_vibrate_title,الاهتزاز,Vibration,Vibration
+notif_vibrate_sub,اهتزاز الهاتف عند وصول إشعار,Vibrer le téléphone à la réception d'une notification,Vibrate phone when a notification arrives
+notif_sounds_title,نغمات الإشعارات,Sons de notification,Notification Sounds
+notif_tone_default,نغمة افتراضية (دينغ دونغ),Son par défaut (Ding Dong),Default Tone (Ding Dong)
+notif_tone_chime,نغمة هادئة (أجراس),Son doux (Carillons),Gentle Tone (Chimes)
+notif_tone_alert,تنبيه سريع (3 صفارات),Alerte rapide (3 bips),Quick Alert (3 Beeps)
+notif_tone_bell,جرس طويل,Cloche longue,Long Bell
+notif_tone_none,صامت (بدون نغمة),Silencieux (Sans son),Silent (No Sound)
+notif_save_tone,حفظ النغمة,Enregistrer le son,Save Tone
+notif_tone_saved,تم الحفظ بنجاح!,Enregistré avec succès !,Saved successfully!
+notif_test_tone,تجربة الصوت,Tester le son,Test Sound
+notif_test_alerts_title,اختبار التنبيه,Tester les alertes,Test Alerts
+notif_test_alerts_sub,جرّب الصوت والاهتزاز الآن,Testez le son et la vibration maintenant,Test sound and vibration now
+low_stock_section_title,⚠️ حد التنبيه للمخزون,⚠️ Seuil d'alerte du stock,⚠️ Low Stock Alert Threshold
+low_stock_field_label,الحد الأدنى للتنبيه (قطعة),Seuil minimal (unités),Minimum threshold (units)
+low_stock_field_hint,عندما يصل مخزون المنتج لهذه الكمية أو أقل، يصل إشعار لكل أعضاء المنظمة,"Lorsque le stock atteint ce seuil ou moins, tous les membres reçoivent une notification","When stock reaches this amount or less, all organization members receive a notification"
+low_stock_alert_title,⚠️ مخزون منخفض,⚠️ Stock faible,⚠️ Low Stock
+low_stock_alert_multi,⚠️ {count} منتجات بمخزون منخفض,⚠️ {count} produits en stock faible,⚠️ {count} products low on stock
+low_stock_alert_msg,"• ""{name}"" — {qty} قطعة (الحد: {threshold})","• ""{name}"" — {qty} unités (seuil: {threshold})","• ""{name}"" — {qty} units (threshold: {threshold})"
+low_stock_alert_single,"المنتج ""{name}"" وصل إلى {qty} قطعة (الحد الأدنى: {threshold})","Le produit ""{name}"" a atteint {qty} unités (seuil: {threshold})","Product ""{name}"" reached {qty} units (threshold: {threshold})"
+low_stock_alert_already,"المنتج ""{name}"" ({qty} قطعة) أقل من أو يساوي الحد الأدنى ({threshold})","Le produit ""{name}"" ({qty} unités) est au seuil ou en dessous ({threshold})","Product ""{name}"" ({qty} units) is at or below the threshold ({threshold})"
+low_stock_warning_banner,⚠️ تحذير: {count} منتج وصل للحد الأدنى للمخزون,⚠️ Attention : {count} produit(s) au seuil minimal,⚠️ Warning: {count} product(s) at minimum stock threshold
+ntf_select_all,تحديد الكل,Tout sélectionner,Select All
+ntf_deselect_all,إلغاء تحديد الكل,Tout désélectionner,Deselect All
+ntf_cancel,إلغاء,Annuler,Cancel
+ntf_confirm_delete,هل تريد حذف {n} إشعار؟,Supprimer {n} notifications ?,Delete {n} notifications?
+ntf_selected_count,المحددة: {n},Sélectionnées : {n},Selected: {n}
+ntf_all,الكل,Tout,All
+ntf_selected,تم تحديد {n},Sélectionné : {n},Selected: {n}
+ntf_delete,حذف,Supprimer,Delete
+ntf_mark_read,تعليم كمقروء,Marquer lu,Mark read
+search_group_products,Products,Produits,Products
+search_group_suppliers,Suppliers,Fournisseurs,Suppliers
+search_group_invoices,Invoices,Factures,Invoices
+search_group_receipts,Receipts,Reçus,Receipts
+search_group_workers,Workers,Travailleurs,Workers
+search_no_results,No results for,Aucun résultat pour,No results for
+search_error,Search error,Erreur de recherche,Search error
+search_recent,عمليات البحث الأخيرة,Recherches récentes,Recent searches
+search_approx,قد تقصد,Vouliez-vous dire,Did you mean
+landing_nav_register,إنشاء حساب,Créer un compte,Sign Up
+sub_feat_support_email,دعم بالبريد,Support par email,Email Support
+sub_feat_support_email_wa,دعم بالبريد + واتساب,Support par email + WhatsApp,Email + WhatsApp Support
+sub_feat_support_247,دعم 24/7,Support 24/7,24/7 Support
