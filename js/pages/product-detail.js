@@ -1,5 +1,6 @@
 // ============================================
-// صفحة تفاصيل المنتج (مع إظهار العملة)
+// صفحة تفاصيل المنتج (مع مخزون منخفض + إصلاح الإشعارات)
+// ✅ إشعار واحد فقط بعد توقف المستخدم عن الكتابة
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   const user = await requireAuth();
@@ -54,6 +55,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   const total = ((product.qty ?? 0) * (product.price ?? 0)).toFixed(2);
   const sellPrice = Number(product.sell_price ?? 0);
   const sellPriceEnabled = product.sell_price_enabled === true;
+  const lowStockThreshold = Number(product.low_stock_threshold ?? 10);
+  const isLowStock = Number(product.qty ?? 0) <= lowStockThreshold;
 
   main.innerHTML = `
     <div class="page-header">
@@ -85,7 +88,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       <div class="product-stats">
         <div class="stat">
           <div class="stat-label">${tr('products_qty')}</div>
-          <div class="stat-value ${(product.qty ?? 0) < 10 ? 'low' : ''}">
+          <div class="stat-value ${isLowStock ? 'low' : ''}" id="qty-stat-value">
             <span class="edit-field center" id="f-qty" data-value="${product.qty ?? 0}"></span>
           </div>
         </div>
@@ -118,6 +121,17 @@ document.addEventListener('DOMContentLoaded', async () => {
         <div class="row">
           <span>${tr('prod_detail_barcode')}</span>
           <strong class="edit-field" id="f-qr_code" data-value="${product.qr_code ?? ''}"></strong>
+        </div>
+      </div>
+
+      <!-- ✅ قسم حد التنبيه للمخزون -->
+      <div class="sell-price-section">
+        <h3 class="sell-price-title">${tr('low_stock_section_title')}</h3>
+
+        <div class="sell-price-input-group">
+          <label>${tr('low_stock_field_label')}</label>
+          <input type="number" id="low-stock-input" value="${lowStockThreshold}" min="0" step="1" dir="ltr" placeholder="10">
+          <small class="field-hint">${tr('low_stock_field_hint')}</small>
         </div>
       </div>
 
@@ -157,6 +171,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     </div>
   `;
 
+  function updateQtyStyle() {
+    const qtyEl = document.getElementById('qty-stat-value');
+    if (!qtyEl) return;
+    const qty = Number(document.getElementById('f-qty').dataset.value ?? 0);
+    const threshold = Number(product.low_stock_threshold ?? 10);
+    if (qty <= threshold) qtyEl.classList.add('low');
+    else qtyEl.classList.remove('low');
+  }
+
   function recalcTotal() {
     const qty = Number(document.getElementById('f-qty').dataset.value ?? 0);
     const price = Number(document.getElementById('f-price').dataset.value ?? 0);
@@ -174,6 +197,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     qr_code: tr('prod_detail_barcode'),
   };
 
+  // ✅ مؤقتات الإشعارات (debounce بسيط)
+  const notifTimers = {};
+
   const fields = [
     { id: 'f-name', field: 'name', type: 'text' },
     { id: 'f-sku', field: 'sku', type: 'text' },
@@ -185,8 +211,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   ];
 
   fields.forEach(({ id, field, type }) => {
+    const el = document.getElementById(id);
+
     inlineEdit({
-      el: document.getElementById(id),
+      el,
       table: 'products',
       id: productId,
       field,
@@ -194,23 +222,94 @@ document.addEventListener('DOMContentLoaded', async () => {
       onSave: async (savedField, newValue) => {
         if (savedField === 'qty' || savedField === 'price') recalcTotal();
 
-        if (typeof notifyOrganization === 'function' && profile?.organization_id) {
-          await notifyOrganization({
-            orgId: profile.organization_id,
-            title: tr('prod_detail_notif_edit_title'),
-            message: `${profile.full_name || tr('prod_detail_user')} ${tr('prod_detail_notif_edit_msg')} ${fieldLabels[savedField] || savedField} "${product.name}" ${tr('prod_detail_to')} "${newValue}"`,
-            type: 'info',
-            link: `/products/detail.html?id=${productId}`,
-            userName: profile.full_name || null,
-          });
+        if (savedField === 'qty') {
+          el.dataset.value = newValue;
+          updateQtyStyle();
         }
+
+        if (typeof notifyOrganization !== 'function' || !profile?.organization_id) return;
+
+        // ✅ debounce: انتظار 2 ثانية بعد آخر حرف قبل إرسال الإشعار
+        if (notifTimers[id]) clearTimeout(notifTimers[id]);
+        notifTimers[id] = setTimeout(async () => {
+          try {
+            const threshold = Number(product.low_stock_threshold ?? 10);
+            const isLow = savedField === 'qty' && Number(newValue) <= threshold;
+
+            if (isLow) {
+              await notifyOrganization({
+                orgId: profile.organization_id,
+                title: tr('low_stock_alert_title'),
+                message: tr('low_stock_alert_single')
+                  .replace('{name}', product.name)
+                  .replace('{qty}', newValue)
+                  .replace('{threshold}', threshold),
+                type: 'warning',
+                link: `/products/detail.html?id=${productId}`,
+                userName: profile.full_name || null,
+              });
+            } else {
+              await notifyOrganization({
+                orgId: profile.organization_id,
+                title: tr('prod_detail_notif_edit_title'),
+                message: `${profile.full_name || tr('prod_detail_user')} ${tr('prod_detail_notif_edit_msg')} ${fieldLabels[savedField] || savedField} "${product.name}" ${tr('prod_detail_to')} "${newValue}"`,
+                type: 'info',
+                link: `/products/detail.html?id=${productId}`,
+                userName: profile.full_name || null,
+              });
+            }
+          } catch (e) { console.warn(e); }
+        }, 2000);
       },
     });
   });
 
+  // ✅ حفظ حد التنبيه
+  let lowStockSaveTimeout = null;
+  const lowStockInput = document.getElementById('low-stock-input');
+
+  lowStockInput.addEventListener('input', () => {
+    clearTimeout(lowStockSaveTimeout);
+    lowStockSaveTimeout = setTimeout(async () => {
+      const newThreshold = Math.max(0, Number(lowStockInput.value) || 0);
+
+      try {
+        const { error: updateError } = await db
+          .from('products')
+          .update({ low_stock_threshold: newThreshold })
+          .eq('id', productId);
+
+        if (updateError) throw new Error(updateError.message);
+
+        product.low_stock_threshold = newThreshold;
+        updateQtyStyle();
+
+        const currentQty = Number(product.qty ?? 0);
+        if (currentQty <= newThreshold && typeof notifyOrganization === 'function' && profile?.organization_id) {
+          await notifyOrganization({
+            orgId: profile.organization_id,
+            title: tr('low_stock_alert_title'),
+            message: tr('low_stock_alert_already')
+              .replace('{name}', product.name)
+              .replace('{qty}', currentQty)
+              .replace('{threshold}', newThreshold),
+            type: 'warning',
+            link: `/products/detail.html?id=${productId}`,
+            userName: profile.full_name || null,
+          });
+        }
+      } catch (err) {
+        console.error('فشل حفظ حد التنبيه:', err);
+        alert(tr('prod_detail_err') + ' ' + err.message);
+      }
+    }, 800);
+  });
+
+  // ✅ رفع الصورة
   const imgContainer = document.getElementById('product-image-container');
   attachImageUpload(productId, imgContainer, product.image_url);
 
+  // ✅ سعر البيع
   const sellPriceToggle = document.getElementById('sell-price-toggle');
   const sellPriceStatus = document.getElementById('sell-price-status');
   const sellPriceInput = document.getElementById('sell-price-input');
@@ -284,6 +383,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }, 800);
   });
 
+  // ✅ زر الحذف
   document.getElementById('delete-btn').addEventListener('click', async () => {
     if (!confirm(tr('prod_detail_confirm_delete'))) return;
 
