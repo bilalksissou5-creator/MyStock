@@ -3,6 +3,7 @@
 // ✅ 3 بطاقات اشتراك + Gumroad Checkout
 // ✅ دعم وضع "تغيير البطاقة" (?change=1)
 // ✅ دعم كامل للترجمة + إشعار إضافة بطاقة
+// ✅ إصلاح اتجاه العملة (LTR) في البطاقات والمبالغ
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   const user = await getCurrentUser();
@@ -74,20 +75,31 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     if (updateError) {
       console.error('Update error:', updateError);
-    } else {
-      // ✅✅✅ إضافة إشعار إضافة بطاقة جديدة هنا
-      if (typeof notifyOrganization === 'function') {
-        try {
-          await notifyOrganization({
-            orgId: profile.organization_id,
-            title: tr('bc_notif_new_card_title') || 'بطاقة بنكية جديدة',
-            message: `${profile.full_name || tr('prod_detail_user')} ${tr('bc_notif_new_card_msg') || 'قام بإضافة بطاقة بنكية جديدة وتفعيل الاشتراك'}`,
-            type: 'success',
-            link: '/bank-card.html',
-            userName: profile.full_name || null,
-          });
-        } catch (e) { console.warn(e); }
-      }
+      container.innerHTML = `
+        <div class="sub-box" style="text-align:center; padding:60px 24px;">
+          <div class="sub-icon" style="background:#fee2e2; margin:0 auto 20px; width:80px; height:80px; border-radius:50%; display:flex; align-items:center; justify-content:center;">
+            <i class="fas fa-times" style="font-size:32px; color:#ef4444;"></i>
+          </div>
+          <h2 style="margin:0 0 12px; font-size:1.4rem; font-weight:800;">حدث خطأ</h2>
+          <p class="sub-text" style="color:#6b7280; font-size:14px;">فشل في تفعيل الاشتراك. يرجى التواصل مع الدعم.</p>
+          <a href="/dashboard.html" class="btn-secondary" style="margin-top:20px;">العودة للوحة التحكم</a>
+        </div>
+      `;
+      return; // نوقف التنفيذ هنا لمنع التحويل الخاطئ
+    }
+
+    // ✅✅✅ إضافة إشعار إضافة بطاقة جديدة هنا
+    if (typeof notifyOrganization === 'function') {
+      try {
+        await notifyOrganization({
+          orgId: profile.organization_id,
+          title: tr('bc_notif_new_card_title'),
+          message: `${profile.full_name || tr('prod_detail_user')} ${tr('bc_notif_new_card_msg')}`,
+          type: 'success',
+          link: '/bank-card.html',
+          userName: profile.full_name || null,
+        });
+      } catch (e) { console.warn(e); }
     }
 
     setTimeout(() => {
@@ -262,10 +274,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         <div class="plan-header">
           <h3 class="plan-name">${name}</h3>
-          <div class="plan-price">
-            <!-- ✅ استخدام رمز العملة من ملف الترجمة -->
-            <span class="plan-price-currency">${tr('currency_symbol')}</span>
+          <!-- ✅ إصلاح اتجاه العملة هنا (الرقم أولاً ثم العملة) -->
+          <div class="plan-price" dir="ltr">
             <span class="plan-price-value">${price}</span>
+            <span class="plan-price-currency">${tr('currency_symbol')}</span>
           </div>
           <span class="plan-price-period">${tr('sub_per_month')}</span>
         </div>
@@ -313,8 +325,8 @@ document.addEventListener('DOMContentLoaded', async () => {
           </div>
           <div class="pending-row">
             <span>${tr('sub_pending_amount')}</span>
-            <!-- ✅ استخدام رمز العملة من ملف الترجمة هنا أيضاً -->
-            <strong>${tr('currency_symbol')}${sub.price || 20}</strong>
+            <!-- ✅ إصلاح اتجاه العملة في تفاصيل الدفع المعلق -->
+            <strong dir="ltr" style="display: inline-block;">${sub.price || 20} ${tr('currency_symbol')}</strong>
           </div>
           <div class="pending-row">
             <span>${tr('sub_pending_date')}</span>

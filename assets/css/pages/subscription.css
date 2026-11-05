@@ -1,6 +1,8 @@
 /* ============================================
    صفحة الاشتراك (One UI Style)
    ✅ 3 بطاقات اشتراك + تأثير اختيار
+   ✅ إصلاح اتجاه العملة ومنع كسر السطر
+   ✅ إضافة تنسيقات حالة "الدفع المعلق"
    ============================================ */
 
 html, body {
@@ -129,12 +131,14 @@ body.subscription-page {
   margin: 0 0 12px;
 }
 
+/* ✅ إصلاح اتجاه السعر ومنع النزول لسطر جديد */
 .plan-price {
   display: flex;
   align-items: baseline;
   justify-content: center;
   gap: 6px;
   margin-bottom: 4px;
+  white-space: nowrap; 
 }
 
 .plan-price-value {
@@ -262,6 +266,107 @@ body.subscription-page {
 .plan-card.selected .plan-btn:hover {
   background: #1d4ed8;
   box-shadow: 0 6px 18px rgba(37, 99, 235, 0.4);
+}
+
+/* ============================================
+   ✅ تنسيقات حالة الانتظار والدفع المعلق (من الجافاسكريبت)
+   ============================================ */
+.sub-box {
+  background: white;
+  border-radius: 20px;
+  padding: 32px 24px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  text-align: center;
+}
+
+.sub-icon {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 20px;
+  font-size: 28px;
+  background: #fef3c7;
+  color: #d97706;
+}
+
+.sub-icon.waiting {
+  background: #fef3c7;
+  color: #d97706;
+}
+
+.sub-box h2 {
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: #171717;
+  margin: 0 0 10px;
+}
+
+.sub-text {
+  font-size: 14px;
+  color: #6b7280;
+  line-height: 1.6;
+  margin: 0 0 24px;
+}
+
+.pending-details {
+  background: #fafafa;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 24px;
+  text-align: start;
+}
+
+.pending-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid #e5e5e5;
+  font-size: 14px;
+}
+
+.pending-row:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.pending-row span {
+  color: #6b7280;
+}
+
+.pending-row strong {
+  color: #171717;
+  font-weight: 700;
+}
+
+.full-width {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 14px 24px;
+  border-radius: 100px;
+  font-size: 15px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  text-decoration: none;
+  border: none;
+  transition: all 0.15s ease;
+}
+
+.btn-secondary.full-width {
+  background: #f5f5f5;
+  color: #171717;
+  border: 1px solid #e5e5e5;
+}
+
+.btn-secondary.full-width:hover {
+  background: #e5e5e5;
 }
 
 /* ══════════════════════════════════════════
