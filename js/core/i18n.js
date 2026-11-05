@@ -947,6 +947,10 @@ const translations = {
     search_approx: 'قد تقصد',
 
     landing_nav_register: "إنشاء حساب",
+
+    sub_feat_support_email: "دعم بالبريد",
+    sub_feat_support_email_wa: "دعم بالبريد + واتساب",
+    sub_feat_support_247: "دعم 24/7",
   },
 
   fr: {
@@ -1884,6 +1888,10 @@ const translations = {
     search_approx: 'Vouliez-vous dire',
 
     landing_nav_register: "Créer un compte",
+
+    sub_feat_support_email: "Support par email",
+    sub_feat_support_email_wa: "Support par email + WhatsApp",
+    sub_feat_support_247: "Support 24/7",
   },
 
   en: {
@@ -2821,6 +2829,10 @@ const translations = {
     search_approx: 'Did you mean',
 
     landing_nav_register: "Sign Up", // أو "Create Account"
+
+    sub_feat_support_email: "Email Support",
+    sub_feat_support_email_wa: "Email + WhatsApp Support",
+    sub_feat_support_247: "24/7 Support",
   },
 
   
