@@ -1,6 +1,7 @@
 // ============================================
 // صفحة المنتجات (مع التحديث الفوري والعملة)
 // ✅ دعم كامل للترجمة
+// ✅ إصلاح اتجاه العملة (LTR) لمنع انزياحها
 // ============================================
 let productsChannel = null; 
 let cachedProducts = []; 
@@ -166,13 +167,13 @@ function renderProductsToDOM() {
           </div>
           <div class="stat">
             <div class="stat-label">${tr('products_price')}</div>
-            <!-- ✅ استخدام دالة التنسيق هنا -->
-            <div class="stat-value">${formatPrice(p.price)}</div>
+            <!-- ✅ تم إضافة dir="ltr" هنا -->
+            <div class="stat-value" dir="ltr">${formatPrice(p.price)}</div>
           </div>
           <div class="stat">
             <div class="stat-label">${tr('products_total')}</div>
-            <!-- ✅ استخدام دالة التنسيق هنا -->
-            <div class="stat-value">${formatPrice(total)}</div>
+            <!-- ✅ تم إضافة dir="ltr" هنا أيضاً -->
+            <div class="stat-value" dir="ltr">${formatPrice(total)}</div>
           </div>
         </div>
       </a>
