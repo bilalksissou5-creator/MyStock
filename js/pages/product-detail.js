@@ -1,6 +1,7 @@
 // ============================================
-// صفحة تفاصيل المنتج (مع مخزون منخفض + إصلاح الإشعارات)
-// ✅ إشعار واحد فقط بعد توقف المستخدم عن الكتابة
+// صفحة تفاصيل المنتج
+// ✅ سعر البيع في مكانه الأصلي، ثم المخزون المنخفض تحته
+// ✅ إشعار واحد فقط لكل عملية تعديل (blur + debounce)
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   const user = await requireAuth();
@@ -46,7 +47,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       .select('currency_symbol, show_currency')
       .eq('id', profile.organization_id)
       .single();
-    
+
     if (org?.show_currency !== false) {
       currencySymbol = org?.currency_symbol || '';
     }
@@ -124,17 +125,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         </div>
       </div>
 
-      <!-- ✅ قسم حد التنبيه للمخزون -->
-      <div class="sell-price-section">
-        <h3 class="sell-price-title">${tr('low_stock_section_title')}</h3>
-
-        <div class="sell-price-input-group">
-          <label>${tr('low_stock_field_label')}</label>
-          <input type="number" id="low-stock-input" value="${lowStockThreshold}" min="0" step="1" dir="ltr" placeholder="10">
-          <small class="field-hint">${tr('low_stock_field_hint')}</small>
-        </div>
-      </div>
-
+      <!-- ✅ سعر البيع (في مكانه الأصلي - قبل المخزون المنخفض) -->
       <div class="sell-price-section">
         <h3 class="sell-price-title">💰 ${tr('prod_detail_sell_price')}</h3>
 
@@ -158,6 +149,17 @@ document.addEventListener('DOMContentLoaded', async () => {
           <label>${tr('prod_detail_sell_input')} (${currencySymbol || 'DH'})</label>
           <input type="number" id="sell-price-input" value="${sellPrice}" min="0" step="0.01" dir="ltr" placeholder="0.00">
           <small class="field-hint">${tr('prod_detail_sell_hint')}</small>
+        </div>
+      </div>
+
+      <!-- ✅ المخزون المنخفض (تحت سعر البيع) -->
+      <div class="sell-price-section">
+        <h3 class="sell-price-title">${tr('low_stock_section_title')}</h3>
+
+        <div class="sell-price-input-group">
+          <label>${tr('low_stock_field_label')}</label>
+          <input type="number" id="low-stock-input" value="${lowStockThreshold}" min="0" step="1" dir="ltr" placeholder="10">
+          <small class="field-hint">${tr('low_stock_field_hint')}</small>
         </div>
       </div>
 
@@ -197,8 +199,43 @@ document.addEventListener('DOMContentLoaded', async () => {
     qr_code: tr('prod_detail_barcode'),
   };
 
-  // ✅ مؤقتات الإشعارات (debounce بسيط)
-  const notifTimers = {};
+  // ✅ التتبع الثلاثي (الأصل + آخر حفظ + آخر إشعار)
+  const originalValues = {};
+  const lastSavedValues = {};
+  const notifiedValues = {};
+  const editTimers = {};
+
+  async function sendNotification(field, value) {
+    if (typeof notifyOrganization !== 'function' || !profile?.organization_id) return;
+
+    const threshold = Number(product.low_stock_threshold ?? 10);
+    const isLow = field === 'qty' && Number(value) <= threshold;
+
+    try {
+      if (isLow) {
+        await notifyOrganization({
+          orgId: profile.organization_id,
+          title: tr('low_stock_alert_title'),
+          message: tr('low_stock_alert_single')
+            .replace('{name}', product.name)
+            .replace('{qty}', value)
+            .replace('{threshold}', threshold),
+          type: 'warning',
+          link: `/products/detail.html?id=${productId}`,
+          userName: profile.full_name || null,
+        });
+      } else {
+        await notifyOrganization({
+          orgId: profile.organization_id,
+          title: tr('prod_detail_notif_edit_title'),
+          message: `${profile.full_name || tr('prod_detail_user')} ${tr('prod_detail_notif_edit_msg')} ${fieldLabels[field] || field} "${product.name}" ${tr('prod_detail_to')} "${value}"`,
+          type: 'info',
+          link: `/products/detail.html?id=${productId}`,
+          userName: profile.full_name || null,
+        });
+      }
+    } catch (e) { console.warn(e); }
+  }
 
   const fields = [
     { id: 'f-name', field: 'name', type: 'text' },
@@ -213,6 +250,29 @@ document.addEventListener('DOMContentLoaded', async () => {
   fields.forEach(({ id, field, type }) => {
     const el = document.getElementById(id);
 
+    // 1️⃣ حفظ القيمة الأصلية عند بدء التعديل
+    el.addEventListener('focus', () => {
+      if (!(id in originalValues)) {
+        originalValues[id] = String(el.dataset.value || '');
+      }
+    }, true);
+
+    // 2️⃣ إرسال إشعار واحد عند مغادرة الحقل (Blur)
+    el.addEventListener('blur', () => {
+      setTimeout(() => {
+        const orig = originalValues[id];
+        const last = lastSavedValues[id];
+
+        if (last === undefined) return;
+        if (String(last) === String(orig)) return;      // لم تتغير القيمة
+        if (String(notifiedValues[id]) === String(last)) return;  // سبق الإشعار
+
+        notifiedValues[id] = last;
+        sendNotification(field, last);
+      }, 200);
+    }, true);
+
+    // 3️⃣ الحفظ الفوري عند كل تغيير (بدون إشعار)
     inlineEdit({
       el,
       table: 'products',
@@ -220,6 +280,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       field,
       type,
       onSave: async (savedField, newValue) => {
+        lastSavedValues[id] = newValue;
+
         if (savedField === 'qty' || savedField === 'price') recalcTotal();
 
         if (savedField === 'qty') {
@@ -227,44 +289,24 @@ document.addEventListener('DOMContentLoaded', async () => {
           updateQtyStyle();
         }
 
-        if (typeof notifyOrganization !== 'function' || !profile?.organization_id) return;
+        // 4️⃣ احتياطي: إذا لم يحدث blur بعد 3 ثوانٍ
+        if (editTimers[id]) clearTimeout(editTimers[id]);
+        editTimers[id] = setTimeout(() => {
+          const orig = originalValues[id];
+          const last = lastSavedValues[id];
 
-        // ✅ debounce: انتظار 2 ثانية بعد آخر حرف قبل إرسال الإشعار
-        if (notifTimers[id]) clearTimeout(notifTimers[id]);
-        notifTimers[id] = setTimeout(async () => {
-          try {
-            const threshold = Number(product.low_stock_threshold ?? 10);
-            const isLow = savedField === 'qty' && Number(newValue) <= threshold;
+          if (last === undefined) return;
+          if (String(last) === String(orig)) return;
+          if (String(notifiedValues[id]) === String(last)) return;
 
-            if (isLow) {
-              await notifyOrganization({
-                orgId: profile.organization_id,
-                title: tr('low_stock_alert_title'),
-                message: tr('low_stock_alert_single')
-                  .replace('{name}', product.name)
-                  .replace('{qty}', newValue)
-                  .replace('{threshold}', threshold),
-                type: 'warning',
-                link: `/products/detail.html?id=${productId}`,
-                userName: profile.full_name || null,
-              });
-            } else {
-              await notifyOrganization({
-                orgId: profile.organization_id,
-                title: tr('prod_detail_notif_edit_title'),
-                message: `${profile.full_name || tr('prod_detail_user')} ${tr('prod_detail_notif_edit_msg')} ${fieldLabels[savedField] || savedField} "${product.name}" ${tr('prod_detail_to')} "${newValue}"`,
-                type: 'info',
-                link: `/products/detail.html?id=${productId}`,
-                userName: profile.full_name || null,
-              });
-            }
-          } catch (e) { console.warn(e); }
-        }, 2000);
+          notifiedValues[id] = last;
+          sendNotification(field, last);
+        }, 3000);
       },
     });
   });
 
-  // ✅ حفظ حد التنبيه
+  // ✅ حفظ حد التنبيه للمخزون
   let lowStockSaveTimeout = null;
   const lowStockInput = document.getElementById('low-stock-input');
 
@@ -309,7 +351,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const imgContainer = document.getElementById('product-image-container');
   attachImageUpload(productId, imgContainer, product.image_url);
 
-  // ✅ سعر البيع
+  // ✅ سعر البيع (تفعيل/إلغاء)
   const sellPriceToggle = document.getElementById('sell-price-toggle');
   const sellPriceStatus = document.getElementById('sell-price-status');
   const sellPriceInput = document.getElementById('sell-price-input');
@@ -351,6 +393,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   });
 
+  // ✅ سعر البيع (تعديل القيمة)
   let sellPriceSaveTimeout = null;
 
   sellPriceInput.addEventListener('input', () => {
