@@ -2958,16 +2958,31 @@ function applyLanguage() {
   });
 }
 
-// 5. تغيير اللغة
-function setLanguage(lang) {
+// 5. تغيير اللغة (بدون إعادة تحميل الصفحة)
+async function setLanguage(lang) {
   if (lang === currentLang) return; 
+  
+  // 1. تحديث المتغير المحلي والذاكرة
+  currentLang = lang;
   localStorage.setItem('app_lang', lang);
-  window.location.reload(); 
+  
+  // 2. تحديث اتجاه الصفحة فوراً
+  document.documentElement.lang = lang;
+  document.documentElement.dir = (lang === 'ar') ? 'rtl' : 'ltr';
+  if (document.body) {
+    document.body.classList.remove('lang-ar', 'lang-fr', 'lang-en');
+    document.body.classList.add('lang-' + lang);
+  }
+
+  // 3. جلب الترجمات الجديدة من Supabase وتطبيقها
+  await fetchSupabaseTranslations(); 
+  applyLanguage();
 }
 
+// مستمع لتغيير اللغة من نافذة أخرى (تبويب آخر)
 window.addEventListener('storage', (e) => {
   if (e.key === 'app_lang' && e.newValue && e.newValue !== currentLang) {
-    window.location.reload();
+    window.location.reload(); // نستخدم الـ reload هنا فقط لتحديث التبويبات الأخرى
   }
 });
 
