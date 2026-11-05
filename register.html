@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html>
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,7 +7,14 @@
 
   <meta name="robots" content="noindex, nofollow">
 
-  <script src="/js/core/lang-boot.js"></script>
+  <!-- ✅ تطبيق اللغة والاتجاه فوراً قبل أي CSS لمنع وميض اللغة -->
+  <script>
+    (function() {
+      var lang = localStorage.getItem('app_lang') || 'ar';
+      document.documentElement.lang = lang;
+      document.documentElement.dir = (lang === 'ar') ? 'rtl' : 'ltr';
+    })();
+  </script>
 
   <link rel="stylesheet" href="/assets/css/common.css?v=11">
   <link rel="stylesheet" href="/assets/css/pages/register.css?v=11">
@@ -39,7 +46,7 @@
       <input type="text" id="org_name" required>
     </div>
 
-    <!-- ✅ إضافة حقل رقم الهاتف هنا -->
+    <!-- ✅ حقل رقم الهاتف -->
     <div class="form-group">
       <label data-i18n="register_phone">رقم الهاتف *</label>
       <input type="tel" id="phone" placeholder="+212 600000000" required dir="ltr">
@@ -98,8 +105,11 @@
   
   <!-- ✅ تفعيل الترجمة عند فتح الصفحة -->
   <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      if (window.applyLanguage) applyLanguage();
+    document.addEventListener('DOMContentLoaded', async () => {
+      // ننتظر تطبيق الترجمة (i18n.js سيقوم بجلبها من Supabase أو الكاش)
+      if (window.applyLanguage) {
+        await window.applyLanguage();
+      }
     });
   </script>
 </body>

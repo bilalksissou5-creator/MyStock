@@ -8,7 +8,7 @@
   <!-- ✅ منع جوجل من فهرسة صفحة تسجيل الدخول -->
   <meta name="robots" content="noindex, nofollow">
 
-  <!-- ✅ تطبيق اللغة فوراً قبل أي CSS -->
+  <!-- ✅ تطبيق اللغة والاتجاه فوراً قبل أي CSS لمنع وميض اللغة -->
   <script>
     (function() {
       var lang = localStorage.getItem('app_lang') || 'ar';
@@ -62,19 +62,27 @@
   <script src="/js/core/i18n.js"></script>
   <script src="/js/core/auth.js"></script>
   <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      if (window.applyLanguage) applyLanguage();
+    // ✅ جعل الدالة async لانتظار تحميل الترجمات من Supabase
+    document.addEventListener('DOMContentLoaded', async () => {
+      
+      // ننتظر تطبيق الترجمة (ملف i18n.js سيقوم بجلبها من Supabase أو الكاش)
+      if (window.applyLanguage) {
+        await window.applyLanguage();
+      }
 
+      // كود إظهار/إخفاء كلمة المرور
       const toggleBtn = document.getElementById('toggle-password');
       const passwordInput = document.getElementById('password');
-      if (!toggleBtn || !passwordInput) return;
-      toggleBtn.addEventListener('click', () => {
-        const isPassword = passwordInput.type === 'password';
-        passwordInput.type = isPassword ? 'text' : 'password';
-        toggleBtn.innerHTML = isPassword
-          ? '<i class="fas fa-eye-slash"></i>'
-          : '<i class="fas fa-eye"></i>';
-      });
+      
+      if (toggleBtn && passwordInput) {
+        toggleBtn.addEventListener('click', () => {
+          const isPassword = passwordInput.type === 'password';
+          passwordInput.type = isPassword ? 'text' : 'password';
+          toggleBtn.innerHTML = isPassword
+            ? '<i class="fas fa-eye-slash"></i>'
+            : '<i class="fas fa-eye"></i>';
+        });
+      }
     });
   </script>
 </body>

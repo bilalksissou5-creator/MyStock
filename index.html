@@ -21,6 +21,7 @@
   <!-- ✅ Google Search Console verification -->
   <meta name="google-site-verification" content="ZCuxwz9GKmHDyuWi4vw8CsBRBoE34mCLvPAQTHYktfQ" />
 
+  <!-- ✅ سكريبت تهيئة اللغة والاتجاه (يعمل قبل تحميل الصفحة لمنع الوميض) -->
   <script>
     (function() {
       var lang = localStorage.getItem('app_lang') || 'ar';
@@ -283,14 +284,16 @@
 
   <script src="/js/core/i18n.js"></script>
   <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      if (window.applyLanguage) applyLanguage();
+    document.addEventListener('DOMContentLoaded', async () => {
+      // ✅ تطبيق الترجمة فوراً عند فتح الصفحة
+      if (window.applyLanguage) await window.applyLanguage();
 
-      // ✅ ضبط القيمة الافتراضية للغة في القائمة المنسدلة
-      const currentLang = localStorage.getItem('app_lang') || 'ar';
+      // ✅ ضبط القيمة الافتراضية للغة في القائمة المنسدلة بناءً على اللغة المحفوظة
+      const currentLang = window.getCurrentLang ? window.getCurrentLang() : 'ar';
       const langSelect = document.getElementById('lang-select');
       if (langSelect) langSelect.value = currentLang;
 
+      // ✅ تحديث النص الخاص بالشهر في الأسعار
       document.querySelectorAll('.landing-price-period').forEach(el => {
         if (el.textContent.includes('{{شهر}}')) {
           el.textContent = '/ ' + (window.t ? window.t('sub_per_month').replace('/ ', '') : 'شهرياً');
@@ -298,10 +301,19 @@
       });
     });
 
-    // ✅ دالة تغيير اللغة
-    function changeLanguage(lang) {
-      localStorage.setItem('app_lang', lang);
-      window.location.reload();
+    // ✅ دالة تغيير اللغة (تستدعي دالة setLanguage الجديدة من i18n.js)
+    async function changeLanguage(lang) {
+      if (window.setLanguage) {
+        await window.setLanguage(lang);
+        
+        // إعادة تحديث نص الشهر بعد تغيير اللغة
+        document.querySelectorAll('.landing-price-period').forEach(el => {
+          el.textContent = '/ ' + (window.t ? window.t('sub_per_month').replace('/ ', '') : 'شهرياً');
+        });
+      } else {
+        localStorage.setItem('app_lang', lang);
+        window.location.reload();
+      }
     }
   </script>
 

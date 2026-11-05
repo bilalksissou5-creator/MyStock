@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>MyStock</title>
 
-  <!-- ✅ تطبيق اللغة فوراً قبل أي CSS -->
+  <!-- ✅ تطبيق اللغة والاتجاه فوراً قبل أي CSS لمنع وميض اللغة -->
   <script>
     (function() {
       var lang = localStorage.getItem('app_lang') || 'ar';
@@ -20,6 +20,7 @@
 </head>
 <body>
   <div class="app"></div>
+  
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.jsdelivr.net/npm/apexcharts@3.45.1/dist/apexcharts.min.js"></script>
   <script src="/js/core/supabase.js"></script>
@@ -28,10 +29,20 @@
   <script src="/js/core/notifications.js"></script>
   <script src="/js/components/layout.js"></script>
   <script src="/js/pages/dashboard.js"></script>
+  
   <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      if (window.applyLanguage) applyLanguage();
-      if (typeof startNotifPolling === 'function') startNotifPolling();
+    // ✅ جعل الدالة async لانتظار تحميل الترجمات من Supabase قبل رسم الواجهة
+    document.addEventListener('DOMContentLoaded', async () => {
+      
+      // ننتظر تطبيق الترجمة (ملف i18n.js سيقوم بجلبها من Supabase أو الكاش)
+      if (window.applyLanguage) {
+        await window.applyLanguage();
+      }
+      
+      // تشغيل الإشعارات بعد التأكد من جلب الترجمة
+      if (typeof startNotifPolling === 'function') {
+        startNotifPolling();
+      }
     });
   </script>
 </body>

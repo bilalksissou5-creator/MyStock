@@ -3,6 +3,75 @@
 // نظام الترجمة (i18n)
 // ============================================
 
+// ... (كائنات translations و countries تبقى كما هي) ...
+
+// ✅ 1. قراءة اللغة الحالية وتحميل الكاش فوراً (قبل رسم الصفحة)
+let currentLang = localStorage.getItem('app_lang') || 'ar';
+let dbTranslations = {}; 
+const cacheKey = `app_translations_${currentLang}`;
+const cachedData = localStorage.getItem(cacheKey);
+
+if (cachedData) {
+  try {
+    dbTranslations = JSON.parse(cachedData);
+  } catch(e) {}
+}
+
+// 2. جلب أحدث الترجمات من Supabase في الخلفية
+async function fetchSupabaseTranslations() {
+  if (!window.db) return; 
+
+  try {
+    const { data, error } = await window.db.from('translations').select('key, ar, fr, en');
+    
+    if (!error && data) {
+      dbTranslations = {};
+      data.forEach(row => {
+        dbTranslations[row.key] = row[currentLang];
+      });
+      
+      localStorage.setItem(cacheKey, JSON.stringify(dbTranslations));
+      applyLanguage(); 
+    }
+  } catch (err) {
+    console.warn("فشل جلب الترجمات من Supabase، سيتم استخدام الكاش.", err);
+  }
+}
+
+// 3. دالة تغيير اللغة (تحديث فوري بدون Reload)
+async function setLanguage(lang) {
+  if (lang === currentLang) return; 
+  
+  currentLang = lang;
+  localStorage.setItem('app_lang', lang);
+  
+  // تحديث اتجاه الصفحة فوراً
+  document.documentElement.lang = lang;
+  document.documentElement.dir = (lang === 'ar') ? 'rtl' : 'ltr';
+  if (document.body) {
+    document.body.classList.remove('lang-ar', 'lang-fr', 'lang-en');
+    document.body.classList.add('lang-' + lang);
+  }
+
+  // جلب الترجمات الجديدة وتطبيقها
+  await fetchSupabaseTranslations(); 
+  applyLanguage();
+}
+
+// ... (باقي دوال t, applyLanguage, إلخ كما هي) ...
+
+// مستمع لتغيير اللغة من تبويب آخر
+window.addEventListener('storage', (e) => {
+  if (e.key === 'app_lang' && e.newValue && e.newValue !== currentLang) {
+    window.location.reload();
+  }
+});
+
+// تشغيل جلب الترجمات عند تحميل الصفحة
+document.addEventListener('DOMContentLoaded', () => {
+    fetchSupabaseTranslations();
+});
+
 const translations = {
   ar: {
     app_name: 'MyStock',
