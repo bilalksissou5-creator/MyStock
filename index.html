@@ -282,7 +282,11 @@
     </div>
   </footer>
 
+  <!-- ✅ تحميل Supabase أولاً لكي تتمكن الصفحة من جلب الترجمات -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="/js/core/supabase.js"></script>
   <script src="/js/core/i18n.js"></script>
+  
   <script>
     document.addEventListener('DOMContentLoaded', async () => {
       // ✅ تطبيق الترجمة فوراً عند فتح الصفحة
@@ -294,26 +298,25 @@
       if (langSelect) langSelect.value = currentLang;
 
       // ✅ تحديث النص الخاص بالشهر في الأسعار
-      document.querySelectorAll('.landing-price-period').forEach(el => {
-        if (el.textContent.includes('{{شهر}}')) {
-          el.textContent = '/ ' + (window.t ? window.t('sub_per_month').replace('/ ', '') : 'شهرياً');
-        }
-      });
+      updateMonthText();
     });
 
     // ✅ دالة تغيير اللغة (تستدعي دالة setLanguage الجديدة من i18n.js)
     async function changeLanguage(lang) {
       if (window.setLanguage) {
         await window.setLanguage(lang);
-        
-        // إعادة تحديث نص الشهر بعد تغيير اللغة
-        document.querySelectorAll('.landing-price-period').forEach(el => {
-          el.textContent = '/ ' + (window.t ? window.t('sub_per_month').replace('/ ', '') : 'شهرياً');
-        });
+        updateMonthText(); // تحديث نص الشهر فوراً
       } else {
         localStorage.setItem('app_lang', lang);
         window.location.reload();
       }
+    }
+
+    // دالة مساعدة لتحديث كلمة "شهر" تحت الأسعار
+    function updateMonthText() {
+      document.querySelectorAll('.landing-price-period').forEach(el => {
+        el.textContent = '/ ' + (window.t ? window.t('sub_per_month').replace('/ ', '') : 'شهرياً');
+      });
     }
   </script>
 
