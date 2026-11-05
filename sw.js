@@ -1,7 +1,8 @@
 // ✅ Service Worker لدعم الإشعارات والعمل بدون إنترنت
 // ✅ تمت إضافة نظام لمسح الكاش القديم لإجبار المتصفح على التحديث
 
-const CACHE_NAME = 'mystock-v5';
+// ⚠️ قمنا بتغيير الإصدار إلى v6 لإجبار المتصفح على مسح كاش v5 (الذي يحتوي على welcome)
+const CACHE_NAME = 'mystock-v6';
 
 self.addEventListener('install', (e) => {
   self.skipWaiting();
@@ -23,7 +24,12 @@ self.addEventListener('activate', (e) => {
 });
 
 self.addEventListener('fetch', (e) => {
-  e.respondWith(fetch(e.request).catch(() => caches.match(e.request)));
+  // استراتيجية: جلب من الشبكة أولاً، وإذا فشل (لا يوجد إنترنت) نستخدم الكاش
+  e.respondWith(
+    fetch(e.request).catch(() => {
+      return caches.match(e.request);
+    })
+  );
 });
 
 // ✅ استقبال الإشعارات من الخادم

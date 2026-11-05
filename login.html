@@ -17,8 +17,8 @@
     })();
   </script>
 
-  <link rel="stylesheet" href="/assets/css/common.css">
-  <link rel="stylesheet" href="/assets/css/pages/login.css">
+  <link rel="stylesheet" href="/assets/css/common.css?v=13">
+  <link rel="stylesheet" href="/assets/css/pages/login.css?v=13">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 <body class="login-page">
@@ -50,7 +50,8 @@
 
     <div class="auth-footer">
       <p data-i18n="login_no_account">ليس لديك حساب؟</p>
-      <a href="/welcome.html" class="btn-secondary" style="width:100%; justify-content:center;">
+      <!-- ✅ تم تعديل الرابط هنا ليشير إلى register.html -->
+      <a href="/register.html" class="btn-secondary" style="width:100%; justify-content:center;">
         <i class="fas fa-user-plus"></i>
         <span data-i18n="login_create_account">إنشاء حساب جديد</span>
       </a>
@@ -59,13 +60,12 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="/js/core/supabase.js"></script>
-  <script src="/js/core/i18n.js"></script>
-  <script src="/js/core/auth.js"></script>
+  <script src="/js/core/i18n.js?v=13"></script>
+  <script src="/js/core/auth.js?v=13"></script>
+  
   <script>
-    // ✅ جعل الدالة async لانتظار تحميل الترجمات من Supabase
     document.addEventListener('DOMContentLoaded', async () => {
-      
-      // ننتظر تطبيق الترجمة (ملف i18n.js سيقوم بجلبها من Supabase أو الكاش)
+      // ننتظر تطبيق الترجمة
       if (window.applyLanguage) {
         await window.applyLanguage();
       }
