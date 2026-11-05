@@ -4,7 +4,7 @@
 // ✅ اكتشاف تلقائي للبلد من IP
 // ✅ قوائم منسدلة مخصصة (Picker)
 // ✅ حفظ الاختيارات في localStorage
-// ✅ تغيير اللغة مباشرة عند التبديل
+// ✅ تغيير اللغة مباشرة عند التبديل (بدون Reload)
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
 
@@ -43,13 +43,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     const saved = localStorage.getItem('app_country');
     if (saved) return saved;
 
-    // 1) من لغة المتصفح (ar-MA → MA)
     const browserRegion = (navigator.language || '').split('-')[1];
     if (browserRegion && window.countries?.[browserRegion.toUpperCase()]) {
       return browserRegion.toUpperCase();
     }
 
-    // 2) من IP (محاولة سريعة)
     try {
       const controller = new AbortController();
       const timeout = setTimeout(() => controller.abort(), 2000);
@@ -63,10 +61,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (code && window.countries?.[code]) return code;
       }
     } catch (e) {
-      // تجاهل الخطأ — سنستخدم الافتراضي
+      // تجاهل الخطأ
     }
 
-    return 'MA'; // افتراضي
+    return 'MA';
   }
 
   // ═══════════════════════════════════════════
@@ -97,7 +95,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       `;
     }).join('');
 
-    // إضافة حدث لكل خيار
     countryDropdown.querySelectorAll('.picker-option').forEach(opt => {
       opt.addEventListener('click', () => {
         selectedCountry = opt.dataset.country;
@@ -117,7 +114,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     langFlag.textContent = flags[selectedLang];
     langName.textContent = names[selectedLang];
 
-    // تحديث حالة الخيارات
     langDropdown.querySelectorAll('.picker-option').forEach(opt => {
       opt.classList.toggle('active', opt.dataset.lang === selectedLang);
     });
@@ -142,7 +138,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     countryName.textContent = nameText;
     continueBtn.disabled = false;
 
-    // تحديث حالة الخيارات
     countryDropdown.querySelectorAll('.picker-option').forEach(opt => {
       opt.classList.toggle('active', opt.dataset.country === selectedCountry);
     });
@@ -170,28 +165,23 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (!isOpen) countryPicker.classList.add('open');
   });
 
-  // إغلاق عند الضغط خارج القوائم
   document.addEventListener('click', () => closeAllPickers());
-
-  // منع إغلاق القائمة عند الضغط داخلها
   langDropdown.addEventListener('click', (e) => e.stopPropagation());
   countryDropdown.addEventListener('click', (e) => e.stopPropagation());
 
   // ═══════════════════════════════════════════
-  // اختيار اللغة
+  // اختيار اللغة (تحديث بدون Reload)
   // ═══════════════════════════════════════════
   langDropdown.querySelectorAll('.picker-option').forEach(opt => {
-    opt.addEventListener('click', () => {
+    opt.addEventListener('click', async () => {
       selectedLang = opt.dataset.lang;
       updateLanguageDisplay();
 
-      // تغيير اللغة مباشرة (يُطبق الترجمة على الصفحة)
-      if (window.setLanguage) window.setLanguage(selectedLang);
+      // ✅ ننتظر انتهاء جلب الترجمة من Supabase قبل إعادة بناء القائمة
+      if (window.setLanguage) await window.setLanguage(selectedLang);
 
-      // إعادة بناء قائمة البلدان باللغة الجديدة
       buildCountryDropdown();
       updateCountryDisplay();
-
       closeAllPickers();
     });
   });
@@ -199,14 +189,14 @@ document.addEventListener('DOMContentLoaded', async () => {
   // ═══════════════════════════════════════════
   // التهيئة الأولية
   // ═══════════════════════════════════════════
-  // تطبيق اللغة
-  if (window.setLanguage) window.setLanguage(selectedLang);
+  // ✅ إذا كانت اللغة المكتشفة تختلف عن لغة الموقع الحالية، نقوم بتحديثها
+  if (window.setLanguage && window.getCurrentLang() !== selectedLang) {
+      await window.setLanguage(selectedLang);
+  }
+  
   updateLanguageDisplay();
-
-  // بناء قائمة البلدان
   buildCountryDropdown();
 
-  // اكتشاف البلد
   selectedCountry = await detectCountry();
   updateCountryDisplay();
 
