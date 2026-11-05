@@ -7,12 +7,91 @@
 // ✅ منع Enter/Go/Done من إرسال الفورم
 // ✅ حفظ رقم الهاتف واللغة في Supabase
 // ============================================
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
 
-  // ✅ تطبيق اللغة
-  if (window.applyLanguage) window.applyLanguage();
+  // ✅ تطبيق اللغة (تم جعلها async لانتظار جلب الترجمات)
+  if (window.applyLanguage) await window.applyLanguage();
 
-  // إظهار/إخفاء كلمات السر
+  // ============================================
+  // ✅ إعدادات قائمة اختيار البلد
+  // ============================================
+  const countryPicker = document.getElementById('country-picker');
+  const countryTrigger = document.getElementById('country-trigger');
+  const countryFlag = document.getElementById('country-flag');
+  const countryName = document.getElementById('country-name');
+  const countryDropdown = document.getElementById('country-dropdown');
+  const countryCodeInput = document.getElementById('country_code');
+
+  if (countryPicker && countryTrigger) {
+    // قراءة البلد المحفوظ مسبقاً (من صفحة الترحيب) أو الافتراضي 'MA'
+    let selectedCountry = localStorage.getItem('app_country') || 'MA';
+
+    function buildCountryDropdown() {
+      const countriesObj = window.countries || {};
+      const currentLangCode = window.getCurrentLang ? window.getCurrentLang() : 'ar';
+
+      countryDropdown.innerHTML = Object.keys(countriesObj).map(code => {
+        const c = countriesObj[code];
+        const name = c[currentLangCode] || c.ar;
+        const flag = name.match(/\p{Emoji}/u)?.[0] || '🌍';
+        const nameText = name.replace(/\p{Emoji}/gu, '').trim();
+
+        return `
+          <button type="button" class="picker-option" data-country="${code}">
+            <span class="picker-flag">${flag}</span>
+            <span class="picker-name">${nameText}</span>
+            <i class="fas fa-check picker-check"></i>
+          </button>
+        `;
+      }).join('');
+
+      countryDropdown.querySelectorAll('.picker-option').forEach(opt => {
+        opt.addEventListener('click', () => {
+          selectedCountry = opt.dataset.country;
+          updateCountryDisplay();
+          countryPicker.classList.remove('open');
+        });
+      });
+    }
+
+    function updateCountryDisplay() {
+      if (!selectedCountry) return;
+
+      const name = window.tCountry ? window.tCountry(selectedCountry) : selectedCountry;
+      const flag = name.match(/\p{Emoji}/u)?.[0] || '🌍';
+      const nameText = name.replace(/\p{Emoji}/gu, '').trim();
+
+      countryFlag.textContent = flag;
+      countryName.textContent = nameText;
+      
+      // حفظ الكود في الحقل المخفي وفي الـ localStorage
+      countryCodeInput.value = selectedCountry;
+      localStorage.setItem('app_country', selectedCountry);
+
+      countryDropdown.querySelectorAll('.picker-option').forEach(opt => {
+        opt.classList.toggle('active', opt.dataset.country === selectedCountry);
+      });
+    }
+
+    countryTrigger.addEventListener('click', (e) => {
+      e.stopPropagation();
+      countryPicker.classList.toggle('open');
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!countryPicker.contains(e.target)) {
+        countryPicker.classList.remove('open');
+      }
+    });
+
+    // التهيئة الأولية للقائمة
+    buildCountryDropdown();
+    updateCountryDisplay();
+  }
+
+  // ============================================
+  // ✅ إظهار/إخفاء كلمات السر
+  // ============================================
   document.querySelectorAll('.toggle-password').forEach(btn => {
     btn.addEventListener('click', () => {
       const targetId = btn.dataset.target;

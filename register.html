@@ -17,7 +17,7 @@
   </script>
 
   <link rel="stylesheet" href="/assets/css/common.css?v=11">
-  <link rel="stylesheet" href="/assets/css/pages/register.css?v=11">
+  <link rel="stylesheet" href="/assets/css/pages/register.css?v=12"> <!-- تم تحديث الإصدار لتحديث الكاش -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 <body class="register-page">
@@ -44,6 +44,21 @@
     <div class="form-group">
       <label data-i18n="register_org_name">إسم المنظمة *</label>
       <input type="text" id="org_name" required>
+    </div>
+
+    <!-- ✅ قائمة اختيار البلد (أُضيفت هنا قبل رقم الهاتف) -->
+    <div class="form-group">
+      <label data-i18n="welcome_country">البلد *</label>
+      <div class="picker" id="country-picker">
+        <button type="button" class="picker-trigger" id="country-trigger">
+          <span class="picker-flag" id="country-flag">🌍</span>
+          <span class="picker-name" id="country-name" data-i18n="welcome_select_country">-- اختر البلد --</span>
+          <i class="fas fa-chevron-down picker-arrow"></i>
+        </button>
+        <div class="picker-dropdown" id="country-dropdown"></div>
+      </div>
+      <!-- حقل مخفي يحمل كود البلد ليتزامن مع register.js -->
+      <input type="hidden" id="country_code" name="country_code">
     </div>
 
     <!-- ✅ حقل رقم الهاتف -->
@@ -101,7 +116,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="/js/core/supabase.js"></script>
   <script src="/js/core/i18n.js?v=11"></script>
-  <script src="/js/core/register.js?v=11"></script>
+  <script src="/js/core/register.js?v=12"></script> <!-- تم تحديث الإصدار -->
   
   <!-- ✅ تفعيل الترجمة عند فتح الصفحة -->
   <script>
