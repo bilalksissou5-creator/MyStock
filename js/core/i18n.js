@@ -2872,6 +2872,10 @@ const countries = {
   OTHER: { ar: 'أخرى', fr: 'Autre', en: 'Other' },
 };
 
+// ============================================
+// نظام الترجمة (i18n) - متصل بـ Supabase
+// ============================================
+
 let currentLang = localStorage.getItem('app_lang') || 'ar';
 let dbTranslations = {}; 
 
@@ -2892,7 +2896,6 @@ async function fetchSupabaseTranslations() {
   }
 
   try {
-    // جلب البيانات من جدول translations
     const { data, error } = await window.db.from('translations').select('key, ar, fr, en');
     
     if (!error && data) {
@@ -2901,7 +2904,6 @@ async function fetchSupabaseTranslations() {
         dbTranslations[row.key] = row[currentLang];
       });
       
-      // حفظ الترجمة في الكاش
       localStorage.setItem(cacheKey, JSON.stringify(dbTranslations));
       applyLanguage(); 
     }
@@ -2912,18 +2914,18 @@ async function fetchSupabaseTranslations() {
 
 // 2. دالة الترجمة t()
 function t(key) {
-  // أولاً: البحث في ترجمات Supabase
+  // البحث أولاً في ترجمات Supabase
   if (dbTranslations[key] !== undefined && dbTranslations[key] !== null) {
     return dbTranslations[key];
   }
   
-  // ثانياً: البحث في الترجمات المحلية (كخطة بديلة)
+  // البحث ثانياً في الترجمات المحلية (الاحتياطية)
   const currentTranslation = translations[currentLang]?.[key];
   if (currentTranslation !== undefined && currentTranslation !== null) {
     return currentTranslation;
   }
   
-  // ثالثاً: العودة للعربية
+  // العودة للعربية
   return translations.ar[key] || key;
 }
 
@@ -2969,7 +2971,7 @@ window.addEventListener('storage', (e) => {
   }
 });
 
-// تشغيل جلب الترجمات عند التحميل
+// تشغيل جلب الترجمات عند تحميل الصفحة
 document.addEventListener('DOMContentLoaded', () => {
     fetchSupabaseTranslations();
 });
