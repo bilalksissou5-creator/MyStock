@@ -1,7 +1,7 @@
 /* ============================================
    صفحة Landing (الصفحة الرئيسية)
    ✅ تصميم One UI عصري + بطاقة المصمم
-   ✅ هيدر ثابت (Fixed) + زر إنشاء حساب + اختيار اللغة
+   ✅ هيدر ثابت + زر إنشاء حساب + اختيار اللغة
    ============================================ */
 
 /* ✅ إصلاح الارتفاع (تجاوز common.css) */
@@ -102,47 +102,54 @@ body.landing-page {
   background: #f5f5f5 !important;
 }
 
-/* ✅ تنسيق قائمة اختيار اللغة */
+/* ✅ تنسيق قائمة اختيار اللغة (أيقونة + اختصارات) */
 .lang-switcher {
   display: flex;
   align-items: center;
+  gap: 6px;
+  background: transparent;
+  border: 2px solid #e5e5e5;
+  border-radius: 10px;
+  padding: 0 12px;
+  height: 40px; 
+  transition: all 0.15s ease;
+}
+
+.lang-switcher:hover {
+  background: #f5f5f5;
+  border-color: #d4d4d4;
+}
+
+.lang-switcher i {
+  color: #6b7280;
+  font-size: 14px;
 }
 
 .lang-switcher select {
   appearance: none;
   -webkit-appearance: none;
-  padding: 8px 30px 8px 12px;
-  border-radius: 10px;
-  border: 1px solid #e5e5e5;
-  background-color: #fafafa;
-  background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23404040%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
-  background-repeat: no-repeat;
-  background-position: left 10px center; /* السهم على اليسار */
-  background-size: 10px;
+  background: transparent;
+  border: none;
   font-family: inherit;
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 800;
   color: #171717;
   cursor: pointer;
   outline: none;
-  transition: all 0.15s;
+  padding: 0;
+  margin: 0;
+  text-align: center;
 }
 
-[dir="rtl"] .lang-switcher select {
-  background-position: right 10px center; /* في العربية السهم على اليمين */
-  padding: 8px 12px 8px 30px;
-}
-
-.lang-switcher select:hover {
-  background-color: #f5f5f5;
-  border-color: #d4d4d4;
+.lang-switcher select::-ms-expand {
+  display: none;
 }
 
 /* ══════════════════════════════════════════
    Hero
    ══════════════════════════════════════════ */
 .landing-hero {
-  padding: 130px 24px 100px;
+  padding: 130px 24px 100px; /* ✅ تعويض مساحة الهيدر الثابت */
   text-align: center;
   background: linear-gradient(180deg, #ffffff 0%, #fafafa 100%);
   position: relative;
@@ -425,6 +432,7 @@ body.landing-page {
   text-align: center;
 }
 
+/* ✅ إضافة white-space: nowrap لمنع نزول العملة لسطر جديد */
 .landing-price {
   display: flex;
   align-items: baseline;
@@ -716,45 +724,49 @@ body.landing-page {
     padding: 32px 20px 24px;
   }
   
+  .lang-switcher {
+    height: 34px;
+    padding: 0 8px;
+    gap: 4px;
+  }
   .lang-switcher select {
     font-size: 13px;
-    padding: 6px 26px 6px 10px;
   }
-  [dir="rtl"] .lang-switcher select {
-    padding: 6px 10px 6px 26px;
+  .lang-switcher i {
+    font-size: 12px;
   }
 }
 
 @media (max-width: 480px) {
   .landing-header-inner {
     padding: 12px 16px;
-    gap: 10px;
+    gap: 8px;
   }
 
   .landing-logo {
-    font-size: 18px;
+    font-size: 17px;
   }
 
   .landing-nav {
-    gap: 6px;
+    gap: 4px;
   }
 
-  .landing-nav a {
-    padding: 6px 10px;
-    font-size: 12px;
-  }
-
+  /* تصغير الأزرار لتناسب الشاشات الصغيرة جداً */
   .landing-btn-login, .landing-btn-register {
-    padding: 6px 12px !important;
-    font-size: 12px !important;
+    padding: 6px 10px !important;
+    font-size: 11px !important;
   }
 
-  .lang-switcher select {
-    font-size: 12px;
-    padding: 6px 24px 6px 8px;
+  .lang-switcher {
+    height: 30px;
+    padding: 0 6px;
+    gap: 3px;
   }
-  [dir="rtl"] .lang-switcher select {
-    padding: 6px 8px 6px 24px;
+  .lang-switcher select {
+    font-size: 11px;
+  }
+  .lang-switcher i {
+    font-size: 11px;
   }
 
   .landing-hero-title {
