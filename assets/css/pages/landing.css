@@ -404,12 +404,15 @@ body.landing-page {
   text-align: center;
 }
 
+/* ✅ إضافة white-space: nowrap لمنع نزول العملة لسطر جديد */
 .landing-price {
   display: flex;
   align-items: baseline;
   justify-content: center;
   gap: 6px;
   margin-bottom: 24px;
+  white-space: nowrap; 
+  flex-wrap: nowrap;
 }
 
 .landing-price-value {
