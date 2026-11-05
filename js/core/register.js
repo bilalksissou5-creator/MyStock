@@ -1,6 +1,6 @@
 // ============================================
 // صفحة إنشاء حساب جديد
-// ✅ يقرأ البلد واللغة من localStorage (welcome.html)
+// ✅ اكتشاف تلقائي للبلد (الجهاز -> IP -> المغرب)
 // ✅ يطبق اللغة تلقائياً
 // ✅ يُنشئ subscriptions بحالة pending
 // ✅ يُحوّل إلى subscription.html بعد التسجيل
@@ -9,11 +9,11 @@
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
 
-  // ✅ تطبيق اللغة (تم جعلها async لانتظار جلب الترجمات)
+  // ✅ تطبيق اللغة
   if (window.applyLanguage) await window.applyLanguage();
 
   // ============================================
-  // ✅ إعدادات قائمة اختيار البلد
+  // ✅ إعدادات قائمة اختيار البلد (مع الاكتشاف التلقائي)
   // ============================================
   const countryPicker = document.getElementById('country-picker');
   const countryTrigger = document.getElementById('country-trigger');
@@ -23,8 +23,41 @@ document.addEventListener('DOMContentLoaded', async () => {
   const countryCodeInput = document.getElementById('country_code');
 
   if (countryPicker && countryTrigger) {
-    // قراءة البلد المحفوظ مسبقاً (من صفحة الترحيب) أو الافتراضي 'MA'
-    let selectedCountry = localStorage.getItem('app_country') || 'MA';
+    
+    // ✅ دالة اكتشاف البلد الذكية
+    async function detectCountry() {
+      // 1. هل هناك بلد محفوظ مسبقاً؟
+      const saved = localStorage.getItem('app_country');
+      if (saved && window.countries?.[saved]) return saved;
+
+      // 2. من لغة المتصفح (مثلاً ar-MA تعني MA)
+      const browserRegion = (navigator.language || '').split('-')[1];
+      if (browserRegion && window.countries?.[browserRegion.toUpperCase()]) {
+        return browserRegion.toUpperCase();
+      }
+
+      // 3. من الـ IP (مع مهلة قصيرة حتى لا تعلق الصفحة)
+      try {
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 2000);
+        const res = await fetch('https://ipapi.co/json/', { signal: controller.signal });
+        clearTimeout(timeout);
+
+        if (res.ok) {
+          const data = await res.json();
+          const code = (data.country_code || '').toUpperCase();
+          if (code && window.countries?.[code]) return code;
+        }
+      } catch (e) {
+        // تجاهل الخطأ
+      }
+
+      // 4. الافتراضي
+      return 'MA';
+    }
+
+    // تهيئة البلد
+    let selectedCountry = await detectCountry();
 
     function buildCountryDropdown() {
       const countriesObj = window.countries || {};
@@ -84,7 +117,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
     });
 
-    // التهيئة الأولية للقائمة
+    // التهيئة الأولية
     buildCountryDropdown();
     updateCountryDisplay();
   }
@@ -106,13 +139,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   const form = document.getElementById('register-form');
   if (!form) return;
-
-  // ✅ إذا لم يُختر البلد، أعد المستخدم إلى welcome.html
-  const country = localStorage.getItem('app_country');
-  if (!country) {
-    window.location.href = '/welcome.html';
-    return;
-  }
 
   // ✅ منع Enter / Go / Done من إرسال الفورم
   form.querySelectorAll('input').forEach(input => {
@@ -141,12 +167,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     const password = document.getElementById('password').value;
     const passwordConfirm = document.getElementById('password_confirm').value;
     
-    // ✅ قراءة رقم الهاتف من الحقل
     const phoneInput = document.getElementById('phone');
     const phone = phoneInput ? phoneInput.value.trim() : '';
-
-    // ✅ قراءة اللغة المختارة
     const appLang = localStorage.getItem('app_lang') || 'ar';
+    
+    // ✅ قراءة البلد من الـ localStorage (الذي تم اكتشافه أو اختياره)
+    const country = localStorage.getItem('app_country');
 
     // ✅ التحقق من الحقول
     if (!firstName || !lastName) {
@@ -161,7 +187,12 @@ document.addEventListener('DOMContentLoaded', async () => {
       return;
     }
 
-    // ✅ التحقق من رقم الهاتف
+    if (!country) {
+      errBox.textContent = 'الرجاء اختيار البلد';
+      errBox.style.display = 'block';
+      return;
+    }
+
     if (!phone) {
       errBox.textContent = 'رقم الهاتف مطلوب';
       errBox.style.display = 'block';
@@ -236,7 +267,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       return;
     }
 
-    // 3. تحديث الملف الشخصي (✅ حفظ الهاتف + اللغة)
+    // 3. تحديث الملف الشخصي
     const { error: profileError } = await db
       .from('profiles')
       .update({
@@ -245,7 +276,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         role: 'admin',
         country: country,
         phone: phone,
-        app_lang: appLang, // ✅ حفظ اللغة هنا
+        app_lang: appLang,
       })
       .eq('id', userId);
 
@@ -277,7 +308,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     successBox.textContent = '✅ تم إنشاء الحساب! جارٍ تحويلك...';
     successBox.style.display = 'block';
 
-    // ✅ التحويل إلى صفحة الاشتراك
     setTimeout(() => {
       window.location.href = '/subscription.html';
     }, 1500);
