@@ -945,6 +945,8 @@ const translations = {
 
     search_recent: 'عمليات البحث الأخيرة',
     search_approx: 'قد تقصد',
+
+    landing_nav_register: "إنشاء حساب",
   },
 
   fr: {
@@ -1880,6 +1882,8 @@ const translations = {
 
     search_recent: 'Recherches récentes',
     search_approx: 'Vouliez-vous dire',
+
+    landing_nav_register: "Créer un compte",
   },
 
   en: {
@@ -2815,6 +2819,8 @@ const translations = {
 
     search_recent: 'Recent searches',
     search_approx: 'Did you mean',
+
+    landing_nav_register: "Sign Up", // أو "Create Account"
   },
 
   
