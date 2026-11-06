@@ -43,6 +43,26 @@ async function login(email, password) {
 }
 
 // ============================================
+// ✅ تسجيل الدخول باستخدام Google (جديد)
+// ============================================
+async function signInWithGoogle() {
+  try {
+    const { data, error } = await db.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        // بعد نجاح تسجيل الدخول، سيتم تحويل المستخدم إلى لوحة التحكم
+        redirectTo: window.location.origin + '/dashboard.html' 
+      }
+    });
+
+    if (error) throw error;
+  } catch (error) {
+    console.error('Google Auth Error:', error.message);
+    alert('حدث خطأ أثناء الاتصال بـ Google. يرجى المحاولة مرة أخرى.');
+  }
+}
+
+// ============================================
 // تسجيل الخروج
 // ============================================
 async function logout() {
@@ -208,37 +228,46 @@ function isUserOnline(profile) {
 }
 
 // ============================================
-// نموذج تسجيل الدخول
+// نموذج تسجيل الدخول وربط زر Google
 // ============================================
 document.addEventListener('DOMContentLoaded', () => {
+  
+  // 1. نموذج الدخول العادي
   const form = document.getElementById('login-form');
-  if (!form) return;
+  if (form) {
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
 
-  form.addEventListener('submit', async (e) => {
-    e.preventDefault();
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      const btn = document.getElementById('login-btn');
+      const errBox = document.getElementById('login-error');
 
-    const email = document.getElementById('email').value;
-    const password = document.getElementById('password').value;
-    const btn = document.getElementById('login-btn');
-    const errBox = document.getElementById('login-error');
+      btn.disabled = true;
+      btn.querySelector('span').textContent = 'جارٍ الدخول...';
+      errBox.style.display = 'none';
 
-    btn.disabled = true;
-    btn.querySelector('span').textContent = 'جارٍ الدخول...';
-    errBox.style.display = 'none';
+      const result = await login(email, password);
 
-    const result = await login(email, password);
+      if (!result.ok) {
+        errBox.textContent = result.error;
+        errBox.style.display = 'block';
+        btn.disabled = false;
+        btn.querySelector('span').textContent = 'دخول';
+      } else {
+        // التحويل إلى لوحة التحكم
+        window.location.href = '/dashboard.html';
+      }
+    });
+  }
 
-    if (!result.ok) {
-      errBox.textContent = result.error;
-      errBox.style.display = 'block';
-      btn.disabled = false;
-      btn.querySelector('span').textContent = 'دخول';
-    } else {
-      // التحويل إلى لوحة التحكم
-      window.location.href = '/dashboard.html';
-    }
-  });
+  // 2. زر تسجيل الدخول عبر Google
+  const googleBtn = document.getElementById('google-login-btn');
+  if (googleBtn) {
+    googleBtn.addEventListener('click', signInWithGoogle);
+  }
 
+  // 3. أزرار تسجيل الخروج
   document.querySelectorAll('.logout').forEach(b => {
     b.addEventListener('click', logout);
   });
