@@ -1,6 +1,7 @@
 // ============================================
 // صفحة تعديل المنظمة (للمدير فقط)
 // ✅ دعم كامل للترجمة + تحديث فوري + إشعارات
+// ✅ ترجمة أسماء العملات ديناميكياً من Supabase
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   const user = await requireAuth();
@@ -8,7 +9,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   renderLayout('profile.html');
 
-  if (window.applyLanguage) window.applyLanguage();
+  if (window.applyLanguage) await window.applyLanguage();
   const tr = (key) => (window.t ? window.t(key) : key);
 
   document.title = tr('oe_title_full');
@@ -44,8 +45,14 @@ document.addEventListener('DOMContentLoaded', async () => {
   let showCurrency = org.show_currency !== false;
   let pendingLogoFile = null;
 
+  // ✅ تم تعديل هذا الجزء لجلب الترجمة من قاعدة البيانات
   const currenciesList = Object.entries(CurrencyUtils.CURRENCIES)
-    .map(([code, info]) => `<option value="${code}" data-symbol="${info.symbol}">${info.name} (${code})</option>`)
+    .map(([code, info]) => {
+      const translatedName = window.t ? window.t('currency_' + code) : info.name;
+      // إذا لم توجد ترجمة في Supabase، نستخدم الاسم الأصلي من ملف currencies.js
+      const finalName = (translatedName === 'currency_' + code) ? info.name : translatedName;
+      return `<option value="${code}" data-symbol="${info.symbol}">${finalName} (${code})</option>`;
+    })
     .join('');
 
   main.innerHTML = `
