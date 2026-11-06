@@ -1,7 +1,7 @@
 // ============================================
 // صفحة تعديل المنظمة (للمدير فقط)
 // ✅ دعم كامل للترجمة + تحديث فوري + إشعارات
-// ✅ ترجمة أسماء العملات ديناميكياً من Supabase
+// ✅ انتظار تحميل الترجمات قبل رسم قائمة العملات
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   const user = await requireAuth();
@@ -9,6 +9,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   renderLayout('profile.html');
 
+  // ✅ إجبار الصفحة على الانتظار حتى تنتهي الترجمات من التحميل (حل مشكلة العملات)
+  if (window.fetchSupabaseTranslations) {
+    await window.fetchSupabaseTranslations();
+  }
+  
   if (window.applyLanguage) await window.applyLanguage();
   const tr = (key) => (window.t ? window.t(key) : key);
 
@@ -45,11 +50,11 @@ document.addEventListener('DOMContentLoaded', async () => {
   let showCurrency = org.show_currency !== false;
   let pendingLogoFile = null;
 
-  // ✅ تم تعديل هذا الجزء لجلب الترجمة من قاعدة البيانات
+  // ✅ جلب أسماء العملات مترجمة
   const currenciesList = Object.entries(CurrencyUtils.CURRENCIES)
     .map(([code, info]) => {
       const translatedName = window.t ? window.t('currency_' + code) : info.name;
-      // إذا لم توجد ترجمة في Supabase، نستخدم الاسم الأصلي من ملف currencies.js
+      // إذا لم توجد ترجمة، تستخدم الاسم الأصلي
       const finalName = (translatedName === 'currency_' + code) ? info.name : translatedName;
       return `<option value="${code}" data-symbol="${info.symbol}">${finalName} (${code})</option>`;
     })

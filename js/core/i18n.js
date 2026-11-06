@@ -2995,3 +2995,4 @@ window.applyLanguage = applyLanguage;
 window.setLanguage = setLanguage;
 window.getCurrentLang = () => currentLang;
 window.countries = countries;
+window.fetchSupabaseTranslations = fetchSupabaseTranslations; // ✅ أضف هذا السطر
