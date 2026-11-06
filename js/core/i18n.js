@@ -2873,19 +2873,15 @@ const countries = {
 };
 
 // ============================================
-// نظام الترجمة (i18n) - متصل بـ Supabase
-// ============================================
-
-// ============================================
 // دوال الترجمة والاتصال بـ Supabase
 // ============================================
 
 let currentLang = localStorage.getItem('app_lang') || 'ar';
 let dbTranslations = {}; 
 
-// دالة مساعدة لجلب الكاش الصحيح
+// ✅ تم تغيير اسم الكاش إلى v2 لإجبار المتصفح على مسح الترجمات القديمة
 function getCacheKey(lang) {
-  return `app_translations_${lang}`;
+  return `app_translations_v2_${lang}`; 
 }
 
 // 1. قراءة الكاش فوراً لتسريع التطبيق
@@ -2898,7 +2894,7 @@ try {
 
 // 2. جلب أحدث الترجمات من Supabase في الخلفية
 async function fetchSupabaseTranslations() {
-  if (!window.db) return; // حماية: إذا لم يكن Supabase محملاً (مثل الصفحة الرئيسية)
+  if (!window.db) return; 
 
   try {
     const { data, error } = await window.db.from('translations').select('key, ar, fr, en');
@@ -2911,14 +2907,14 @@ async function fetchSupabaseTranslations() {
       
       dbTranslations = newTranslations;
       localStorage.setItem(getCacheKey(currentLang), JSON.stringify(dbTranslations));
-      applyLanguage(); // تحديث الشاشة فوراً
+      applyLanguage(); 
     }
   } catch (err) {
     console.warn("فشل جلب الترجمات من Supabase:", err);
   }
 }
 
-// 3. دالة الترجمة t() (البحث في Supabase أولاً ثم المحلي)
+// 3. دالة الترجمة t() 
 function t(key) {
   if (dbTranslations[key] !== undefined && dbTranslations[key] !== null) {
     return dbTranslations[key];
@@ -2959,7 +2955,7 @@ function applyLanguage() {
   });
 }
 
-// 6. تغيير اللغة (تحديث فوري بدون Reload)
+// 6. تغيير اللغة 
 async function setLanguage(lang) {
   if (lang === currentLang) return; 
   
@@ -2977,7 +2973,7 @@ async function setLanguage(lang) {
   applyLanguage();
 }
 
-// 7. المستمعين (Event Listeners)
+// 7. المستمعين 
 window.addEventListener('storage', (e) => {
   if (e.key === 'app_lang' && e.newValue && e.newValue !== currentLang) {
     window.location.reload();
@@ -2988,11 +2984,11 @@ document.addEventListener('DOMContentLoaded', () => {
     fetchSupabaseTranslations();
 });
 
-// 8. تصدير الدوال لتعمل في كل الصفحات
+// 8. تصدير الدوال 
 window.t = t;
 window.tCountry = tCountry;
 window.applyLanguage = applyLanguage;
 window.setLanguage = setLanguage;
 window.getCurrentLang = () => currentLang;
 window.countries = countries;
-window.fetchSupabaseTranslations = fetchSupabaseTranslations; // ✅ أضف هذا السطر
+window.fetchSupabaseTranslations = fetchSupabaseTranslations; 
