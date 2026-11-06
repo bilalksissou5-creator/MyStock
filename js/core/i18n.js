@@ -2872,16 +2872,16 @@ const countries = {
   OTHER: { ar: 'أخرى', fr: 'Autre', en: 'Other' },
 };
 
-// ============================================// ============================================
+// ============================================
 // دوال الترجمة والاتصال بـ Supabase
 // ============================================
 
 let currentLang = localStorage.getItem('app_lang') || 'ar';
 let dbTranslations = {}; 
 
-// ✅ اسم كاش جديد تماماً v6 لمسح أي ذكريات قديمة
+// ✅ اسم كاش جديد تماماً v7 لمسح أي ذكريات قديمة
 function getCacheKey(lang) {
-  return `app_translations_v6_${lang}`; 
+  return `app_translations_v7_${lang}`; 
 }
 
 // 1. قراءة الكاش فوراً
@@ -2994,7 +2994,7 @@ window.countries = countries;
 window.fetchSupabaseTranslations = fetchSupabaseTranslations; 
 
 // ============================================
-// ✅ قاموس العملات الكامل (جميع العملات محلياً)
+// ✅ القاموس المحلي الشامل (يحتوي على جميع العملات في صورك)
 // ============================================
 if (typeof translations !== 'undefined') {
   const allCurrencies = {
@@ -3081,7 +3081,44 @@ if (typeof translations !== 'undefined') {
     'currency_UGX': { ar: 'شلن أوغندي', fr: 'Shilling ougandais', en: 'Ugandan Shilling' },
     'currency_USD': { ar: 'دولار أمريكي', fr: 'Dollar américain', en: 'US Dollar' },
     'currency_EUR': { ar: 'يورو', fr: 'Euro', en: 'Euro' },
-    'currency_GBP': { ar: 'جنيه إسترليني', fr: 'Livre sterling', en: 'British Pound' }
+    'currency_GBP': { ar: 'جنيه إسترليني', fr: 'Livre sterling', en: 'British Pound' },
+    
+    // ✅ العملات المتبقية التي كانت تظهر بالعربية في صورك
+    'currency_SOS': { ar: 'شلن صومالي', fr: 'Shilling somalien', en: 'Somali Shilling' },
+    'currency_DJF': { ar: 'فرنك جيبوتي', fr: 'Franc djiboutien', en: 'Djiboutian Franc' },
+    'currency_KMF': { ar: 'فرنك قمري', fr: 'Franc comorien', en: 'Comorian Franc' },
+    'currency_MDL': { ar: 'ليو مولدوفي', fr: 'Leu moldave', en: 'Moldovan Leu' },
+    'currency_GEL': { ar: 'لاري جورجي', fr: 'Lari géorgien', en: 'Georgian Lari' },
+    'currency_AZN': { ar: 'مانات أذربيجاني', fr: 'Manat azerbaïdjanais', en: 'Azerbaijani Manat' },
+    'currency_AMD': { ar: 'درام أرميني', fr: 'Dram arménien', en: 'Armenian Dram' },
+    'currency_UYU': { ar: 'بيزو أوروغواي', fr: 'Peso uruguayen', en: 'Uruguayan Peso' },
+    'currency_RWF': { ar: 'فرنك رواندي', fr: 'Franc rwandais', en: 'Rwandan Franc' },
+    'currency_XOF': { ar: 'فرنك غرب أفريقي', fr: 'Franc CFA (UEMOA)', en: 'West African CFA Franc' },
+    'currency_XAF': { ar: 'فرنك وسط أفريقي', fr: 'Franc CFA (CEMAC)', en: 'Central African CFA Franc' },
+    'currency_ZMW': { ar: 'كواشا زامبي', fr: 'Kwacha zambien', en: 'Zambian Kwacha' },
+    'currency_MWK': { ar: 'كواشا مالاوي', fr: 'Kwacha malawien', en: 'Malawian Kwacha' },
+    'currency_MZN': { ar: 'متكال موزمبيقي', fr: 'Metical mozambicain', en: 'Mozambican Metical' },
+    'currency_BWP': { ar: 'بولا بوتسواني', fr: 'Pula botswanais', en: 'Botswana Pula' },
+    'currency_NAD': { ar: 'دولار ناميبي', fr: 'Dollar namibien', en: 'Namibian Dollar' },
+    'currency_MUR': { ar: 'روبية موريشيوسية', fr: 'Roupie mauricienne', en: 'Mauritian Rupee' },
+    'currency_SCR': { ar: 'روبية سيشيلية', fr: 'Roupie seychelloise', en: 'Seychellois Rupee' },
+    'currency_CVE': { ar: 'إسكودو الرأس الأخضر', fr: 'Escudo cap-verdien', en: 'Cape Verdean Escudo' },
+    'currency_GMD': { ar: 'دالاسي غامبي', fr: 'Dalasi gambien', en: 'Gambian Dalasi' },
+    'currency_GNF': { ar: 'فرنك غيني', fr: 'Franc guinéen', en: 'Guinean Franc' },
+    'currency_LRD': { ar: 'دولار ليبيري', fr: 'Dollar libérien', en: 'Liberian Dollar' },
+    'currency_SLL': { ar: 'ليون سيراليوني', fr: 'Leone sierra-léonais', en: 'Sierra Leonean Leone' },
+    'currency_STN': { ar: 'دوبرا ساو تومي', fr: 'Dobra santoméen', en: 'São Tomé and Príncipe Dobra' },
+    'currency_AOA': { ar: 'كوانزا أنغولي', fr: 'Kwanza angolais', en: 'Angolan Kwanza' },
+    'currency_CDF': { ar: 'فرنك كونغولي', fr: 'Franc congolais', en: 'Congolese Franc' },
+    'currency_BIF': { ar: 'فرنك بوروندي', fr: 'Franc burundais', en: 'Burundian Franc' },
+    'currency_ERN': { ar: 'ناكفا إريتري', fr: 'Nakfa érythréen', en: 'Eritrean Nakfa' },
+    'currency_SSP': { ar: 'جنيه جنوب السودان', fr: 'Livre sud-soudanaise', en: 'South Sudanese Pound' },
+    'currency_FJD': { ar: 'دولار فيجي', fr: 'Dollar fidjien', en: 'Fijian Dollar' },
+    'currency_PGK': { ar: 'كينا بابوا', fr: 'Kina papouan-néo-guinéen', en: 'Papua New Guinean Kina' },
+    'currency_WST': { ar: 'تالا ساموا', fr: 'Tala samoan', en: 'Samoan Tala' },
+    'currency_TOP': { ar: 'بانغا تونغا', fr: 'Paʻanga tongien', en: 'Tongan Paʻanga' },
+    'currency_VUV': { ar: 'فاتو فانواتو', fr: 'Vatu vanuatais', en: 'Vanuatu Vatu' },
+    'currency_SBD': { ar: 'دولار جزر سليمان', fr: 'Dollar des Îles Salomon', en: 'Solomon Islands Dollar' }
   };
 
   for (const key in allCurrencies) {
