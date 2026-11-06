@@ -2879,12 +2879,12 @@ const countries = {
 let currentLang = localStorage.getItem('app_lang') || 'ar';
 let dbTranslations = {}; 
 
-// ✅ تم تغيير اسم الكاش إلى v3 لإجبار المتصفح على مسح الترجمات القديمة
+// ✅ اسم كاش جديد تماماً v4 لمسح أي ذكريات قديمة
 function getCacheKey(lang) {
-  return `app_translations_v3_${lang}`; 
+  return `app_translations_v4_${lang}`; 
 }
 
-// 1. قراءة الكاش فوراً لتسريع التطبيق
+// 1. قراءة الكاش فوراً
 try {
   const cachedData = localStorage.getItem(getCacheKey(currentLang));
   if (cachedData) {
@@ -2892,7 +2892,7 @@ try {
   }
 } catch(e) {}
 
-// 2. جلب أحدث الترجمات من Supabase في الخلفية
+// 2. جلب أحدث الترجمات من Supabase
 async function fetchSupabaseTranslations() {
   if (!window.db) return; 
 
@@ -2931,7 +2931,7 @@ function tCountry(code) {
   return countries[code]?.[currentLang] || countries[code]?.ar || code;
 }
 
-// 5. تطبيق الترجمة على عناصر الصفحة
+// 5. تطبيق الترجمة
 function applyLanguage() {
   const html = document.documentElement;
   html.lang = currentLang;
@@ -2994,10 +2994,10 @@ window.countries = countries;
 window.fetchSupabaseTranslations = fetchSupabaseTranslations; 
 
 // ============================================
-// ⚠️ إضافة ترجمات العملات محلياً كخطة بديلة
+// ✅ إضافة ترجمات العملات محلياً (بشكل صحيح هذه المرة)
 // ============================================
 if (typeof translations !== 'undefined') {
-  const currencyKeys = {
+  const currencyDict = {
     'currency_MAD': { ar: 'درهم مغربي', fr: 'Dirham marocain', en: 'Moroccan Dirham' },
     'currency_SAR': { ar: 'ريال سعودي', fr: 'Riyal saoudien', en: 'Saudi Riyal' },
     'currency_AED': { ar: 'درهم إماراتي', fr: 'Dirham des Émirats', en: 'UAE Dirham' },
@@ -3007,25 +3007,16 @@ if (typeof translations !== 'undefined') {
     'currency_KWD': { ar: 'دينار كويتي', fr: 'Dinar koweïtien', en: 'Kuwaiti Dinar' },
     'currency_QAR': { ar: 'ريال قطري', fr: 'Riyal qatari', en: 'Qatari Riyal' },
     'currency_OMR': { ar: 'ريال عماني', fr: 'Rial omanais', en: 'Omani Rial' },
-    'currency_BHD': { ar: 'دينار بحريني', fr: 'Dinar bahreïni', en: 'Bahraini Dinar' },
-    'currency_JOD': { ar: 'دينار أردني', fr: 'Dinar jordanien', en: 'Jordanian Dinar' },
-    'currency_LBP': { ar: 'ليرة لبنانية', fr: 'Livre libanaise', en: 'Lebanese Pound' },
-    'currency_IQD': { ar: 'دينار عراقي', fr: 'Dinar irakien', en: 'Iraqi Dinar' },
-    'currency_SYP': { ar: 'ليرة سورية', fr: 'Livre syrienne', en: 'Syrian Pound' },
-    'currency_YER': { ar: 'ريال يمني', fr: 'Riyal yéménite', en: 'Yemeni Rial' },
-    'currency_SDG': { ar: 'جنيه سوداني', fr: 'Livre soudanaise', en: 'Sudanese Pound' },
-    'currency_LYD': { ar: 'دينار ليبي', fr: 'Dinar libyen', en: 'Libyan Dinar' },
-    'currency_MRU': { ar: 'أوقية موريتانية', fr: 'Ouguiya mauritanien', en: 'Mauritanian Ouguiya' },
     'currency_USD': { ar: 'دولار أمريكي', fr: 'Dollar américain', en: 'US Dollar' },
     'currency_EUR': { ar: 'يورو', fr: 'Euro', en: 'Euro' },
-    'currency_GBP': { ar: 'جنيه إسترليني', fr: 'Livre sterling', en: 'British Pound' },
-    'currency_TRY': { ar: 'ليرة تركية', fr: 'Livre turque', en: 'Turkish Lira' }
+    'currency_GBP': { ar: 'جنيه إسترليني', fr: 'Livre sterling', en: 'British Pound' }
   };
 
-  for (const lang in currencyKeys) {
-    for (const code in currencyKeys[lang]) {
+  // التصحيح هنا: نمر على كود العملة أولاً، ثم على اللغات
+  for (const key in currencyDict) {
+    for (const lang in currencyDict[key]) {
       if (!translations[lang]) translations[lang] = {};
-      translations[lang][code] = currencyKeys[lang][code];
+      translations[lang][key] = currencyDict[key][lang];
     }
   }
 }
