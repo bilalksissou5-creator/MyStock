@@ -8,8 +8,8 @@ const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSI
 const { createClient } = supabase;
 const db = createClient(SUPABASE_URL, SUPABASE_KEY, {
   auth: {
-    detectSessionInUrl: true, // ✅ ضروري لاستقبال الجلسة من الروابط
-    persistSession: true,     // ✅ حفظ الجلسة في المتصفح
-    flowType: 'implicit'      // ✅ استخدام التدفق الضمني لتجنب مشاكل الكود
+    detectSessionInUrl: true, // ✅ استقبال الجلسة من الرابط
+    persistSession: true,     // ✅ حفظ الجلسة
+    flowType: 'implicit'      // ✅ إجبار التدفق الضمني لتجنب خطأ التبادل
   }
 });
