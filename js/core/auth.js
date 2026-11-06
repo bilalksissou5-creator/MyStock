@@ -43,15 +43,18 @@ async function login(email, password) {
 }
 
 // ============================================
-// ✅ تسجيل الدخول باستخدام Google
+// ✅ تسجيل الدخول باستخدام Google (تم التحديث)
 // ============================================
 async function signInWithGoogle() {
   try {
     const { data, error } = await db.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        // ✅ تم التعديل: التوجيه إلى صفحة الاستقبال الوسيطة
-        redirectTo: window.location.origin + '/auth-callback.html' 
+        // التوجيه إلى صفحة الاستقبال الوسيطة
+        redirectTo: window.location.origin + '/auth-callback.html',
+        
+        // ✅ إضافة صلاحية قراءة البريد الإلكتروني بشكل صريح
+        scopes: 'https://www.googleapis.com/auth/userinfo.email'
       }
     });
 
