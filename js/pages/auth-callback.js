@@ -1,7 +1,6 @@
 // ============================================
 // معالجة تسجيل الدخول عبر Google (Callback)
-// ✅ متوافق مع Implicit Flow
-// ✅ يعالج الأخطاء ويخفي مؤشر التحميل
+// ✅ التوجيه إلى صفحة الاشتراك بعد النجاح
 // ============================================
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -10,13 +9,10 @@ document.addEventListener('DOMContentLoaded', () => {
   const errBox = document.getElementById('error-details');
   const spinner = document.getElementById('spinner');
 
-  // دالة مساعدة لعرض الأخطاء وإخفاء التحميل
+  // دالة مساعدة لعرض الأخطاء
   function showError(title, details) {
     if (spinner) spinner.style.display = 'none';
-    if (msg) { 
-      msg.textContent = title; 
-      msg.style.color = 'red'; 
-    }
+    if (msg) { msg.textContent = title; msg.style.color = 'red'; }
     if (submsg) submsg.style.display = 'none';
     if (errBox) {
       errBox.style.display = 'block';
@@ -24,7 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // 1. التحقق من وجود أخطاء في الرابط (مثل رفض المستخدم للوصول)
+  // 1. التحقق من وجود أخطاء في الرابط
   const hashParams = new URLSearchParams(window.location.hash.substring(1));
   const queryParams = new URLSearchParams(window.location.search);
   
@@ -34,30 +30,23 @@ document.addEventListener('DOMContentLoaded', () => {
     return;
   }
 
-  // 2. الانتظار قليلاً حتى يقوم Supabase (بفضل Implicit Flow) بقراءة الجلسة من الرابط
+  // 2. الانتظار قليلاً حتى يقرأ Supabase الجلسة
   setTimeout(async () => {
     try {
       const { data: { session }, error } = await db.auth.getSession();
       
       if (session) {
-        // نجاح! توجيه المستخدم إلى لوحة التحكم
+        // ✅ نجاح: التوجيه إلى صفحة الاشتراك
         if (msg) msg.textContent = 'تم تسجيل الدخول بنجاح!';
         if (spinner) spinner.style.display = 'none';
         
-        // تحويل فوري إلى لوحة التحكم
-        window.location.replace('/dashboard.html');
+        window.location.replace('/subscription.html');
       } else {
-        // فشل في العثور على الجلسة
-        showError(
-          'لم يتم العثور على جلسة نشطة', 
-          'السبب: Supabase لم يستلم الجلسة. قد يكون الرابط منتهي الصلاحية أو أن الإعدادات تحتاج إلى تحديث.'
-        );
-        
-        // العودة لصفحة الدخول بعد 3 ثوانٍ
+        showError('لم يتم العثور على جلسة نشطة', 'السبب: Supabase لم يستلم الجلسة.');
         setTimeout(() => window.location.replace('/login.html'), 3000);
       }
     } catch (err) {
       showError('خطأ في النظام', err.message);
     }
-  }, 1000); // ثانية واحدة كافية جداً مع الـ implicit flow
+  }, 1000); 
 });
