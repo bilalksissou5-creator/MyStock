@@ -1,10 +1,8 @@
 // ============================================
 // صفحة إنشاء حساب جديد
-// ✅ اكتشاف تلقائي للبلد (الجهاز -> IP -> المغرب)
-// ✅ يطبق اللغة تلقائياً
+// ✅ اكتشاف تلقائي للبلد
 // ✅ يدعم إكمال بيانات حساب Google
-// ✅ يُنشئ subscriptions بحالة pending
-// ✅ يُحوّل إلى subscription.html بعد التسجيل
+// ✅ يرسل القيم الإجبارية لجدول organizations (daily_rate, bank_linked)
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
 
@@ -24,12 +22,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     async function detectCountry() {
       const saved = localStorage.getItem('app_country');
       if (saved && window.countries?.[saved]) return saved;
-
       const browserRegion = (navigator.language || '').split('-')[1];
       if (browserRegion && window.countries?.[browserRegion.toUpperCase()]) {
         return browserRegion.toUpperCase();
       }
-
       try {
         const controller = new AbortController();
         const timeout = setTimeout(() => controller.abort(), 2000);
@@ -139,7 +135,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     const appLang = localStorage.getItem('app_lang') || 'ar';
     const country = localStorage.getItem('app_country');
 
-    // التحقق
     if (!firstName || !lastName) { errBox.textContent = 'الاسم مطلوب'; errBox.style.display = 'block'; return; }
     if (!orgName) { errBox.textContent = 'اسم المنظمة مطلوب'; errBox.style.display = 'block'; return; }
     if (!country) { errBox.textContent = 'الرجاء اختيار البلد'; errBox.style.display = 'block'; return; }
@@ -180,9 +175,16 @@ document.addEventListener('DOMContentLoaded', async () => {
       let orgId = existingProfile?.organization_id;
 
       if (!orgId) {
+        // ✅ نرسل القيم الإجبارية: daily_rate و bank_linked
         const { data: orgData, error: orgError } = await db
           .from('organizations')
-          .insert({ name: orgName, owner_id: userId, country: country })
+          .insert({ 
+            name: orgName, 
+            owner_id: userId, 
+            country: country,
+            daily_rate: 0,        // ✅ قيمة افتراضية للعمود الإجباري
+            bank_linked: false    // ✅ قيمة افتراضية للعمود الإجباري
+          })
           .select()
           .single();
 
@@ -205,7 +207,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       if (profileError) throw new Error('خطأ في تحديث الملف: ' + profileError.message);
 
-      // ✅ 5. إنشاء اشتراك pending
+      // ✅ 5. إنشاء اشتراك pending (إذا لم يكن موجوداً)
       const { data: existingSub } = await db
         .from('subscriptions')
         .select('id')
