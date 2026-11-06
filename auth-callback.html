@@ -4,29 +4,60 @@
   <meta charset="UTF-8">
   <title>جاري تسجيل الدخول...</title>
 </head>
-<body style="display:flex; justify-content:center; align-items:center; height:100vh; font-family:sans-serif;">
-  <div style="text-align:center;">
-    <h2>جاري التحقق من حسابك...</h2>
-    <p>يرجى الانتظار لحظة.</p>
+<body style="display:flex; justify-content:center; align-items:center; height:100vh; font-family:sans-serif; background:#f5f5f5;">
+  <div style="text-align:center; background:white; padding:30px; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.1); max-width: 90%; width: 350px;">
+    <h2 id="msg" style="margin-bottom: 10px;">جاري التحقق من حسابك...</h2>
+    <p id="submsg" style="color:#666; font-size:14px;">يرجى الانتظار لحظة.</p>
+    <div id="error-details" style="color:red; margin-top:15px; font-size:12px; text-align:left; display:none; word-wrap: break-word; background: #fff5f5; padding: 10px; border-radius: 5px;"></div>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="/js/core/supabase.js"></script>
   <script>
-    // هذه الدالة تنتظر Supabase لإنشاء الجلسة ثم تحولك للوحة التحكم
     document.addEventListener('DOMContentLoaded', async () => {
-      // ننتظر قليلاً ليقوم Supabase بمعالجة الرمز الموجود في الرابط
-      setTimeout(async () => {
-        const { data: { session } } = await db.auth.getSession();
+      const msg = document.getElementById('msg');
+      const submsg = document.getElementById('submsg');
+      const errBox = document.getElementById('error-details');
+
+      try {
+        // التحقق من وجود أخطاء في الرابط قادمة من Google
+        const hashParams = new URLSearchParams(window.location.hash.substring(1));
+        const queryParams = new URLSearchParams(window.location.search);
         
-        if (session) {
-          // إذا تم إنشاء الجلسة بنجاح، انتقل إلى لوحة التحكم
-          window.location.replace('/dashboard.html');
-        } else {
-          // إذا فشل إنشاء الجلسة، عد إلى صفحة الدخول
-          window.location.replace('/login.html');
+        if (hashParams.get('error') || queryParams.get('error')) {
+            const errorDesc = hashParams.get('error_description') || queryParams.get('error_description') || 'خطأ غير معروف';
+            msg.textContent = 'فشل تسجيل الدخول';
+            msg.style.color = 'red';
+            submsg.style.display = 'none';
+            errBox.style.display = 'block';
+            errBox.textContent = 'السبب: ' + errorDesc;
+            return;
         }
-      }, 1000); // انتظار ثانية واحدة
+
+        // الانتظار لمدة 3 ثوانٍ ليقوم Supabase بمعالجة الجلسة
+        setTimeout(async () => {
+          const { data: { session }, error } = await db.auth.getSession();
+          
+          if (session) {
+            msg.textContent = 'تم تسجيل الدخول بنجاح!';
+            window.location.replace('/dashboard.html');
+          } else {
+            msg.textContent = 'لم يتم العثور على جلسة نشطة';
+            msg.style.color = 'red';
+            submsg.style.display = 'none';
+            errBox.style.display = 'block';
+            errBox.textContent = 'السبب: Supabase لم يستلم الجلسة. قد يكون الرابط منتهي الصلاحية أو هناك مشكلة في إعدادات Redirect.';
+            // العودة لصفحة الدخول بعد 5 ثوانٍ
+            setTimeout(() => window.location.replace('/login.html'), 5000);
+          }
+        }, 3000); 
+
+      } catch (err) {
+        msg.textContent = 'خطأ في النظام';
+        msg.style.color = 'red';
+        errBox.style.display = 'block';
+        errBox.textContent = err.message;
+      }
     });
   </script>
 </body>
