@@ -2879,9 +2879,9 @@ const countries = {
 let currentLang = localStorage.getItem('app_lang') || 'ar';
 let dbTranslations = {}; 
 
-// ✅ تم تغيير اسم الكاش إلى v2 لإجبار المتصفح على مسح الترجمات القديمة
+// ✅ تم تغيير اسم الكاش إلى v3 لإجبار المتصفح على مسح الترجمات القديمة
 function getCacheKey(lang) {
-  return `app_translations_v2_${lang}`; 
+  return `app_translations_v3_${lang}`; 
 }
 
 // 1. قراءة الكاش فوراً لتسريع التطبيق
@@ -2992,3 +2992,40 @@ window.setLanguage = setLanguage;
 window.getCurrentLang = () => currentLang;
 window.countries = countries;
 window.fetchSupabaseTranslations = fetchSupabaseTranslations; 
+
+// ============================================
+// ⚠️ إضافة ترجمات العملات محلياً كخطة بديلة
+// ============================================
+if (typeof translations !== 'undefined') {
+  const currencyKeys = {
+    'currency_MAD': { ar: 'درهم مغربي', fr: 'Dirham marocain', en: 'Moroccan Dirham' },
+    'currency_SAR': { ar: 'ريال سعودي', fr: 'Riyal saoudien', en: 'Saudi Riyal' },
+    'currency_AED': { ar: 'درهم إماراتي', fr: 'Dirham des Émirats', en: 'UAE Dirham' },
+    'currency_DZD': { ar: 'دينار جزائري', fr: 'Dinar algérien', en: 'Algerian Dinar' },
+    'currency_TND': { ar: 'دينار تونسي', fr: 'Dinar tunisien', en: 'Tunisian Dinar' },
+    'currency_EGP': { ar: 'جنيه مصري', fr: 'Livre égyptienne', en: 'Egyptian Pound' },
+    'currency_KWD': { ar: 'دينار كويتي', fr: 'Dinar koweïtien', en: 'Kuwaiti Dinar' },
+    'currency_QAR': { ar: 'ريال قطري', fr: 'Riyal qatari', en: 'Qatari Riyal' },
+    'currency_OMR': { ar: 'ريال عماني', fr: 'Rial omanais', en: 'Omani Rial' },
+    'currency_BHD': { ar: 'دينار بحريني', fr: 'Dinar bahreïni', en: 'Bahraini Dinar' },
+    'currency_JOD': { ar: 'دينار أردني', fr: 'Dinar jordanien', en: 'Jordanian Dinar' },
+    'currency_LBP': { ar: 'ليرة لبنانية', fr: 'Livre libanaise', en: 'Lebanese Pound' },
+    'currency_IQD': { ar: 'دينار عراقي', fr: 'Dinar irakien', en: 'Iraqi Dinar' },
+    'currency_SYP': { ar: 'ليرة سورية', fr: 'Livre syrienne', en: 'Syrian Pound' },
+    'currency_YER': { ar: 'ريال يمني', fr: 'Riyal yéménite', en: 'Yemeni Rial' },
+    'currency_SDG': { ar: 'جنيه سوداني', fr: 'Livre soudanaise', en: 'Sudanese Pound' },
+    'currency_LYD': { ar: 'دينار ليبي', fr: 'Dinar libyen', en: 'Libyan Dinar' },
+    'currency_MRU': { ar: 'أوقية موريتانية', fr: 'Ouguiya mauritanien', en: 'Mauritanian Ouguiya' },
+    'currency_USD': { ar: 'دولار أمريكي', fr: 'Dollar américain', en: 'US Dollar' },
+    'currency_EUR': { ar: 'يورو', fr: 'Euro', en: 'Euro' },
+    'currency_GBP': { ar: 'جنيه إسترليني', fr: 'Livre sterling', en: 'British Pound' },
+    'currency_TRY': { ar: 'ليرة تركية', fr: 'Livre turque', en: 'Turkish Lira' }
+  };
+
+  for (const lang in currencyKeys) {
+    for (const code in currencyKeys[lang]) {
+      if (!translations[lang]) translations[lang] = {};
+      translations[lang][code] = currencyKeys[lang][code];
+    }
+  }
+}
