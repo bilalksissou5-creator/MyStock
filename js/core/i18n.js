@@ -2872,16 +2872,16 @@ const countries = {
   OTHER: { ar: 'أخرى', fr: 'Autre', en: 'Other' },
 };
 
-// ============================================
+// ============================================// ============================================
 // دوال الترجمة والاتصال بـ Supabase
 // ============================================
 
 let currentLang = localStorage.getItem('app_lang') || 'ar';
 let dbTranslations = {}; 
 
-// ✅ اسم كاش جديد تماماً v4 لمسح أي ذكريات قديمة
+// ✅ اسم كاش جديد تماماً v6 لمسح أي ذكريات قديمة
 function getCacheKey(lang) {
-  return `app_translations_v4_${lang}`; 
+  return `app_translations_v6_${lang}`; 
 }
 
 // 1. قراءة الكاش فوراً
@@ -2994,10 +2994,10 @@ window.countries = countries;
 window.fetchSupabaseTranslations = fetchSupabaseTranslations; 
 
 // ============================================
-// ✅ إضافة ترجمات العملات محلياً (بشكل صحيح هذه المرة)
+// ✅ قاموس العملات الكامل (جميع العملات محلياً)
 // ============================================
 if (typeof translations !== 'undefined') {
-  const currencyDict = {
+  const allCurrencies = {
     'currency_MAD': { ar: 'درهم مغربي', fr: 'Dirham marocain', en: 'Moroccan Dirham' },
     'currency_SAR': { ar: 'ريال سعودي', fr: 'Riyal saoudien', en: 'Saudi Riyal' },
     'currency_AED': { ar: 'درهم إماراتي', fr: 'Dirham des Émirats', en: 'UAE Dirham' },
@@ -3007,16 +3007,87 @@ if (typeof translations !== 'undefined') {
     'currency_KWD': { ar: 'دينار كويتي', fr: 'Dinar koweïtien', en: 'Kuwaiti Dinar' },
     'currency_QAR': { ar: 'ريال قطري', fr: 'Riyal qatari', en: 'Qatari Riyal' },
     'currency_OMR': { ar: 'ريال عماني', fr: 'Rial omanais', en: 'Omani Rial' },
+    'currency_BHD': { ar: 'دينار بحريني', fr: 'Dinar bahreïni', en: 'Bahraini Dinar' },
+    'currency_JOD': { ar: 'دينار أردني', fr: 'Dinar jordanien', en: 'Jordanian Dinar' },
+    'currency_LBP': { ar: 'ليرة لبنانية', fr: 'Livre libanaise', en: 'Lebanese Pound' },
+    'currency_IQD': { ar: 'دينار عراقي', fr: 'Dinar irakien', en: 'Iraqi Dinar' },
+    'currency_LYD': { ar: 'دينار ليبي', fr: 'Dinar libyen', en: 'Libyan Dinar' },
+    'currency_SDG': { ar: 'جنيه سوداني', fr: 'Livre soudanaise', en: 'Sudanese Pound' },
+    'currency_YER': { ar: 'ريال يمني', fr: 'Riyal yéménite', en: 'Yemeni Rial' },
+    'currency_SYP': { ar: 'ليرة سورية', fr: 'Livre syrienne', en: 'Syrian Pound' },
+    'currency_MRU': { ar: 'أوقية موريتانية', fr: 'Ouguiya mauritanien', en: 'Mauritanian Ouguiya' },
+    'currency_ILS': { ar: 'شيكل إسرائيلي', fr: 'Shekel israélien', en: 'Israeli Shekel' },
+    'currency_CAD': { ar: 'دولار كندي', fr: 'Dollar canadien', en: 'Canadian Dollar' },
+    'currency_MXN': { ar: 'بيزو مكسيكي', fr: 'Peso mexicain', en: 'Mexican Peso' },
+    'currency_BRL': { ar: 'ريال برازيلي', fr: 'Réal brésilien', en: 'Brazilian Real' },
+    'currency_ARS': { ar: 'بيزو أرجنتيني', fr: 'Peso argentin', en: 'Argentine Peso' },
+    'currency_CLP': { ar: 'بيزو تشيلي', fr: 'Peso chilien', en: 'Chilean Peso' },
+    'currency_COP': { ar: 'بيزو كولومبي', fr: 'Peso colombien', en: 'Colombian Peso' },
+    'currency_PEN': { ar: 'سول بيروفي', fr: 'Sol péruvien', en: 'Peruvian Sol' },
+    'currency_VES': { ar: 'بوليفار فنزويلي', fr: 'Bolivar vénézuélien', en: 'Venezuelan Bolívar' },
+    'currency_BOB': { ar: 'بوليفيانو بوليفي', fr: 'Boliviano bolivien', en: 'Bolivian Boliviano' },
+    'currency_PYG': { ar: 'غواراني باراغواي', fr: 'Guarani paraguayen', en: 'Paraguayan Guarani' },
+    'currency_GYD': { ar: 'دولار غيانا', fr: 'Dollar guyanien', en: 'Guyanese Dollar' },
+    'currency_SRD': { ar: 'دولار سورينامي', fr: 'Dollar surinamais', en: 'Surinamese Dollar' },
+    'currency_CNY': { ar: 'يوان صيني', fr: 'Yuan chinois', en: 'Chinese Yuan' },
+    'currency_JPY': { ar: 'ين ياباني', fr: 'Yen japonais', en: 'Japanese Yen' },
+    'currency_KRW': { ar: 'وون كوري', fr: 'Won sud-coréen', en: 'South Korean Won' },
+    'currency_INR': { ar: 'روبية هندية', fr: 'Roupie indienne', en: 'Indian Rupee' },
+    'currency_BDT': { ar: 'تاكا بنغلاديشية', fr: 'Taka bangladais', en: 'Bangladeshi Taka' },
+    'currency_LKR': { ar: 'روبية سريلانكية', fr: 'Roupie srilankaise', en: 'Sri Lankan Rupee' },
+    'currency_NPR': { ar: 'روبية نيبالية', fr: 'Roupie népalaise', en: 'Nepalese Rupee' },
+    'currency_AFN': { ar: 'أفغاني', fr: 'Afghani afghan', en: 'Afghan Afghani' },
+    'currency_IRR': { ar: 'ريال إيراني', fr: 'Rial iranien', en: 'Iranian Rial' },
+    'currency_TRY': { ar: 'ليرة تركية', fr: 'Livre turque', en: 'Turkish Lira' },
+    'currency_IDR': { ar: 'روبية إندونيسية', fr: 'Roupie indonésienne', en: 'Indonesian Rupiah' },
+    'currency_MYR': { ar: 'رينغيت ماليزي', fr: 'Ringgit malaisien', en: 'Malaysian Ringgit' },
+    'currency_PHP': { ar: 'بيزو فلبيني', fr: 'Peso philippin', en: 'Philippine Peso' },
+    'currency_THB': { ar: 'بات تايلاندي', fr: 'Baht thaïlandais', en: 'Thai Baht' },
+    'currency_VND': { ar: 'دونغ فيتنامي', fr: 'Dong vietnamien', en: 'Vietnamese Dong' },
+    'currency_SGD': { ar: 'دولار سنغافوري', fr: 'Dollar singapourien', en: 'Singapore Dollar' },
+    'currency_HKD': { ar: 'دولار هونغ كونغ', fr: 'Dollar de Hong Kong', en: 'Hong Kong Dollar' },
+    'currency_TWD': { ar: 'دولار تايواني', fr: 'Nouveau dollar de Taïwan', en: 'New Taiwan Dollar' },
+    'currency_KHR': { ar: 'رييل كمبودي', fr: 'Riel cambodgien', en: 'Cambodian Riel' },
+    'currency_LAK': { ar: 'كيب لاوسي', fr: 'Kip laotien', en: 'Lao Kip' },
+    'currency_MMK': { ar: 'كيات ميانمار', fr: 'Kyat birman', en: 'Myanmar Kyat' },
+    'currency_BND': { ar: 'دولار بروناي', fr: 'Dollar de Brunei', en: 'Brunei Dollar' },
+    'currency_MNT': { ar: 'توغروغ منغولي', fr: 'Tugrik mongol', en: 'Mongolian Tugrik' },
+    'currency_PKR': { ar: 'روبية باكستانية', fr: 'Roupie pakistanaise', en: 'Pakistani Rupee' },
+    'currency_RUB': { ar: 'روبل روسي', fr: 'Rouble russe', en: 'Russian Ruble' },
+    'currency_UAH': { ar: 'هريفنيا أوكرانية', fr: 'Hryvnia ukrainienne', en: 'Ukrainian Hryvnia' },
+    'currency_PLN': { ar: 'زلوتي بولندي', fr: 'Zloty polonais', en: 'Polish Zloty' },
+    'currency_CZK': { ar: 'كرونة تشيكية', fr: 'Couronne tchèque', en: 'Czech Koruna' },
+    'currency_HUF': { ar: 'فورنت هنغاري', fr: 'Forint hongrois', en: 'Hungarian Forint' },
+    'currency_RON': { ar: 'ليو روماني', fr: 'Leu roumain', en: 'Romanian Leu' },
+    'currency_BGN': { ar: 'ليف بلغاري', fr: 'Lev bulgare', en: 'Bulgarian Lev' },
+    'currency_HRK': { ar: 'كونا كرواتية', fr: 'Kuna croate', en: 'Croatian Kuna' },
+    'currency_RSD': { ar: 'دينار صربي', fr: 'Dinar serbe', en: 'Serbian Dinar' },
+    'currency_BAM': { ar: 'مارك بوسني', fr: 'Mark convertible de Bosnie-Herzégovine', en: 'Bosnia-Herzegovina Convertible Mark' },
+    'currency_MKD': { ar: 'دينار مقدوني', fr: 'Denar macédonien', en: 'Macedonian Denar' },
+    'currency_ALL': { ar: 'ليك ألباني', fr: 'Lek albanais', en: 'Albanian Lek' },
+    'currency_CHF': { ar: 'فرنك سويسري', fr: 'Franc suisse', en: 'Swiss Franc' },
+    'currency_NOK': { ar: 'كرونة نرويجية', fr: 'Couronne norvégienne', en: 'Norwegian Krone' },
+    'currency_SEK': { ar: 'كرونة سويدية', fr: 'Couronne suédoise', en: 'Swedish Krona' },
+    'currency_DKK': { ar: 'كرونة دنماركية', fr: 'Couronne danoise', en: 'Danish Krone' },
+    'currency_ISK': { ar: 'كرونة آيسلندية', fr: 'Couronne islandaise', en: 'Icelandic Krona' },
+    'currency_AUD': { ar: 'دولار أسترالي', fr: 'Dollar australien', en: 'Australian Dollar' },
+    'currency_NZD': { ar: 'دولار نيوزيلندي', fr: 'Dollar néo-zélandais', en: 'New Zealand Dollar' },
+    'currency_ZAR': { ar: 'راند جنوب أفريقي', fr: 'Rand sud-africain', en: 'South African Rand' },
+    'currency_NGN': { ar: 'نيرة نيجيرية', fr: 'Naira nigérian', en: 'Nigerian Naira' },
+    'currency_KES': { ar: 'شلن كيني', fr: 'Shilling kényan', en: 'Kenyan Shilling' },
+    'currency_GHS': { ar: 'سيدي غاني', fr: 'Cedi ghanéen', en: 'Ghanaian Cedi' },
+    'currency_ETB': { ar: 'بير إثيوبي', fr: 'Birr éthiopien', en: 'Ethiopian Birr' },
+    'currency_TZS': { ar: 'شلن تنزاني', fr: 'Shilling tanzanien', en: 'Tanzanian Shilling' },
+    'currency_UGX': { ar: 'شلن أوغندي', fr: 'Shilling ougandais', en: 'Ugandan Shilling' },
     'currency_USD': { ar: 'دولار أمريكي', fr: 'Dollar américain', en: 'US Dollar' },
     'currency_EUR': { ar: 'يورو', fr: 'Euro', en: 'Euro' },
     'currency_GBP': { ar: 'جنيه إسترليني', fr: 'Livre sterling', en: 'British Pound' }
   };
 
-  // التصحيح هنا: نمر على كود العملة أولاً، ثم على اللغات
-  for (const key in currencyDict) {
-    for (const lang in currencyDict[key]) {
+  for (const key in allCurrencies) {
+    for (const lang in allCurrencies[key]) {
       if (!translations[lang]) translations[lang] = {};
-      translations[lang][key] = currencyDict[key][lang];
+      translations[lang][key] = allCurrencies[key][lang];
     }
   }
 }
