@@ -7,7 +7,7 @@
 // ============================================
 
 // ============================================
-// تسجيل الدخول
+// تسجيل الدخول العادي
 // ============================================
 async function login(email, password) {
   const { data, error } = await db.auth.signInWithPassword({ email, password });
@@ -43,15 +43,15 @@ async function login(email, password) {
 }
 
 // ============================================
-// ✅ تسجيل الدخول باستخدام Google (جديد)
+// ✅ تسجيل الدخول باستخدام Google
 // ============================================
 async function signInWithGoogle() {
   try {
     const { data, error } = await db.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        // بعد نجاح تسجيل الدخول، سيتم تحويل المستخدم إلى لوحة التحكم
-        redirectTo: window.location.origin + '/dashboard.html' 
+        // ✅ تم التعديل: التوجيه إلى صفحة الاستقبال الوسيطة
+        redirectTo: window.location.origin + '/auth-callback.html' 
       }
     });
 
@@ -228,7 +228,7 @@ function isUserOnline(profile) {
 }
 
 // ============================================
-// نموذج تسجيل الدخول وربط زر Google
+// الأحداث (Event Listeners)
 // ============================================
 document.addEventListener('DOMContentLoaded', () => {
   
