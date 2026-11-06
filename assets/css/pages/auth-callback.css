@@ -1,0 +1,70 @@
+/* ============================================
+   صفحة استقبال تسجيل الدخول (Auth Callback)
+   ============================================ */
+
+body.auth-callback-page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  font-family: system-ui, -apple-system, sans-serif;
+  background: #f5f5f5;
+  margin: 0;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.auth-callback-box {
+  text-align: center;
+  background: white;
+  padding: 32px 24px;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+  max-width: 100%;
+  width: 380px;
+  box-sizing: border-box;
+}
+
+.auth-callback-box h2 {
+  margin: 0 0 10px 0;
+  color: #171717;
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
+.auth-callback-box p {
+  color: #6b7280;
+  font-size: 14px;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.auth-callback-error {
+  color: #dc2626;
+  margin-top: 20px;
+  font-size: 13px;
+  text-align: start;
+  display: none;
+  word-wrap: break-word;
+  background: #fef2f2;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid #fecaca;
+  font-family: monospace; /* لقراءة الأكواد والأخطاء بوضوح */
+}
+
+/* مؤشر تحميل بسيط (Spinner) */
+.auth-spinner {
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  border: 3px solid #e5e5e5;
+  border-top-color: #171717;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 16px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}

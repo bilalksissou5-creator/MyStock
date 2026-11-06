@@ -2,63 +2,25 @@
 <html>
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>جاري تسجيل الدخول...</title>
+  
+  <link rel="stylesheet" href="/assets/css/pages/auth-callback.css?v=1">
 </head>
-<body style="display:flex; justify-content:center; align-items:center; height:100vh; font-family:sans-serif; background:#f5f5f5;">
-  <div style="text-align:center; background:white; padding:30px; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.1); max-width: 90%; width: 350px;">
-    <h2 id="msg" style="margin-bottom: 10px;">جاري التحقق من حسابك...</h2>
-    <p id="submsg" style="color:#666; font-size:14px;">يرجى الانتظار لحظة.</p>
-    <div id="error-details" style="color:red; margin-top:15px; font-size:12px; text-align:left; display:none; word-wrap: break-word; background: #fff5f5; padding: 10px; border-radius: 5px;"></div>
+<body class="auth-callback-page">
+  
+  <div class="auth-callback-box">
+    <div class="auth-spinner" id="spinner"></div>
+    <h2 id="msg">جاري التحقق من حسابك...</h2>
+    <p id="submsg">يرجى الانتظار لحظة.</p>
+    <div id="error-details" class="auth-callback-error"></div>
   </div>
 
+  <!-- تحميل المكتبات الأساسية -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="/js/core/supabase.js"></script>
-  <script>
-    document.addEventListener('DOMContentLoaded', async () => {
-      const msg = document.getElementById('msg');
-      const submsg = document.getElementById('submsg');
-      const errBox = document.getElementById('error-details');
-
-      try {
-        // التحقق من وجود أخطاء في الرابط قادمة من Google
-        const hashParams = new URLSearchParams(window.location.hash.substring(1));
-        const queryParams = new URLSearchParams(window.location.search);
-        
-        if (hashParams.get('error') || queryParams.get('error')) {
-            const errorDesc = hashParams.get('error_description') || queryParams.get('error_description') || 'خطأ غير معروف';
-            msg.textContent = 'فشل تسجيل الدخول';
-            msg.style.color = 'red';
-            submsg.style.display = 'none';
-            errBox.style.display = 'block';
-            errBox.textContent = 'السبب: ' + errorDesc;
-            return;
-        }
-
-        // الانتظار لمدة 3 ثوانٍ ليقوم Supabase بمعالجة الجلسة
-        setTimeout(async () => {
-          const { data: { session }, error } = await db.auth.getSession();
-          
-          if (session) {
-            msg.textContent = 'تم تسجيل الدخول بنجاح!';
-            window.location.replace('/dashboard.html');
-          } else {
-            msg.textContent = 'لم يتم العثور على جلسة نشطة';
-            msg.style.color = 'red';
-            submsg.style.display = 'none';
-            errBox.style.display = 'block';
-            errBox.textContent = 'السبب: Supabase لم يستلم الجلسة. قد يكون الرابط منتهي الصلاحية أو هناك مشكلة في إعدادات Redirect.';
-            // العودة لصفحة الدخول بعد 5 ثوانٍ
-            setTimeout(() => window.location.replace('/login.html'), 5000);
-          }
-        }, 3000); 
-
-      } catch (err) {
-        msg.textContent = 'خطأ في النظام';
-        msg.style.color = 'red';
-        errBox.style.display = 'block';
-        errBox.textContent = err.message;
-      }
-    });
-  </script>
+  
+  <!-- تحميل ملف المعالجة الخاص بالصفحة -->
+  <script src="/js/pages/auth-callback.js?v=1"></script>
 </body>
 </html>
