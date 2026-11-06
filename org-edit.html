@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>MyStock</title>
 
+  <!-- ✅ تطبيق اللغة والاتجاه فوراً قبل أي CSS لمنع وميض اللغة -->
   <script>
     (function() {
       var lang = localStorage.getItem('app_lang') || 'ar';
@@ -13,23 +14,29 @@
     })();
   </script>
 
-  <link rel="stylesheet" href="/assets/css/common.css">
-  <link rel="stylesheet" href="/assets/css/pages/org-edit.css">
+  <!-- ✅ تحديث الإصدارات إلى v=14 لإجبار المتصفح على قراءة الملفات الجديدة -->
+  <link rel="stylesheet" href="/assets/css/common.css?v=14">
+  <link rel="stylesheet" href="/assets/css/pages/org-edit.css?v=14">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 <body>
   <div class="app"></div>
+  
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="/js/core/supabase.js"></script>
-  <script src="/js/core/i18n.js"></script>
-  <script src="/js/core/auth.js"></script>
+  <script src="/js/core/i18n.js?v=14"></script>
+  <script src="/js/core/auth.js?v=14"></script>
   <script src="/js/core/notifications.js"></script>
-  <script src="/js/core/currencies.js"></script>
-  <script src="/js/components/layout.js"></script>
-  <script src="/js/pages/org-edit.js"></script>
+  <script src="/js/core/currencies.js?v=14"></script>
+  <script src="/js/components/layout.js?v=14"></script>
+  
+  <!-- ⚠️ تأكد أن ملف org-edit.js موجود في هذا المسار -->
+  <script src="/js/pages/org-edit.js?v=14"></script>
+  
   <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      if (window.applyLanguage) applyLanguage();
+    // ✅ جعل الدالة async لانتظار جلب الترجمة من Supabase
+    document.addEventListener('DOMContentLoaded', async () => {
+      if (window.applyLanguage) await window.applyLanguage();
       if (typeof startNotifPolling === 'function') startNotifPolling();
     });
   </script>
