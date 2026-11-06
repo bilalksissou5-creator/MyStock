@@ -6,4 +6,10 @@ const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSI
 
 // إنشاء الاتصال
 const { createClient } = supabase;
-const db = createClient(SUPABASE_URL, SUPABASE_KEY);
+const db = createClient(SUPABASE_URL, SUPABASE_KEY, {
+  auth: {
+    detectSessionInUrl: true, // ✅ ضروري لاستقبال الجلسة من الروابط
+    persistSession: true,     // ✅ حفظ الجلسة في المتصفح
+    flowType: 'implicit'      // ✅ استخدام التدفق الضمني لتجنب مشاكل الكود
+  }
+});
