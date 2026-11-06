@@ -26,13 +26,10 @@ async function login(email, password) {
     const localLang = localStorage.getItem('app_lang');
 
     if (localLang) {
-      // المستخدم لديه لغة محفوظة في الهاتف (ربما اختارها من الصفحة الرئيسية)
-      // إذا اختلفت عن قاعدة البيانات، نحدث قاعدة البيانات لتتزامن
       if (profile?.app_lang !== localLang) {
         await db.from('profiles').update({ app_lang: localLang }).eq('id', data.user.id);
       }
     } else if (profile?.app_lang) {
-      // إذا لم يكن هناك لغة محفوظة في الهاتف، نأخذ من قاعدة البيانات
       localStorage.setItem('app_lang', profile.app_lang);
     }
   } catch (e) {
@@ -43,17 +40,15 @@ async function login(email, password) {
 }
 
 // ============================================
-// ✅ تسجيل الدخول باستخدام Google (تم التحديث)
+// ✅ تسجيل الدخول باستخدام Google
 // ============================================
 async function signInWithGoogle() {
   try {
     const { data, error } = await db.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        // التوجيه إلى صفحة الاستقبال الوسيطة
-        redirectTo: window.location.origin + '/auth-callback.html',
-        
-        // ✅ إضافة صلاحية قراءة البريد الإلكتروني بشكل صريح
+        // ✅ التوجيه المباشر إلى صفحة الاشتراك (بدون صفحة وسيطة)
+        redirectTo: window.location.origin + '/subscription.html',
         scopes: 'https://www.googleapis.com/auth/userinfo.email'
       }
     });
@@ -258,7 +253,6 @@ document.addEventListener('DOMContentLoaded', () => {
         btn.disabled = false;
         btn.querySelector('span').textContent = 'دخول';
       } else {
-        // التحويل إلى لوحة التحكم
         window.location.href = '/dashboard.html';
       }
     });
