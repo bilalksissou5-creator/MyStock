@@ -25,15 +25,14 @@ async function login(email, password) {
 }
 
 // ============================================
-// ✅ تسجيل الدخول باستخدام Google (توجيه مباشر)
+// ✅ تسجيل الدخول باستخدام Google (يوجه إلى صفحة الاستقبال)
 // ============================================
 async function signInWithGoogle() {
   try {
     const { data, error } = await db.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        // ✅ التوجيه المباشر إلى صفحة إكمال البيانات (بدون وسيط)
-        redirectTo: window.location.origin + '/complete-profile.html',
+        redirectTo: window.location.origin + '/auth-callback.html',
         scopes: 'https://www.googleapis.com/auth/userinfo.email'
       }
     });
@@ -76,19 +75,17 @@ async function requireAuth() {
   startHeartbeat(user.id);
 
   const currentPage = window.location.pathname;
-  
-  // ✅ الصفحات المسموحة بدون اشتراك (أضفنا complete-profile)
   const isSubscriptionPage = currentPage.includes('subscription.html');
   const isRegisterPage = currentPage.includes('register');
   const isLoginPage = currentPage.includes('login');
   const isBankCardPage = currentPage.includes('bank-card');
   const isCompleteProfilePage = currentPage.includes('complete-profile');
+  const isAuthCallbackPage = currentPage.includes('auth-callback');
 
-  if (isSubscriptionPage || isRegisterPage || isLoginPage || isBankCardPage || isCompleteProfilePage) {
+  if (isSubscriptionPage || isRegisterPage || isLoginPage || isBankCardPage || isCompleteProfilePage || isAuthCallbackPage) {
     return user;
   }
 
-  // ⚠️ باقي الصفحات تحتاج اشتراك نشط
   const { data: profile } = await db.from('profiles').select('organization_id, role').eq('id', user.id).single();
   if (!profile?.organization_id) {
     window.location.href = '/complete-profile.html';
@@ -153,7 +150,6 @@ function isUserOnline(profile) {
 // الأحداث
 // ============================================
 document.addEventListener('DOMContentLoaded', () => {
-  
   const form = document.getElementById('login-form');
   if (form) {
     form.addEventListener('submit', async (e) => {
