@@ -1,5 +1,5 @@
 // ============================================
-// صفحة إكمال البيانات (النسخة النهائية - الاستماع للجلسة)
+// صفحة إكمال البيانات (نسخة مضادة للتعليق والصفحة البيضاء)
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   if (window.applyLanguage) await window.applyLanguage();
@@ -19,12 +19,12 @@ document.addEventListener('DOMContentLoaded', async () => {
   const pendingPhone = localStorage.getItem('pending_phone');
   let isProcessing = false;
 
-  // ✅ دالة إنشاء المنظمة
+  // دالة إنشاء المنظمة
   async function processOrganization(user) {
     if (!pendingOrg || !pendingPhone || isProcessing) return;
     isProcessing = true;
 
-    if (form) form.style.display = 'none';
+    if (btn) { btn.disabled = true; btn.querySelector('span').textContent = 'جارٍ إنشاء المنظمة...'; }
     if (errBox) errBox.style.display = 'none';
     if (successBox) {
       successBox.textContent = '✅ تم التحقق! جارٍ إنشاء المنظمة...';
@@ -67,25 +67,29 @@ document.addEventListener('DOMContentLoaded', async () => {
       return;
 
     } catch (err) {
+      // في حال حدوث خطأ، نعيد الصفحة لحالتها الطبيعية ونظهر الخطأ
       if (successBox) successBox.style.display = 'none';
-      if (form) form.style.display = 'block';
       if (errBox) {
         errBox.textContent = err.message;
         errBox.style.display = 'block';
       }
+      if (btn) { btn.disabled = false; btn.querySelector('span').textContent = 'متابعة'; }
+      localStorage.removeItem('pending_org_name');
+      localStorage.removeItem('pending_phone');
       isProcessing = false;
     }
   }
 
   // ============================================
-  // ✅ معالجة العودة من Google (استماع ذكي)
+  // ✅ معالجة العودة من Google
   // ============================================
   if (pendingOrg && pendingPhone) {
-    if (form) form.style.display = 'none';
+    // إظهار رسالة التحقق
     if (successBox) {
       successBox.textContent = '✅ جارٍ التحقق من الحساب...';
       successBox.style.display = 'block';
     }
+    if (btn) { btn.disabled = true; btn.querySelector('span').textContent = 'جاري التحقق...'; }
 
     // 1. الاستماع لحدث الدخول
     db.auth.onAuthStateChange((event, session) => {
@@ -94,18 +98,36 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // 2. محاولة فورية
     const { data: { session } } = await db.auth.getSession();
-    if (session?.user) processOrganization(session.user);
-
-    // 3. محاولة احتياطية كل نصف ثانية
-    let attempts = 0;
-    const interval = setInterval(async () => {
-      attempts++;
-      if (isProcessing) { clearInterval(interval); return; }
-      const { data: { session: s } } = await db.auth.getSession();
-      if (s?.user) { clearInterval(interval); processOrganization(s.user); }
-      if (attempts >= 20) clearInterval(interval);
-    }, 500);
-
+    if (session?.user) {
+      processOrganization(session.user);
+    } else {
+      // 3. محاولة احتياطية لمدة 10 ثوانٍ
+      let attempts = 0;
+      const interval = setInterval(async () => {
+        attempts++;
+        if (isProcessing) { clearInterval(interval); return; }
+        const { data: { session: s } } = await db.auth.getSession();
+        if (s?.user) { 
+          clearInterval(interval); 
+          processOrganization(s.user); 
+        }
+        
+        // إذا انتهى الوقت ولم نجد جلسة، نعرض خطأ ونعيد الزر
+        if (attempts >= 20) {
+          clearInterval(interval);
+          if (!isProcessing) {
+            if (successBox) successBox.style.display = 'none';
+            if (errBox) {
+              errBox.textContent = 'تعذر قراءة الجلسة من Google. يرجى المحاولة مرة أخرى.';
+              errBox.style.display = 'block';
+            }
+            if (btn) { btn.disabled = false; btn.querySelector('span').textContent = 'متابعة'; }
+            localStorage.removeItem('pending_org_name');
+            localStorage.removeItem('pending_phone');
+          }
+        }
+      }, 500);
+    }
   } else {
     // ============================================
     // ✅ عرض النموذج (مستخدم جديد)
@@ -113,6 +135,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (form) form.style.display = 'block';
     if (errBox) errBox.style.display = 'none';
     if (successBox) successBox.style.display = 'none';
+    if (btn) { btn.disabled = false; btn.querySelector('span').textContent = 'متابعة'; }
 
     // تعبئة قائمة البلد
     if (countryPicker && countryTrigger) {
