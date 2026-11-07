@@ -1,10 +1,7 @@
 // ============================================
-// المصادقة + البوابة الأمنية (Auth Guard)
+// المصادقة + البوابة الذكية (Router)
 // ============================================
 
-// ============================================
-// تسجيل الدخول العادي
-// ============================================
 async function login(email, password) {
   const { data, error } = await db.auth.signInWithPassword({ email, password });
   if (error) return { ok: false, error: error.message };
@@ -12,29 +9,22 @@ async function login(email, password) {
   return { ok: true, user: data.user };
 }
 
-// ============================================
-// تسجيل الدخول باستخدام Google (يوجه للوحة التحكم)
-// ============================================
+// ✅ توجيه Google مباشرة للوحة التحكم (البوابة ستتولى الباقي)
 async function signInWithGoogle() {
   try {
-    const { data, error } = await db.auth.signInWithOAuth({
+    const { error } = await db.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        // ✅ نوجه دائماً إلى لوحة التحكم، والشرطي (requireAuth) سيتصرف
         redirectTo: window.location.origin + '/dashboard.html',
         scopes: 'https://www.googleapis.com/auth/userinfo.email'
       }
     });
     if (error) throw error;
   } catch (error) {
-    console.error('Google Auth Error:', error.message);
-    alert('حدث خطأ أثناء الاتصال بـ Google.');
+    alert('خطأ: ' + error.message);
   }
 }
 
-// ============================================
-// تسجيل الخروج
-// ============================================
 async function logout() {
   const { data: { user } } = await db.auth.getUser();
   if (user) await setOffline(user.id);
@@ -42,102 +32,108 @@ async function logout() {
   window.location.href = '/';
 }
 
-// ============================================
-// جلب المستخدم الحالي
-// ============================================
 async function getCurrentUser() {
   const { data } = await db.auth.getUser();
   return data?.user ?? null;
 }
 
-// ============================================
-// 🚦 شرطي المرور (Auth Guard)
-// ============================================
-async function requireAuth() {
-  const currentPage = window.location.pathname;
+// ✅ قراءة الجلسة بشكل موثوق (تنتظر معالجة OAuth)
+async function getSessionRobust() {
+  // محاولة قراءة الجلسة الحالية
+  const { data: { session: current } } = await db.auth.getSession();
+  if (current) return current;
 
-  // استثناء الصفحات العامة
-  if (currentPage.includes('login.html') || 
-      currentPage.includes('register.html') || 
-      currentPage === '/' || 
-      currentPage.includes('index.html')) {
-    return await getCurrentUser();
-  }
-
-  // ✅ الانتظار باستخدام onAuthStateChange + مهلة احتياطية
-  let user = null;
-  let resolved = false;
-
-  // 1. الاستماع لأول حدث مصادقة
-  const authPromise = new Promise((resolve) => {
+  // إذا لم توجد، نستمع لأحداث Supabase (ستُطلق بعد معالجة الرابط)
+  return new Promise((resolve) => {
+    let resolved = false;
+    
     const { data: { subscription } } = db.auth.onAuthStateChange((event, session) => {
-      if (!resolved && session?.user) {
+      if (!resolved) {
         resolved = true;
         subscription.unsubscribe();
-        resolve(session.user);
+        resolve(session);
       }
     });
-    // مهلة احتياطية بعد 8 ثوانٍ
+
+    // مهلة احتياطية 5 ثوانٍ
     setTimeout(() => {
       if (!resolved) {
         resolved = true;
         subscription.unsubscribe();
         resolve(null);
       }
-    }, 8000);
+    }, 5000);
   });
+}
 
-  user = await authPromise;
+// ============================================
+// 🚦 البوابة الذكية (Router)
+// ============================================
+async function requireAuth() {
+  const currentPage = window.location.pathname;
 
-  // 2. إذا لم نجد المستخدم، نحاول مرة أخرى مباشرة
-  if (!user) {
-    const { data } = await db.auth.getUser();
-    user = data?.user || null;
+  // 1. استثناء الصفحات العامة
+  if (
+    currentPage.includes('login.html') ||
+    currentPage.includes('register.html') ||
+    currentPage === '/' ||
+    currentPage.includes('index.html')
+  ) {
+    return null;
   }
 
-  // 3. إذا لم يوجد مستخدم، اذهب لصفحة الدخول
-  if (!user) {
+  // 2. قراءة الجلسة (تنتظر OAuth)
+  const session = await getSessionRobust();
+
+  // 3. لا توجد جلسة → صفحة الدخول
+  if (!session) {
     window.location.replace('/login.html');
     return null;
   }
 
+  const user = session.user;
   await setOnline(user.id);
   startHeartbeat(user.id);
 
-  // 4. إذا كنا في صفحة إكمال البيانات، لا نتحقق من الحالة (المستخدم هنا ليكملها)
+  // 4. إذا كنا في صفحة إكمال البيانات، لا توجه المستخدم (دعه يكملها)
   if (currentPage.includes('complete-profile.html')) {
     return user;
   }
 
-  // 5. جلب حالة الملف الشخصي
+  // 5. قراءة حالة المستخدم من قاعدة البيانات
   const { data: profile } = await db
     .from('profiles')
     .select('organization_id, onboarding_completed')
     .eq('id', user.id)
     .single();
 
-  // 6. إذا لم يكمل البيانات → صفحة إكمال البيانات
+  // 6. المرحلة الأولى: لم يكمل البيانات → صفحة إكمال البيانات
   if (!profile?.onboarding_completed) {
     window.location.replace('/complete-profile.html');
     return user;
   }
 
-  // 7. التحقق من الاشتراك
+  // 7. المرحلة الثانية: التحقق من الاشتراك
   const { data: sub } = await db
     .from('subscriptions')
     .select('status, expires_at')
     .eq('owner_id', user.id)
     .maybeSingle();
 
-  const isActive = sub?.status === 'active' && 
-                   (!sub.expires_at || new Date(sub.expires_at) > new Date());
+  const isActive =
+    sub?.status === 'active' &&
+    (!sub.expires_at || new Date(sub.expires_at) > new Date());
 
-  // 8. إذا لم يكن مشتركاً → صفحة الاشتراك
-  if (!isActive && !currentPage.includes('subscription.html') && !currentPage.includes('bank-card.html')) {
+  if (
+    !isActive &&
+    !currentPage.includes('subscription.html') &&
+    !currentPage.includes('bank-card.html')
+  ) {
     window.location.replace('/subscription.html');
     return user;
   }
 
+  // 8. كل شيء سليم → اسمح بالمرور
   return user;
 }
 
@@ -182,7 +178,6 @@ document.addEventListener('DOMContentLoaded', () => {
       errBox.style.display = 'none';
 
       const result = await login(email, password);
-
       if (!result.ok) {
         errBox.textContent = result.error;
         errBox.style.display = 'block';

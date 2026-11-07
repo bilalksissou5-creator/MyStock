@@ -1,5 +1,5 @@
 // ============================================
-// صفحة إكمال البيانات (تحديث قاعدة البيانات مباشرة)
+// صفحة إكمال البيانات (State Machine)
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   if (window.applyLanguage) await window.applyLanguage();
@@ -18,11 +18,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   const countryDropdown = document.getElementById('country-dropdown');
   const countryCodeInput = document.getElementById('country_code');
 
-  // 2. التحقق من وجود مستخدم مسجل
-  const { data: { user }, error: authError } = await db.auth.getUser();
-  
-  if (authError || !user) {
-    // إذا لم يوجد مستخدم، اذهب لصفحة الدخول
+  // 2. التحقق من وجود المستخدم (إذا لم يوجد، البوابة ستتكفل به)
+  const { data: { user } } = await db.auth.getUser();
+  if (!user) {
     window.location.replace('/login.html');
     return;
   }
@@ -95,7 +93,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     const phone = document.getElementById('phone').value.trim();
     const country = localStorage.getItem('app_country') || 'MA';
 
-    // التحقق من الحقول
     if (!orgName) { errBox.textContent = 'اسم المنظمة مطلوب'; errBox.style.display = 'block'; return; }
     if (!country) { errBox.textContent = 'الرجاء اختيار البلد'; errBox.style.display = 'block'; return; }
     if (!phone || phone.length < 8) { errBox.textContent = 'رقم الهاتف مطلوب (8 أرقام على الأقل)'; errBox.style.display = 'block'; return; }
@@ -105,35 +102,35 @@ document.addEventListener('DOMContentLoaded', async () => {
     errBox.style.display = 'none';
 
     try {
-      // أ. جلب المنظمة التي أنشأها الـ Trigger تلقائياً
-      const { data: profile } = await db
+      // 1. جلب المنظمة التي أنشأها الـ Trigger
+      const { data: profile, error: profileFetchErr } = await db
         .from('profiles')
         .select('organization_id')
         .eq('id', user.id)
         .single();
 
+      if (profileFetchErr) throw new Error('تعذر جلب بيانات المستخدم: ' + profileFetchErr.message);
+
       let orgId = profile?.organization_id;
 
+      // 2. تحديث أو إنشاء المنظمة
       if (orgId) {
-        // تحديث المنظمة الموجودة
-        const { error: orgError } = await db
+        const { error: orgErr } = await db
           .from('organizations')
           .update({ name: orgName, country: country })
           .eq('id', orgId);
-        if (orgError) throw new Error('خطأ في تحديث المنظمة: ' + orgError.message);
+        if (orgErr) throw new Error('خطأ في تحديث المنظمة: ' + orgErr.message);
       } else {
-        // إذا لم توجد منظمة (نادراً)، ننشئ واحدة
-        const { data: newOrg, error: createErr } = await db
+        const { data: newOrg, error: orgErr } = await db
           .from('organizations')
           .insert({ name: orgName, owner_id: user.id, country: country, daily_rate: 0, bank_linked: false })
-          .select()
-          .single();
-        if (createErr) throw new Error('خطأ في إنشاء المنظمة: ' + createErr.message);
+          .select().single();
+        if (orgErr) throw new Error('خطأ في إنشاء المنظمة: ' + orgErr.message);
         orgId = newOrg.id;
       }
 
-      // ب. تحديث الملف الشخصي وتعيين onboarding_completed = true
-      const { error: profileError } = await db
+      // 3. تحديث الملف الشخصي وتعيين onboarding_completed = true
+      const { error: updateErr } = await db
         .from('profiles')
         .update({
           phone: phone,
@@ -143,16 +140,17 @@ document.addEventListener('DOMContentLoaded', async () => {
         })
         .eq('id', user.id);
 
-      if (profileError) throw new Error('خطأ في تحديث الملف: ' + profileError.message);
+      if (updateErr) throw new Error('خطأ في تحديث الملف: ' + updateErr.message);
 
-      // ج. النجاح! التوجيه لصفحة الاشتراك
+      // 4. النجاح! العودة إلى البوابة (لوحة التحكم) لتقرر الخطوة التالية
       if (successBox) {
-        successBox.textContent = '✅ تم حفظ البيانات! جارٍ تحويلك...';
+        successBox.textContent = '✅ تم حفظ البيانات! جارٍ التحويل...';
         successBox.style.display = 'block';
       }
-      
+
       setTimeout(() => {
-        window.location.replace('/subscription.html');
+        // نعود إلى لوحة التحكم، والبوابة ستوجهنا لصفحة الاشتراك
+        window.location.replace('/dashboard.html');
       }, 1000);
 
     } catch (err) {

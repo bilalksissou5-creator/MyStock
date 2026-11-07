@@ -8,11 +8,11 @@ const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 const { createClient } = supabase;
 const db = createClient(SUPABASE_URL, SUPABASE_KEY, {
   auth: {
-    detectSessionInUrl: true,       // ✅ لاستقبال الجلسة من الرابط
-    persistSession: true,           // ✅ لحفظ الجلسة في المتصفح
-    autoRefreshToken: true,         // ✅ لتحديث الجلسة تلقائياً
-    flowType: 'implicit',           // ✅ إجبار التدفق الضمني لتجنب مشاكل PKCE
-    storage: window.localStorage,   // ✅ تخزين الجلسة في local storage
-    storageKey: 'mystock-auth-token' // ✅ اسم مخصص للتخزين (هذا هو السطر الناقص)
+    detectSessionInUrl: true,       // ✅ يقرأ الجلسة تلقائياً من الرابط بعد عودة Google
+    persistSession: true,           // ✅ يحفظ الجلسة في المتصفح لتبقى مفتوحة
+    autoRefreshToken: true,         // ✅ يجدد الجلسة تلقائياً في الخلفية (جلسة غير محدودة)
+    flowType: 'implicit',           // ✅ يمنع مشكلة PKCE ويجعل التبادل فورياً
+    storage: window.localStorage,   // ✅ مكان تخزين الجلسة (ضروري تقنياً لعمل OAuth)
+    storageKey: 'mystock-auth-token' // ✅ اسم موحد للجلسة
   }
 });
