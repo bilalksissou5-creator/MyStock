@@ -2,7 +2,7 @@
 // ✅ تمت إضافة نظام لمسح الكاش القديم لإجبار المتصفح على التحديث
 
 // ⚠️ قمنا بتغيير الإصدار إلى v6 لإجبار المتصفح على مسح كاش v5 (الذي يحتوي على welcome)
-const CACHE_NAME = 'mystock-v7';
+const CACHE_NAME = 'mystock-v202611071232';
 
 self.addEventListener('install', (e) => {
   self.skipWaiting();

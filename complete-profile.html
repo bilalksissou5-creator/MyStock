@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>إكمال البيانات - MyStock</title>
+
+  <script>
+    (function() {
+      var lang = localStorage.getItem('app_lang') || 'ar';
+      document.documentElement.lang = lang;
+      document.documentElement.dir = (lang === 'ar') ? 'rtl' : 'ltr';
+    })();
+  </script>
+
+  <link rel="stylesheet" href="/assets/css/common.css">
+  <link rel="stylesheet" href="/assets/css/pages/register.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body class="register-page">
+  <form class="auth-box" id="complete-form">
+    <h1>MyStock</h1>
+    <p class="subtitle" data-i18n="register_personal_info">أكمل بياناتك</p>
+
+    <div class="alert alert-error" id="comp-error" style="display:none;"></div>
+    <div class="alert alert-success" id="comp-success" style="display:none;"></div>
+
+    <!-- 1. اسم المنظمة -->
+    <div class="form-group">
+      <label data-i18n="register_org_name">اسم المنظمة (التجاري) *</label>
+      <input type="text" id="org_name" required>
+    </div>
+
+    <!-- 2. البلد -->
+    <div class="form-group">
+      <label data-i18n="welcome_country">البلد *</label>
+      <div class="picker" id="country-picker">
+        <button type="button" class="picker-trigger" id="country-trigger">
+          <span class="picker-flag" id="country-flag">🌍</span>
+          <span class="picker-name" id="country-name" data-i18n="welcome_select_country">-- اختر البلد --</span>
+          <i class="fas fa-chevron-down picker-arrow"></i>
+        </button>
+        <div class="picker-dropdown" id="country-dropdown"></div>
+      </div>
+      <input type="hidden" id="country_code" name="country_code">
+    </div>
+
+    <!-- 3. رقم الهاتف -->
+    <div class="form-group">
+      <label data-i18n="register_phone">رقم الهاتف *</label>
+      <input type="tel" id="phone" placeholder="+212 600000000" required dir="ltr">
+    </div>
+
+    <button type="submit" class="btn-primary" style="width:100%; justify-content:center; margin-top: 20px;" id="complete-btn">
+      <i class="fas fa-check"></i>
+      <span data-i18n="welcome_continue">متابعة</span>
+    </button>
+  </form>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="/js/core/supabase.js"></script>
+  <script src="/js/core/i18n.js"></script>
+  <script src="/js/pages/complete-profile.js"></script>
+</body>
+</html>

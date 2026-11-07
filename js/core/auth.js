@@ -1,10 +1,6 @@
 // ============================================
 // المصادقة + حالة الاتصال + فحص الاشتراك
 // ============================================
-// ⚠️ قاعدة: الاشتراك على مستوى المنظمة (organization_id)
-// - المدير هو المسؤول عن الدفع
-// - النواب والعمال يستفيدون من اشتراك المدير
-// ============================================
 
 // ============================================
 // تسجيل الدخول العادي
@@ -15,7 +11,6 @@ async function login(email, password) {
 
   await setOnline(data.user.id);
 
-  // ✅ إصلاح: احترام اللغة المختارة محلياً أولاً
   try {
     const { data: profile } = await db
       .from('profiles')
@@ -47,8 +42,8 @@ async function signInWithGoogle() {
     const { data, error } = await db.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        // ✅ التوجيه إلى صفحة تسجيل حساب جديد لإكمال بيانات المنظمة
-        redirectTo: window.location.origin + '/register.html',
+        // ✅ التوجيه إلى صفحة إكمال البيانات الناقصة
+        redirectTo: window.location.origin + '/complete-profile.html',
         scopes: 'https://www.googleapis.com/auth/userinfo.email'
       }
     });
@@ -80,7 +75,7 @@ async function getCurrentUser() {
 }
 
 // ============================================
-// حماية الصفحة — يجب تسجيل الدخول + اشتراك نشط
+// حماية الصفحة
 // ============================================
 async function requireAuth() {
   const user = await getCurrentUser();
@@ -94,34 +89,30 @@ async function requireAuth() {
 
   const currentPage = window.location.pathname;
 
-  // ✅ الصفحات المسموحة بدون اشتراك
+  // ✅ الصفحات المسموحة بدون اشتراك (أضفنا complete-profile)
   const isSubscriptionPage = currentPage.includes('subscription.html');
   const isRegisterPage = currentPage.includes('register');
   const isLoginPage = currentPage.includes('login');
   const isBankCardPage = currentPage.includes('bank-card');
+  const isCompleteProfilePage = currentPage.includes('complete-profile');
 
-  if (isSubscriptionPage || isRegisterPage || isLoginPage || isBankCardPage) {
+  if (isSubscriptionPage || isRegisterPage || isLoginPage || isBankCardPage || isCompleteProfilePage) {
     return user;
   }
 
   // ⚠️ باقي الصفحات تحتاج اشتراك نشط
-
-  // جلب بيانات المستخدم
   const { data: profile } = await db
     .from('profiles')
     .select('organization_id, role')
     .eq('id', user.id)
     .single();
 
-  // ✅ إذا لم تكن هناك منظمة → حول للتسجيل
   if (!profile?.organization_id) {
-    window.location.href = '/register.html';
+    window.location.href = '/complete-profile.html';
     return null;
   }
 
-  // جلب الاشتراك (من المستخدم أولاً، ثم من المنظمة)
   let sub = null;
-
   const { data: userSub } = await db
     .from('subscriptions')
     .select('status, expires_at')
@@ -139,23 +130,20 @@ async function requireAuth() {
     sub = orgSub;
   }
 
-  // ✅ فحص الحالة
   const status = sub?.status ?? 'none';
   const expiresAt = sub?.expires_at ? new Date(sub.expires_at) : null;
   const isExpired = expiresAt && expiresAt < new Date();
 
-  // ✅ الاشتراك النشط فقط
   if (status === 'active' && !isExpired) {
     return user;
   }
 
-  // ❌ غير مشترك (pending / none / cancelled / expired) → حوّل إلى subscription
   window.location.href = '/subscription.html';
   return null;
 }
 
 // ============================================
-// حالة الاتصال: online / offline
+// حالة الاتصال
 // ============================================
 async function setOnline(userId) {
   if (!userId) return;
@@ -180,7 +168,7 @@ async function setOffline(userId) {
 }
 
 // ============================================
-// Heartbeat: تحديث last_active_at كل 30 ثانية
+// Heartbeat
 // ============================================
 let heartbeatInterval = null;
 
@@ -226,11 +214,10 @@ function isUserOnline(profile) {
 }
 
 // ============================================
-// الأحداث (Event Listeners)
+// الأحداث
 // ============================================
 document.addEventListener('DOMContentLoaded', () => {
   
-  // 1. نموذج الدخول العادي
   const form = document.getElementById('login-form');
   if (form) {
     form.addEventListener('submit', async (e) => {
@@ -258,13 +245,11 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // 2. زر تسجيل الدخول عبر Google
   const googleBtn = document.getElementById('google-login-btn');
   if (googleBtn) {
     googleBtn.addEventListener('click', signInWithGoogle);
   }
 
-  // 3. أزرار تسجيل الخروج
   document.querySelectorAll('.logout').forEach(b => {
     b.addEventListener('click', logout);
   });
