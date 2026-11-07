@@ -134,7 +134,7 @@ body.landing-page {
   font-size: 14px;
 }
 
-/* ✅ تحديث القائمة المنسدلة لضمان عرض مناسب */
+/* ✅ تعديل القائمة المنسدلة لجعل عرضها 60px */
 .lang-switcher select {
   appearance: none;
   -webkit-appearance: none;
@@ -150,9 +150,9 @@ body.landing-page {
   height: 100%;
   text-align: center;
   
-  /* ✅ الإضافات الجديدة لضمان ظهور القائمة بعرض مناسب */
-  min-width: 70px; 
-  padding: 0 8px; 
+  /* ✅ العرض المطلوب (60px) */
+  width: 60px; 
+  padding: 0 5px; 
 }
 
 .lang-switcher select::-ms-expand {
