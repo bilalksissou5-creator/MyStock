@@ -12,46 +12,35 @@ async function login(email, password) {
   await setOnline(data.user.id);
 
   try {
-    const { data: profile } = await db
-      .from('profiles')
-      .select('app_lang')
-      .eq('id', data.user.id)
-      .single();
-
+    const { data: profile } = await db.from('profiles').select('app_lang').eq('id', data.user.id).single();
     const localLang = localStorage.getItem('app_lang');
-
-    if (localLang) {
-      if (profile?.app_lang !== localLang) {
-        await db.from('profiles').update({ app_lang: localLang }).eq('id', data.user.id);
-      }
-    } else if (profile?.app_lang) {
+    if (localLang && profile?.app_lang !== localLang) {
+      await db.from('profiles').update({ app_lang: localLang }).eq('id', data.user.id);
+    } else if (!localLang && profile?.app_lang) {
       localStorage.setItem('app_lang', profile.app_lang);
     }
-  } catch (e) {
-    console.warn('خطأ في جلب أو تحديث لغة المستخدم:', e);
-  }
+  } catch (e) { console.warn(e); }
 
   return { ok: true, user: data.user };
 }
 
 // ============================================
-// ✅ تسجيل الدخول باستخدام Google
+// ✅ تسجيل الدخول باستخدام Google (توجيه مباشر)
 // ============================================
 async function signInWithGoogle() {
   try {
     const { data, error } = await db.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        // ✅ التوجيه إلى الصفحة الوسيطة (وليس صفحة إكمال البيانات)
-        redirectTo: window.location.origin + '/auth-callback.html',
+        // ✅ التوجيه المباشر إلى صفحة إكمال البيانات (بدون وسيط)
+        redirectTo: window.location.origin + '/complete-profile.html',
         scopes: 'https://www.googleapis.com/auth/userinfo.email'
       }
     });
-
     if (error) throw error;
   } catch (error) {
     console.error('Google Auth Error:', error.message);
-    alert('حدث خطأ أثناء الاتصال بـ Google. يرجى المحاولة مرة أخرى.');
+    alert('حدث خطأ أثناء الاتصال بـ Google.');
   }
 }
 
@@ -61,7 +50,6 @@ async function signInWithGoogle() {
 async function logout() {
   const { data: { user } } = await db.auth.getUser();
   if (user) await setOffline(user.id);
-
   await db.auth.signOut();
   window.location.href = '/';
 }
@@ -88,46 +76,30 @@ async function requireAuth() {
   startHeartbeat(user.id);
 
   const currentPage = window.location.pathname;
-
-  // ✅ الصفحات المسموحة بدون اشتراك (أضفنا الصفحات الوسيطة)
+  
+  // ✅ الصفحات المسموحة بدون اشتراك (أضفنا complete-profile)
   const isSubscriptionPage = currentPage.includes('subscription.html');
   const isRegisterPage = currentPage.includes('register');
   const isLoginPage = currentPage.includes('login');
   const isBankCardPage = currentPage.includes('bank-card');
   const isCompleteProfilePage = currentPage.includes('complete-profile');
-  const isAuthCallbackPage = currentPage.includes('auth-callback'); // ✅ أضفناها هنا
 
-  if (isSubscriptionPage || isRegisterPage || isLoginPage || isBankCardPage || isCompleteProfilePage || isAuthCallbackPage) {
+  if (isSubscriptionPage || isRegisterPage || isLoginPage || isBankCardPage || isCompleteProfilePage) {
     return user;
   }
 
   // ⚠️ باقي الصفحات تحتاج اشتراك نشط
-  const { data: profile } = await db
-    .from('profiles')
-    .select('organization_id, role')
-    .eq('id', user.id)
-    .single();
-
+  const { data: profile } = await db.from('profiles').select('organization_id, role').eq('id', user.id).single();
   if (!profile?.organization_id) {
     window.location.href = '/complete-profile.html';
     return null;
   }
 
   let sub = null;
-  const { data: userSub } = await db
-    .from('subscriptions')
-    .select('status, expires_at')
-    .eq('owner_id', user.id)
-    .maybeSingle();
-
+  const { data: userSub } = await db.from('subscriptions').select('status, expires_at').eq('owner_id', user.id).maybeSingle();
   sub = userSub;
-
   if (!sub) {
-    const { data: orgSub } = await db
-      .from('subscriptions')
-      .select('status, expires_at')
-      .eq('organization_id', profile.organization_id)
-      .maybeSingle();
+    const { data: orgSub } = await db.from('subscriptions').select('status, expires_at').eq('organization_id', profile.organization_id).maybeSingle();
     sub = orgSub;
   }
 
@@ -148,70 +120,33 @@ async function requireAuth() {
 // ============================================
 async function setOnline(userId) {
   if (!userId) return;
-  await db
-    .from('profiles')
-    .update({
-      status: 'online',
-      last_active_at: new Date().toISOString(),
-    })
-    .eq('id', userId);
+  await db.from('profiles').update({ status: 'online', last_active_at: new Date().toISOString() }).eq('id', userId);
 }
 
 async function setOffline(userId) {
   if (!userId) return;
-  await db
-    .from('profiles')
-    .update({
-      status: 'offline',
-      last_active_at: new Date().toISOString(),
-    })
-    .eq('id', userId);
+  await db.from('profiles').update({ status: 'offline', last_active_at: new Date().toISOString() }).eq('id', userId);
 }
 
-// ============================================
-// Heartbeat
-// ============================================
 let heartbeatInterval = null;
-
 function startHeartbeat(userId) {
   if (!userId) return;
-
   if (heartbeatInterval) clearInterval(heartbeatInterval);
-
   heartbeatInterval = setInterval(async () => {
-    await db
-      .from('profiles')
-      .update({ last_active_at: new Date().toISOString() })
-      .eq('id', userId);
+    await db.from('profiles').update({ last_active_at: new Date().toISOString() }).eq('id', userId);
   }, 30000);
-
-  window.addEventListener('beforeunload', () => {
-    if (heartbeatInterval) clearInterval(heartbeatInterval);
-  });
-
+  window.addEventListener('beforeunload', () => { if (heartbeatInterval) clearInterval(heartbeatInterval); });
   document.addEventListener('visibilitychange', async () => {
     if (document.visibilityState === 'visible') {
-      await db
-        .from('profiles')
-        .update({ status: 'online', last_active_at: new Date().toISOString() })
-        .eq('id', userId);
+      await db.from('profiles').update({ status: 'online', last_active_at: new Date().toISOString() }).eq('id', userId);
     }
   });
 }
 
-// ============================================
-// فحص: هل مستخدم "متصل"؟
-// ============================================
 function isUserOnline(profile) {
-  if (!profile) return false;
-  if (profile.status !== 'online') return false;
-  if (!profile.last_active_at) return false;
-
+  if (!profile || profile.status !== 'online' || !profile.last_active_at) return false;
   const lastActive = new Date(profile.last_active_at).getTime();
-  const now = Date.now();
-  const diffSeconds = (now - lastActive) / 1000;
-
-  return diffSeconds < 60;
+  return (Date.now() - lastActive) / 1000 < 60;
 }
 
 // ============================================
@@ -223,7 +158,6 @@ document.addEventListener('DOMContentLoaded', () => {
   if (form) {
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
-
       const email = document.getElementById('email').value;
       const password = document.getElementById('password').value;
       const btn = document.getElementById('login-btn');

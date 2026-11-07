@@ -1,5 +1,5 @@
 // ============================================
-// صفحة إكمال البيانات (سريعة وثابتة)
+// صفحة إكمال البيانات (الحل النهائي المستقر)
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   if (window.applyLanguage) await window.applyLanguage();
@@ -18,17 +18,20 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   let currentUser = null;
 
-  // ✅ قراءة المستخدم مباشرة (لأن الجلسة جاهزة بفضل صفحة الوسيط)
-  const { data: { user } } = await db.auth.getUser();
-  if (!user) {
-    // إذا لم توجد جلسة (حالة نادرة)، نعرض رسالة خطأ
-    errBox.textContent = 'تعذر قراءة الجلسة. يرجى المحاولة مرة أخرى.';
-    errBox.style.display = 'block';
-    return;
+  // ✅ 1. محاولة قراءة الجلسة فوراً (في الخلفية)
+  const { data: { session } } = await db.auth.getSession();
+  if (session?.user) {
+    currentUser = session.user;
   }
-  currentUser = user;
 
-  // ✅ تعبئة قائمة البلدان
+  // ✅ 2. الاستماع لتغيير الجلسة (في حال تأخرت من الرابط)
+  db.auth.onAuthStateChange((event, session) => {
+    if (session?.user) {
+      currentUser = session.user;
+    }
+  });
+
+  // ✅ 3. تعبئة قائمة البلدان
   if (countryPicker && countryTrigger) {
     let selectedCountry = localStorage.getItem('app_country') || 'MA';
 
@@ -88,9 +91,27 @@ document.addEventListener('DOMContentLoaded', async () => {
     updateCountryDisplay();
   }
 
-  // ✅ معالجة زر "متابعة"
+  // ✅ 4. معالجة زر "متابعة"
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
+
+    // إذا لم تكن الجلسة جاهزة، ننتظرها لثانية واحدة
+    if (!currentUser) {
+      const { data: { user } } = await db.auth.getUser();
+      if (user) {
+        currentUser = user;
+      } else {
+        await new Promise(r => setTimeout(r, 1000));
+        const { data: { user: u2 } } = await db.auth.getUser();
+        currentUser = u2;
+      }
+    }
+
+    if (!currentUser) {
+      errBox.textContent = 'تعذر قراءة الجلسة. يرجى تحديث الصفحة والمحاولة مرة أخرى.';
+      errBox.style.display = 'block';
+      return;
+    }
 
     const orgName = document.getElementById('org_name').value.trim();
     const phone = document.getElementById('phone').value.trim();
