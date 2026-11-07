@@ -1,14 +1,16 @@
 // ============================================
-// صفحة إكمال البيانات (حفظ مباشر في قاعدة البيانات)
+// صفحة إكمال البيانات (حفظ مباشر + إنشاء اشتراك pending)
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   if (window.applyLanguage) await window.applyLanguage();
 
+  // 1. جلب العناصر
   const form = document.getElementById('complete-form');
   const btn = document.getElementById('complete-btn');
   const errBox = document.getElementById('comp-error');
   const successBox = document.getElementById('comp-success');
   
+  // عناصر قائمة البلد
   const countryPicker = document.getElementById('country-picker');
   const countryTrigger = document.getElementById('country-trigger');
   const countryFlag = document.getElementById('country-flag');
@@ -20,7 +22,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   const session = await window.authReadyPromise;
   const user = session?.user;
 
-  // إذا لم توجد جلسة، العودة لصفحة الدخول
   if (!user) {
     window.location.replace('/login.html');
     return;
@@ -89,7 +90,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   // ============================================
-  // معالجة زر "متابعة" (حفظ مباشر بدون Google)
+  // معالجة زر "متابعة" (حفظ البيانات وإنشاء اشتراك)
   // ============================================
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -144,13 +145,33 @@ document.addEventListener('DOMContentLoaded', async () => {
           phone: phone,
           country: country,
           organization_id: orgId,
-          onboarding_completed: true // ✅ المفتاح السحري الذي يفتح باقي التطبيق
+          onboarding_completed: true
         })
         .eq('id', user.id);
 
       if (updateErr) throw new Error('خطأ في تحديث الملف: ' + updateErr.message);
 
-      // 4. النجاح! التوجيه إلى صفحة الاشتراك
+      // 4. ✅ إنشاء اشتراك بحالة pending (إن لم يكن موجوداً)
+      const { data: existingSub } = await db
+        .from('subscriptions')
+        .select('id')
+        .eq('organization_id', orgId)
+        .maybeSingle();
+
+      if (!existingSub) {
+        const { error: subErr } = await db.from('subscriptions').insert({
+          organization_id: orgId,
+          owner_id: user.id,
+          plan: 'basic',
+          status: 'pending',
+          price: 150,
+          currency: 'MAD',
+          billing_cycle: 'monthly',
+        });
+        if (subErr) console.error('خطأ في إنشاء الاشتراك:', subErr);
+      }
+
+      // 5. النجاح! التوجيه إلى صفحة الاشتراك
       successBox.textContent = '✅ تم حفظ البيانات! جارٍ تحويلك إلى صفحة الاشتراك...';
       successBox.style.display = 'block';
       
