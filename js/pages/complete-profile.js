@@ -15,26 +15,33 @@ document.addEventListener('DOMContentLoaded', async () => {
   const successBox = document.getElementById('comp-success');
   const btn = document.getElementById('complete-btn');
 
-  // ============================================
-  // ✅ الجزء الأول: معالجة العودة من Google
-  // ============================================
-  // ننتظر لحظة صغيرة ليقوم Supabase بقراءة الجلسة من الرابط
-  await new Promise(r => setTimeout(r, 1000));
-
-  const { data: { session } } = await db.auth.getSession();
+  // ✅ 1. التحقق من العودة من Google (بذكاء وصبر)
+  let session = null;
   const pendingOrg = localStorage.getItem('pending_org_name');
   const pendingPhone = localStorage.getItem('pending_phone');
 
-  // إذا كانت هناك جلسة AND كانت هناك بيانات محفوظة، فهذا يعني أننا عدنا من Google
-  if (session && pendingOrg && pendingPhone) {
-    // إخفاء النموذج وإظهار رسالة التحميل
+  // إذا كنا ننتظر عودة من Google (توجد بيانات محفوظة)
+  if (pendingOrg && pendingPhone) {
     if (form) form.style.display = 'none';
     if (errBox) errBox.style.display = 'none';
     if (successBox) {
-      successBox.textContent = '✅ تم تسجيل الدخول! جارٍ إنشاء المنظمة...';
+      successBox.textContent = '✅ جارٍ التحقق من الحساب وإنشاء المنظمة...';
       successBox.style.display = 'block';
     }
 
+    // نحاول قراءة الجلسة لعدة مرات (لأن المتصفح قد يتأخر في قراءتها من الرابط)
+    for (let i = 0; i < 6; i++) {
+      const { data } = await db.auth.getSession();
+      if (data?.session) {
+        session = data.session;
+        break;
+      }
+      await new Promise(r => setTimeout(r, 500)); // ننتظر نصف ثانية بين كل محاولة
+    }
+  }
+
+  // ✅ 2. إذا وجدنا جلسة وبيانات محفوظة، ننشئ المنظمة
+  if (session && pendingOrg && pendingPhone) {
     try {
       const country = localStorage.getItem('app_country') || 'MA';
 
@@ -66,7 +73,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       if (profileError) throw new Error('خطأ في تحديث الملف: ' + profileError.message);
 
-      // 3. مسح البيانات المؤقتة بعد النجاح
+      // 3. مسح البيانات المؤقتة
       localStorage.removeItem('pending_org_name');
       localStorage.removeItem('pending_phone');
 
@@ -75,21 +82,24 @@ document.addEventListener('DOMContentLoaded', async () => {
       return;
 
     } catch (err) {
+      // إذا حدث خطأ في قاعدة البيانات، نعرضه للمستخدم
+      if (successBox) successBox.style.display = 'none';
+      if (form) form.style.display = 'block';
       if (errBox) {
         errBox.textContent = err.message;
         errBox.style.display = 'block';
       }
-      if (form) form.style.display = 'block'; // إعادة إظهار النموذج في حال الخطأ
-      if (successBox) successBox.style.display = 'none';
+      // تنظيف البيانات المؤقتة حتى لا يعلق المستخدم
+      localStorage.removeItem('pending_org_name');
+      localStorage.removeItem('pending_phone');
       return;
     }
   }
 
-  // ============================================
-  // ✅ الجزء الثاني: عرض النموذج للمستخدم الجديد
-  // ============================================
+  // ✅ 3. عرض النموذج (إذا كان مستخدماً جديداً أو لم نجد جلسة)
   if (form) form.style.display = 'block';
   if (errBox) errBox.style.display = 'none';
+  if (successBox) successBox.style.display = 'none';
 
   // تعبئة قائمة البلد
   if (countryPicker && countryTrigger) {
@@ -151,9 +161,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     updateCountryDisplay();
   }
 
-  // ============================================
-  // ✅ الجزء الثالث: معالجة زر "متابعة" (حفظ ثم إطلاق Google)
-  // ============================================
+  // ✅ 4. معالجة زر "متابعة" (حفظ ثم إطلاق Google)
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
 
@@ -177,7 +185,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       const { error } = await db.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          // ✅ التوجيه يعود إلى هذه الصفحة نفسها
           redirectTo: window.location.origin + '/complete-profile.html',
           scopes: 'https://www.googleapis.com/auth/userinfo.email'
         }
