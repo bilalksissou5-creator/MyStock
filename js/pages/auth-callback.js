@@ -1,6 +1,6 @@
 // ============================================
 // معالجة تسجيل الدخول عبر Google (Callback)
-// ✅ التوجيه إلى صفحة الاشتراك بعد النجاح
+// ✅ التوجيه إلى صفحة إكمال البيانات
 // ============================================
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // 1. التحقق من وجود أخطاء في الرابط
+  // 1. التحقق من وجود أخطاء في الرابط (مثل رفض المستخدم للوصول)
   const hashParams = new URLSearchParams(window.location.hash.substring(1));
   const queryParams = new URLSearchParams(window.location.search);
   
@@ -30,18 +30,19 @@ document.addEventListener('DOMContentLoaded', () => {
     return;
   }
 
-  // 2. الانتظار قليلاً حتى يقرأ Supabase الجلسة
+  // 2. الانتظار لمدة ثانية واحدة ليقوم Supabase بمعالجة الرابط
   setTimeout(async () => {
     try {
       const { data: { session }, error } = await db.auth.getSession();
       
       if (session) {
-        // ✅ نجاح: التوجيه إلى صفحة الاشتراك
+        // ✅ نجاح: التوجيه إلى صفحة إكمال البيانات
         if (msg) msg.textContent = 'تم تسجيل الدخول بنجاح!';
         if (spinner) spinner.style.display = 'none';
         
-        window.location.replace('/subscription.html');
+        window.location.replace('/complete-profile.html');
       } else {
+        // ❌ فشل: لم يتم العثور على جلسة
         showError('لم يتم العثور على جلسة نشطة', 'السبب: Supabase لم يستلم الجلسة.');
         setTimeout(() => window.location.replace('/login.html'), 3000);
       }

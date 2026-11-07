@@ -1,53 +1,41 @@
+// ============================================
+// صفحة إكمال البيانات (سريعة وثابتة)
+// ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   if (window.applyLanguage) await window.applyLanguage();
 
-  // ✅ إظهار النموذج فوراً للمستخدم
-  const form = document.getElementById('complete-form');
-  const errBox = document.getElementById('comp-error');
-  if (form) form.style.display = 'block';
-  if (errBox) errBox.style.display = 'none';
-
-  // ✅ إعدادات البلد
+  // ✅ إعدادات قائمة البلد
   const countryPicker = document.getElementById('country-picker');
   const countryTrigger = document.getElementById('country-trigger');
   const countryFlag = document.getElementById('country-flag');
   const countryName = document.getElementById('country-name');
   const countryDropdown = document.getElementById('country-dropdown');
   const countryCodeInput = document.getElementById('country_code');
+  const form = document.getElementById('complete-form');
+  const errBox = document.getElementById('comp-error');
   const successBox = document.getElementById('comp-success');
   const btn = document.getElementById('complete-btn');
 
   let currentUser = null;
 
-  // ✅ دالة قراءة الجلسة بشكل صامت (بدون إزعاج المستخدم)
-  async function loadUser() {
-    const { data: { user } } = await db.auth.getUser();
-    if (user) {
-      currentUser = user;
-      // تعبئة قائمة البلدان بمجرد معرفة المستخدم
-      initCountryPicker();
-    }
+  // ✅ قراءة المستخدم مباشرة (لأن الجلسة جاهزة بفضل صفحة الوسيط)
+  const { data: { user } } = await db.auth.getUser();
+  if (!user) {
+    // إذا لم توجد جلسة (حالة نادرة)، نعرض رسالة خطأ
+    errBox.textContent = 'تعذر قراءة الجلسة. يرجى المحاولة مرة أخرى.';
+    errBox.style.display = 'block';
+    return;
   }
+  currentUser = user;
 
-  // ✅ الاستماع لتغيير الجلسة (في حال تأخرت)
-  db.auth.onAuthStateChange((event, session) => {
-    if (session?.user) {
-      currentUser = session.user;
-      initCountryPicker();
-    }
-  });
-
-  // ✅ محاولة فورية
-  await loadUser();
-
-  // ✅ دالة تعبئة قائمة البلدان
-  function initCountryPicker() {
-    if (!countryPicker || !countryTrigger) return;
+  // ✅ تعبئة قائمة البلدان
+  if (countryPicker && countryTrigger) {
     let selectedCountry = localStorage.getItem('app_country') || 'MA';
 
     function buildCountryDropdown() {
       const countriesObj = window.countries || {};
       const currentLangCode = window.getCurrentLang ? window.getCurrentLang() : 'ar';
+
       countryDropdown.innerHTML = Object.keys(countriesObj).map(code => {
         const c = countriesObj[code];
         const name = c[currentLangCode] || c.ar;
@@ -100,20 +88,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     updateCountryDisplay();
   }
 
-  // ✅ معالجة زر المتابعة
+  // ✅ معالجة زر "متابعة"
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
-
-    // إذا لم تكن الجلسة جاهزة، نحاول قراءتها الآن
-    if (!currentUser) {
-      const { data: { user } } = await db.auth.getUser();
-      if (!user) {
-        errBox.textContent = 'تعذر قراءة الجلسة. يرجى تحديث الصفحة.';
-        errBox.style.display = 'block';
-        return;
-      }
-      currentUser = user;
-    }
 
     const orgName = document.getElementById('org_name').value.trim();
     const phone = document.getElementById('phone').value.trim();
@@ -127,21 +104,40 @@ document.addEventListener('DOMContentLoaded', async () => {
     btn.querySelector('span').textContent = 'جارٍ الحفظ...';
 
     try {
-      const { data: orgData, error: orgError } = await db.from('organizations').insert({
-        name: orgName, owner_id: currentUser.id, country: country, daily_rate: 0, bank_linked: false
-      }).select().single();
+      // 1. إنشاء المنظمة
+      const { data: orgData, error: orgError } = await db
+        .from('organizations')
+        .insert({
+          name: orgName,
+          owner_id: currentUser.id,
+          country: country,
+          daily_rate: 0,
+          bank_linked: false
+        })
+        .select()
+        .single();
 
       if (orgError) throw new Error('خطأ في إنشاء المنظمة: ' + orgError.message);
 
-      const { error: profileError } = await db.from('profiles').update({
-        organization_id: orgData.id, phone: phone, country: country, role: 'admin'
-      }).eq('id', currentUser.id);
+      // 2. تحديث الملف الشخصي
+      const { error: profileError } = await db
+        .from('profiles')
+        .update({
+          organization_id: orgData.id,
+          phone: phone,
+          country: country,
+          role: 'admin'
+        })
+        .eq('id', currentUser.id);
 
       if (profileError) throw new Error('خطأ في تحديث الملف: ' + profileError.message);
 
       successBox.textContent = '✅ تم حفظ البيانات! جارٍ تحويلك...';
       successBox.style.display = 'block';
-      setTimeout(() => window.location.href = '/subscription.html', 1500);
+
+      setTimeout(() => {
+        window.location.href = '/subscription.html';
+      }, 1500);
 
     } catch (err) {
       errBox.textContent = err.message;
