@@ -1,31 +1,26 @@
 // ============================================
 // صفحة إكمال البيانات (لحسابات Google الجديدة)
-// ✅ لا تحول المستخدم إلى صفحة الدخول، بل تنتظر الجلسة
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   if (window.applyLanguage) await window.applyLanguage();
 
-  // ✅ دالة تنتظر الجلسة حتى 10 ثوانٍ
-  async function waitForUser() {
-    for (let i = 0; i < 20; i++) {
-      const { data: { user } } = await db.auth.getUser();
-      if (user) return user;
-      await new Promise(r => setTimeout(r, 500));
+  // ✅ الانتظار قليلاً حتى تُحمّل قائمة البلدان من i18n.js
+  await new Promise(r => setTimeout(r, 500));
+
+  // ✅ محاولة قراءة الجلسة عدة مرات (بدون طرد المستخدم)
+  let user = null;
+  for (let i = 0; i < 20; i++) {
+    const { data } = await db.auth.getUser();
+    if (data?.user) {
+      user = data.user;
+      break;
     }
-    return null;
+    await new Promise(r => setTimeout(r, 500));
   }
 
-  const user = await waitForUser();
-
-  // ❌ إذا لم توجد جلسة بعد 10 ثوانٍ، نعرض رسالة خطأ بدلاً من الطرد
   if (!user) {
-    document.body.innerHTML = `
-      <div style="text-align:center; padding:50px 20px; font-family:sans-serif;">
-        <h2 style="color:#dc2626;">تعذر قراءة الجلسة</h2>
-        <p>يرجى المحاولة مرة أخرى أو العودة لتسجيل الدخول.</p>
-        <a href="/login.html" style="display:inline-block; margin-top:20px; padding:12px 24px; background:#171717; color:#fff; border-radius:10px; text-decoration:none;">العودة لتسجيل الدخول</a>
-      </div>
-    `;
+    document.getElementById('comp-error').textContent = 'تعذر قراءة الجلسة. يرجى تحديث الصفحة أو المحاولة مرة أخرى.';
+    document.getElementById('comp-error').style.display = 'block';
     return;
   }
 
@@ -43,6 +38,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     function buildCountryDropdown() {
       const countriesObj = window.countries || {};
       const currentLangCode = window.getCurrentLang ? window.getCurrentLang() : 'ar';
+
+      if (Object.keys(countriesObj).length === 0) {
+        countryDropdown.innerHTML = '<div style="padding:10px; text-align:center; color:#999;">جاري تحميل البلدان...</div>';
+        return;
+      }
 
       countryDropdown.innerHTML = Object.keys(countriesObj).map(code => {
         const c = countriesObj[code];
@@ -95,7 +95,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     buildCountryDropdown();
-    updateCountryDisplay();
+    // إعادة بناء القائمة إذا كانت فارغة بعد لحظة (في حال تأخر التحميل)
+    setTimeout(() => {
+      if (countryDropdown.children.length === 1 && countryDropdown.children[0].tagName === 'DIV') {
+        buildCountryDropdown();
+      }
+      updateCountryDisplay();
+    }, 1000);
   }
 
   // ✅ معالجة إرسال النموذج
@@ -110,27 +116,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     const phone = document.getElementById('phone').value.trim();
     const country = localStorage.getItem('app_country');
 
-    if (!orgName) {
-      errBox.textContent = 'اسم المنظمة مطلوب';
-      errBox.style.display = 'block';
-      return;
-    }
-    if (!country) {
-      errBox.textContent = 'الرجاء اختيار البلد';
-      errBox.style.display = 'block';
-      return;
-    }
-    if (!phone || phone.length < 8) {
-      errBox.textContent = 'رقم الهاتف مطلوب (8 أرقام على الأقل)';
-      errBox.style.display = 'block';
-      return;
-    }
+    if (!orgName) { errBox.textContent = 'اسم المنظمة مطلوب'; errBox.style.display = 'block'; return; }
+    if (!country) { errBox.textContent = 'الرجاء اختيار البلد'; errBox.style.display = 'block'; return; }
+    if (!phone || phone.length < 8) { errBox.textContent = 'رقم الهاتف مطلوب (8 أرقام على الأقل)'; errBox.style.display = 'block'; return; }
 
     btn.disabled = true;
     btn.querySelector('span').textContent = 'جارٍ الحفظ...';
 
     try {
-      // 1. إنشاء المنظمة
       const { data: orgData, error: orgError } = await db
         .from('organizations')
         .insert({
@@ -145,7 +138,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       if (orgError) throw new Error('خطأ في إنشاء المنظمة: ' + orgError.message);
 
-      // 2. تحديث الملف الشخصي
       const { error: profileError } = await db
         .from('profiles')
         .update({
