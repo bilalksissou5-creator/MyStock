@@ -1,5 +1,5 @@
 // ============================================
-// صفحة إكمال البيانات (State Machine - النسخة النهائية)
+// صفحة إكمال البيانات (State Machine - معمارية احترافية)
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   if (window.applyLanguage) await window.applyLanguage();
@@ -18,8 +18,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const countryDropdown = document.getElementById('country-dropdown');
   const countryCodeInput = document.getElementById('country_code');
 
-  // 2. ✅ انتظار الجلسة عالمياً (بدلاً من getCurrentUser المباشر)
-  // هذا يمنع الطرد إذا كانت الجلسة لم تجهز بعد
+  // 2. ✅ انتظار الجلسة عالمياً
   const session = await window.authReadyPromise;
   const user = session?.user;
 
@@ -96,7 +95,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     const phone = document.getElementById('phone').value.trim();
     const country = localStorage.getItem('app_country') || 'MA';
 
-    // التحقق من الحقول
     if (!orgName) { errBox.textContent = 'اسم المنظمة مطلوب'; errBox.style.display = 'block'; return; }
     if (!country) { errBox.textContent = 'الرجاء اختيار البلد'; errBox.style.display = 'block'; return; }
     if (!phone || phone.length < 8) { errBox.textContent = 'رقم الهاتف مطلوب (8 أرقام على الأقل)'; errBox.style.display = 'block'; return; }
@@ -117,7 +115,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       let orgId = profile?.organization_id;
 
-      // 2. تحديث أو إنشاء المنظمة
+      // 2. تحديث المنظمة (أو إنشاؤها إن لم تكن موجودة)
       if (orgId) {
         const { error: orgErr } = await db
           .from('organizations')
@@ -146,7 +144,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       if (updateErr) throw new Error('خطأ في تحديث الملف: ' + updateErr.message);
 
-      // 4. النجاح! العودة إلى لوحة التحكم (البوابة ستقرر الخطوة التالية)
+      // 4. النجاح! العودة إلى لوحة التحكم (البوابة ستوجهك للاشتراك)
       if (successBox) {
         successBox.textContent = '✅ تم حفظ البيانات! جارٍ التحويل...';
         successBox.style.display = 'block';
