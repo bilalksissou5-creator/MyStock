@@ -1,9 +1,10 @@
 // ============================================
 // المصادقة + حالة الاتصال + فحص الاشتراك
+// 🏛️ المعمارية الاحترافية (State-Based Routing)
 // ============================================
 
 // ============================================
-// تسجيل الدخول العادي
+// تسجيل الدخول العادي (بالبريد)
 // ============================================
 async function login(email, password) {
   const { data, error } = await db.auth.signInWithPassword({ email, password });
@@ -25,14 +26,15 @@ async function login(email, password) {
 }
 
 // ============================================
-// ✅ تسجيل الدخول باستخدام Google (يوجه إلى صفحة الاستقبال)
+// ✅ تسجيل الدخول باستخدام Google
 // ============================================
 async function signInWithGoogle() {
   try {
     const { data, error } = await db.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: window.location.origin + '/auth-callback.html',
+        // نوجهه إلى لوحة التحكم، والشرطي (requireAuth) سيتصرف
+        redirectTo: window.location.origin + '/dashboard.html',
         scopes: 'https://www.googleapis.com/auth/userinfo.email'
       }
     });
@@ -62,10 +64,12 @@ async function getCurrentUser() {
 }
 
 // ============================================
-// حماية الصفحة
+// 🚦 شرطي المرور: حماية الصفحات وتوجيه المستخدم
 // ============================================
 async function requireAuth() {
   const user = await getCurrentUser();
+  
+  // 1. إذا لم يكن مسجلاً، اذهب لصفحة الدخول
   if (!user) {
     window.location.href = '/login.html';
     return null;
@@ -75,28 +79,52 @@ async function requireAuth() {
   startHeartbeat(user.id);
 
   const currentPage = window.location.pathname;
-  const isSubscriptionPage = currentPage.includes('subscription.html');
-  const isRegisterPage = currentPage.includes('register');
-  const isLoginPage = currentPage.includes('login');
-  const isBankCardPage = currentPage.includes('bank-card');
-  const isCompleteProfilePage = currentPage.includes('complete-profile');
-  const isAuthCallbackPage = currentPage.includes('auth-callback');
 
-  if (isSubscriptionPage || isRegisterPage || isLoginPage || isBankCardPage || isCompleteProfilePage || isAuthCallbackPage) {
-    return user;
-  }
+  // الصفحات العامة التي لا تحتاج فحص اشتراك (لتجنب الحلقات المفرغة)
+  const isAuthPage = currentPage.includes('login.html') || 
+                     currentPage.includes('register.html') || 
+                     currentPage.includes('complete-profile.html') || 
+                     currentPage.includes('auth-callback.html');
 
-  const { data: profile } = await db.from('profiles').select('organization_id, role').eq('id', user.id).single();
-  if (!profile?.organization_id) {
+  if (isAuthPage) return user;
+
+  // 2. جلب بيانات الملف الشخصي (مع حالة إكمال البيانات)
+  const { data: profile, error } = await db
+    .from('profiles')
+    .select('organization_id, role, onboarding_completed')
+    .eq('id', user.id)
+    .single();
+
+  if (error) {
+    console.error('Error fetching profile:', error);
     window.location.href = '/complete-profile.html';
     return null;
   }
 
+  // 3. إذا لم يكمل البيانات بعد -> اذهب لصفحة إكمال البيانات
+  if (!profile?.onboarding_completed) {
+    if (!currentPage.includes('complete-profile.html')) {
+      window.location.href = '/complete-profile.html';
+    }
+    return user;
+  }
+
+  // 4. التحقق من الاشتراك (بما أنه أكمل البيانات)
   let sub = null;
-  const { data: userSub } = await db.from('subscriptions').select('status, expires_at').eq('owner_id', user.id).maybeSingle();
+  const { data: userSub } = await db
+    .from('subscriptions')
+    .select('status, expires_at')
+    .eq('owner_id', user.id)
+    .maybeSingle();
+
   sub = userSub;
-  if (!sub) {
-    const { data: orgSub } = await db.from('subscriptions').select('status, expires_at').eq('organization_id', profile.organization_id).maybeSingle();
+
+  if (!sub && profile.organization_id) {
+    const { data: orgSub } = await db
+      .from('subscriptions')
+      .select('status, expires_at')
+      .eq('organization_id', profile.organization_id)
+      .maybeSingle();
     sub = orgSub;
   }
 
@@ -104,16 +132,20 @@ async function requireAuth() {
   const expiresAt = sub?.expires_at ? new Date(sub.expires_at) : null;
   const isExpired = expiresAt && expiresAt < new Date();
 
-  if (status === 'active' && !isExpired) {
+  // 5. إذا لم يكن هناك اشتراك نشط -> اذهب لصفحة الاشتراك
+  if (status !== 'active' || isExpired) {
+    if (!currentPage.includes('subscription.html') && !currentPage.includes('bank-card.html')) {
+      window.location.href = '/subscription.html';
+    }
     return user;
   }
 
-  window.location.href = '/subscription.html';
-  return null;
+  // 6. إذا كان كل شيء سليماً، اسمح له بالمرور
+  return user;
 }
 
 // ============================================
-// حالة الاتصال
+// حالة الاتصال: online / offline
 // ============================================
 async function setOnline(userId) {
   if (!userId) return;
@@ -147,9 +179,10 @@ function isUserOnline(profile) {
 }
 
 // ============================================
-// الأحداث
+// الأحداث (Event Listeners)
 // ============================================
 document.addEventListener('DOMContentLoaded', () => {
+  
   const form = document.getElementById('login-form');
   if (form) {
     form.addEventListener('submit', async (e) => {
@@ -171,6 +204,7 @@ document.addEventListener('DOMContentLoaded', () => {
         btn.disabled = false;
         btn.querySelector('span').textContent = 'دخول';
       } else {
+        // التحويل إلى لوحة التحكم (الشرطي سيتصرف)
         window.location.href = '/dashboard.html';
       }
     });

@@ -1,9 +1,10 @@
 // ============================================
-// صفحة إكمال البيانات (النسخة النهائية والمضمونة)
+// صفحة إكمال البيانات (النسخة الاحترافية)
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   if (window.applyLanguage) await window.applyLanguage();
 
+  // 1. جلب العناصر
   const countryPicker = document.getElementById('country-picker');
   const countryTrigger = document.getElementById('country-trigger');
   const countryFlag = document.getElementById('country-flag');
@@ -17,117 +18,106 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   const pendingOrg = localStorage.getItem('pending_org_name');
   const pendingPhone = localStorage.getItem('pending_phone');
-  let isProcessing = false; // لمنع تكرار العملية
+  let isProcessing = false;
 
   // ============================================
-  // دالة إنشاء المنظمة (تُستدعى بمجرد توفر الجلسة)
+  // دالة حفظ البيانات في قاعدة البيانات
   // ============================================
-  async function processOrganization(user) {
-    if (!pendingOrg || !pendingPhone || isProcessing) return;
+  async function saveDataToDatabase(user) {
+    if (isProcessing) return;
     isProcessing = true;
 
     if (form) form.style.display = 'none';
     if (errBox) errBox.style.display = 'none';
     if (successBox) {
-      successBox.textContent = '✅ تم التحقق! جارٍ إنشاء المنظمة...';
+      successBox.textContent = '✅ جارٍ حفظ بيانات المنظمة...';
       successBox.style.display = 'block';
     }
 
     try {
       const country = localStorage.getItem('app_country') || 'MA';
 
-      // 1. إنشاء المنظمة
-      const { data: orgData, error: orgError } = await db
+      // أ. تحديث المنظمة (التي أنشأها الـ Trigger تلقائياً)
+      const { error: orgError } = await db
         .from('organizations')
-        .insert({
-          name: pendingOrg,
-          owner_id: user.id,
-          country: country,
-          daily_rate: 0,
-          bank_linked: false
-        })
-        .select()
-        .single();
+        .update({ name: pendingOrg, country: country })
+        .eq('owner_id', user.id);
 
-      if (orgError) throw new Error('خطأ في إنشاء المنظمة: ' + orgError.message);
+      if (orgError) throw new Error('خطأ في تحديث المنظمة: ' + orgError.message);
 
-      // 2. تحديث الملف الشخصي
+      // ب. تحديث الملف الشخصي وتعيين onboarding_completed = true
       const { error: profileError } = await db
         .from('profiles')
         .update({
-          organization_id: orgData.id,
           phone: pendingPhone,
           country: country,
-          role: 'admin'
+          onboarding_completed: true // ✅ المفتاح السحري الذي يفتح باقي التطبيق
         })
         .eq('id', user.id);
 
       if (profileError) throw new Error('خطأ في تحديث الملف: ' + profileError.message);
 
-      // 3. مسح البيانات المؤقتة
+      // ج. مسح البيانات المؤقتة
       localStorage.removeItem('pending_org_name');
       localStorage.removeItem('pending_phone');
 
-      // 4. التوجيه إلى صفحة الاشتراك
+      // د. التوجيه إلى صفحة الاشتراك
+      if (successBox) successBox.textContent = '✅ تم الحفظ! جارٍ تحويلك...';
       window.location.replace('/subscription.html');
 
     } catch (err) {
-      // في حال حدوث خطأ، نعيد الصفحة ونظهر الخطأ
       if (successBox) successBox.style.display = 'none';
       if (form) form.style.display = 'block';
       if (errBox) {
         errBox.textContent = err.message;
         errBox.style.display = 'block';
       }
+      isProcessing = false;
       localStorage.removeItem('pending_org_name');
       localStorage.removeItem('pending_phone');
-      isProcessing = false;
     }
   }
 
   // ============================================
-  // الجزء الأول: العودة من Google
+  // الحالة الثانية: العودة من Google (توجد بيانات محفوظة)
   // ============================================
   if (pendingOrg && pendingPhone) {
-    // إظهار حالة التحميل
+    // إخفاء النموذج وإظهار رسالة التحميل
     if (form) form.style.display = 'none';
-    if (errBox) errBox.style.display = 'none';
     if (successBox) {
-      successBox.textContent = '✅ جارٍ التحقق من الحساب...';
+      successBox.textContent = '✅ جارٍ التحقق من حسابك...';
       successBox.style.display = 'block';
     }
 
-    // 1. الاستماع لحدث الدخول (الطريقة الأضمن في Supabase)
-    db.auth.onAuthStateChange((event, session) => {
-      if (session?.user) {
-        processOrganization(session.user);
+    // البحث عن الجلسة (بشكل مستمر لمدة 5 ثوانٍ كحد أقصى)
+    let session = null;
+    for (let i = 0; i < 10; i++) {
+      const { data } = await db.auth.getSession();
+      if (data?.session) {
+        session = data.session;
+        break;
       }
-    });
-
-    // 2. محاولة فورية (في حال كانت الجلسة جاهزة)
-    const { data: { session } } = await db.auth.getSession();
-    if (session?.user) {
-      processOrganization(session.user);
-    } else {
-      // 3. مهلة احتياطية: إذا لم يحدث شيء خلال 8 ثوانٍ، نعيد النموذج
-      setTimeout(() => {
-        if (!isProcessing) {
-          if (successBox) successBox.style.display = 'none';
-          if (form) form.style.display = 'block';
-          if (errBox) {
-            errBox.textContent = 'انتهت مهلة الاتصال. يرجى المحاولة مرة أخرى.';
-            errBox.style.display = 'block';
-          }
-          localStorage.removeItem('pending_org_name');
-          localStorage.removeItem('pending_phone');
-        }
-      }, 8000);
+      await new Promise(r => setTimeout(r, 500));
     }
-    return;
+
+    if (session?.user) {
+      await saveDataToDatabase(session.user);
+    } else {
+      // إذا لم نجد الجلسة، نعيد النموذج
+      if (successBox) successBox.style.display = 'none';
+      if (form) form.style.display = 'block';
+      if (errBox) {
+        errBox.textContent = 'تعذر قراءة الجلسة. يرجى المحاولة مرة أخرى.';
+        errBox.style.display = 'block';
+      }
+      localStorage.removeItem('pending_org_name');
+      localStorage.removeItem('pending_phone');
+    }
+    return; // ننهي التنفيذ هنا
   }
 
   // ============================================
-  // الجزء الثاني: عرض النموذج (مستخدم جديد)
+  // الحالة الأولى: مستخدم جديد (عرض النموذج)
   // ============================================
   if (form) form.style.display = 'block';
   if (errBox) errBox.style.display = 'none';
@@ -193,9 +183,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     updateCountryDisplay();
   }
 
-  // ============================================
-  // الجزء الثالث: معالجة زر "متابعة" (حفظ ثم إطلاق Google)
-  // ============================================
+  // معالجة زر "متابعة" (للمستخدم الجديد)
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
 

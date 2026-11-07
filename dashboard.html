@@ -31,15 +31,20 @@
   <script src="/js/pages/dashboard.js"></script>
   
   <script>
-    // ✅ جعل الدالة async لانتظار تحميل الترجمات من Supabase قبل رسم الواجهة
     document.addEventListener('DOMContentLoaded', async () => {
       
-      // ننتظر تطبيق الترجمة (ملف i18n.js سيقوم بجلبها من Supabase أو الكاش)
+      // ✅ 1. تفعيل الترجمة أولاً
       if (window.applyLanguage) {
         await window.applyLanguage();
       }
+
+      // ✅ 2. تفعيل "شرطي المرور" (إذا لم يكن مفعلاً في dashboard.js)
+      // هذا السطر سيقرر ما إذا كان المستخدم يجب أن يبقى هنا أو يذهب لإكمال البيانات أو الاشتراك
+      if (typeof requireAuth === 'function') {
+        await requireAuth();
+      }
       
-      // تشغيل الإشعارات بعد التأكد من جلب الترجمة
+      // ✅ 3. تشغيل الإشعارات
       if (typeof startNotifPolling === 'function') {
         startNotifPolling();
       }
