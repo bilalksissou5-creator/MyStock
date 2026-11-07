@@ -4,6 +4,7 @@
 // ✅ دعم وضع "تغيير البطاقة" (?change=1)
 // ✅ دعم كامل للترجمة + إشعار إضافة بطاقة
 // ✅ إصلاح اتجاه العملة (LTR) في البطاقات والمبالغ
+// ✅ معالجة البيانات المعلقة القادمة من Google
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   const user = await getCurrentUser();
@@ -19,6 +20,80 @@ document.addEventListener('DOMContentLoaded', async () => {
   document.title = tr('sub_title_full');
 
   const container = document.getElementById('subscription-content');
+
+  // ═══════════════════════════════════════════
+  // ✅ معالجة البيانات المعلقة (العودة من Google)
+  // ═══════════════════════════════════════════
+  const pendingOrg = localStorage.getItem('pending_org_name');
+  const pendingPhone = localStorage.getItem('pending_phone');
+
+  if (pendingOrg && pendingPhone) {
+    container.innerHTML = `
+      <div class="sub-box" style="text-align:center; padding:60px 24px;">
+        <div class="sub-icon" style="background:#dcfce7; margin:0 auto 20px; width:80px; height:80px; border-radius:50%; display:flex; align-items:center; justify-content:center;">
+          <i class="fas fa-spinner fa-spin" style="font-size:32px; color:#22c55e;"></i>
+        </div>
+        <h2 style="margin:0 0 12px; font-size:1.4rem; font-weight:800;">جارٍ حفظ بياناتك...</h2>
+        <p class="sub-text" style="color:#6b7280; font-size:14px;">يرجى الانتظار لحظة.</p>
+      </div>
+    `;
+
+    try {
+      const pendingCountry = localStorage.getItem('app_country') || 'MA';
+
+      // 1. جلب المنظمة الحالية
+      const { data: currentProfile } = await db
+        .from('profiles')
+        .select('organization_id')
+        .eq('id', user.id)
+        .single();
+
+      let orgId = currentProfile?.organization_id;
+
+      // 2. تحديث أو إنشاء المنظمة
+      if (orgId) {
+        await db.from('organizations').update({ name: pendingOrg, country: pendingCountry }).eq('id', orgId);
+      } else {
+        const { data: newOrg, error: createErr } = await db
+          .from('organizations')
+          .insert({ name: pendingOrg, owner_id: user.id, country: pendingCountry, daily_rate: 0, bank_linked: false })
+          .select()
+          .single();
+        if (createErr) throw new Error(createErr.message);
+        orgId = newOrg.id;
+      }
+
+      // 3. تحديث الملف الشخصي
+      const { error: profileErr } = await db.from('profiles')
+        .update({
+          phone: pendingPhone,
+          country: pendingCountry,
+          organization_id: orgId,
+          onboarding_completed: true
+        })
+        .eq('id', user.id);
+
+      if (profileErr) throw new Error(profileErr.message);
+
+      // 4. مسح البيانات المعلقة
+      localStorage.removeItem('pending_org_name');
+      localStorage.removeItem('pending_phone');
+
+    } catch (err) {
+      console.error('Failed to save pending data:', err);
+      container.innerHTML = `
+        <div class="sub-box" style="text-align:center; padding:60px 24px;">
+          <div class="sub-icon" style="background:#fee2e2; margin:0 auto 20px; width:80px; height:80px; border-radius:50%; display:flex; align-items:center; justify-content:center;">
+            <i class="fas fa-times" style="font-size:32px; color:#ef4444;"></i>
+          </div>
+          <h2 style="margin:0 0 12px; font-size:1.4rem; font-weight:800;">حدث خطأ</h2>
+          <p class="sub-text" style="color:#6b7280; font-size:14px;">${err.message}</p>
+          <a href="/complete-profile.html" class="btn-secondary" style="margin-top:20px;">إعادة المحاولة</a>
+        </div>
+      `;
+      return;
+    }
+  }
 
   // ═══════════════════════════════════════════
   // ✅ روابط Gumroad
@@ -85,7 +160,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           <a href="/dashboard.html" class="btn-secondary" style="margin-top:20px;">العودة للوحة التحكم</a>
         </div>
       `;
-      return; // نوقف التنفيذ هنا لمنع التحويل الخاطئ
+      return;
     }
 
     // ✅✅✅ إضافة إشعار إضافة بطاقة جديدة هنا
@@ -176,7 +251,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       ${buildPlanCard({
         id: 'basic',
         name: tr('sub_plan_basic'),
-        price: '20', /* ✅ السعر الجديد */
+        price: '20',
         badge: null,
         features: [
           { icon: 'fa-users', label: tr('sub_feat_users'), value: '10' },
@@ -190,7 +265,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       ${buildPlanCard({
         id: 'pro',
         name: tr('sub_plan_pro'),
-        price: '30', /* ✅ السعر الجديد */
+        price: '30',
         badge: tr('sub_most_popular'),
         popular: true,
         features: [
@@ -205,7 +280,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       ${buildPlanCard({
         id: 'advanced',
         name: tr('sub_plan_advanced'),
-        price: '50', /* ✅ السعر الجديد */
+        price: '50',
         badge: null,
         features: [
           { icon: 'fa-users', label: tr('sub_feat_users'), value: tr('sub_unlimited'), unlimited: true },
@@ -274,7 +349,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         <div class="plan-header">
           <h3 class="plan-name">${name}</h3>
-          <!-- ✅ إصلاح اتجاه العملة هنا (الرقم أولاً ثم العملة) -->
           <div class="plan-price" dir="ltr">
             <span class="plan-price-value">${price}</span>
             <span class="plan-price-currency">${tr('currency_symbol')}</span>
@@ -325,7 +399,6 @@ document.addEventListener('DOMContentLoaded', async () => {
           </div>
           <div class="pending-row">
             <span>${tr('sub_pending_amount')}</span>
-            <!-- ✅ إصلاح اتجاه العملة في تفاصيل الدفع المعلق -->
             <strong dir="ltr" style="display: inline-block;">${sub.price || 20} ${tr('currency_symbol')}</strong>
           </div>
           <div class="pending-row">
