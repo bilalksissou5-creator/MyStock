@@ -42,8 +42,8 @@ async function signInWithGoogle() {
     const { data, error } = await db.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        // ✅ التوجيه إلى صفحة إكمال البيانات الناقصة
-        redirectTo: window.location.origin + '/complete-profile.html',
+        // ✅ التوجيه إلى الصفحة الوسيطة (وليس صفحة إكمال البيانات)
+        redirectTo: window.location.origin + '/auth-callback.html',
         scopes: 'https://www.googleapis.com/auth/userinfo.email'
       }
     });
@@ -89,14 +89,15 @@ async function requireAuth() {
 
   const currentPage = window.location.pathname;
 
-  // ✅ الصفحات المسموحة بدون اشتراك (أضفنا complete-profile)
+  // ✅ الصفحات المسموحة بدون اشتراك (أضفنا الصفحات الوسيطة)
   const isSubscriptionPage = currentPage.includes('subscription.html');
   const isRegisterPage = currentPage.includes('register');
   const isLoginPage = currentPage.includes('login');
   const isBankCardPage = currentPage.includes('bank-card');
   const isCompleteProfilePage = currentPage.includes('complete-profile');
+  const isAuthCallbackPage = currentPage.includes('auth-callback'); // ✅ أضفناها هنا
 
-  if (isSubscriptionPage || isRegisterPage || isLoginPage || isBankCardPage || isCompleteProfilePage) {
+  if (isSubscriptionPage || isRegisterPage || isLoginPage || isBankCardPage || isCompleteProfilePage || isAuthCallbackPage) {
     return user;
   }
 
