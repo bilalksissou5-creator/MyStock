@@ -168,7 +168,7 @@ body.landing-page {
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
   display: none;
   flex-direction: column;
-  min-width: 60px; /* ✅ عرض النافذة المنسدلة */
+  min-width: 50px; /* ✅ عرض النافذة المنسدلة */
   padding: 5px;    /* ✅ الحشوة الداخلية للنافذة */
   z-index: 1000;
 }
