@@ -157,25 +157,20 @@ body.landing-page {
   align-items: center;
 }
 
-/* ✅ النافذة المنسدلة للغة */
+/* ✅ النافذة المنسدلة للغة (بنفس عرض الزر) */
 .lang-dropdown {
   position: absolute;
   top: calc(100% + 8px);
-  right: 0;
+  left: 0;                  /* ✅ يتمدد ليطابق عرض الزر من اليسار */
+  right: 0;                 /* ✅ يتمدد ليطابق عرض الزر من اليمين */
   background: white;
   border: 1px solid #e5e5e5;
   border-radius: 10px;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
   display: none;
   flex-direction: column;
-  min-width: 50px; /* ✅ عرض النافذة المنسدلة */
-  padding: 5px;    /* ✅ الحشوة الداخلية للنافذة */
+  padding: 5px;
   z-index: 1000;
-}
-
-[dir="rtl"] .lang-dropdown {
-  right: auto;
-  left: 0;
 }
 
 .lang-switcher.open .lang-dropdown {
@@ -190,7 +185,7 @@ body.landing-page {
   font-size: 14px;
   font-weight: 600;
   color: #171717;
-  padding: 8px 20px; /* ✅ الحشوة من اليمين واليسار (20px) */
+  padding: 8px 10px; /* ✅ حشوة مناسبة */
   text-align: center;
   border-radius: 6px;
   cursor: pointer;
@@ -791,8 +786,12 @@ body.landing-page {
     gap: 4px;
   }
   
-  .lang-switcher select, .lang-switcher i {
+  .lang-trigger, .lang-switcher i {
     font-size: 13px;
+  }
+  
+  .lang-dropdown {
+    min-width: 0;
   }
 }
 
@@ -828,7 +827,7 @@ body.landing-page {
     border-width: 1.5px !important;
   }
   
-  .lang-switcher select, .lang-switcher i {
+  .lang-trigger, .lang-switcher i {
     font-size: 11px !important;
   }
 
