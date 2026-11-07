@@ -2,24 +2,17 @@
 // المصادقة + البوابة الذكية (Route Guard)
 // ============================================
 
-// ============================================
-// تسجيل الدخول العادي (بالبريد)
-// ============================================
 async function login(email, password) {
   const { data, error } = await db.auth.signInWithPassword({ email, password });
   if (error) return { ok: false, error: error.message };
   return { ok: true, user: data.user };
 }
 
-// ============================================
-// تسجيل الدخول باستخدام Google (يوجه للوحة التحكم)
-// ============================================
 async function signInWithGoogle() {
   try {
     const { error } = await db.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        // ✅ نوجه دائماً إلى لوحة التحكم، والبوابة ستقرر الخطوة التالية
         redirectTo: window.location.origin + '/dashboard.html',
         scopes: 'https://www.googleapis.com/auth/userinfo.email'
       }
@@ -31,9 +24,6 @@ async function signInWithGoogle() {
   }
 }
 
-// ============================================
-// تسجيل الخروج
-// ============================================
 async function logout() {
   const { data: { user } } = await db.auth.getUser();
   if (user) await setOffline(user.id);
@@ -41,27 +31,22 @@ async function logout() {
   window.location.href = '/login.html';
 }
 
-// ============================================
-// ✅ جلب المستخدم الحالي (مع انتظار الجلسة)
-// ============================================
 async function getCurrentUser() {
-  // ننتظر الوعد العالمي أولاً (authReadyPromise)
   if (window.authReadyPromise) {
     const session = await window.authReadyPromise;
     if (session?.user) return session.user;
   }
-  // إذا لم توجد جلسة، نجرب مرة أخيرة مباشرة
   const { data } = await db.auth.getUser();
   return data?.user ?? null;
 }
 
 // ============================================
-// 🚦 البوابة الذكية (Auth Guard)
+// 🚦 البوابة الذكية (Auth Guard) - النسخة المحدثة
 // ============================================
 async function requireAuth() {
   const currentPage = window.location.pathname;
 
-  // 1. الصفحات العامة (لا تحتاج جلسة)
+  // 1. الصفحات العامة
   if (
     currentPage.includes('login.html') ||
     currentPage.includes('register.html') ||
@@ -82,36 +67,52 @@ async function requireAuth() {
   await setOnline(user.id);
   startHeartbeat(user.id);
 
-  // 3. جلب حالة المستخدم من قاعدة البيانات
+  // 3. جلب حالة المستخدم
   const { data: profile } = await db
     .from('profiles')
-    .select('organization_id, onboarding_completed')
+    .select('organization_id, onboarding_completed, role')
     .eq('id', user.id)
     .single();
 
-  // 4. المرحلة الأولى: لم يكمل البيانات
+  // 4. إذا لم يكمل البيانات
   if (!profile?.onboarding_completed) {
-    // نسمح بالمرور في الصفحات التالية (لتجنب الحلقات المفرغة)
     const allowedPages = ['complete-profile.html', 'subscription.html', 'bank-card.html'];
     const isAllowed = allowedPages.some(p => currentPage.includes(p));
-    
     if (!isAllowed) {
       window.location.replace('/complete-profile.html');
     }
     return user;
   }
 
-  // 5. المرحلة الثانية: التحقق من الاشتراك (باستثناء صفحة الاشتراك والبطاقة)
+  // 5. التحقق من الاشتراك (بحث شامل)
   if (!currentPage.includes('subscription.html') && !currentPage.includes('bank-card.html')) {
-    const { data: sub } = await db
+    
+    // أ. البحث عن اشتراك بـ owner_id
+    let { data: sub } = await db
       .from('subscriptions')
       .select('status, expires_at')
       .eq('owner_id', user.id)
       .maybeSingle();
 
-    const isActive = sub?.status === 'active' && 
-                     (!sub.expires_at || new Date(sub.expires_at) > new Date());
+    // ب. إذا لم نجد، نبحث بـ organization_id
+    if (!sub && profile?.organization_id) {
+      const { data: orgSub } = await db
+        .from('subscriptions')
+        .select('status, expires_at')
+        .eq('organization_id', profile.organization_id)
+        .maybeSingle();
+      sub = orgSub;
+    }
 
+    // ج. التحقق من حالة الاشتراك
+    const status = sub?.status ?? 'none';
+    const expiresAt = sub?.expires_at ? new Date(sub.expires_at) : null;
+    const isExpired = expiresAt && expiresAt < new Date();
+    
+    // ✅ الاشتراك نشط إذا كانت الحالة "active" ولم تنته صلاحيته
+    const isActive = status === 'active' && !isExpired;
+
+    // إذا لم يكن مشتركاً، نوجهه إلى الاشتراك
     if (!isActive) {
       window.location.replace('/subscription.html');
       return user;
@@ -123,7 +124,7 @@ async function requireAuth() {
 }
 
 // ============================================
-// حالة الاتصال: online / offline
+// حالة الاتصال
 // ============================================
 async function setOnline(userId) {
   if (!userId) return;
@@ -145,9 +146,6 @@ async function setOffline(userId) {
   } catch (e) { console.warn(e); }
 }
 
-// ============================================
-// Heartbeat (تحديث آخر نشاط)
-// ============================================
 let heartbeatInterval = null;
 function startHeartbeat(userId) {
   if (!userId) return;
@@ -166,11 +164,9 @@ function startHeartbeat(userId) {
 }
 
 // ============================================
-// الأحداث (Event Listeners)
+// الأحداث
 // ============================================
 document.addEventListener('DOMContentLoaded', () => {
-  
-  // 1. نموذج الدخول العادي
   const form = document.getElementById('login-form');
   if (form) {
     form.addEventListener('submit', async (e) => {
@@ -192,19 +188,16 @@ document.addEventListener('DOMContentLoaded', () => {
         btn.disabled = false;
         btn.querySelector('span').textContent = 'دخول';
       } else {
-        // بعد الدخول، البوابة ستعرف أين توجهه
         window.location.href = '/dashboard.html';
       }
     });
   }
 
-  // 2. زر تسجيل الدخول عبر Google
   const googleBtn = document.getElementById('google-login-btn');
   if (googleBtn) {
     googleBtn.addEventListener('click', signInWithGoogle);
   }
 
-  // 3. أزرار تسجيل الخروج
   document.querySelectorAll('.logout').forEach(b => {
     b.addEventListener('click', logout);
   });
