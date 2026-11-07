@@ -47,14 +47,17 @@
         <a href="#features" data-i18n="landing_nav_features">الميزات</a>
         <a href="#pricing" data-i18n="landing_nav_pricing">الأسعار</a>
         
-        <!-- ✅ قائمة اختيار اللغة (بدون رايات) -->
-        <div class="lang-switcher">
+        <!-- ✅ قائمة اختيار اللغة (مخصصة) -->
+        <div class="lang-switcher" id="lang-picker">
           <i class="fas fa-globe"></i>
-          <select id="lang-select" onchange="changeLanguage(this.value)">
-            <option value="ar">AR</option>
-            <option value="fr">FR</option>
-            <option value="en">EN</option>
-          </select>
+          <button type="button" class="lang-trigger" id="lang-trigger">
+            <span id="current-lang-text">AR</span>
+          </button>
+          <div class="lang-dropdown" id="lang-dropdown">
+            <button type="button" class="lang-option" data-lang="ar">AR</button>
+            <button type="button" class="lang-option" data-lang="fr">FR</button>
+            <button type="button" class="lang-option" data-lang="en">EN</button>
+          </div>
         </div>
 
         <!-- ✅ زر إنشاء حساب -->
@@ -178,7 +181,6 @@
     <div class="landing-pricing-grid">
       <div class="landing-price-card">
         <h3 data-i18n="sub_plan_basic">الباقة الأساسية</h3>
-        <!-- ✅ إصلاح اتجاه السعر -->
         <div class="landing-price" dir="ltr">
           <span class="landing-price-value">20</span>
           <span class="landing-price-currency">$</span>
@@ -197,7 +199,6 @@
       <div class="landing-price-card featured">
         <div class="landing-price-badge" data-i18n="sub_most_popular">الأكثر شيوعاً</div>
         <h3 data-i18n="sub_plan_pro">الباقة الاحترافية</h3>
-        <!-- ✅ إصلاح اتجاه السعر -->
         <div class="landing-price" dir="ltr">
           <span class="landing-price-value">30</span>
           <span class="landing-price-currency">$</span>
@@ -215,7 +216,6 @@
 
       <div class="landing-price-card">
         <h3 data-i18n="sub_plan_advanced">الباقة المتقدمة</h3>
-        <!-- ✅ إصلاح اتجاه السعر -->
         <div class="landing-price" dir="ltr">
           <span class="landing-price-value">50</span>
           <span class="landing-price-currency">$</span>
@@ -249,7 +249,6 @@
   <footer class="landing-footer">
     <div class="landing-footer-inner">
       
-      <!-- ✅ قسم المصمم (Developer Profile) -->
       <div class="developer-profile">
         <div class="developer-avatar">
           <img src="/assets/img/developer.jpg" alt="Bilal Ksissou" onerror="this.src='https://ui-avatars.com/api/?name=Bilal+Ksissou&background=171717&color=fff&size=128'">
@@ -282,37 +281,55 @@
     </div>
   </footer>
 
-  <!-- ✅ تحميل Supabase أولاً لكي تتمكن الصفحة من جلب الترجمات -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="/js/core/supabase.js"></script>
   <script src="/js/core/i18n.js"></script>
   
   <script>
     document.addEventListener('DOMContentLoaded', async () => {
-      // ✅ تطبيق الترجمة فوراً عند فتح الصفحة
       if (window.applyLanguage) await window.applyLanguage();
 
-      // ✅ ضبط القيمة الافتراضية للغة في القائمة المنسدلة بناءً على اللغة المحفوظة
-      const currentLang = window.getCurrentLang ? window.getCurrentLang() : 'ar';
-      const langSelect = document.getElementById('lang-select');
-      if (langSelect) langSelect.value = currentLang;
+      // ✅ تشغيل قائمة اللغة المخصصة
+      const langPicker = document.getElementById('lang-picker');
+      const langTrigger = document.getElementById('lang-trigger');
+      const langDropdown = document.getElementById('lang-dropdown');
+      const currentLangText = document.getElementById('current-lang-text');
 
-      // ✅ تحديث النص الخاص بالشهر في الأسعار
+      if (langPicker && langTrigger) {
+        const currentLang = window.getCurrentLang ? window.getCurrentLang() : 'ar';
+        currentLangText.textContent = currentLang.toUpperCase();
+
+        langTrigger.addEventListener('click', (e) => {
+          e.stopPropagation();
+          langPicker.classList.toggle('open');
+        });
+
+        langDropdown.querySelectorAll('.lang-option').forEach(opt => {
+          opt.addEventListener('click', async () => {
+            const lang = opt.dataset.lang;
+            currentLangText.textContent = lang.toUpperCase();
+            langPicker.classList.remove('open');
+            
+            if (window.setLanguage) {
+              await window.setLanguage(lang);
+              updateMonthText();
+            } else {
+              localStorage.setItem('app_lang', lang);
+              window.location.reload();
+            }
+          });
+        });
+
+        document.addEventListener('click', (e) => {
+          if (!langPicker.contains(e.target)) {
+            langPicker.classList.remove('open');
+          }
+        });
+      }
+
       updateMonthText();
     });
 
-    // ✅ دالة تغيير اللغة (تستدعي دالة setLanguage الجديدة من i18n.js)
-    async function changeLanguage(lang) {
-      if (window.setLanguage) {
-        await window.setLanguage(lang);
-        updateMonthText(); // تحديث نص الشهر فوراً
-      } else {
-        localStorage.setItem('app_lang', lang);
-        window.location.reload();
-      }
-    }
-
-    // دالة مساعدة لتحديث كلمة "شهر" تحت الأسعار
     function updateMonthText() {
       document.querySelectorAll('.landing-price-period').forEach(el => {
         el.textContent = '/ ' + (window.t ? window.t('sub_per_month').replace('/ ', '') : 'شهرياً');
@@ -320,7 +337,6 @@
     }
   </script>
 
-  <!-- ✅ تسجيل Service Worker لتثبيت التطبيق -->
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {

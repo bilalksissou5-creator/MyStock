@@ -116,12 +116,20 @@ body.landing-page {
   background: #f5f5f5 !important;
 }
 
-/* ✅ زر اختيار اللغة */
+/* ✅ زر اختيار اللغة (النسخة المخصصة) */
 .lang-switcher {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 38px;
+  padding: 0 10px;
   border: 2px solid #e5e5e5;
-  gap: 6px;
+  border-radius: 10px;
+  background: transparent;
   cursor: pointer;
   transition: all 0.15s ease;
+  gap: 6px;
 }
 
 .lang-switcher:hover {
@@ -134,9 +142,7 @@ body.landing-page {
   font-size: 14px;
 }
 
-.lang-switcher select {
-  appearance: none;
-  -webkit-appearance: none;
+.lang-trigger {
   background: transparent;
   border: none;
   font-family: inherit;
@@ -146,13 +152,53 @@ body.landing-page {
   cursor: pointer;
   outline: none;
   padding: 0;
-  margin: 0;
-  height: 100%;              /* ✅ ملء ارتفاع الحاوية بالكامل */
-  text-align: center;
+  height: 100%;
+  display: flex;
+  align-items: center;
 }
 
-.lang-switcher select::-ms-expand {
+/* ✅ النافذة المنسدلة للغة */
+.lang-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  background: white;
+  border: 1px solid #e5e5e5;
+  border-radius: 10px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
   display: none;
+  flex-direction: column;
+  min-width: 60px; /* ✅ عرض النافذة المنسدلة */
+  padding: 5px;    /* ✅ الحشوة الداخلية للنافذة */
+  z-index: 1000;
+}
+
+[dir="rtl"] .lang-dropdown {
+  right: auto;
+  left: 0;
+}
+
+.lang-switcher.open .lang-dropdown {
+  display: flex;
+}
+
+/* ✅ الخيارات داخل النافذة المنسدلة */
+.lang-option {
+  background: transparent;
+  border: none;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  color: #171717;
+  padding: 8px 20px; /* ✅ الحشوة من اليمين واليسار (20px) */
+  text-align: center;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.lang-option:hover {
+  background: #f5f5f5;
 }
 
 /* ══════════════════════════════════════════
@@ -676,7 +722,6 @@ body.landing-page {
    Responsive
    ══════════════════════════════════════════ */
 @media (max-width: 768px) {
-  /* إخفاء الروابط النصية فقط، مع إبقاء أزرار الدخول واللغة */
   .landing-nav a:not(.landing-btn-login):not(.landing-btn-register) {
     display: none;
   }
@@ -733,7 +778,6 @@ body.landing-page {
     padding: 32px 20px 24px;
   }
 
-  /* ✅ تصغير الأزرار بشكل موحد ومتطابق للجوال */
   .landing-nav a, .lang-switcher {
     height: 34px;
     padding: 0 10px;
@@ -766,7 +810,6 @@ body.landing-page {
     gap: 4px;
   }
 
-  /* ✅ تصغير الأزرار بشكل موحد ومتطابق للشاشات الصغيرة جداً */
   .landing-nav a, .lang-switcher {
     height: 30px !important; 
     padding: 0 8px !important;
