@@ -1,16 +1,31 @@
 // ============================================
 // صفحة إكمال البيانات (لحسابات Google الجديدة)
+// ✅ لا تحول المستخدم إلى صفحة الدخول، بل تنتظر الجلسة
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   if (window.applyLanguage) await window.applyLanguage();
 
-  // ✅ الانتظار قليلاً حتى يقرأ Supabase الجلسة من الرابط
-  await new Promise(r => setTimeout(r, 1000));
+  // ✅ دالة تنتظر الجلسة حتى 10 ثوانٍ
+  async function waitForUser() {
+    for (let i = 0; i < 20; i++) {
+      const { data: { user } } = await db.auth.getUser();
+      if (user) return user;
+      await new Promise(r => setTimeout(r, 500));
+    }
+    return null;
+  }
 
-  // التحقق من وجود مستخدم مسجل
-  const { data: { user } } = await db.auth.getUser();
+  const user = await waitForUser();
+
+  // ❌ إذا لم توجد جلسة بعد 10 ثوانٍ، نعرض رسالة خطأ بدلاً من الطرد
   if (!user) {
-    window.location.href = '/login.html';
+    document.body.innerHTML = `
+      <div style="text-align:center; padding:50px 20px; font-family:sans-serif;">
+        <h2 style="color:#dc2626;">تعذر قراءة الجلسة</h2>
+        <p>يرجى المحاولة مرة أخرى أو العودة لتسجيل الدخول.</p>
+        <a href="/login.html" style="display:inline-block; margin-top:20px; padding:12px 24px; background:#171717; color:#fff; border-radius:10px; text-decoration:none;">العودة لتسجيل الدخول</a>
+      </div>
+    `;
     return;
   }
 
