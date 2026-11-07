@@ -1,5 +1,5 @@
 // ============================================
-// صفحة إكمال البيانات (الذكية - بدون وسيط)
+// صفحة إكمال البيانات (النسخة النهائية والمضمونة)
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   if (window.applyLanguage) await window.applyLanguage();
@@ -15,16 +15,81 @@ document.addEventListener('DOMContentLoaded', async () => {
   const successBox = document.getElementById('comp-success');
   const btn = document.getElementById('complete-btn');
 
-  // ============================================
-  // ✅ الجزء الأول: معالجة العودة من Google
-  // ============================================
   const pendingOrg = localStorage.getItem('pending_org_name');
   const pendingPhone = localStorage.getItem('pending_phone');
+  let isProcessing = false; // لمنع تكرار العملية
 
-  // إذا كان هناك بيانات محفوظة (أي أن المستخدم قادم من Google)
+  // ============================================
+  // دالة إنشاء المنظمة (تُستدعى بمجرد توفر الجلسة)
+  // ============================================
+  async function processOrganization(user) {
+    if (!pendingOrg || !pendingPhone || isProcessing) return;
+    isProcessing = true;
+
+    if (form) form.style.display = 'none';
+    if (errBox) errBox.style.display = 'none';
+    if (successBox) {
+      successBox.textContent = '✅ تم التحقق! جارٍ إنشاء المنظمة...';
+      successBox.style.display = 'block';
+    }
+
+    try {
+      const country = localStorage.getItem('app_country') || 'MA';
+
+      // 1. إنشاء المنظمة
+      const { data: orgData, error: orgError } = await db
+        .from('organizations')
+        .insert({
+          name: pendingOrg,
+          owner_id: user.id,
+          country: country,
+          daily_rate: 0,
+          bank_linked: false
+        })
+        .select()
+        .single();
+
+      if (orgError) throw new Error('خطأ في إنشاء المنظمة: ' + orgError.message);
+
+      // 2. تحديث الملف الشخصي
+      const { error: profileError } = await db
+        .from('profiles')
+        .update({
+          organization_id: orgData.id,
+          phone: pendingPhone,
+          country: country,
+          role: 'admin'
+        })
+        .eq('id', user.id);
+
+      if (profileError) throw new Error('خطأ في تحديث الملف: ' + profileError.message);
+
+      // 3. مسح البيانات المؤقتة
+      localStorage.removeItem('pending_org_name');
+      localStorage.removeItem('pending_phone');
+
+      // 4. التوجيه إلى صفحة الاشتراك
+      window.location.replace('/subscription.html');
+
+    } catch (err) {
+      // في حال حدوث خطأ، نعيد الصفحة ونظهر الخطأ
+      if (successBox) successBox.style.display = 'none';
+      if (form) form.style.display = 'block';
+      if (errBox) {
+        errBox.textContent = err.message;
+        errBox.style.display = 'block';
+      }
+      localStorage.removeItem('pending_org_name');
+      localStorage.removeItem('pending_phone');
+      isProcessing = false;
+    }
+  }
+
+  // ============================================
+  // الجزء الأول: العودة من Google
+  // ============================================
   if (pendingOrg && pendingPhone) {
-    
-    // إخفاء النموذج وإظهار رسالة التحميل
+    // إظهار حالة التحميل
     if (form) form.style.display = 'none';
     if (errBox) errBox.style.display = 'none';
     if (successBox) {
@@ -32,85 +97,37 @@ document.addEventListener('DOMContentLoaded', async () => {
       successBox.style.display = 'block';
     }
 
-    // ✅ البحث عن الجلسة بشكل مستمر (لمدة 5 ثوانٍ كحد أقصى)
-    let session = null;
-    for (let i = 0; i < 10; i++) {
-      const { data } = await db.auth.getSession();
-      if (data?.session) {
-        session = data.session;
-        break;
+    // 1. الاستماع لحدث الدخول (الطريقة الأضمن في Supabase)
+    db.auth.onAuthStateChange((event, session) => {
+      if (session?.user) {
+        processOrganization(session.user);
       }
-      await new Promise(r => setTimeout(r, 500)); // انتظار نصف ثانية
-    }
+    });
 
-    // إذا وجدنا الجلسة، ننشئ المنظمة
-    if (session) {
-      try {
-        const country = localStorage.getItem('app_country') || 'MA';
-
-        // 1. إنشاء المنظمة
-        const { data: orgData, error: orgError } = await db
-          .from('organizations')
-          .insert({
-            name: pendingOrg,
-            owner_id: session.user.id,
-            country: country,
-            daily_rate: 0,
-            bank_linked: false
-          })
-          .select()
-          .single();
-
-        if (orgError) throw new Error('خطأ في إنشاء المنظمة: ' + orgError.message);
-
-        // 2. تحديث الملف الشخصي
-        const { error: profileError } = await db
-          .from('profiles')
-          .update({
-            organization_id: orgData.id,
-            phone: pendingPhone,
-            country: country,
-            role: 'admin'
-          })
-          .eq('id', session.user.id);
-
-        if (profileError) throw new Error('خطأ في تحديث الملف: ' + profileError.message);
-
-        // 3. مسح البيانات المؤقتة
-        localStorage.removeItem('pending_org_name');
-        localStorage.removeItem('pending_phone');
-
-        // 4. التوجيه إلى صفحة الاشتراك
-        window.location.replace('/subscription.html');
-        return;
-
-      } catch (err) {
-        if (errBox) {
-          errBox.textContent = err.message;
-          errBox.style.display = 'block';
-        }
-        if (successBox) successBox.style.display = 'none';
-        if (form) form.style.display = 'block'; // إعادة إظهار النموذج في حال الخطأ
-        localStorage.removeItem('pending_org_name');
-        localStorage.removeItem('pending_phone');
-        return;
-      }
+    // 2. محاولة فورية (في حال كانت الجلسة جاهزة)
+    const { data: { session } } = await db.auth.getSession();
+    if (session?.user) {
+      processOrganization(session.user);
     } else {
-      // إذا انتهى الوقت ولم نجد الجلسة
-      if (errBox) {
-        errBox.textContent = 'تعذر قراءة الجلسة من Google. يرجى المحاولة مرة أخرى.';
-        errBox.style.display = 'block';
-      }
-      if (successBox) successBox.style.display = 'none';
-      if (form) form.style.display = 'block';
-      localStorage.removeItem('pending_org_name');
-      localStorage.removeItem('pending_phone');
-      return;
+      // 3. مهلة احتياطية: إذا لم يحدث شيء خلال 8 ثوانٍ، نعيد النموذج
+      setTimeout(() => {
+        if (!isProcessing) {
+          if (successBox) successBox.style.display = 'none';
+          if (form) form.style.display = 'block';
+          if (errBox) {
+            errBox.textContent = 'انتهت مهلة الاتصال. يرجى المحاولة مرة أخرى.';
+            errBox.style.display = 'block';
+          }
+          localStorage.removeItem('pending_org_name');
+          localStorage.removeItem('pending_phone');
+        }
+      }, 8000);
     }
+    return;
   }
 
   // ============================================
-  // ✅ الجزء الثاني: عرض النموذج للمستخدم الجديد
+  // الجزء الثاني: عرض النموذج (مستخدم جديد)
   // ============================================
   if (form) form.style.display = 'block';
   if (errBox) errBox.style.display = 'none';
@@ -177,7 +194,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   // ============================================
-  // ✅ الجزء الثالث: معالجة زر "متابعة" (حفظ ثم إطلاق Google)
+  // الجزء الثالث: معالجة زر "متابعة" (حفظ ثم إطلاق Google)
   // ============================================
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -197,12 +214,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     localStorage.setItem('pending_org_name', orgName);
     localStorage.setItem('pending_phone', phone);
 
-    // إطلاق Google (التوجيه سيعود إلى هذه الصفحة نفسها)
+    // إطلاق Google
     try {
       const { error } = await db.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          // ✅ التوجيه يعود إلى هذه الصفحة نفسها
           redirectTo: window.location.origin + '/complete-profile.html',
           scopes: 'https://www.googleapis.com/auth/userinfo.email'
         }
