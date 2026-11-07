@@ -4,6 +4,9 @@
 document.addEventListener('DOMContentLoaded', async () => {
   if (window.applyLanguage) await window.applyLanguage();
 
+  // ✅ السطر السحري: يجبر Supabase على قراءة الجلسة من الرابط وحفظها فوراً
+  await db.auth.getSession();
+
   // ✅ قائمة اختيار البلد
   const countryPicker = document.getElementById('country-picker');
   const countryTrigger = document.getElementById('country-trigger');
@@ -67,12 +70,11 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
     });
 
-    // تعبئة القائمة بمجرد فتح الصفحة
     buildCountryDropdown();
     updateCountryDisplay();
   }
 
-  // ✅ معالجة زر "متابعة" فقط
+  // ✅ معالجة زر "متابعة"
   const form = document.getElementById('complete-form');
   const errBox = document.getElementById('comp-error');
   const successBox = document.getElementById('comp-success');
@@ -92,7 +94,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     btn.querySelector('span').textContent = 'جارٍ الحفظ...';
 
     try {
-      // ✅ الآن نقرأ الجلسة (ستكون جاهزة لأن المستخدم أخذ وقتاً في ملء البيانات)
+      // ✅ قراءة الجلسة للتأكد من وجود المستخدم
       const { data: { user } } = await db.auth.getUser();
       if (!user) throw new Error('انتهت الجلسة. يرجى تسجيل الدخول مرة أخرى.');
 
