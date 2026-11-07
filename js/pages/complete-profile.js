@@ -1,5 +1,5 @@
 // ============================================
-// صفحة إكمال البيانات (State Machine)
+// صفحة إكمال البيانات (State Machine - النسخة النهائية)
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   if (window.applyLanguage) await window.applyLanguage();
@@ -18,8 +18,11 @@ document.addEventListener('DOMContentLoaded', async () => {
   const countryDropdown = document.getElementById('country-dropdown');
   const countryCodeInput = document.getElementById('country_code');
 
-  // 2. التحقق من وجود المستخدم (إذا لم يوجد، البوابة ستتكفل به)
-  const { data: { user } } = await db.auth.getUser();
+  // 2. ✅ انتظار الجلسة عالمياً (بدلاً من getCurrentUser المباشر)
+  // هذا يمنع الطرد إذا كانت الجلسة لم تجهز بعد
+  const session = await window.authReadyPromise;
+  const user = session?.user;
+
   if (!user) {
     window.location.replace('/login.html');
     return;
@@ -93,6 +96,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const phone = document.getElementById('phone').value.trim();
     const country = localStorage.getItem('app_country') || 'MA';
 
+    // التحقق من الحقول
     if (!orgName) { errBox.textContent = 'اسم المنظمة مطلوب'; errBox.style.display = 'block'; return; }
     if (!country) { errBox.textContent = 'الرجاء اختيار البلد'; errBox.style.display = 'block'; return; }
     if (!phone || phone.length < 8) { errBox.textContent = 'رقم الهاتف مطلوب (8 أرقام على الأقل)'; errBox.style.display = 'block'; return; }
@@ -102,7 +106,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     errBox.style.display = 'none';
 
     try {
-      // 1. جلب المنظمة التي أنشأها الـ Trigger
+      // 1. جلب المنظمة التي أنشأها الـ Trigger تلقائياً
       const { data: profile, error: profileFetchErr } = await db
         .from('profiles')
         .select('organization_id')
@@ -142,14 +146,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       if (updateErr) throw new Error('خطأ في تحديث الملف: ' + updateErr.message);
 
-      // 4. النجاح! العودة إلى البوابة (لوحة التحكم) لتقرر الخطوة التالية
+      // 4. النجاح! العودة إلى لوحة التحكم (البوابة ستقرر الخطوة التالية)
       if (successBox) {
         successBox.textContent = '✅ تم حفظ البيانات! جارٍ التحويل...';
         successBox.style.display = 'block';
       }
 
       setTimeout(() => {
-        // نعود إلى لوحة التحكم، والبوابة ستوجهنا لصفحة الاشتراك
         window.location.replace('/dashboard.html');
       }, 1000);
 

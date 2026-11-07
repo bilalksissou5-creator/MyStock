@@ -9,7 +9,6 @@ async function login(email, password) {
   return { ok: true, user: data.user };
 }
 
-// ✅ توجيه Google مباشرة للوحة التحكم (البوابة ستتولى الباقي)
 async function signInWithGoogle() {
   try {
     const { error } = await db.auth.signInWithOAuth({
@@ -37,35 +36,6 @@ async function getCurrentUser() {
   return data?.user ?? null;
 }
 
-// ✅ قراءة الجلسة بشكل موثوق (تنتظر معالجة OAuth)
-async function getSessionRobust() {
-  // محاولة قراءة الجلسة الحالية
-  const { data: { session: current } } = await db.auth.getSession();
-  if (current) return current;
-
-  // إذا لم توجد، نستمع لأحداث Supabase (ستُطلق بعد معالجة الرابط)
-  return new Promise((resolve) => {
-    let resolved = false;
-    
-    const { data: { subscription } } = db.auth.onAuthStateChange((event, session) => {
-      if (!resolved) {
-        resolved = true;
-        subscription.unsubscribe();
-        resolve(session);
-      }
-    });
-
-    // مهلة احتياطية 5 ثوانٍ
-    setTimeout(() => {
-      if (!resolved) {
-        resolved = true;
-        subscription.unsubscribe();
-        resolve(null);
-      }
-    }, 5000);
-  });
-}
-
 // ============================================
 // 🚦 البوابة الذكية (Router)
 // ============================================
@@ -82,8 +52,10 @@ async function requireAuth() {
     return null;
   }
 
-  // 2. قراءة الجلسة (تنتظر OAuth)
-  const session = await getSessionRobust();
+  // 2. ✅ انتظار الجلسة عالمياً (هذا يحل مشكلة طرد المستخدم قبل قراءة الجلسة)
+  console.log('[Guard] Waiting for auth session...');
+  const session = await window.authReadyPromise;
+  console.log('[Guard] Session:', session?.user?.email || 'none');
 
   // 3. لا توجد جلسة → صفحة الدخول
   if (!session) {
@@ -107,13 +79,13 @@ async function requireAuth() {
     .eq('id', user.id)
     .single();
 
-  // 6. المرحلة الأولى: لم يكمل البيانات → صفحة إكمال البيانات
+  // 6. لم يكمل البيانات → صفحة إكمال البيانات
   if (!profile?.onboarding_completed) {
     window.location.replace('/complete-profile.html');
     return user;
   }
 
-  // 7. المرحلة الثانية: التحقق من الاشتراك
+  // 7. التحقق من الاشتراك
   const { data: sub } = await db
     .from('subscriptions')
     .select('status, expires_at')
@@ -133,7 +105,6 @@ async function requireAuth() {
     return user;
   }
 
-  // 8. كل شيء سليم → اسمح بالمرور
   return user;
 }
 
