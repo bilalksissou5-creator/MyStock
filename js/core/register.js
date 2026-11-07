@@ -1,18 +1,117 @@
 // ============================================
 // صفحة إنشاء حساب جديد
-// ✅ يقرأ البلد واللغة من localStorage (welcome.html)
+// ✅ اكتشاف تلقائي للبلد
 // ✅ يطبق اللغة تلقائياً
 // ✅ يُنشئ subscriptions بحالة pending
 // ✅ يُحوّل إلى subscription.html بعد التسجيل
 // ✅ منع Enter/Go/Done من إرسال الفورم
 // ✅ حفظ رقم الهاتف واللغة في Supabase
 // ============================================
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
 
   // ✅ تطبيق اللغة
-  if (window.applyLanguage) window.applyLanguage();
+  if (window.applyLanguage) await window.applyLanguage();
 
-  // إظهار/إخفاء كلمات السر
+  // ============================================
+  // ✅ إعدادات قائمة اختيار البلد
+  // ============================================
+  const countryPicker = document.getElementById('country-picker');
+  const countryTrigger = document.getElementById('country-trigger');
+  const countryFlag = document.getElementById('country-flag');
+  const countryName = document.getElementById('country-name');
+  const countryDropdown = document.getElementById('country-dropdown');
+  const countryCodeInput = document.getElementById('country_code');
+
+  if (countryPicker && countryTrigger) {
+    async function detectCountry() {
+      const saved = localStorage.getItem('app_country');
+      if (saved && window.countries?.[saved]) return saved;
+
+      const browserRegion = (navigator.language || '').split('-')[1];
+      if (browserRegion && window.countries?.[browserRegion.toUpperCase()]) {
+        return browserRegion.toUpperCase();
+      }
+
+      try {
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 2000);
+        const res = await fetch('https://ipapi.co/json/', { signal: controller.signal });
+        clearTimeout(timeout);
+
+        if (res.ok) {
+          const data = await res.json();
+          const code = (data.country_code || '').toUpperCase();
+          if (code && window.countries?.[code]) return code;
+        }
+      } catch (e) {}
+
+      return 'MA';
+    }
+
+    let selectedCountry = await detectCountry();
+
+    function buildCountryDropdown() {
+      const countriesObj = window.countries || {};
+      const currentLangCode = window.getCurrentLang ? window.getCurrentLang() : 'ar';
+
+      countryDropdown.innerHTML = Object.keys(countriesObj).map(code => {
+        const c = countriesObj[code];
+        const name = c[currentLangCode] || c.ar;
+        const flag = name.match(/\p{Emoji}/u)?.[0] || '🌍';
+        const nameText = name.replace(/\p{Emoji}/gu, '').trim();
+
+        return `
+          <button type="button" class="picker-option" data-country="${code}">
+            <span class="picker-flag">${flag}</span>
+            <span class="picker-name">${nameText}</span>
+            <i class="fas fa-check picker-check"></i>
+          </button>
+        `;
+      }).join('');
+
+      countryDropdown.querySelectorAll('.picker-option').forEach(opt => {
+        opt.addEventListener('click', () => {
+          selectedCountry = opt.dataset.country;
+          updateCountryDisplay();
+          countryPicker.classList.remove('open');
+        });
+      });
+    }
+
+    function updateCountryDisplay() {
+      if (!selectedCountry) return;
+      const name = window.tCountry ? window.tCountry(selectedCountry) : selectedCountry;
+      const flag = name.match(/\p{Emoji}/u)?.[0] || '🌍';
+      const nameText = name.replace(/\p{Emoji}/gu, '').trim();
+
+      countryFlag.textContent = flag;
+      countryName.textContent = nameText;
+      countryCodeInput.value = selectedCountry;
+      localStorage.setItem('app_country', selectedCountry);
+
+      countryDropdown.querySelectorAll('.picker-option').forEach(opt => {
+        opt.classList.toggle('active', opt.dataset.country === selectedCountry);
+      });
+    }
+
+    countryTrigger.addEventListener('click', (e) => {
+      e.stopPropagation();
+      countryPicker.classList.toggle('open');
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!countryPicker.contains(e.target)) {
+        countryPicker.classList.remove('open');
+      }
+    });
+
+    buildCountryDropdown();
+    updateCountryDisplay();
+  }
+
+  // ============================================
+  // ✅ إظهار/إخفاء كلمات السر
+  // ============================================
   document.querySelectorAll('.toggle-password').forEach(btn => {
     btn.addEventListener('click', () => {
       const targetId = btn.dataset.target;
@@ -27,13 +126,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const form = document.getElementById('register-form');
   if (!form) return;
-
-  // ✅ إذا لم يُختر البلد، أعد المستخدم إلى welcome.html
-  const country = localStorage.getItem('app_country');
-  if (!country) {
-    window.location.href = '/welcome.html';
-    return;
-  }
 
   // ✅ منع Enter / Go / Done من إرسال الفورم
   form.querySelectorAll('input').forEach(input => {
@@ -62,12 +154,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const password = document.getElementById('password').value;
     const passwordConfirm = document.getElementById('password_confirm').value;
     
-    // ✅ قراءة رقم الهاتف من الحقل
     const phoneInput = document.getElementById('phone');
     const phone = phoneInput ? phoneInput.value.trim() : '';
-
-    // ✅ قراءة اللغة المختارة
     const appLang = localStorage.getItem('app_lang') || 'ar';
+    const country = localStorage.getItem('app_country');
 
     // ✅ التحقق من الحقول
     if (!firstName || !lastName) {
@@ -82,7 +172,12 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    // ✅ التحقق من رقم الهاتف
+    if (!country) {
+      errBox.textContent = 'الرجاء اختيار البلد';
+      errBox.style.display = 'block';
+      return;
+    }
+
     if (!phone) {
       errBox.textContent = 'رقم الهاتف مطلوب';
       errBox.style.display = 'block';
@@ -145,6 +240,8 @@ document.addEventListener('DOMContentLoaded', () => {
         name: orgName,
         owner_id: userId,
         country: country,
+        daily_rate: 0,
+        bank_linked: false
       })
       .select()
       .single();
@@ -157,7 +254,7 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    // 3. تحديث الملف الشخصي (✅ حفظ الهاتف + اللغة)
+    // 3. تحديث الملف الشخصي
     const { error: profileError } = await db
       .from('profiles')
       .update({
@@ -166,7 +263,7 @@ document.addEventListener('DOMContentLoaded', () => {
         role: 'admin',
         country: country,
         phone: phone,
-        app_lang: appLang, // ✅ حفظ اللغة هنا
+        app_lang: appLang,
       })
       .eq('id', userId);
 
@@ -198,7 +295,6 @@ document.addEventListener('DOMContentLoaded', () => {
     successBox.textContent = '✅ تم إنشاء الحساب! جارٍ تحويلك...';
     successBox.style.display = 'block';
 
-    // ✅ التحويل إلى صفحة الاشتراك
     setTimeout(() => {
       window.location.href = '/subscription.html';
     }, 1500);
