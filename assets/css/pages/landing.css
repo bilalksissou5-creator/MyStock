@@ -72,13 +72,13 @@ body.landing-page {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  height: 38px;              /* ✅ الارتفاع الثابت والمشترك */
-  padding: 0 12px;           /* ✅ إلغاء أي مساحة علوية أو سفلية تسبب اختلاف الطول */
-  box-sizing: border-box;    /* ✅ لضمان أن الإطار لا يزيد من الحجم */
+  height: 38px;
+  padding: 0 12px;
+  box-sizing: border-box;
   border-radius: 10px;
   font-size: 14px;
   font-weight: 600;
-  line-height: 1;            /* ✅ منع الخط من تمديد الزر */
+  line-height: 1;
   text-decoration: none;
 }
 
@@ -134,6 +134,7 @@ body.landing-page {
   font-size: 14px;
 }
 
+/* ✅ تحديث القائمة المنسدلة لضمان عرض مناسب */
 .lang-switcher select {
   appearance: none;
   -webkit-appearance: none;
@@ -145,10 +146,13 @@ body.landing-page {
   color: #171717;
   cursor: pointer;
   outline: none;
-  padding: 0;
   margin: 0;
-  height: 100%;              /* ✅ ملء ارتفاع الحاوية بالكامل */
+  height: 100%;
   text-align: center;
+  
+  /* ✅ الإضافات الجديدة لضمان ظهور القائمة بعرض مناسب */
+  min-width: 70px; 
+  padding: 0 8px; 
 }
 
 .lang-switcher select::-ms-expand {
@@ -777,7 +781,7 @@ body.landing-page {
   }
 
   .landing-btn-login, .landing-btn-register {
-    border-width: 1.5px !important; /* تقليل سمك الإطار قليلاً للشاشات الصغيرة */
+    border-width: 1.5px !important;
   }
 
   .lang-switcher {
