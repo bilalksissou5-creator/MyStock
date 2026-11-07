@@ -5,6 +5,7 @@
 // ✅ دعم كامل للترجمة + إشعار إضافة بطاقة
 // ✅ إصلاح اتجاه العملة (LTR) في البطاقات والمبالغ
 // ✅ معالجة البيانات المعلقة القادمة من Google (إن وجدت)
+// ✅ إضافة بطاقة بنكية (وهمية) عند نجاح الدفع لتظهر في صفحة البطاقة
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   const user = await getCurrentUser();
@@ -28,7 +29,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   const pendingPhone = localStorage.getItem('pending_phone');
 
   if (pendingOrg && pendingPhone) {
-    // عرض رسالة تحميل
     container.innerHTML = `
       <div class="sub-box" style="text-align:center; padding:60px 24px;">
         <div class="sub-icon" style="background:#dcfce7; margin:0 auto 20px; width:80px; height:80px; border-radius:50%; display:flex; align-items:center; justify-content:center;">
@@ -42,7 +42,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     try {
       const pendingCountry = localStorage.getItem('app_country') || 'MA';
 
-      // 1. جلب المنظمة الحالية
       const { data: currentProfile } = await db
         .from('profiles')
         .select('organization_id')
@@ -51,7 +50,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       let orgId = currentProfile?.organization_id;
 
-      // 2. تحديث أو إنشاء المنظمة
       if (orgId) {
         await db.from('organizations').update({ name: pendingOrg, country: pendingCountry }).eq('id', orgId);
       } else {
@@ -64,7 +62,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         orgId = newOrg.id;
       }
 
-      // 3. تحديث الملف الشخصي
       const { error: profileErr } = await db.from('profiles')
         .update({
           phone: pendingPhone,
@@ -76,7 +73,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       if (profileErr) throw new Error(profileErr.message);
 
-      // 4. مسح البيانات المعلقة
       localStorage.removeItem('pending_org_name');
       localStorage.removeItem('pending_phone');
 
@@ -162,6 +158,30 @@ document.addEventListener('DOMContentLoaded', async () => {
         </div>
       `;
       return;
+    }
+
+    // ✅ إضافة بطاقة بنكية (وهمية) لتظهر في صفحة البطاقة
+    // (لأن Gumroad لا يشارك تفاصيل البطاقة الحقيقية)
+    try {
+      const { data: existingCard } = await db
+        .from('bank_cards')
+        .select('id')
+        .eq('profile_id', user.id)
+        .maybeSingle();
+
+      if (!existingCard) {
+        await db.from('bank_cards').insert({
+          profile_id: user.id,
+          organization_id: profile.organization_id,
+          last4: '4242', // رقم وهمي
+          brand: 'Visa', // نوع وهمي
+          holder: profile.full_name || 'User',
+          expiry: '12/29',
+          active: true
+        });
+      }
+    } catch (e) {
+      console.warn('Could not insert mock card:', e);
     }
 
     // ✅✅✅ إضافة إشعار إضافة بطاقة جديدة هنا
@@ -305,24 +325,19 @@ document.addEventListener('DOMContentLoaded', async () => {
       `}
     `;
 
-    // ✅ الضغط على البطاقة → تحديد
     container.querySelectorAll('.plan-card').forEach(card => {
       card.addEventListener('click', (e) => {
         if (e.target.closest('.plan-btn')) return;
-
         container.querySelectorAll('.plan-card').forEach(c => c.classList.remove('selected'));
         card.classList.add('selected');
       });
     });
 
-    // ✅ أزرار الاشتراك
     container.querySelectorAll('[data-plan]').forEach(btn => {
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
-
         const planId = btn.dataset.plan;
         const link = PLAN_LINKS[planId];
-
         const card = btn.closest('.plan-card');
         container.querySelectorAll('.plan-card').forEach(c => c.classList.remove('selected'));
         card.classList.add('selected');
