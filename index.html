@@ -287,6 +287,17 @@
   
   <script>
     document.addEventListener('DOMContentLoaded', async () => {
+      // ✅ السحر: التحقق من الجلسة قبل عرض أي شيء
+      // إذا كان المستخدم مسجلاً بالفعل، نوجهه فوراً إلى لوحة التحكم
+      if (window.authReadyPromise) {
+        const session = await window.authReadyPromise;
+        if (session?.user) {
+          window.location.replace('/dashboard.html');
+          return;
+        }
+      }
+
+      // إذا لم يكن مسجلاً، نكمل تحميل صفحة الهبوط
       if (window.applyLanguage) await window.applyLanguage();
 
       // ✅ تشغيل قائمة اللغة المخصصة
@@ -342,7 +353,7 @@
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('/sw.js')
           .then(reg => console.log('✅ SW registered:', reg.scope))
-          .catch(err => console.warn('❌ SW registration failed:', err));
+          .catch(err => console.warn('❌ SW Registration failed:', err));
       });
     }
   </script>
