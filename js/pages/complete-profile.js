@@ -1,30 +1,10 @@
 // ============================================
-// صفحة إكمال البيانات (لحسابات Google الجديدة)
+// صفحة إكمال البيانات (ثابتة 100%)
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   if (window.applyLanguage) await window.applyLanguage();
 
-  // ✅ الانتظار قليلاً حتى تُحمّل قائمة البلدان من i18n.js
-  await new Promise(r => setTimeout(r, 500));
-
-  // ✅ محاولة قراءة الجلسة عدة مرات (بدون طرد المستخدم)
-  let user = null;
-  for (let i = 0; i < 20; i++) {
-    const { data } = await db.auth.getUser();
-    if (data?.user) {
-      user = data.user;
-      break;
-    }
-    await new Promise(r => setTimeout(r, 500));
-  }
-
-  if (!user) {
-    document.getElementById('comp-error').textContent = 'تعذر قراءة الجلسة. يرجى تحديث الصفحة أو المحاولة مرة أخرى.';
-    document.getElementById('comp-error').style.display = 'block';
-    return;
-  }
-
-  // ✅ إعدادات قائمة اختيار البلد
+  // ✅ قائمة اختيار البلد
   const countryPicker = document.getElementById('country-picker');
   const countryTrigger = document.getElementById('country-trigger');
   const countryFlag = document.getElementById('country-flag');
@@ -38,11 +18,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     function buildCountryDropdown() {
       const countriesObj = window.countries || {};
       const currentLangCode = window.getCurrentLang ? window.getCurrentLang() : 'ar';
-
-      if (Object.keys(countriesObj).length === 0) {
-        countryDropdown.innerHTML = '<div style="padding:10px; text-align:center; color:#999;">جاري تحميل البلدان...</div>';
-        return;
-      }
 
       countryDropdown.innerHTML = Object.keys(countriesObj).map(code => {
         const c = countriesObj[code];
@@ -72,12 +47,10 @@ document.addEventListener('DOMContentLoaded', async () => {
       const name = window.tCountry ? window.tCountry(selectedCountry) : selectedCountry;
       const flag = name.match(/\p{Emoji}/u)?.[0] || '🌍';
       const nameText = name.replace(/\p{Emoji}/gu, '').trim();
-
       countryFlag.textContent = flag;
       countryName.textContent = nameText;
       countryCodeInput.value = selectedCountry;
       localStorage.setItem('app_country', selectedCountry);
-
       countryDropdown.querySelectorAll('.picker-option').forEach(opt => {
         opt.classList.toggle('active', opt.dataset.country === selectedCountry);
       });
@@ -94,17 +67,12 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
     });
 
+    // تعبئة القائمة بمجرد فتح الصفحة
     buildCountryDropdown();
-    // إعادة بناء القائمة إذا كانت فارغة بعد لحظة (في حال تأخر التحميل)
-    setTimeout(() => {
-      if (countryDropdown.children.length === 1 && countryDropdown.children[0].tagName === 'DIV') {
-        buildCountryDropdown();
-      }
-      updateCountryDisplay();
-    }, 1000);
+    updateCountryDisplay();
   }
 
-  // ✅ معالجة إرسال النموذج
+  // ✅ معالجة زر "متابعة" فقط
   const form = document.getElementById('complete-form');
   const errBox = document.getElementById('comp-error');
   const successBox = document.getElementById('comp-success');
@@ -124,6 +92,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     btn.querySelector('span').textContent = 'جارٍ الحفظ...';
 
     try {
+      // ✅ الآن نقرأ الجلسة (ستكون جاهزة لأن المستخدم أخذ وقتاً في ملء البيانات)
+      const { data: { user } } = await db.auth.getUser();
+      if (!user) throw new Error('انتهت الجلسة. يرجى تسجيل الدخول مرة أخرى.');
+
+      // 1. إنشاء المنظمة
       const { data: orgData, error: orgError } = await db
         .from('organizations')
         .insert({
@@ -138,6 +111,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       if (orgError) throw new Error('خطأ في إنشاء المنظمة: ' + orgError.message);
 
+      // 2. تحديث الملف الشخصي
       const { error: profileError } = await db
         .from('profiles')
         .update({
