@@ -5,8 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>MyStock - Login</title>
 
+  <!-- ✅ منع جوجل من فهرسة صفحة تسجيل الدخول -->
   <meta name="robots" content="noindex, nofollow">
 
+  <!-- ✅ تطبيق اللغة والاتجاه فوراً قبل أي CSS لمنع وميض اللغة -->
   <script>
     (function() {
       var lang = localStorage.getItem('app_lang') || 'ar';
@@ -15,8 +17,8 @@
     })();
   </script>
 
-  <link rel="stylesheet" href="/assets/css/common.css?v=14">
-  <link rel="stylesheet" href="/assets/css/pages/login.css?v=14">
+  <link rel="stylesheet" href="/assets/css/common.css?v=15">
+  <link rel="stylesheet" href="/assets/css/pages/login.css?v=15">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 <body class="login-page">
@@ -49,18 +51,20 @@
     <div class="auth-footer">
       <p data-i18n="login_no_account">ليس لديك حساب؟</p>
       
+      <!-- ✅ زر إنشاء حساب جديد -->
       <a href="/register.html" class="btn-secondary" style="width:100%; justify-content:center;">
         <i class="fas fa-user-plus"></i>
         <span data-i18n="login_create_account">إنشاء حساب جديد</span>
       </a>
 
+      <!-- ✅ فاصل "أو" -->
       <div style="margin: 15px 0; text-align: center; color: #a3a3a3; font-size: 13px; display: flex; align-items: center; gap: 10px;">
         <span style="flex: 1; height: 1px; background: #e5e5e5;"></span>
         <span>أو</span>
         <span style="flex: 1; height: 1px; background: #e5e5e5;"></span>
       </div>
 
-      <!-- ✅ زر Google يفتح صفحة إكمال البيانات أولاً -->
+      <!-- ✅ زر Google: رابط مباشر يفتح صفحة إكمال البيانات أولاً -->
       <a href="/complete-profile.html" class="btn-secondary" style="width:100%; justify-content:center; display: flex; align-items: center; gap: 10px; background: white; border: 1px solid #d4d4d4; color: #171717; text-decoration: none;">
         <svg width="18" height="18" viewBox="0 0 24 24">
           <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -74,14 +78,18 @@
   </form>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="/js/core/supabase.js"></script>
-  <script src="/js/core/i18n.js?v=14"></script>
-  <script src="/js/core/auth.js?v=14"></script>
+  <script src="/js/core/supabase.js?v=15"></script>
+  <script src="/js/core/i18n.js?v=15"></script>
+  <script src="/js/core/auth.js?v=15"></script>
   
   <script>
     document.addEventListener('DOMContentLoaded', async () => {
-      if (window.applyLanguage) await window.applyLanguage();
+      // ننتظر تطبيق الترجمة
+      if (window.applyLanguage) {
+        await window.applyLanguage();
+      }
 
+      // كود إظهار/إخفاء كلمة المرور
       const toggleBtn = document.getElementById('toggle-password');
       const passwordInput = document.getElementById('password');
       
