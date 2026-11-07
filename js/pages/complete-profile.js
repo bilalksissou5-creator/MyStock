@@ -1,5 +1,5 @@
 // ============================================
-// صفحة إكمال البيانات (توجه مباشرة إلى الاشتراك)
+// صفحة إكمال البيانات (حفظ مباشر في قاعدة البيانات)
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   if (window.applyLanguage) await window.applyLanguage();
@@ -7,6 +7,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const form = document.getElementById('complete-form');
   const btn = document.getElementById('complete-btn');
   const errBox = document.getElementById('comp-error');
+  const successBox = document.getElementById('comp-success');
   
   const countryPicker = document.getElementById('country-picker');
   const countryTrigger = document.getElementById('country-trigger');
@@ -15,7 +16,19 @@ document.addEventListener('DOMContentLoaded', async () => {
   const countryDropdown = document.getElementById('country-dropdown');
   const countryCodeInput = document.getElementById('country_code');
 
+  // ✅ انتظار الجلسة (المستخدم مسجل دخول بالفعل عبر Google)
+  const session = await window.authReadyPromise;
+  const user = session?.user;
+
+  // إذا لم توجد جلسة، العودة لصفحة الدخول
+  if (!user) {
+    window.location.replace('/login.html');
+    return;
+  }
+
+  // ============================================
   // تعبئة قائمة البلد
+  // ============================================
   if (countryPicker && countryTrigger) {
     let selectedCountry = localStorage.getItem('app_country') || 'MA';
 
@@ -75,7 +88,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     updateCountryDisplay();
   }
 
-  // زر المتابعة
+  // ============================================
+  // معالجة زر "متابعة" (حفظ مباشر بدون Google)
+  // ============================================
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
 
@@ -83,30 +98,68 @@ document.addEventListener('DOMContentLoaded', async () => {
     const phone = document.getElementById('phone').value.trim();
     const country = localStorage.getItem('app_country') || 'MA';
 
+    // التحقق من الحقول
     if (!orgName) { errBox.textContent = 'اسم المنظمة مطلوب'; errBox.style.display = 'block'; return; }
     if (!country) { errBox.textContent = 'الرجاء اختيار البلد'; errBox.style.display = 'block'; return; }
     if (!phone || phone.length < 8) { errBox.textContent = 'رقم الهاتف مطلوب (8 أرقام على الأقل)'; errBox.style.display = 'block'; return; }
 
     btn.disabled = true;
-    btn.querySelector('span').textContent = 'جارٍ الاتصال بـ Google...';
+    btn.querySelector('span').textContent = 'جارٍ الحفظ...';
+    errBox.style.display = 'none';
+    successBox.style.display = 'none';
 
-    // حفظ البيانات مؤقتاً (ستُستخدم في subscription.js بعد العودة)
-    localStorage.setItem('pending_org_name', orgName);
-    localStorage.setItem('pending_phone', phone);
-    localStorage.setItem('app_country', country);
-
-    // ✅ التوجيه المباشر إلى صفحة الاشتراك بعد Google
     try {
-      const { error } = await db.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          redirectTo: window.location.origin + '/subscription.html',
-          scopes: 'https://www.googleapis.com/auth/userinfo.email'
-        }
-      });
-      if (error) throw error;
+      // 1. جلب المنظمة التي أنشأها الـ Trigger تلقائياً عند تسجيل Google
+      const { data: profile, error: profileErr } = await db
+        .from('profiles')
+        .select('organization_id')
+        .eq('id', user.id)
+        .single();
+
+      if (profileErr) throw new Error('تعذر جلب بيانات المستخدم: ' + profileErr.message);
+
+      let orgId = profile?.organization_id;
+
+      // 2. تحديث أو إنشاء المنظمة
+      if (orgId) {
+        const { error: orgErr } = await db
+          .from('organizations')
+          .update({ name: orgName, country: country })
+          .eq('id', orgId);
+        if (orgErr) throw new Error('خطأ في تحديث المنظمة: ' + orgErr.message);
+      } else {
+        const { data: newOrg, error: createErr } = await db
+          .from('organizations')
+          .insert({ name: orgName, owner_id: user.id, country: country, daily_rate: 0, bank_linked: false })
+          .select()
+          .single();
+        if (createErr) throw new Error('خطأ في إنشاء المنظمة: ' + createErr.message);
+        orgId = newOrg.id;
+      }
+
+      // 3. تحديث الملف الشخصي وتعيين onboarding_completed = true
+      const { error: updateErr } = await db
+        .from('profiles')
+        .update({
+          phone: phone,
+          country: country,
+          organization_id: orgId,
+          onboarding_completed: true // ✅ المفتاح السحري الذي يفتح باقي التطبيق
+        })
+        .eq('id', user.id);
+
+      if (updateErr) throw new Error('خطأ في تحديث الملف: ' + updateErr.message);
+
+      // 4. النجاح! التوجيه إلى صفحة الاشتراك
+      successBox.textContent = '✅ تم حفظ البيانات! جارٍ تحويلك إلى صفحة الاشتراك...';
+      successBox.style.display = 'block';
+      
+      setTimeout(() => {
+        window.location.replace('/subscription.html');
+      }, 1000);
+
     } catch (err) {
-      errBox.textContent = 'خطأ: ' + err.message;
+      errBox.textContent = err.message;
       errBox.style.display = 'block';
       btn.disabled = false;
       btn.querySelector('span').textContent = 'متابعة';

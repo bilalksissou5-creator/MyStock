@@ -7,40 +7,34 @@ const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 const { createClient } = supabase;
 const db = createClient(SUPABASE_URL, SUPABASE_KEY, {
   auth: {
-    detectSessionInUrl: true,
-    persistSession: true,
-    autoRefreshToken: true,
-    flowType: 'implicit',
+    detectSessionInUrl: true,       // يقرأ الجلسة من الرابط بعد Google
+    persistSession: true,           // يحفظ الجلسة في المتصفح
+    autoRefreshToken: true,         // يجدد الجلسة تلقائياً
+    flowType: 'implicit',           // إجبار التدفق الضمني (حل مشكلة 4/0A)
     storage: window.localStorage,
     storageKey: 'mystock-auth-token'
   }
 });
 
-// ✅ وعد عالمي محصّن: لا يُحل بـ null مبكراً، وينتظر معالجة OAuth
+// ✅ وعد عالمي: لا يُحل إلا عندما تصبح الجلسة جاهزة
 window.authReadyPromise = new Promise((resolve) => {
   let resolved = false;
   const finish = (session) => {
     if (resolved) return;
     resolved = true;
-    console.log('[Auth Ready] Resolved:', session?.user?.email || 'no session');
     resolve(session);
   };
 
-  // 1. الاستماع لحدث المصادقة (يُطلق عند معالجة رابط OAuth)
+  // 1. الاستماع لأول حدث مصادقة
   db.auth.onAuthStateChange((event, session) => {
-    console.log('[Auth Event]', event, session?.user?.email || '');
     if (session) finish(session);
   });
 
-  // 2. محاولات احتياطية (في حال كان الحدث قد أُطلق قبل الاستماع)
-  [500, 1500, 3000].forEach(delay => {
-    setTimeout(async () => {
-      if (resolved) return;
-      const { data } = await db.auth.getSession();
-      if (data?.session) finish(data.session);
-    }, delay);
+  // 2. محاولة قراءة الجلسة فوراً (إذا كانت موجودة مسبقاً)
+  db.auth.getSession().then(({ data }) => {
+    if (data?.session) finish(data.session);
   });
 
-  // 3. مهلة نهائية: 10 ثوانٍ
-  setTimeout(() => finish(null), 10000);
+  // 3. مهلة احتياطية 8 ثوانٍ
+  setTimeout(() => finish(null), 8000);
 });

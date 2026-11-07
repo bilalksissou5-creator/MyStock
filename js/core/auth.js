@@ -19,6 +19,7 @@ async function signInWithGoogle() {
     const { error } = await db.auth.signInWithOAuth({
       provider: 'google',
       options: {
+        // ✅ نوجه دائماً إلى لوحة التحكم، والبوابة ستقرر الخطوة التالية
         redirectTo: window.location.origin + '/dashboard.html',
         scopes: 'https://www.googleapis.com/auth/userinfo.email'
       }
@@ -41,7 +42,7 @@ async function logout() {
 }
 
 // ============================================
-// ✅ جلب المستخدم الحالي (مع الانتظار للجلسة)
+// ✅ جلب المستخدم الحالي (مع انتظار الجلسة)
 // ============================================
 async function getCurrentUser() {
   // ننتظر الوعد العالمي أولاً (authReadyPromise)
@@ -59,7 +60,6 @@ async function getCurrentUser() {
 // ============================================
 async function requireAuth() {
   const currentPage = window.location.pathname;
-  console.log('[Guard] Page:', currentPage);
 
   // 1. الصفحات العامة (لا تحتاج جلسة)
   if (
@@ -69,18 +69,18 @@ async function requireAuth() {
     currentPage === '/' ||
     currentPage.includes('index.html')
   ) {
-    console.log('[Guard] Public page - skipping');
     return null;
   }
 
   // 2. انتظار الجلسة
   const user = await getCurrentUser();
   if (!user) {
-    console.log('[Guard] No user - redirecting to login');
     window.location.replace('/login.html');
     return null;
   }
-  console.log('[Guard] User:', user.email);
+
+  await setOnline(user.id);
+  startHeartbeat(user.id);
 
   // 3. جلب حالة المستخدم من قاعدة البيانات
   const { data: profile } = await db
@@ -89,24 +89,19 @@ async function requireAuth() {
     .eq('id', user.id)
     .single();
 
-  console.log('[Guard] Onboarding:', profile?.onboarding_completed);
-  await setOnline(user.id);
-  startHeartbeat(user.id);
-
   // 4. المرحلة الأولى: لم يكمل البيانات
   if (!profile?.onboarding_completed) {
-    // ✅ نسمح بالمرور في صفحات معينة (لتجنب الحلقة المفرغة)
+    // نسمح بالمرور في الصفحات التالية (لتجنب الحلقات المفرغة)
     const allowedPages = ['complete-profile.html', 'subscription.html', 'bank-card.html'];
     const isAllowed = allowedPages.some(p => currentPage.includes(p));
     
     if (!isAllowed) {
-      console.log('[Guard] Onboarding not done - redirecting to complete-profile');
       window.location.replace('/complete-profile.html');
     }
     return user;
   }
 
-  // 5. المرحلة الثانية: التحقق من الاشتراك
+  // 5. المرحلة الثانية: التحقق من الاشتراك (باستثناء صفحة الاشتراك والبطاقة)
   if (!currentPage.includes('subscription.html') && !currentPage.includes('bank-card.html')) {
     const { data: sub } = await db
       .from('subscriptions')
@@ -117,16 +112,13 @@ async function requireAuth() {
     const isActive = sub?.status === 'active' && 
                      (!sub.expires_at || new Date(sub.expires_at) > new Date());
 
-    console.log('[Guard] Subscription:', sub?.status || 'none');
-
     if (!isActive) {
-      console.log('[Guard] No active subscription - redirecting to subscription');
       window.location.replace('/subscription.html');
       return user;
     }
   }
 
-  console.log('[Guard] All checks passed');
+  // 6. كل شيء سليم → اسمح بالمرور
   return user;
 }
 
@@ -154,7 +146,7 @@ async function setOffline(userId) {
 }
 
 // ============================================
-// Heartbeat
+// Heartbeat (تحديث آخر نشاط)
 // ============================================
 let heartbeatInterval = null;
 function startHeartbeat(userId) {
@@ -200,6 +192,7 @@ document.addEventListener('DOMContentLoaded', () => {
         btn.disabled = false;
         btn.querySelector('span').textContent = 'دخول';
       } else {
+        // بعد الدخول، البوابة ستعرف أين توجهه
         window.location.href = '/dashboard.html';
       }
     });
