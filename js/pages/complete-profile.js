@@ -1,92 +1,41 @@
 // ============================================
-// صفحة إكمال البيانات (تعتمد على URL لنقل البيانات)
+// صفحة إكمال البيانات (البوابة النهائية)
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   if (window.applyLanguage) await window.applyLanguage();
 
+  // 1. جلب العناصر
+  const form = document.getElementById('complete-form');
+  const btn = document.getElementById('complete-btn');
+  const errBox = document.getElementById('comp-error');
+  const successBox = document.getElementById('comp-success');
+  
+  // عناصر قائمة البلد
   const countryPicker = document.getElementById('country-picker');
   const countryTrigger = document.getElementById('country-trigger');
   const countryFlag = document.getElementById('country-flag');
   const countryName = document.getElementById('country-name');
   const countryDropdown = document.getElementById('country-dropdown');
   const countryCodeInput = document.getElementById('country_code');
-  const form = document.getElementById('complete-form');
-  const errBox = document.getElementById('comp-error');
-  const successBox = document.getElementById('comp-success');
-  const btn = document.getElementById('complete-btn');
 
-  // ✅ قراءة البيانات من الرابط أولاً، ثم من localStorage كاحتياط
-  const urlParams = new URLSearchParams(window.location.search);
-  const pendingOrg = urlParams.get('org') || localStorage.getItem('pending_org_name');
-  const pendingPhone = urlParams.get('phone') || localStorage.getItem('pending_phone');
-  const pendingCountry = urlParams.get('country') || localStorage.getItem('app_country') || 'MA';
-
-  let isProcessing = false;
-
-  // ============================================
-  // دالة حفظ البيانات في قاعدة البيانات
-  // ============================================
-  async function saveDataToDatabase(user) {
-    if (isProcessing) return;
-    isProcessing = true;
-
-    if (form) form.style.display = 'none';
-    if (errBox) errBox.style.display = 'none';
-    if (successBox) {
-      successBox.textContent = '✅ جارٍ حفظ بيانات المنظمة...';
-      successBox.style.display = 'block';
-    }
-
-    try {
-      // أ. تحديث المنظمة
-      const { error: orgError } = await db
-        .from('organizations')
-        .update({ name: pendingOrg, country: pendingCountry })
-        .eq('owner_id', user.id);
-
-      if (orgError) throw new Error('خطأ في تحديث المنظمة: ' + orgError.message);
-
-      // ب. تحديث الملف الشخصي
-      const { error: profileError } = await db
-        .from('profiles')
-        .update({
-          phone: pendingPhone,
-          country: pendingCountry,
-          onboarding_completed: true // ✅ المفتاح السحري
-        })
-        .eq('id', user.id);
-
-      if (profileError) throw new Error('خطأ في تحديث الملف: ' + profileError.message);
-
-      // ج. مسح البيانات المؤقتة
-      localStorage.removeItem('pending_org_name');
-      localStorage.removeItem('pending_phone');
-
-      // د. التوجيه إلى صفحة الاشتراك
-      window.location.replace('/subscription.html');
-
-    } catch (err) {
-      alert('فشل الحفظ! السبب: ' + err.message); // سيظهر لك الخطأ بوضوح
-      if (successBox) successBox.style.display = 'none';
-      if (form) form.style.display = 'block';
-      if (errBox) {
-        errBox.textContent = err.message;
-        errBox.style.display = 'block';
-      }
-      isProcessing = false;
-    }
-  }
+  // قراءة البيانات المؤقتة
+  const pendingOrg = localStorage.getItem('pending_org_name');
+  const pendingPhone = localStorage.getItem('pending_phone');
+  const pendingCountry = localStorage.getItem('app_country') || 'MA';
 
   // ============================================
   // الحالة الثانية: العودة من Google
   // ============================================
   if (pendingOrg && pendingPhone) {
+    // إخفاء النموذج وإظهار رسالة التحميل
     if (form) form.style.display = 'none';
+    if (errBox) errBox.style.display = 'none';
     if (successBox) {
       successBox.textContent = '✅ جارٍ التحقق من حسابك...';
       successBox.style.display = 'block';
     }
 
+    // ننتظر الجلسة بصبر (حتى 5 ثوانٍ)
     let session = null;
     for (let i = 0; i < 10; i++) {
       const { data } = await db.auth.getSession();
@@ -97,21 +46,54 @@ document.addEventListener('DOMContentLoaded', async () => {
       await new Promise(r => setTimeout(r, 500));
     }
 
-    if (session?.user) {
-      await saveDataToDatabase(session.user);
-    } else {
-      if (successBox) successBox.style.display = 'none';
-      if (form) form.style.display = 'block';
-      if (errBox) {
-        errBox.textContent = 'تعذر قراءة الجلسة. يرجى المحاولة مرة أخرى.';
-        errBox.style.display = 'block';
+    if (session) {
+      try {
+        // 1. تحديث المنظمة (التي أنشأها الـ Trigger)
+        const { error: orgError } = await db
+          .from('organizations')
+          .update({ name: pendingOrg, country: pendingCountry })
+          .eq('owner_id', session.user.id);
+
+        if (orgError) throw new Error('خطأ في تحديث المنظمة: ' + orgError.message);
+
+        // 2. تحديث الملف الشخصي وتعيين onboarding_completed = true
+        const { error: profileError } = await db
+          .from('profiles')
+          .update({
+            phone: pendingPhone,
+            country: pendingCountry,
+            onboarding_completed: true
+          })
+          .eq('id', session.user.id);
+
+        if (profileError) throw new Error('خطأ في تحديث الملف: ' + profileError.message);
+
+        // 3. مسح البيانات المؤقتة
+        localStorage.removeItem('pending_org_name');
+        localStorage.removeItem('pending_phone');
+
+        // 4. التوجيه إلى صفحة الاشتراك
+        if (successBox) successBox.textContent = '✅ تم الحفظ! جارٍ تحويلك...';
+        window.location.replace('/subscription.html');
+
+      } catch (err) {
+        alert('فشل الحفظ: ' + err.message);
+        if (form) form.style.display = 'block';
+        if (successBox) successBox.style.display = 'none';
+        if (errBox) { errBox.textContent = err.message; errBox.style.display = 'block'; }
       }
+    } else {
+      alert('تعذر قراءة الجلسة بعد الانتظار. يرجى المحاولة مرة أخرى.');
+      if (form) form.style.display = 'block';
+      if (successBox) successBox.style.display = 'none';
+      localStorage.removeItem('pending_org_name');
+      localStorage.removeItem('pending_phone');
     }
-    return;
+    return; // ننهي التنفيذ هنا
   }
 
   // ============================================
-  // الحالة الأولى: مستخدم جديد
+  // الحالة الأولى: مستخدم جديد (عرض النموذج)
   // ============================================
   if (form) form.style.display = 'block';
   if (errBox) errBox.style.display = 'none';
@@ -177,7 +159,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     updateCountryDisplay();
   }
 
-  // معالجة زر "متابعة"
+  // معالجة زر "متابعة" (للمستخدم الجديد)
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
 
@@ -192,18 +174,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     btn.disabled = true;
     btn.querySelector('span').textContent = 'جارٍ الاتصال بـ Google...';
 
-    // حفظ في localStorage كاحتياط
+    // حفظ البيانات مؤقتاً في المتصفح
     localStorage.setItem('pending_org_name', orgName);
     localStorage.setItem('pending_phone', phone);
 
-    // ✅ إرسال البيانات عبر الرابط لضمان عدم ضياعها
-    const redirectUrl = window.location.origin + '/complete-profile.html?org=' + encodeURIComponent(orgName) + '&phone=' + encodeURIComponent(phone) + '&country=' + encodeURIComponent(country);
-
+    // إطلاق Google
     try {
       const { error } = await db.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: redirectUrl,
+          redirectTo: window.location.origin + '/complete-profile.html',
           scopes: 'https://www.googleapis.com/auth/userinfo.email'
         }
       });
