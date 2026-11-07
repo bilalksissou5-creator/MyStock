@@ -4,6 +4,9 @@
 document.addEventListener('DOMContentLoaded', async () => {
   if (window.applyLanguage) await window.applyLanguage();
 
+  // ✅ الانتظار قليلاً حتى يقرأ Supabase الجلسة من الرابط
+  await new Promise(r => setTimeout(r, 1000));
+
   // التحقق من وجود مستخدم مسجل
   const { data: { user } } = await db.auth.getUser();
   if (!user) {
