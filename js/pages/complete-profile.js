@@ -138,6 +138,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         orgId = newOrg.id;
       }
 
+      // استخراج رابط الصورة من بيانات Google
+      const googleAvatar = user.user_metadata?.avatar_url || user.user_metadata?.picture;
+      
       // 3. تحديث الملف الشخصي وتعيين onboarding_completed = true
       const { error: updateErr } = await db
         .from('profiles')
@@ -145,9 +148,10 @@ document.addEventListener('DOMContentLoaded', async () => {
           phone: phone,
           country: country,
           organization_id: orgId,
-          onboarding_completed: true
-        })
-        .eq('id', user.id);
+          onboarding_completed: true,
+          avatar_url: googleAvatar || null // ✅ حفظ صورة Google
+      })
+      .eq('id', user.id);
 
       if (updateErr) throw new Error('خطأ في تحديث الملف: ' + updateErr.message);
 
