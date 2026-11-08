@@ -28,7 +28,7 @@ async function logout() {
   const { data: { user } } = await db.auth.getUser();
   if (user) await setOffline(user.id);
   await db.auth.signOut();
-  window.location.href = '/login.html';
+  window.location.href = '/index.html';
 }
 
 async function getCurrentUser() {
