@@ -1,11 +1,19 @@
 // ============================================
 // صفحة البطاقة البنكية (Lemon Squeezy)
 // ✅ تقرأ وتكتب من جدول bank_cards المنفصل
+// ✅ تعمل مع جميع المستخدمين (Google / بريد إلكتروني)
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
-  const user = await requireAuth();
-  if (!user) return;
+  // ✅ 1. انتظار الجلسة بشكل صارم (يحل مشكلة Google)
+  const session = await window.authReadyPromise;
+  const user = session?.user;
 
+  if (!user) {
+    window.location.replace('/login.html');
+    return;
+  }
+
+  // ✅ 2. رسم الهيكل
   renderLayout('profile.html');
 
   if (window.applyLanguage) window.applyLanguage();
@@ -14,21 +22,28 @@ document.addEventListener('DOMContentLoaded', async () => {
   document.title = tr('bc_title_full');
 
   const main = document.getElementById('main-content');
+  if (!main) return;
 
-  // ✅ جلب البيانات الأساسية للمستخدم
-  const { data: profile } = await db
+  // ✅ 3. جلب البيانات الأساسية (بأمان)
+  const { data: profile, error: profileErr } = await db
     .from('profiles')
     .select('organization_id, full_name, role')
     .eq('id', user.id)
-    .single();
+    .maybeSingle();
 
-  // ✅ جلب البطاقة من الجدول الجديد (RLS يمنع أي شخص آخر من قراءتها)
-  const { data: card } = await db
+  if (profileErr) console.error('Profile fetch error:', profileErr);
+
+  // ✅ 4. جلب البطاقة من جدول bank_cards
+  const { data: card, error: cardErr } = await db
     .from('bank_cards')
     .select('*')
     .eq('profile_id', user.id)
     .maybeSingle();
 
+  if (cardErr) console.error('Card fetch error:', cardErr);
+  console.log('✅ Card Data:', card);
+
+  // ✅ 5. جلب الاشتراك
   let subscription = null;
   if (profile?.organization_id) {
     const { data: sub } = await db
@@ -39,6 +54,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     subscription = sub;
   }
 
+  // دوال مساعدة
   const errBox = document.createElement('div');
   errBox.className = 'alert alert-error';
   errBox.style.display = 'none';
@@ -74,7 +90,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   function render() {
-    // ✅ قراءة من card بدلاً من profile
     const hasCard = !!card?.last4;
     const isActive = card?.active !== false;
 
@@ -112,7 +127,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     wrapper.className = 'bank-card-wrapper';
 
     if (hasCard) {
-      // ✅ استخدام أعمدة الجدول الجديد
       const last4 = card.last4;
       const brand = card.brand || 'Card';
       const holder = card.holder || '—';
@@ -219,7 +233,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     main.appendChild(wrapper);
 
-    // ✅ زر إلغاء التفعيل - يحدث جدول bank_cards
+    // ✅ زر إلغاء التفعيل
     document.getElementById('deactivate-btn')?.addEventListener('click', async () => {
       if (!confirm(tr('bc_confirm_deactivate'))) return;
 
@@ -264,7 +278,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
     });
 
-    // ✅ زر إعادة التفعيل - يحدث جدول bank_cards
+    // ✅ زر إعادة التفعيل
     document.getElementById('reactivate-btn')?.addEventListener('click', async () => {
       const btn = document.getElementById('reactivate-btn');
       btn.disabled = true;
