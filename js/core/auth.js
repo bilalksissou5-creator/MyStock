@@ -13,7 +13,6 @@ async function signInWithGoogle() {
     const { error } = await db.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        // ✅ التعديل هنا: التوجيه إلى صفحة العبور بدلاً من dashboard
         redirectTo: window.location.origin + '/auth-callback.html',
         scopes: 'https://www.googleapis.com/auth/userinfo.email'
       }
@@ -52,7 +51,7 @@ async function requireAuth() {
     currentPage.includes('login.html') ||
     currentPage.includes('register.html') ||
     currentPage.includes('complete-profile.html') ||
-    currentPage.includes('auth-callback.html') || // ✅ تمت الإضافة
+    currentPage.includes('auth-callback.html') ||
     currentPage === '/' ||
     currentPage.includes('index.html')
   ) {
@@ -60,7 +59,16 @@ async function requireAuth() {
   }
 
   // 2. انتظار الجلسة
-  const user = await getCurrentUser();
+  let user = await getCurrentUser();
+  
+  // ✅ الإصلاح 1: إذا لم نجد مستخدم (لأن الهاتف كان في الخلفية)، نحاول تحديث الجلسة قسرياً
+  if (!user) {
+    const { data: { session } } = await db.auth.refreshSession();
+    if (session?.user) {
+      user = session.user;
+    }
+  }
+
   if (!user) {
     window.location.replace('/login.html');
     return null;
@@ -111,10 +119,8 @@ async function requireAuth() {
     const expiresAt = sub?.expires_at ? new Date(sub.expires_at) : null;
     const isExpired = expiresAt && expiresAt < new Date();
     
-    // ✅ الاشتراك نشط إذا كانت الحالة "active" ولم تنته صلاحيته
     const isActive = status === 'active' && !isExpired;
 
-    // إذا لم يكن مشتركاً، نوجهه إلى الاشتراك
     if (!isActive) {
       window.location.replace('/subscription.html');
       return user;
@@ -149,7 +155,7 @@ async function setOffline(userId) {
 }
 
 // ============================================
-// ✅ Heartbeat محسّن (تحديث last_active_at + offline عند الإغلاق/الإخفاء)
+// ✅ Heartbeat محسّن
 // ============================================
 let heartbeatInterval = null;
 function startHeartbeat(userId) {
@@ -164,7 +170,6 @@ function startHeartbeat(userId) {
     } catch (e) { console.warn(e); }
   }, 30000);
 
-  // عند إغلاق الصفحة: offline فوري
   window.addEventListener('beforeunload', () => {
     if (heartbeatInterval) clearInterval(heartbeatInterval);
     db.from('profiles')
@@ -172,7 +177,6 @@ function startHeartbeat(userId) {
       .eq('id', userId);
   });
 
-  // عند إخفاء التبويب: offline — عند العودة: online
   document.addEventListener('visibilitychange', () => {
     if (document.hidden) {
       db.from('profiles')
@@ -187,13 +191,12 @@ function startHeartbeat(userId) {
 }
 
 // ============================================
-// ✅ فحص حالة الاتصال (يُستخدم في profile.js وغيره)
+// ✅ فحص حالة الاتصال
 // ============================================
 function isUserOnline(profile) {
   if (!profile) return false;
   if (profile.status !== 'online') return false;
   if (!profile.last_active_at) return false;
-  // إذا لم يُحدّث last_active_at خلال آخر دقيقتين → يعتبر offline (جلسة ميتة)
   const diff = Date.now() - new Date(profile.last_active_at).getTime();
   return diff < 2 * 60 * 1000;
 }
@@ -223,7 +226,6 @@ document.addEventListener('DOMContentLoaded', () => {
         btn.disabled = false;
         btn.querySelector('span').textContent = 'دخول';
       } else {
-        // ✅ التعديل هنا أيضاً: التوجيه إلى صفحة العبور بعد الدخول بالبريد
         window.location.href = '/auth-callback.html';
       }
     });
@@ -237,4 +239,24 @@ document.addEventListener('DOMContentLoaded', () => {
   document.querySelectorAll('.logout').forEach(b => {
     b.addEventListener('click', logout);
   });
+});
+
+// ============================================
+// ✅ الإصلاح 2: تحديث الجلسة فوراً عند العودة للتطبيق من الخلفية
+// ============================================
+document.addEventListener('visibilitychange', async () => {
+  if (document.visibilityState === 'visible') {
+    const currentPage = window.location.pathname;
+    // لا نطبق هذا في صفحات تسجيل الدخول أو الصفحة الرئيسية
+    if (currentPage.includes('login.html') || currentPage.includes('index.html') || currentPage === '/') return;
+
+    const { data: { session } } = await db.auth.getSession();
+    if (!session) {
+      // محاولة أخيرة لتحديث الجلسة
+      const { data: { session: refreshed } } = await db.auth.refreshSession();
+      if (!refreshed) {
+        window.location.replace('/login.html');
+      }
+    }
+  }
 });
