@@ -200,24 +200,25 @@ document.addEventListener('DOMContentLoaded', async () => {
              <span>${tr('bc_inactive')}</span>
            </div>`;
 
-      // ✅ التعديل هنا: زر "إضافة بطاقة جديدة" يفتح رابط Gumroad
-      const actions = isActive
-        ? `<button type="button" class="btn-danger full-width" id="deactivate-btn">
-             <i class="fas fa-ban"></i>
-             <span>${tr('bc_deactivate')}</span>
-           </button>
-           <a href="${getGumroadUrl()}" class="btn-secondary full-width" style="margin-top:8px;">
-             <i class="fas fa-plus"></i>
-             <span>${tr('bc_add_new')}</span>
-           </a>`
-        : `<button type="button" class="btn-primary full-width" id="reactivate-btn">
-             <i class="fas fa-check"></i>
-             <span>${tr('bc_reactivate')}</span>
-           </button>
-           <a href="${getGumroadUrl()}" class="btn-secondary full-width" style="margin-top:8px;">
-             <i class="fas fa-plus"></i>
-             <span>${tr('bc_add_new')}</span>
-           </a>`;
+      // ✅ التعديل الجوهري هنا: 
+      // إذا كانت نشطة -> زر إلغاء التفعيل
+      // إذا كانت ملغاة -> زر إضافة بطاقة جديدة (يربط بـ Gumroad)
+      let actions = '';
+      if (isActive) {
+        actions = `
+          <button type="button" class="btn-danger full-width" id="deactivate-btn">
+            <i class="fas fa-ban"></i>
+            <span>${tr('bc_deactivate')}</span>
+          </button>
+        `;
+      } else {
+        actions = `
+          <a href="${getGumroadUrl()}" class="btn-primary full-width" style="margin-top:8px;">
+            <i class="fas fa-plus"></i>
+            <span>${tr('bc_add_new')}</span>
+          </a>
+        `;
+      }
 
       wrapper.innerHTML = `
         <div class="bank-card-container">
@@ -282,8 +283,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         </div>
 
         <div class="bank-card-actions">
-          <!-- ✅ التعديل هنا: زر "اشترك الآن" يوجه لصفحة الباقات -->
-          <a href="/subscription.html" class="btn-primary full-width">
+          <a href="/subscription.html?change=1" class="btn-primary full-width">
             <i class="fas fa-credit-card"></i>
             <span>${tr('bc_subscribe_now')}</span>
           </a>
@@ -334,42 +334,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         showSuccess(tr('bc_deactivated'));
-        setTimeout(() => render(), 800);
-      }
-    });
-
-    // ✅ زر إعادة التفعيل
-    document.getElementById('reactivate-btn')?.addEventListener('click', async () => {
-      const btn = document.getElementById('reactivate-btn');
-      btn.disabled = true;
-      btn.querySelector('span').textContent = tr('pe_saving');
-
-      const { error } = await db
-        .from('bank_cards')
-        .update({
-          active: true,
-          deactivated_at: null,
-          warning_sent: 0,
-        })
-        .eq('profile_id', user.id);
-
-      if (profile?.organization_id) {
-        await db
-          .from('organizations')
-          .update({ payment_blocked: false })
-          .eq('id', profile.organization_id);
-      }
-
-      if (error) {
-        showError(error.message);
-        btn.disabled = false;
-        btn.querySelector('span').textContent = tr('bc_reactivate');
-      } else {
-        card.active = true;
-        card.deactivated_at = null;
-        card.warning_sent = 0;
-
-        showSuccess(tr('bc_reactivated'));
         setTimeout(() => render(), 800);
       }
     });
