@@ -957,6 +957,15 @@ const translations = {
     rcpt_cancel: 'إلغاء الإيصال',
     rcpt_cancel_confirm: 'هل أنت متأكد من إلغاء هذا الإيصال؟\nسيتم حذف الإيصال وإرجاع الكميات إلى المخزون.',
     rcpt_cancelled: '✅ تم إلغاء الإيصال وإرجاع المنتجات للمخزون بنجاح.',
+
+    auth_cb_checking: 'جاري التحقق من حسابك...',
+    auth_cb_wait: 'يرجى الانتظار لحظة.',
+    auth_cb_success: 'تم تسجيل الدخول بنجاح!',
+    auth_cb_fail: 'فشل تسجيل الدخول',
+    auth_cb_no_session: 'لم يتم العثور على جلسة نشطة',
+    auth_cb_error: 'خطأ في النظام',
+    auth_cb_reason: 'السبب: ',
+    auth_cb_unknown_err: 'خطأ غير معروف',
   },
 
   fr: {
@@ -1904,6 +1913,15 @@ const translations = {
     rcpt_cancel: 'Annuler le reçu',
     rcpt_cancel_confirm: 'Êtes-vous sûr de vouloir annuler ce reçu ?\nLe reçu sera supprimé et les quantités remises en stock.',
     rcpt_cancelled: '✅ Reçu annulé et stock restauré avec succès.',
+
+    auth_cb_checking: 'Vérification de votre compte...',
+    auth_cb_wait: 'Veuillez patienter un instant.',
+    auth_cb_success: 'Connexion réussie !',
+    auth_cb_fail: 'Échec de la connexion',
+    auth_cb_no_session: 'Aucune session active trouvée',
+    auth_cb_error: 'Erreur système',
+    auth_cb_reason: 'Raison : ',
+    auth_cb_unknown_err: 'Erreur inconnue',
   },
 
   en: {
@@ -2852,6 +2870,15 @@ const translations = {
     
     rcpt_cancel_confirm: 'Are you sure you want to cancel this receipt?\nThe receipt will be deleted and quantities returned to stock.',
     rcpt_cancelled: '✅ Receipt cancelled and stock restored successfully.',
+
+    auth_cb_checking: 'Checking your account...',
+    auth_cb_wait: 'Please wait a moment.',
+    auth_cb_success: 'Logged in successfully!',
+    auth_cb_fail: 'Login failed',
+    auth_cb_no_session: 'No active session found',
+    auth_cb_error: 'System error',
+    auth_cb_reason: 'Reason: ',
+    auth_cb_unknown_err: 'Unknown error',
   },
 
   
@@ -2900,7 +2927,7 @@ let dbTranslations = {};
 
 // ✅ اسم كاش جديد تماماً v7 لمسح أي ذكريات قديمة
 function getCacheKey(lang) {
-  return `app_translations_v202611091339_${lang}`; 
+  return `app_translations_v8_${lang}`; 
 }
 
 // 1. قراءة الكاش فوراً
