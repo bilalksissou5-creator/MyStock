@@ -1,6 +1,6 @@
 // ============================================
 // معالجة تسجيل الدخول عبر Google (Callback)
-// ✅ يفحص حالة المستخدم ويوجهه للمكان الصحيح + ترجمة كاملة
+// ✅ يفحص حالة المستخدم ويوجهه للمكان الصحيح + استرجاع آخر جلسة
 // ============================================
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -27,7 +27,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
 
-  // 1. التحقق من وجود أخطاء في الرابط
+  // 1. التحقق من وجود أخطاء في الرابط (مثل رفض المستخدم للوصول)
   const hashParams = new URLSearchParams(window.location.hash.substring(1));
   const queryParams = new URLSearchParams(window.location.search);
   
@@ -48,7 +48,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         return;
       }
 
-      // 3. جلب حالة إكمال البيانات
+      // 3. جلب حالة إكمال البيانات من جدول profiles
       const { data: profile } = await db
         .from('profiles')
         .select('onboarding_completed')
@@ -60,8 +60,20 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       // 4. التوجيه الذكي
       if (profile?.onboarding_completed) {
-        window.location.replace('/dashboard.html');
+        
+        // ✅ البحث عن آخر صفحة تمت زيارتها
+        const lastVisitedPage = localStorage.getItem('mystock_last_visited_page');
+        
+        if (lastVisitedPage && lastVisitedPage !== '/index.html' && lastVisitedPage !== '/auth-callback.html' && lastVisitedPage !== '/') {
+          // العودة إلى نفس الصفحة التي أغلق فيها المستخدم التطبيق
+          window.location.replace(lastVisitedPage);
+        } else {
+          // إذا لم توجد صفحة سابقة، التوجه للوحة التحكم
+          window.location.replace('/dashboard.html');
+        }
+        
       } else {
+        // إذا لم يكمل البيانات، يذهب لصفحة إكمال البيانات
         window.location.replace('/complete-profile.html');
       }
 

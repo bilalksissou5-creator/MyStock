@@ -28,6 +28,10 @@ async function logout() {
   const { data: { user } } = await db.auth.getUser();
   if (user) await setOffline(user.id);
   await db.auth.signOut();
+  
+  // ✅ مسح آخر صفحة عند تسجيل الخروج (حتى لا تعود عند فتح التطبيق مجدداً)
+  localStorage.removeItem('mystock_last_visited_page');
+  
   window.location.href = '/index.html';
 }
 
@@ -61,7 +65,7 @@ async function requireAuth() {
   // 2. انتظار الجلسة
   let user = await getCurrentUser();
   
-  // ✅ الإصلاح 1: إذا لم نجد مستخدم (لأن الهاتف كان في الخلفية)، نحاول تحديث الجلسة قسرياً
+  // ✅ الإصلاح: إذا لم نجد مستخدم (لأن الهاتف كان في الخلفية)، نحاول تحديث الجلسة قسرياً
   if (!user) {
     const { data: { session } } = await db.auth.refreshSession();
     if (session?.user) {
@@ -125,6 +129,12 @@ async function requireAuth() {
       window.location.replace('/subscription.html');
       return user;
     }
+  }
+
+  // ✅ حفظ آخر صفحة قام المستخدم بزيارتها (لتذكرها عند فتح التطبيق لاحقاً)
+  if (!currentPage.includes('login.html') && !currentPage.includes('auth-callback.html') && !currentPage.includes('index.html')) {
+    const fullUrl = window.location.pathname + window.location.search;
+    localStorage.setItem('mystock_last_visited_page', fullUrl);
   }
 
   // 6. كل شيء سليم → اسمح بالمرور
@@ -242,17 +252,15 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // ============================================
-// ✅ الإصلاح 2: تحديث الجلسة فوراً عند العودة للتطبيق من الخلفية
+// ✅ الإصلاح: تحديث الجلسة فوراً عند العودة للتطبيق من الخلفية
 // ============================================
 document.addEventListener('visibilitychange', async () => {
   if (document.visibilityState === 'visible') {
     const currentPage = window.location.pathname;
-    // لا نطبق هذا في صفحات تسجيل الدخول أو الصفحة الرئيسية
     if (currentPage.includes('login.html') || currentPage.includes('index.html') || currentPage === '/') return;
 
     const { data: { session } } = await db.auth.getSession();
     if (!session) {
-      // محاولة أخيرة لتحديث الجلسة
       const { data: { session: refreshed } } = await db.auth.refreshSession();
       if (!refreshed) {
         window.location.replace('/login.html');

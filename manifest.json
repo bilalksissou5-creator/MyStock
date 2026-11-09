@@ -3,7 +3,7 @@
   "name": "MyStock",
   "short_name": "MyStock",
   "description": "نظام إدارة المخزون والمبيعات",
-  "start_url": "/index.html",
+  "start_url": "/auth-callback.html",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#ffffff",
