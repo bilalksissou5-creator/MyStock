@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>جاري تسجيل الدخول...</title>
+  <title>MyStock - Auth</title>
   
   <link rel="stylesheet" href="/assets/css/pages/auth-callback.css?v=1">
 </head>
@@ -11,19 +11,20 @@
   
   <div class="auth-callback-box">
     <div class="auth-spinner" id="spinner"></div>
-    <h2 id="msg">جاري التحقق من حسابك...</h2>
-    <p id="submsg">يرجى الانتظار لحظة.</p>
+    
+    <!-- ✅ تم إضافة data-i18n هنا ليتم ترجمتها تلقائياً -->
+    <h2 id="msg">
+      <span data-i18n="auth_cb_checking">جاري التحقق من حسابك...</span>
+      <br>
+      <span style="font-size: 13px; color: #888; font-weight: normal;" data-i18n="auth_cb_wait">يرجى الانتظار لحظة.</span>
+    </h2>
+    
     <div id="error-details" class="auth-callback-error"></div>
   </div>
 
-  <!-- تحميل المكتبات الأساسية -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="/js/core/supabase.js"></script>
-  
-  <!-- ✅ تحميل ملف الترجمة -->
   <script src="/js/core/i18n.js"></script>
-  
-  <!-- تحميل ملف المعالجة الخاص بالصفحة -->
   <script src="/js/pages/auth-callback.js?v=2"></script>
 </body>
 </html>
