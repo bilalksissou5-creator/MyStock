@@ -954,6 +954,9 @@ const translations = {
 
     login_google: 'المتابعة باستخدام Google',
     login_or: 'أو',
+    rcpt_cancel: 'إلغاء الإيصال',
+    rcpt_cancel_confirm: 'هل أنت متأكد من إلغاء هذا الإيصال؟\nسيتم حذف الإيصال وإرجاع الكميات إلى المخزون.',
+    rcpt_cancelled: '✅ تم إلغاء الإيصال وإرجاع المنتجات للمخزون بنجاح.',
   },
 
   fr: {
@@ -1897,6 +1900,10 @@ const translations = {
     sub_feat_support_247: "Support 24/7",
     login_google: 'Continuer avec Google',
     login_or: 'Ou',
+
+    rcpt_cancel: 'Annuler le reçu',
+    rcpt_cancel_confirm: 'Êtes-vous sûr de vouloir annuler ce reçu ?\nLe reçu sera supprimé et les quantités remises en stock.',
+    rcpt_cancelled: '✅ Reçu annulé et stock restauré avec succès.',
   },
 
   en: {
@@ -2841,6 +2848,10 @@ const translations = {
 
     login_google: 'Continue with Google',
     login_or: 'Or',
+    rcpt_cancel: 'Cancel Receipt',
+    
+    rcpt_cancel_confirm: 'Are you sure you want to cancel this receipt?\nThe receipt will be deleted and quantities returned to stock.',
+    rcpt_cancelled: '✅ Receipt cancelled and stock restored successfully.',
   },
 
   
