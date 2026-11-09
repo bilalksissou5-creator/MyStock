@@ -146,21 +146,54 @@ async function setOffline(userId) {
   } catch (e) { console.warn(e); }
 }
 
+// ============================================
+// ✅ Heartbeat محسّن (تحديث last_active_at + offline عند الإغلاق/الإخفاء)
+// ============================================
 let heartbeatInterval = null;
 function startHeartbeat(userId) {
   if (!userId) return;
   if (heartbeatInterval) clearInterval(heartbeatInterval);
+
   heartbeatInterval = setInterval(async () => {
     try {
       await db.from('profiles')
-        .update({ last_active_at: new Date().toISOString() })
+        .update({ last_active_at: new Date().toISOString(), status: 'online' })
         .eq('id', userId);
     } catch (e) { console.warn(e); }
   }, 30000);
-  
-  window.addEventListener('beforeunload', () => { 
-    if (heartbeatInterval) clearInterval(heartbeatInterval); 
+
+  // عند إغلاق الصفحة: offline فوري
+  window.addEventListener('beforeunload', () => {
+    if (heartbeatInterval) clearInterval(heartbeatInterval);
+    db.from('profiles')
+      .update({ status: 'offline', last_active_at: new Date().toISOString() })
+      .eq('id', userId);
   });
+
+  // عند إخفاء التبويب: offline — عند العودة: online
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+      db.from('profiles')
+        .update({ status: 'offline', last_active_at: new Date().toISOString() })
+        .eq('id', userId);
+    } else {
+      db.from('profiles')
+        .update({ status: 'online', last_active_at: new Date().toISOString() })
+        .eq('id', userId);
+    }
+  });
+}
+
+// ============================================
+// ✅ فحص حالة الاتصال (يُستخدم في profile.js وغيره)
+// ============================================
+function isUserOnline(profile) {
+  if (!profile) return false;
+  if (profile.status !== 'online') return false;
+  if (!profile.last_active_at) return false;
+  // إذا لم يُحدّث last_active_at خلال آخر دقيقتين → يعتبر offline (جلسة ميتة)
+  const diff = Date.now() - new Date(profile.last_active_at).getTime();
+  return diff < 2 * 60 * 1000;
 }
 
 // ============================================
