@@ -479,7 +479,16 @@ document.addEventListener('DOMContentLoaded', async () => {
       const { error: itemsErr } = await db.from('receipt_items').insert(receiptItems);
       if (itemsErr) throw new Error(tr('mout_err_items') + ' ' + itemsErr.message);
 
-      const movements = addedProducts.map(p => ({ organization_id: prof.organization_id, product_id: p.id, type: 'out', method: 'manual', quantity: Number(p.qty), performed_by: authUser.id }));
+      // ✅ التعديل هنا: ربط الحركة برقم الإيصال (receipt_id)
+      const movements = addedProducts.map(p => ({ 
+        organization_id: prof.organization_id, 
+        product_id: p.id, 
+        receipt_id: newReceipt.id, // <--- ربط الحركة بالإيصال
+        type: 'out', 
+        method: 'manual', 
+        quantity: Number(p.qty), 
+        performed_by: authUser.id 
+      }));
       const { error: moveError } = await db.from('stock_movements').insert(movements);
       if (moveError) throw new Error(tr('mout_err_movements') + ' ' + moveError.message);
 
@@ -506,7 +515,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
       }
 
-      // ✅ إشعار المخزون المنخفض (بدون تحديد صورة يدوياً)
+      // ✅ إشعار المخزون المنخفض (مترجم) مع صورة تنبيه
       if (lowStockAlerts.length > 0 && typeof notifyOrganization === 'function') {
         try {
           const alertLines = lowStockAlerts
@@ -531,7 +540,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         } catch (e) { console.warn('low stock alert failed:', e); }
       }
 
-      // ✅ إشعار البيع (بدون تحديد صورة يدوياً)
+      // ✅ إشعار البيع
       if (typeof notifyOrganization === 'function') {
         try {
           await notifyOrganization({ 

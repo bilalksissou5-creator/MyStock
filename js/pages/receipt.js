@@ -130,7 +130,7 @@ function renderReceipt({ receipt, items }) {
         <span>${tr('rcpt_print')}</span>
       </button>
       
-      <!-- ✅ زر إلغاء الإيصال الجديد -->
+      <!-- ✅ زر إلغاء الإيصال -->
       <button type="button" id="btn-cancel-receipt" class="btn-secondary" 
               style="background:#fee2e2; color:#dc2626; border-color:#fca5a5; width:100%; justify-content:center; margin-top: 10px;"
               onclick="cancelReceipt('${receipt.id}')">
@@ -158,7 +158,16 @@ async function cancelReceipt(receiptId) {
   }
 
   try {
-    // 1. جلب عناصر الإيصال
+    // 1. جلب تفاصيل الإيصال
+    const { data: receipt, error: rcptErr } = await db
+      .from('receipts')
+      .select('*')
+      .eq('id', receiptId)
+      .single();
+
+    if (rcptErr) throw rcptErr;
+
+    // 2. جلب عناصر الإيصال
     const { data: items, error: itemsErr } = await db
       .from('receipt_items')
       .select('product_id, qty')
@@ -166,7 +175,7 @@ async function cancelReceipt(receiptId) {
 
     if (itemsErr) throw itemsErr;
 
-    // 2. إرجاع الكميات للمنتجات في المخزون
+    // 3. إرجاع الكمية للمنتج في المخزون
     if (items && items.length > 0) {
       for (const item of items) {
         if (!item.product_id) continue;
@@ -184,15 +193,32 @@ async function cancelReceipt(receiptId) {
       }
     }
 
-    // 3. حذف عناصر الإيصال
+    // 4. ✅ التعديل الجذري: حذف حركات المخزون المرتبطة بهذا الإيصال فقط
+    await db.from('stock_movements').delete().eq('receipt_id', receiptId);
+
+    // 5. حذف عناصر الإيصال
     const { error: delItemsErr } = await db.from('receipt_items').delete().eq('receipt_id', receiptId);
     if (delItemsErr) throw delItemsErr;
 
-    // 4. حذف الإيصال نفسه
+    // 6. حذف الإيصال نفسه
     const { error: delRcptErr } = await db.from('receipts').delete().eq('id', receiptId);
     if (delRcptErr) throw delRcptErr;
 
-    // 5. نجاح العملية
+    // 7. تنظيف تقارير اليومية
+    const { data: reports } = await db
+      .from('daily_reports')
+      .select('id, receipt_ids')
+      .eq('organization_id', receipt.organization_id)
+      .contains('receipt_ids', [receiptId]);
+
+    if (reports && reports.length > 0) {
+      for (const rep of reports) {
+        const updatedIds = rep.receipt_ids.filter(id => id !== receiptId);
+        await db.from('daily_reports').update({ receipt_ids: updatedIds }).eq('id', rep.id);
+      }
+    }
+
+    // 8. نجاح العملية
     alert(tr('rcpt_cancelled'));
     window.location.href = '/movements/list.html'; 
 
