@@ -1,16 +1,25 @@
 // ============================================
 // معالجة تسجيل الدخول (Callback)
-// ✅ ترجمة كاملة عبر data-i18n + توجيه ذكي
+// ✅ ترجمة كاملة + توجيه ذكي
 // ============================================
 
 document.addEventListener('DOMContentLoaded', async () => {
-  // تفعيل الترجمة (ستقوم بترجمة العناصر التي تحمل data-i18n في الـ HTML)
+  // تفعيل الترجمة
   if (window.applyLanguage) await window.applyLanguage();
   const tr = (key) => (window.t ? window.t(key) : key);
 
   const msg = document.getElementById('msg');
   const errBox = document.getElementById('error-details');
   const spinner = document.getElementById('spinner');
+
+  // ترجمة النصوص الأولية بشكل صريح (لضمان التحديث)
+  if (msg) {
+    msg.innerHTML = `
+      <span data-i18n="auth_cb_checking">${tr('auth_cb_checking')}</span>
+      <br>
+      <span style="font-size: 13px; color: #888; font-weight: normal;" data-i18n="auth_cb_wait">${tr('auth_cb_wait')}</span>
+    `;
+  }
 
   // دالة مساعدة لعرض الأخطاء
   function showError(title, details) {
