@@ -21,6 +21,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     .eq('id', user.id)
     .single();
 
+  // ✅ تحديث: fallback لجلب صورة Google إذا كانت avatar_url فارغة في الجدول
+  if (profile && !profile.avatar_url) {
+    profile.avatar_url =
+      user.user_metadata?.avatar_url ||
+      user.user_metadata?.picture ||
+      null;
+  }
+
   const currentRole = profile?.role;
   const isAdmin = currentRole === 'admin';
   const isAdminOrDeputy = currentRole === 'admin' || currentRole === 'deputy';
