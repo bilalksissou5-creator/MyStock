@@ -18,7 +18,7 @@ async function autoCheckPaymentBlock() {
   try {
     if (typeof db === 'undefined') return;
     
-    // ✅ التعديل: استخدام getSession بدلاً من getUser لسرعة الاستجابة ومنع التعليق
+    // ✅ استخدام getSession بدلاً من getUser لسرعة الاستجابة
     const { data: { session } } = await db.auth.getSession();
     const user = session?.user;
     if (!user) return;
@@ -780,3 +780,37 @@ window.playNotificationAlerts = async function() {
     console.log('📳 Vibration triggered');
   }
 };
+
+// ============================================
+// ✅ دعم التنقل الذكي في التطبيق المثبت (PWA)
+// ============================================
+
+// 1. استقبال أمر التنقل من الإشعارات (إذا كان التطبيق مفتوحاً)
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.addEventListener('message', event => {
+    if (event.data && event.data.type === 'NAVIGATE') {
+      window.location.href = event.data.url;
+    }
+  });
+}
+
+// 2. إصلاح زر الرجوع (Hardware Back) لمنع إغلاق التطبيق فجأة
+if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone) {
+  // إضافة حالة وهمية للسجل لكي لا يغلق التطبيق عند أول ضغطة رجوع
+  if (!window.history.state || !window.history.state.isAppRoot) {
+    window.history.pushState({ isAppRoot: true }, '', window.location.href);
+  }
+
+  window.addEventListener('popstate', (e) => {
+    // إذا عاد المستخدم للجذر ولم يتبقَّ صفحات في السجل
+    if (!e.state || !e.state.isAppRoot) {
+      const currentPath = window.location.pathname;
+      
+      // إذا كان في صفحة عميقة (مثل إيصال، منتج، الخ)، نعيده لصفحة الإشعارات
+      if (!currentPath.includes('notifications.html') && !currentPath.includes('dashboard.html') && currentPath !== '/' && !currentPath.includes('index.html')) {
+        window.location.href = '/notifications.html';
+      }
+      // إذا كان في لوحة التحكم أو الإشعارات، نتركه يغلق التطبيق بشكل طبيعي
+    }
+  });
+}
