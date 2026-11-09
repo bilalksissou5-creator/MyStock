@@ -61,16 +61,32 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   });
 
-  // ✅ التعديل هنا: الاستماع للتغييرات وتحديث الذاكرة مباشرة بدون إعادة تحميل
+  // ✅ الاستماع لكل التغييرات (إضافة كمية، منتج جديد، أو حذف) وتحديث الشاشة فوراً
   productsChannel = db.channel('custom-products-channel')
     .on(
       'postgres_changes',
-      { event: 'UPDATE', schema: 'public', table: 'products' },
-      (payload) => { 
-        const index = cachedProducts.findIndex(p => p.id === payload.new.id);
-        if (index !== -1) {
-          cachedProducts[index].qty = payload.new.qty;
-          renderProductsToDOM(); // تحديث فوري للشاشة
+      { event: '*', schema: 'public', table: 'products' },
+      async (payload) => { 
+        if (payload.eventType === 'UPDATE') {
+          // تحديث الكمية (إضافة أو إخراج)
+          const index = cachedProducts.findIndex(p => p.id === payload.new.id);
+          if (index !== -1) {
+            cachedProducts[index].qty = payload.new.qty;
+            renderProductsToDOM(); 
+          }
+        } 
+        else if (payload.eventType === 'INSERT') {
+          // منتج جديد كلياً: نجلبه مع بيانات المورد لعرضه فوراً
+          const { data: newProduct } = await db.from('products').select('*, suppliers(name)').eq('id', payload.new.id).single();
+          if (newProduct && !cachedProducts.some(p => p.id === newProduct.id)) {
+            cachedProducts.unshift(newProduct);
+            renderProductsToDOM();
+          }
+        }
+        else if (payload.eventType === 'DELETE') {
+          // حذف منتج: نزيله من الشاشة فوراً
+          cachedProducts = cachedProducts.filter(p => p.id !== payload.old.id);
+          renderProductsToDOM();
         }
       }
     )
