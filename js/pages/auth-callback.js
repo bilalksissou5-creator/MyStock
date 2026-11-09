@@ -1,6 +1,6 @@
 // ============================================
 // معالجة تسجيل الدخول عبر Google (Callback)
-// ✅ يفحص هل المستخدم جديد أم قديم
+// ✅ يفحص حالة المستخدم ويوجهه للمكان الصحيح
 // ============================================
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -9,6 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const errBox = document.getElementById('error-details');
   const spinner = document.getElementById('spinner');
 
+  // دالة مساعدة لعرض الأخطاء
   function showError(title, details) {
     if (spinner) spinner.style.display = 'none';
     if (msg) { msg.textContent = title; msg.style.color = 'red'; }
@@ -19,34 +20,39 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // 1. التحقق من أخطاء الرابط
+  // 1. التحقق من وجود أخطاء في الرابط (مثل رفض المستخدم للوصول)
   const hashParams = new URLSearchParams(window.location.hash.substring(1));
   const queryParams = new URLSearchParams(window.location.search);
-
+  
   if (hashParams.get('error') || queryParams.get('error')) {
     const errorDesc = hashParams.get('error_description') || queryParams.get('error_description') || 'خطأ غير معروف';
     showError('فشل تسجيل الدخول', 'السبب: ' + errorDesc);
     return;
   }
 
-  // 2. انتظار Supabase لمعالجة الجلسة
+  // 2. الانتظار لمدة ثانية ليقوم Supabase بحفظ الجلسة
   setTimeout(async () => {
     try {
+      // جلب بيانات المستخدم (وليس الجلسة فقط، لضمان الدقة)
       const { data: { user }, error } = await db.auth.getUser();
-
+      
       if (error || !user) {
         showError('لم يتم العثور على جلسة نشطة', 'السبب: Supabase لم يستلم الجلسة.');
         setTimeout(() => window.location.replace('/login.html'), 3000);
         return;
       }
 
-      // 3. ✅ فحص حالة إكمال البيانات
+      // 3. جلب حالة إكمال البيانات من جدول profiles
       const { data: profile } = await db
         .from('profiles')
         .select('onboarding_completed')
         .eq('id', user.id)
         .single();
 
+      if (msg) msg.textContent = 'تم تسجيل الدخول بنجاح!';
+      if (spinner) spinner.style.display = 'none';
+
+      // 4. التوجيه الذكي
       if (profile?.onboarding_completed) {
         window.location.replace('/dashboard.html');
       } else {
@@ -56,5 +62,5 @@ document.addEventListener('DOMContentLoaded', () => {
     } catch (err) {
       showError('خطأ في النظام', err.message);
     }
-  }, 1000);
+  }, 1000); 
 });
