@@ -1,6 +1,6 @@
 // ============================================
 // صفحة تسجيل العامل (عبر دعوة)
-// ✅ دعم كامل للترجمة
+// ✅ دعم كامل للترجمة + تأمين عبر RPC
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
 
@@ -39,21 +39,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     return;
   }
 
-  const { data: invite, error: inviteErr } = await db
-    .from('worker_invites')
-    .select('*')
-    .eq('token', token)
-    .eq('status', 'pending')
-    .limit(1)
-    .maybeSingle();
+  // ✅ استخدام الدالة الآمنة (RPC) بدلاً من القراءة المباشرة
+  const { data: invites, error: inviteErr } = await db
+    .rpc('get_invite_by_token', { invite_token: token });
+
+  // الدالة ترجع مصفوفة، نأخذ العنصر الأول
+  const invite = invites && invites.length > 0 ? invites[0] : null;
 
   if (inviteErr || !invite) {
     showError(tr('rw_err_invite'));
-    return;
-  }
-
-  if (invite.expires_at && new Date(invite.expires_at) < new Date()) {
-    showError(tr('rw_err_expired'));
     return;
   }
 
@@ -86,7 +80,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     if (password !== passwordConfirm) {
-      showError(tr('prod_add_err_qty').replace('الكمية', '').trim() || 'Passwords do not match');
+      showError('كلمتا المرور غير متطابقتين'); // تم إصلاح الترجمة هنا
       return;
     }
 
@@ -101,6 +95,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     try {
       const fullName = `${firstName} ${lastName}`;
 
+      // 1. إنشاء الحساب (الـ Trigger سيتكفل بإنشاء البروفايل تلقائياً)
       const { data: authData, error: authError } = await db.auth.signUp({
         email: email,
         password: password,
@@ -118,6 +113,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       const userId = authData.user?.id;
       if (!userId) throw new Error(tr('rw_err_signup'));
 
+      // 2. تحديث الهاتف كاحتياط إضافي
       await db
         .from('profiles')
         .update({
@@ -126,10 +122,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         })
         .eq('id', userId);
 
-      await db
-        .from('worker_invites')
-        .update({ status: 'accepted' })
-        .eq('id', invite.id);
+      // 3. ✅ استخدام دالة القبول الآمنة (RPC) بدلاً من التحديث المباشر
+      await db.rpc('accept_worker_invite', { invite_token: token });
 
       successBox.textContent = tr('rw_success');
       successBox.style.display = 'block';
