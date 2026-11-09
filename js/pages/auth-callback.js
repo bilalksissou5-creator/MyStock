@@ -1,30 +1,18 @@
 // ============================================
 // معالجة تسجيل الدخول (Callback)
-// ✅ انتظار الترجمة من Supabase + توجيه ذكي
+// ✅ ترجمة كاملة + توجيه ذكي
 // ============================================
 
 document.addEventListener('DOMContentLoaded', async () => {
-  // ✅ الانتظار حتى يتم جلب أحدث الترجمات من Supabase
-  if (typeof window.fetchSupabaseTranslations === 'function') {
-    await window.fetchSupabaseTranslations();
-  }
-
-  // تفعيل الترجمة بعد التحميل
+  // 1. تفعيل الترجمة (ستقوم بترجمة النصوص التي تحمل data-i18n في الـ HTML)
   if (window.applyLanguage) await window.applyLanguage();
+  
+  // دالة الترجمة
   const tr = (key) => (window.t ? window.t(key) : key);
 
   const msg = document.getElementById('msg');
   const errBox = document.getElementById('error-details');
   const spinner = document.getElementById('spinner');
-
-  // ترجمة النصوص الأولية
-  if (msg) {
-    msg.innerHTML = `
-      <span data-i18n="auth_cb_checking">${tr('auth_cb_checking')}</span>
-      <br>
-      <span style="font-size: 13px; color: #888; font-weight: normal;" data-i18n="auth_cb_wait">${tr('auth_cb_wait')}</span>
-    `;
-  }
 
   // دالة مساعدة لعرض الأخطاء
   function showError(title, details) {
@@ -39,7 +27,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
 
-  // 1. التحقق من وجود أخطاء في الرابط
+  // 2. التحقق من وجود أخطاء في الرابط
   const hashParams = new URLSearchParams(window.location.hash.substring(1));
   const queryParams = new URLSearchParams(window.location.search);
   
@@ -49,7 +37,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     return;
   }
 
-  // 2. الانتظار لثانية ليقوم Supabase بحفظ الجلسة
+  // 3. الانتظار لثانية ليقوم Supabase بحفظ الجلسة
   setTimeout(async () => {
     try {
       const { data: { user }, error } = await db.auth.getUser();
@@ -60,19 +48,19 @@ document.addEventListener('DOMContentLoaded', async () => {
         return;
       }
 
-      // 3. جلب حالة إكمال البيانات
+      // 4. جلب حالة إكمال البيانات
       const { data: profile } = await db
         .from('profiles')
         .select('onboarding_completed')
         .eq('id', user.id)
         .single();
 
+      // عرض رسالة النجاح
       if (msg) msg.innerHTML = `<span style="color: green;" data-i18n="auth_cb_success">${tr('auth_cb_success')}</span>`;
       if (spinner) spinner.style.display = 'none';
 
-      // 4. التوجيه الذكي
+      // 5. التوجيه الذكي
       if (profile?.onboarding_completed) {
-        
         // البحث عن آخر صفحة تمت زيارتها
         const lastVisitedPage = localStorage.getItem('mystock_last_visited_page');
         
@@ -81,7 +69,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         } else {
           window.location.replace('/dashboard.html');
         }
-        
       } else {
         window.location.replace('/complete-profile.html');
       }
