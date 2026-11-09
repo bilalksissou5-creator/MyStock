@@ -1,203 +1,346 @@
 // ============================================
-// بطاقة المستخدم (للقسم الأول في الـ Workspace)
+// صفحة البطاقة البنكية (Lemon Squeezy / Gumroad)
+// ✅ تقرأ وتكتب من جدول bank_cards المنفصل
+// ✅ تعمل مع جميع المستخدمين (Google / بريد إلكتروني)
+// ✅ تدعم عرض التاريخ بثلاث لغات (عربي، فرنسي، إنجليزي)
 // ============================================
-document.addEventListener('DOMContentLoaded', async () => {
-  const urlParams = new URLSearchParams(window.location.search);
-  const targetUserId = urlParams.get('userId');
 
-  if (!targetUserId) {
-    document.getElementById('main-content').innerHTML = `<div class="alert alert-error" style="margin:16px;">No User ID provided</div>`;
+// ⚠️ رابط الباقة الأساسية في Gumroad (تستخدم عند إضافة بطاقة جديدة)
+const GUMROAD_LINK = 'https://sissou7.gumroad.com/l/bpqhes';
+
+document.addEventListener('DOMContentLoaded', async () => {
+  // ✅ 1. انتظار الجلسة بشكل صارم (يحل مشكلة Google)
+  const session = await window.authReadyPromise;
+  const user = session?.user;
+
+  if (!user) {
+    window.location.replace('/login.html');
     return;
   }
 
-  renderLayout('user-card.html');
+  // ✅ 2. رسم الهيكل
+  renderLayout('profile.html');
+
+  if (window.applyLanguage) window.applyLanguage();
   const tr = (key) => (window.t ? window.t(key) : key);
 
-  const main = document.getElementById('main-content');
-
-  // ✅ تنسيقات البطاقة لتناسب العمود الضيق (320px)
-  const style = document.createElement('style');
-  style.innerHTML = `
-    .main { padding: 0 !important; }
-    .profile-fb-wrapper { border-radius: 10px; margin-bottom: 0; box-shadow: none; border: none; padding-top: 16px; }
-    
-    /* إخفاء الغلاف */
-    .profile-cover { display: none !important; }
-    
-    /* توسيط الصورة الشخصية */
-    .profile-avatar-fb-wrap { 
-      margin-top: 0 !important; 
-      display: flex; 
-      justify-content: center; 
-      position: relative;
-      padding-bottom: 8px;
-    }
-    
-    .profile-avatar-fb { width: 80px !important; height: 80px !important; }
-    .profile-fb-info { text-align: center; padding-top: 0 !important; padding-bottom: 12px !important; }
-    
-    /* تنسيق قائمة المعلومات */
-    .info-list { 
-      padding: 0 16px 16px 16px !important; 
-      margin: 0 !important; 
-    }
-    .info-row { 
-      display: flex; 
-      align-items: center; 
-      gap: 10px; 
-      padding: 10px 0; 
-      border-bottom: 1px solid #f0f0f0; 
-    }
-    .info-row:last-child { border-bottom: none; }
-    .info-icon { width: 20px; text-align: center; color: #737373; }
-    .info-text { font-size: 13px; color: #171717; word-break: break-all; }
-    
-    /* تنسيق الأزرار */
-    .records-row { margin: 0 16px 16px 16px !important; gap: 8px; }
-    .record-item { padding: 8px !important; font-size: 12px !important; }
-    .log-panel { margin: 0 16px 16px 16px !important; }
-  `;
-  document.head.appendChild(style);
-
-  // جلب بيانات المستخدم
-  const { data: profile, error } = await db.from('profiles').select('*').eq('id', targetUserId).single();
-
-  if (error || !profile) {
-    main.innerHTML = `<div class="alert alert-error" style="margin:16px;">User not found</div>`;
-    return;
-  }
-
-  // تجهيز البيانات
-  const email = profile.email || '—'; // ملاحظة: إذا لم يكن البريد مخزناً في جدول profiles، سيظهر "—"
-  const phone = profile.phone || '—';
-  
-  const roleLabel = profile.role === 'admin' ? tr('mp_role_admin') : profile.role === 'deputy' ? tr('wk_role_deputy') : tr('wk_role_worker');
-  const roleIcon = profile.role === 'admin' 
-    ? '<i class="fas fa-crown info-icon" style="color:#fbbf24;"></i>' 
-    : profile.role === 'deputy' 
-      ? '<i class="fas fa-star info-icon" style="color:#fbbf24;"></i>' 
-      : '<i class="fas fa-users info-icon"></i>';
-
-  const isMeOnline = typeof isUserOnline === 'function' && isUserOnline(profile);
-
-  main.innerHTML = `
-    <div class="profile-fb-wrapper">
-      <div class="profile-avatar-fb-wrap">
-        <div class="profile-avatar-fb">
-          ${profile.avatar_url ? `<img src="${profile.avatar_url}" alt="avatar">` : `<i class="fas fa-user"></i>`}
-          <span class="profile-status-dot ${isMeOnline ? 'online' : 'offline'}" title="${isMeOnline ? tr('wk_online') : tr('wk_offline')}"></span>
-        </div>
-      </div>
-
-      <div class="profile-fb-info">
-        <h3>${profile.full_name ?? tr('products_no_name')}</h3>
-        <div class="profile-fb-badges">
-          <span class="badge-role">${roleLabel}</span>
-        </div>
-      </div>
-
-      <!-- ✅ معلومات الاتصال (فوق الأزرار) -->
-      <div class="info-list">
-        <div class="info-row">
-          <i class="fas fa-envelope info-icon"></i>
-          <span class="info-text" dir="ltr">${email}</span>
-        </div>
-        <div class="info-row">
-          <i class="fab fa-whatsapp info-icon" style="color:#25d366;"></i>
-          <span class="info-text" dir="ltr">${phone}</span>
-        </div>
-        <div class="info-row">
-          ${roleIcon}
-          <span class="info-text">${roleLabel}</span>
-        </div>
-      </div>
-
-      <!-- الأزرار (فواتير وإيصال بيع) -->
-      <div class="records-row">
-        <div class="records-left" style="width:100%; display:flex; gap:8px;">
-          <a href="#" class="record-item" data-record="invoices" style="flex:1; justify-content:center;">
-            <i class="fas fa-file-invoice"></i>
-            <span>${tr('mp_invoices')}</span>
-          </a>
-          <a href="#" class="record-item" data-record="out" style="flex:1; justify-content:center;">
-            <i class="fas fa-arrow-up-from-bracket"></i>
-            <span>${tr('mp_out')}</span>
-          </a>
-        </div>
-      </div>
-
-      <div id="log-invoices" class="log-panel" style="display:none;"></div>
-      <div id="log-out" class="log-panel" style="display:none;"></div>
-    </div>
-  `;
-
-  const logInvoices = document.getElementById('log-invoices');
-  const logOut = document.getElementById('log-out');
-  const btnInvoices = document.querySelector('.record-item[data-record="invoices"]');
-  const btnOut = document.querySelector('.record-item[data-record="out"]');
-
+  // ✅ إعدادات اللغة للتواريخ
   const lang = window.getCurrentLang ? window.getCurrentLang() : 'ar';
   const localeMap = { ar: 'ar-MA', fr: 'fr-FR', en: 'en-US' };
   const locale = localeMap[lang] || 'en-US';
 
-  async function loadInvoices() {
-    logInvoices.innerHTML = `<div class="log-loading"><i class="fas fa-spinner fa-spin"></i></div>`;
-    const { data } = await db.from('invoices').select('id, invoice_number, total_qty, total_value, created_at').eq('created_by', targetUserId).order('created_at', { ascending: false });
+  document.title = tr('bc_title_full');
 
-    if (!data || data.length === 0) {
-      logInvoices.innerHTML = `<div class="log-empty">${tr('inv_empty')}</div>`;
-      return;
-    }
-    logInvoices.innerHTML = `
-      <div class="log-list">
-        ${data.map(inv => `
-          <a href="/invoice.html?id=${encodeURIComponent(inv.invoice_number)}" class="log-row log-row-link">
-            <div class="log-row-main"><strong>${inv.invoice_number}</strong><span>${inv.total_qty ?? 0} • ${Number(inv.total_value ?? 0).toFixed(2)}</span></div>
-            <div class="log-row-date">${new Date(inv.created_at).toLocaleDateString(locale)}</div>
-          </a>
-        `).join('')}
-      </div>
-    `;
+  const main = document.getElementById('main-content');
+  if (!main) return;
+
+  // ✅ 3. جلب البيانات الأساسية (بأمان)
+  const { data: profile, error: profileErr } = await db
+    .from('profiles')
+    .select('organization_id, full_name, role')
+    .eq('id', user.id)
+    .maybeSingle();
+
+  if (profileErr) console.error('Profile fetch error:', profileErr);
+
+  // ✅ 4. جلب البطاقة من جدول bank_cards
+  const { data: card, error: cardErr } = await db
+    .from('bank_cards')
+    .select('*')
+    .eq('profile_id', user.id)
+    .maybeSingle();
+
+  if (cardErr) console.error('Card fetch error:', cardErr);
+  console.log('✅ Card Data:', card);
+
+  // ✅ 5. جلب الاشتراك
+  let subscription = null;
+  if (profile?.organization_id) {
+    const { data: sub } = await db
+      .from('subscriptions')
+      .select('*')
+      .eq('organization_id', profile.organization_id)
+      .maybeSingle();
+    subscription = sub;
   }
 
-  async function loadOut() {
-    logOut.innerHTML = `<div class="log-loading"><i class="fas fa-spinner fa-spin"></i></div>`;
-    const { data } = await db.from('receipts').select('id, receipt_number, total_qty, total_value, created_at, printed_at').eq('created_by', targetUserId).order('created_at', { ascending: false });
+  // ============================================
+  // ✅ معالجة العودة من Gumroad بعد الدفع بنجاح
+  // ============================================
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.get('payment') === 'success' && profile?.organization_id) {
+    main.innerHTML = `<div style="text-align:center; padding: 50px;"><i class="fas fa-spinner fa-spin" style="font-size:40px; color:#2563eb;"></i><h3 style="margin-top:20px;">${tr('loading')}</h3></div>`;
 
-    if (!data || data.length === 0) {
-      logOut.innerHTML = `<div class="log-empty">${tr('mp_no_out')}</div>`;
+    try {
+      const now = new Date();
+      const expires = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000); // 30 يوم
+
+      // تفعيل الاشتراك
+      await db.from('subscriptions').upsert({
+        organization_id: profile.organization_id,
+        owner_id: user.id,
+        status: 'active',
+        started_at: now.toISOString(),
+        expires_at: expires.toISOString(),
+        plan: 'basic',
+        price: 150,
+        currency: 'MAD',
+        billing_cycle: 'monthly'
+      }, { onConflict: 'organization_id' });
+
+      // إنشاء بطاقة وهمية لتظهر في الواجهة
+      await db.from('bank_cards').upsert({
+        profile_id: user.id,
+        organization_id: profile.organization_id,
+        last4: 'GUMR',
+        brand: 'Gumroad',
+        holder: profile.full_name || 'User',
+        expiry: '**/**',
+        active: true,
+        deactivated_at: null
+      }, { onConflict: 'profile_id' });
+
+      // إزالة حظر الدفع
+      await db.from('organizations').update({ payment_blocked: false }).eq('id', profile.organization_id);
+
+      alert('✅ ' + tr('pay_success_btn'));
+      window.location.replace('/bank-card.html'); // إعادة التحميل بدون باراميتر
       return;
+    } catch (err) {
+      console.error('Activation error:', err);
+      alert(tr('pay_err_generic') + err.message);
     }
-    const unprintedCount = data.filter(r => !r.printed_at).length;
-
-    logOut.innerHTML = `
-      ${unprintedCount > 0 ? `
-        <a href="/receipts-print.html" class="print-all-btn"><i class="fas fa-print"></i><span>${tr('pf_print_all')} (${unprintedCount} ${tr('pf_new')})</span></a>
-      ` : ''}
-      <div class="log-list">
-        ${data.map(r => `
-          <a href="/receipt.html?id=${r.id}" class="log-row log-row-link">
-            <div class="log-row-main"><strong>${r.receipt_number}</strong><span>${r.total_qty ?? 0} • ${Number(r.total_value ?? 0).toFixed(2)}</span></div>
-            <div class="log-row-date">${new Date(r.created_at).toLocaleDateString(locale)}</div>
-          </a>
-        `).join('')}
-      </div>
-    `;
   }
 
-  btnInvoices.addEventListener('click', (e) => {
-    e.preventDefault();
-    const isOpen = logInvoices.style.display !== 'none';
-    logInvoices.style.display = 'none'; logOut.style.display = 'none';
-    btnInvoices.classList.remove('active'); btnOut.classList.remove('active');
-    if (!isOpen) { logInvoices.style.display = 'block'; btnInvoices.classList.add('active'); loadInvoices(); }
-  });
+  // دوال مساعدة
+  const errBox = document.createElement('div');
+  errBox.className = 'alert alert-error';
+  errBox.style.display = 'none';
 
-  btnOut.addEventListener('click', (e) => {
-    e.preventDefault();
-    const isOpen = logOut.style.display !== 'none';
-    logInvoices.style.display = 'none'; logOut.style.display = 'none';
-    btnInvoices.classList.remove('active'); btnOut.classList.remove('active');
-    if (!isOpen) { logOut.style.display = 'block'; btnOut.classList.add('active'); loadOut(); }
-  });
+  const successBox = document.createElement('div');
+  successBox.className = 'alert alert-success';
+  successBox.style.display = 'none';
+
+  function showError(msg) {
+    successBox.style.display = 'none';
+    errBox.textContent = msg;
+    errBox.style.display = 'block';
+    errBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+
+  function showSuccess(msg) {
+    errBox.style.display = 'none';
+    successBox.textContent = msg;
+    successBox.style.display = 'block';
+    successBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    setTimeout(() => { successBox.style.display = 'none'; }, 3000);
+  }
+
+  function getBrandIcon(brandName) {
+    const b = (brandName || '').toLowerCase();
+    if (b.includes('visa')) return '<i class="fab fa-cc-visa"></i>';
+    if (b.includes('mastercard')) return '<i class="fab fa-cc-mastercard"></i>';
+    if (b.includes('amex') || b.includes('american')) return '<i class="fab fa-cc-amex"></i>';
+    if (b.includes('discover')) return '<i class="fab fa-cc-discover"></i>';
+    if (b.includes('apple')) return '<i class="fab fa-apple-pay"></i>';
+    if (b.includes('google')) return '<i class="fab fa-google-pay"></i>';
+    if (b.includes('gumroad')) return '<i class="fas fa-shopping-bag"></i>';
+    return '<i class="fas fa-credit-card"></i>';
+  }
+
+  // ✅ دالة توليد رابط Gumroad مع إيميل المستخدم
+  function getGumroadUrl() {
+    return `${GUMROAD_LINK}?email=${encodeURIComponent(user.email)}&wanted=true`;
+  }
+
+  function render() {
+    const hasCard = !!card?.last4;
+    const isActive = card?.active !== false;
+
+    const params = new URLSearchParams(window.location.search);
+    const isBlocked = params.get('blocked') === '1';
+
+    main.innerHTML = `
+      <div class="page-header">
+        <h2>${tr('bc_title')}</h2>
+        <a href="/profile-dashboard.html" class="btn-secondary">
+          <i class="fas fa-arrow-right"></i>
+          <span>${tr('prod_detail_back')}</span>
+        </a>
+      </div>
+    `;
+
+    if (isBlocked) {
+      const blockedMsg = document.createElement('div');
+      blockedMsg.className = 'alert alert-error';
+      blockedMsg.style.background = '#fef2f2';
+      blockedMsg.style.border = '2px solid #dc2626';
+      blockedMsg.style.color = '#991b1b';
+      blockedMsg.style.fontWeight = '600';
+      blockedMsg.innerHTML = `
+        <i class="fas fa-lock" style="font-size:18px;"></i>
+        <strong style="margin-inline-start:6px;">${tr('bc_blocked_msg')}</strong>
+      `;
+      main.appendChild(blockedMsg);
+    }
+
+    main.appendChild(errBox);
+    main.appendChild(successBox);
+
+    const wrapper = document.createElement('div');
+    wrapper.className = 'bank-card-wrapper';
+
+    if (hasCard) {
+      const last4 = card.last4;
+      const brand = card.brand || 'Card';
+      const holder = card.holder || '—';
+      const expiry = card.expiry || 'MM/YY';
+
+      const statusBadge = isActive
+        ? `<div class="bc-default-badge">
+             <i class="fas fa-check-circle"></i>
+             <span>${tr('bc_default')}</span>
+           </div>`
+        : `<div class="bc-inactive-badge">
+             <i class="fas fa-exclamation-circle"></i>
+             <span>${tr('bc_inactive')}</span>
+           </div>`;
+
+      let actions = '';
+      if (isActive) {
+        actions = `
+          <button type="button" class="btn-danger full-width" id="deactivate-btn">
+            <i class="fas fa-ban"></i>
+            <span>${tr('bc_deactivate')}</span>
+          </button>
+        `;
+      } else {
+        actions = `
+          <a href="${getGumroadUrl()}" class="btn-primary full-width" style="margin-top:8px;">
+            <i class="fas fa-plus"></i>
+            <span>${tr('bc_add_new')}</span>
+          </a>
+        `;
+      }
+
+      wrapper.innerHTML = `
+        <div class="bank-card-container">
+          <div class="bank-card-visual ${isActive ? '' : 'inactive'}">
+            <div class="bank-card-front">
+              <div class="bc-top">
+                <span class="bc-brand">${getBrandIcon(brand)}</span>
+                <span class="bc-label">${brand}</span>
+              </div>
+              <div class="bc-number">•••• •••• •••• ${last4}</div>
+              <div class="bc-bottom">
+                <div class="bc-field">
+                  <span class="bc-field-label">${tr('pay_card_holder')}</span>
+                  <span class="bc-field-value">${holder}</span>
+                </div>
+                <div class="bc-field">
+                  <span class="bc-field-label">${tr('pay_card_expires')}</span>
+                  <span class="bc-field-value">${expiry}</span>
+                </div>
+              </div>
+              ${!isActive ? `<div class="bc-inactive-overlay"><i class="fas fa-ban"></i></div>` : ''}
+            </div>
+
+            <div class="bank-card-back">
+              <div class="bc-stripe"></div>
+              <div class="bc-cvv-box">
+                <span class="bc-cvv-label">CVV</span>
+                <span class="bc-cvv-value">•••</span>
+              </div>
+              <div class="bc-back-note">${tr('pay_card_test_note')}</div>
+            </div>
+          </div>
+        </div>
+
+        ${statusBadge}
+
+        ${subscription?.status === 'active' ? `
+          <div class="bc-subscription-info">
+            <div class="bc-info-row">
+              <i class="fas fa-crown"></i>
+              <span>${tr('bc_sub_status')}: <strong>${tr('bc_sub_active')}</strong></span>
+            </div>
+            ${subscription.expires_at ? `
+              <div class="bc-info-row">
+                <i class="fas fa-calendar"></i>
+                <span>${tr('bc_sub_expires')}: <strong>${new Date(subscription.expires_at).toLocaleDateString(locale)}</strong></span>
+              </div>
+            ` : ''}
+          </div>
+        ` : ''}
+
+        <div class="bank-card-actions">
+          ${actions}
+        </div>
+      `;
+    } else {
+      wrapper.innerHTML = `
+        <div class="bank-card-empty">
+          <i class="fas fa-credit-card"></i>
+          <p>${tr('bc_empty')}</p>
+          <small>${tr('bc_empty_hint')}</small>
+        </div>
+
+        <div class="bank-card-actions">
+          <a href="/subscription.html?change=1" class="btn-primary full-width">
+            <i class="fas fa-credit-card"></i>
+            <span>${tr('bc_subscribe_now')}</span>
+          </a>
+        </div>
+      `;
+    }
+
+    main.appendChild(wrapper);
+
+    // ✅ زر إلغاء التفعيل
+    document.getElementById('deactivate-btn')?.addEventListener('click', async () => {
+      if (!confirm(tr('bc_confirm_deactivate'))) return;
+
+      const btn = document.getElementById('deactivate-btn');
+      btn.disabled = true;
+      btn.querySelector('span').textContent = tr('pe_saving');
+
+      const now = new Date().toISOString();
+      const { error } = await db
+        .from('bank_cards')
+        .update({
+          active: false,
+          deactivated_at: now,
+          warning_sent: 0,
+        })
+        .eq('profile_id', user.id);
+
+      if (error) {
+        showError(error.message);
+        btn.disabled = false;
+        btn.querySelector('span').textContent = tr('bc_deactivate');
+      } else {
+        card.active = false;
+        card.deactivated_at = now;
+        card.warning_sent = 0;
+
+        if (typeof notifyOrganization === 'function' && profile?.organization_id) {
+          try {
+            await notifyOrganization({
+              orgId: profile.organization_id,
+              title: tr('warn_title_1'),
+              message: tr('warn_msg_1'),
+              type: 'warning',
+              link: '/bank-card.html',
+              userName: profile.full_name || null,
+            });
+          } catch (e) { console.warn(e); }
+        }
+
+        showSuccess(tr('bc_deactivated'));
+        setTimeout(() => render(), 800);
+      }
+    });
+  }
+
+  render();
 });
