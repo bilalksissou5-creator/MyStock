@@ -61,11 +61,18 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   });
 
+  // ✅ التعديل هنا: الاستماع للتغييرات وتحديث الذاكرة مباشرة بدون إعادة تحميل
   productsChannel = db.channel('custom-products-channel')
     .on(
       'postgres_changes',
-      { event: '*', schema: 'public', table: 'products' },
-      (payload) => { loadProductsFromDB(); }
+      { event: 'UPDATE', schema: 'public', table: 'products' },
+      (payload) => { 
+        const index = cachedProducts.findIndex(p => p.id === payload.new.id);
+        if (index !== -1) {
+          cachedProducts[index].qty = payload.new.qty;
+          renderProductsToDOM(); // تحديث فوري للشاشة
+        }
+      }
     )
     .subscribe();
 
@@ -167,12 +174,10 @@ function renderProductsToDOM() {
           </div>
           <div class="stat">
             <div class="stat-label">${tr('products_price')}</div>
-            <!-- ✅ تم إضافة dir="ltr" هنا -->
             <div class="stat-value" dir="ltr">${formatPrice(p.price)}</div>
           </div>
           <div class="stat">
             <div class="stat-label">${tr('products_total')}</div>
-            <!-- ✅ تم إضافة dir="ltr" هنا أيضاً -->
             <div class="stat-value" dir="ltr">${formatPrice(total)}</div>
           </div>
         </div>
