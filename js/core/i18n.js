@@ -951,6 +951,9 @@ const translations = {
     sub_feat_support_email: "دعم بالبريد",
     sub_feat_support_email_wa: "دعم بالبريد + واتساب",
     sub_feat_support_247: "دعم 24/7",
+
+    login_google: 'المتابعة باستخدام Google',
+    login_or: 'أو',
   },
 
   fr: {
@@ -1892,6 +1895,8 @@ const translations = {
     sub_feat_support_email: "Support par email",
     sub_feat_support_email_wa: "Support par email + WhatsApp",
     sub_feat_support_247: "Support 24/7",
+    login_google: 'Continuer avec Google',
+    login_or: 'Ou',
   },
 
   en: {
@@ -2833,6 +2838,9 @@ const translations = {
     sub_feat_support_email: "Email Support",
     sub_feat_support_email_wa: "Email + WhatsApp Support",
     sub_feat_support_247: "24/7 Support",
+
+    login_google: 'Continue with Google',
+    login_or: 'Or',
   },
 
   
