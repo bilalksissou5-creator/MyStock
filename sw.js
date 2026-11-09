@@ -1,7 +1,7 @@
 // ✅ Service Worker لدعم الإشعارات والعمل بدون إنترنت
 // ✅ مسح تلقائي للكاش القديم عند كل تحديث
 
-const CACHE_NAME = 'mystock-v202611091200';
+const CACHE_NAME = 'mystock-v202611091230';
 
 self.addEventListener('install', (e) => {
   self.skipWaiting(); // إجبار المتصفح على تفعيل النسخة الجديدة فوراً
@@ -40,8 +40,9 @@ self.addEventListener('push', function(event) {
     
     const options = {
       body: data.body,
-      icon: baseUrl + '/assets/img/icon-192.png', // الشعار الكبير
-      image: baseUrl + '/assets/img/icon-512.png', // بانر كبير أسفل الإشعار
+      icon: baseUrl + '/assets/img/icon-192.png', // شعار التطبيق (يمين)
+      image: data.image_url || (baseUrl + '/assets/img/receipt-banner.png'), // صورة الإشعار (بانر)
+      badge: baseUrl + '/assets/img/badge.png', // أيقونة صغيرة (شريط الحالة)
       vibrate: [200, 100, 200],
       data: {
         url: data.url || '/'

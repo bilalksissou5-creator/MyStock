@@ -506,7 +506,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
       }
 
-      // ✅ إشعار المخزون المنخفض (مترجم)
+      // ✅ إشعار المخزون المنخفض (بدون تحديد صورة يدوياً)
       if (lowStockAlerts.length > 0 && typeof notifyOrganization === 'function') {
         try {
           const alertLines = lowStockAlerts
@@ -526,14 +526,22 @@ document.addEventListener('DOMContentLoaded', async () => {
             message: alertLines,
             type: 'warning',
             link: '/products/list.html',
-            userName: prof.full_name || null,
+            userName: prof.full_name || null
           });
         } catch (e) { console.warn('low stock alert failed:', e); }
       }
 
+      // ✅ إشعار البيع (بدون تحديد صورة يدوياً)
       if (typeof notifyOrganization === 'function') {
         try {
-          await notifyOrganization({ orgId: prof.organization_id, title: addedProducts.length === 1 ? tr('mout_notif_title_1') : `${tr('mout_notif_title_n')} (${addedProducts.length})`, message: `${prof.full_name || tr('prod_detail_user')} ${tr('mout_notif_msg')} ${totalQty} ${tr('mout_notif_unit')} ${totalValue.toFixed(2)} — ${receiptNumber}`, type: 'warning', link: `/receipt.html?id=${newReceipt.id}`, userName: prof.full_name || null });
+          await notifyOrganization({ 
+            orgId: prof.organization_id, 
+            title: addedProducts.length === 1 ? tr('mout_notif_title_1') : `${tr('mout_notif_title_n')} (${addedProducts.length})`, 
+            message: `${prof.full_name || tr('prod_detail_user')} ${tr('mout_notif_msg')} ${totalQty} ${tr('mout_notif_unit')} ${totalValue.toFixed(2)} — ${receiptNumber}`, 
+            type: 'warning', 
+            link: `/receipt.html?id=${newReceipt.id}`, 
+            userName: prof.full_name || null
+          });
         } catch (e) {}
       }
 

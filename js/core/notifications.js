@@ -1,12 +1,8 @@
 // ============================================
 // الإشعارات
-// الدور: جلب + إنشاء إشعارات + تحديث فوري بسرعة البرق
-// ✅ تشغيل الصوت والاهتزاز + إشعار حقيقي في شريط الهاتف
+// ✅ محرك ذكي لاختيار الصور تلقائياً حسب نوع الإشعار
 // ============================================
 
-// ============================================
-// جلب عدد الإشعارات غير المقروءة
-// ============================================
 async function getUnreadCount() {
   const { data: { user } } = await db.auth.getUser();
   if (!user) return 0;
@@ -32,6 +28,7 @@ async function createNotification({
   type = 'info',
   link = null,
   userName = null,
+  imageUrl = null, // يمكنك تركها فارغة ليقوم النظام باختيار الصورة تلقائياً
 }) {
   const { error } = await db.from('notifications').insert({
     user_id: userId,
@@ -41,6 +38,7 @@ async function createNotification({
     type,
     link,
     user_name: userName,
+    image_url: imageUrl,
   });
 
   if (error) {
@@ -61,6 +59,7 @@ async function notifyOrganization({
   link = null,
   userName = null,
   excludeUserId = null,
+  imageUrl = null,
 }) {
   const { data: members, error } = await db
     .from('profiles')
@@ -82,6 +81,7 @@ async function notifyOrganization({
       type,
       link,
       user_name: userName,
+      image_url: imageUrl,
     }));
 
   if (notifications.length === 0) return true;
@@ -97,9 +97,6 @@ async function notifyOrganization({
   return true;
 }
 
-// ============================================
-// ✅ دالة مركزية: سجّل نشاطاً + أنشئ إشعاراً
-// ============================================
 async function logActivity({
   orgId = null,
   title,
@@ -108,6 +105,7 @@ async function logActivity({
   link = null,
   userName = null,
   excludeUserId = null,
+  imageUrl = null,
 }) {
   if (!orgId || !userName) {
     try {
@@ -129,25 +127,13 @@ async function logActivity({
     }
   }
 
-  if (!orgId) {
-    console.warn('logActivity: no orgId — skipped');
-    return false;
-  }
+  if (!orgId) return false;
 
   return await notifyOrganization({
-    orgId,
-    title,
-    message,
-    type,
-    link,
-    userName,
-    excludeUserId,
+    orgId, title, message, type, link, userName, excludeUserId, imageUrl
   });
 }
 
-// ============================================
-// تحديث عداد الإشعارات في Header
-// ============================================
 async function updateNotifCounter() {
   const counter = document.getElementById('notif-count');
   if (!counter) return;
@@ -168,6 +154,45 @@ async function updateNotifCounter() {
 }
 
 // ============================================
+// 🧠 محرك اختيار الصورة الذكي
+// ============================================
+function getSmartImage(notification) {
+  const baseUrl = window.location.origin;
+  
+  // 1. إذا كانت الصورة محددة يدوياً في قاعدة البيانات، استخدمها
+  if (notification.image_url) return notification.image_url;
+
+  const link = (notification.link || '').toLowerCase();
+  const title = (notification.title || '').toLowerCase();
+  const type = (notification.type || '').toLowerCase();
+
+  // 2. تحليل الرابط (link) لمعرفة نوع الإشعار
+  if (link.includes('/receipt') || link.includes('/out')) {
+    return baseUrl + '/assets/img/receipt-banner.png'; // صورة فاتورة البيع
+  }
+  if (link.includes('/invoice') || link.includes('/products/add')) {
+    return baseUrl + '/assets/img/product-banner.png'; // صورة فاتورة شراء/منتج
+  }
+  if (link.includes('/products')) {
+    return baseUrl + '/assets/img/product-banner.png'; // صورة منتج
+  }
+  if (link.includes('/worker') || link.includes('/member')) {
+    return baseUrl + '/assets/img/worker-banner.png'; // صورة عامل
+  }
+  if (link.includes('/bank-card') || link.includes('/subscription')) {
+    return baseUrl + '/assets/img/payment-banner.png'; // صورة دفع/اشتراك
+  }
+
+  // 3. تحليل النوع (type) كخيار احتياطي
+  if (type === 'warning') {
+    return baseUrl + '/assets/img/warning-banner.png'; // صورة تحذير (مخزون منخفض)
+  }
+
+  // 4. الصورة الافتراضية (شعار التطبيق)
+  return baseUrl + '/assets/img/icon-512.png';
+}
+
+// ============================================
 // ✅ التحديث الفوري (Realtime) + إشعارات النظام
 // ============================================
 let notifRealtimeChannel = null;
@@ -178,52 +203,46 @@ function startNotifPolling() {
     return;
   }
 
-  // 1. تحديث فوري عند تحميل الصفحة لأول مرة
   updateNotifCounter();
 
-  // 2. طلب إذن الإشعارات إذا لم يكن ممنوحاً (للمتصفحات والهواتف)
   if ('Notification' in window && Notification.permission === 'default') {
     Notification.requestPermission();
   }
 
-  // 3. إلغاء أي قناة قديمة لتجنب تكرار الاستماع
   if (notifRealtimeChannel) {
     db.removeChannel(notifRealtimeChannel);
     notifRealtimeChannel = null;
   }
 
-  // 4. الاستماع الفوري للإشعارات الجديدة
   notifRealtimeChannel = db.channel('realtime-notifications-' + Date.now())
     .on(
       'postgres_changes',
       { event: 'INSERT', schema: 'public', table: 'notifications' },
       async (payload) => {
-        console.log('⚡ إشعار جديد وصل فوراً:', payload);
-        
-        // ✅ تحديث العداد
         updateNotifCounter();
 
-        // ✅ التحقق: هل هذا الإشعار موجه للمستخدم الحالي؟
         try {
           const { data: { user } } = await db.auth.getUser();
           
           if (user && payload.new && payload.new.user_id === user.id) {
             
-            // 1. تشغيل الصوت والاهتزاز
             if (typeof window.playNotificationAlerts === 'function') {
               window.playNotificationAlerts();
             }
 
-            // 2. ✅ إظهار إشعار حقيقي في شريط إشعارات الهاتف
             if ('Notification' in window && Notification.permission === 'granted') {
               try {
                 const reg = await navigator.serviceWorker.ready;
                 const baseUrl = window.location.origin;
                 
+                // ✅ استخدام المحرك الذكي لجلب الصورة تلقائياً
+                const smartImage = getSmartImage(payload.new);
+
                 reg.showNotification(payload.new.title || 'إشعار جديد', {
                   body: payload.new.message || '',
-                  icon: baseUrl + '/assets/img/icon-192.png', // الشعار الكبير
-                  image: baseUrl + '/assets/img/icon-512.png', // بانر كبير أسفل الإشعار
+                  icon: baseUrl + '/assets/img/icon-192.png', // شعار التطبيق
+                  image: smartImage, // 🚀 الصورة التي اختارها النظام تلقائياً
+                  badge: baseUrl + '/assets/img/badge.png', // أيقونة صغيرة
                   vibrate: [200, 100, 200],
                   data: { url: payload.new.link || '/' }
                 });
@@ -237,11 +256,5 @@ function startNotifPolling() {
         }
       }
     )
-    .subscribe((status) => {
-      if (status === 'SUBSCRIBED') {
-        console.log('✅ Realtime notifications is active!');
-      } else if (status === 'CHANNEL_ERROR') {
-        console.warn('⚠️ Realtime failed. Check Supabase Replication.');
-      }
-    });
+    .subscribe();
 }
