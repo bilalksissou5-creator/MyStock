@@ -1,6 +1,6 @@
 // ============================================
 // صفحة الإيصال (نمط سوبر ماركت)
-// ✅ دعم كامل للترجمة
+// ✅ دعم كامل للترجمة + إمكانية إلغاء الإيصال
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   const user = await requireAuth();
@@ -129,10 +129,83 @@ function renderReceipt({ receipt, items }) {
         <i class="fas fa-print"></i>
         <span>${tr('rcpt_print')}</span>
       </button>
-      <a href="/movements/list.html" class="btn-secondary">
-        <i class="fas fa-arrow-right"></i>
-        <span>${tr('rcpt_back')}</span>
-      </a>
+      
+      <!-- ✅ زر إلغاء الإيصال الجديد -->
+      <button type="button" id="btn-cancel-receipt" class="btn-secondary" 
+              style="background:#fee2e2; color:#dc2626; border-color:#fca5a5; width:100%; justify-content:center; margin-top: 10px;"
+              onclick="cancelReceipt('${receipt.id}')">
+        <i class="fas fa-trash-alt"></i>
+        <span>${tr('rcpt_cancel')}</span>
+      </button>
     </div>
   `;
 }
+
+// ============================================
+// دالة إلغاء الإيصال وإرجاع المخزون
+// ============================================
+async function cancelReceipt(receiptId) {
+  const tr = (key) => (window.t ? window.t(key) : key);
+  
+  if (!confirm(tr('rcpt_cancel_confirm'))) {
+    return;
+  }
+
+  const btn = document.getElementById('btn-cancel-receipt');
+  if (btn) {
+    btn.disabled = true;
+    btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> <span>${tr('loading')}</span>`;
+  }
+
+  try {
+    // 1. جلب عناصر الإيصال
+    const { data: items, error: itemsErr } = await db
+      .from('receipt_items')
+      .select('product_id, qty')
+      .eq('receipt_id', receiptId);
+
+    if (itemsErr) throw itemsErr;
+
+    // 2. إرجاع الكميات للمنتجات في المخزون
+    if (items && items.length > 0) {
+      for (const item of items) {
+        if (!item.product_id) continue;
+        
+        const { data: product } = await db
+          .from('products')
+          .select('qty')
+          .eq('id', item.product_id)
+          .single();
+
+        if (product) {
+          const newQty = Number(product.qty || 0) + Number(item.qty);
+          await db.from('products').update({ qty: newQty }).eq('id', item.product_id);
+        }
+      }
+    }
+
+    // 3. حذف عناصر الإيصال
+    const { error: delItemsErr } = await db.from('receipt_items').delete().eq('receipt_id', receiptId);
+    if (delItemsErr) throw delItemsErr;
+
+    // 4. حذف الإيصال نفسه
+    const { error: delRcptErr } = await db.from('receipts').delete().eq('id', receiptId);
+    if (delRcptErr) throw delRcptErr;
+
+    // 5. نجاح العملية
+    alert(tr('rcpt_cancelled'));
+    window.location.href = '/movements/list.html'; 
+
+  } catch (err) {
+    console.error('Cancel receipt error:', err);
+    alert(tr('prod_detail_err') + ' ' + err.message);
+    
+    if (btn) {
+      btn.disabled = false;
+      btn.innerHTML = `<i class="fas fa-trash-alt"></i> <span>${tr('rcpt_cancel')}</span>`;
+    }
+  }
+}
+
+// تصدير الدالة لتكون متاحة لزر الـ HTML
+window.cancelReceipt = cancelReceipt;
