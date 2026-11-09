@@ -17,7 +17,10 @@ async function autoCheckPaymentBlock() {
   if (ALLOWED_PAGES.includes(currentPage)) return;
   try {
     if (typeof db === 'undefined') return;
-    const { data: { user } } = await db.auth.getUser();
+    
+    // ✅ التعديل: استخدام getSession بدلاً من getUser لسرعة الاستجابة ومنع التعليق
+    const { data: { session } } = await db.auth.getSession();
+    const user = session?.user;
     if (!user) return;
     
     const { data: profile } = await db.from('profiles').select('role, organization_id, bank_card_last4, bank_card_active, bank_card_deactivated_at, card_warning_sent, full_name').eq('id', user.id).single();
