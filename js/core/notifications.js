@@ -1,7 +1,7 @@
 // ============================================
 // الإشعارات
 // الدور: جلب + إنشاء إشعارات + تحديث فوري بسرعة البرق
-// ✅ تشغيل الصوت والاهتزاز عند وصول إشعار جديد
+// ✅ تشغيل الصوت والاهتزاز + إشعار حقيقي في شريط الهاتف
 // ============================================
 
 // ============================================
@@ -168,7 +168,7 @@ async function updateNotifCounter() {
 }
 
 // ============================================
-// ✅ التحديث الفوري (Realtime) بسرعة البرق
+// ✅ التحديث الفوري (Realtime) + إشعارات النظام
 // ============================================
 let notifRealtimeChannel = null;
 
@@ -181,13 +181,18 @@ function startNotifPolling() {
   // 1. تحديث فوري عند تحميل الصفحة لأول مرة
   updateNotifCounter();
 
-  // 2. إلغاء أي قناة قديمة لتجنب تكرار الاستماع
+  // 2. طلب إذن الإشعارات إذا لم يكن ممنوحاً (للمتصفحات والهواتف)
+  if ('Notification' in window && Notification.permission === 'default') {
+    Notification.requestPermission();
+  }
+
+  // 3. إلغاء أي قناة قديمة لتجنب تكرار الاستماع
   if (notifRealtimeChannel) {
     db.removeChannel(notifRealtimeChannel);
     notifRealtimeChannel = null;
   }
 
-  // 3. الاستماع الفوري للإشعارات الجديدة
+  // 4. الاستماع الفوري للإشعارات الجديدة
   notifRealtimeChannel = db.channel('realtime-notifications-' + Date.now())
     .on(
       'postgres_changes',
@@ -201,10 +206,28 @@ function startNotifPolling() {
         // ✅ التحقق: هل هذا الإشعار موجه للمستخدم الحالي؟
         try {
           const { data: { user } } = await db.auth.getUser();
+          
           if (user && payload.new && payload.new.user_id === user.id) {
-            // تشغيل الصوت والاهتزاز
+            
+            // 1. تشغيل الصوت والاهتزاز (الكود القديم الخاص بك)
             if (typeof window.playNotificationAlerts === 'function') {
               window.playNotificationAlerts();
+            }
+
+            // 2. ✅ إظهار إشعار حقيقي في شريط إشعارات الهاتف
+            if ('Notification' in window && Notification.permission === 'granted') {
+              try {
+                const reg = await navigator.serviceWorker.ready;
+                reg.showNotification(payload.new.title || 'إشعار جديد', {
+                  body: payload.new.message || '',
+                  icon: '/assets/img/icon-192.png',
+                  badge: '/assets/img/icon-192.png',
+                  vibrate: [200, 100, 200],
+                  data: { url: payload.new.link || '/' }
+                });
+              } catch (err) {
+                console.warn('فشل إظهار إشعار النظام:', err);
+              }
             }
           }
         } catch (err) {
