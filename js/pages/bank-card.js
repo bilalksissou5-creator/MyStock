@@ -1,10 +1,9 @@
 // ============================================
 // صفحة البطاقة البنكية (Gumroad Integration)
-// ✅ توجيه المستخدم إلى Gumroad لإضافة بطاقة جديدة
 // ============================================
 
-// ⚠️ ضع رابط منتجك في Gumroad هنا
-const GUMROAD_LINK = 'https://gumroad.com/l/YOUR_PRODUCT_LINK'; 
+// ⚠️ رابط الباقة الأساسية (الذي يفتح عند إضافة بطاقة جديدة)
+const GUMROAD_LINK = 'https://sissou7.gumroad.com/l/bpqhes'; 
 
 document.addEventListener('DOMContentLoaded', async () => {
   const session = await window.authReadyPromise;
@@ -42,7 +41,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       const now = new Date();
       const expires = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000); // 30 يوم
 
-      // تحديث أو إنشاء الاشتراك
       await db.from('subscriptions').upsert({
         organization_id: profile.organization_id,
         owner_id: user.id,
@@ -55,7 +53,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         billing_cycle: 'monthly'
       }, { onConflict: 'organization_id' });
 
-      // إنشاء بطاقة "وهمية" لتظهر في الواجهة
       await db.from('bank_cards').upsert({
         profile_id: user.id,
         organization_id: profile.organization_id,
@@ -97,7 +94,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     return '<i class="fas fa-credit-card"></i>';
   }
 
-  // دالة توليد رابط Gumroad
   function getGumroadUrl() {
     return `${GUMROAD_LINK}?email=${encodeURIComponent(user.email)}&wanted=true`;
   }
@@ -137,7 +133,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         ? `<div class="bc-default-badge"><i class="fas fa-check-circle"></i><span>${tr('bc_default')}</span></div>`
         : `<div class="bc-inactive-badge"><i class="fas fa-exclamation-circle"></i><span>${tr('bc_inactive')}</span></div>`;
 
-      // ✅ التعديل هنا: إذا كانت البطاقة غير نشطة، نعرض زر "إضافة بطاقة جديدة" فقط ويوجه لـ Gumroad
       const actions = isActive
         ? `<button type="button" class="btn-danger full-width" id="deactivate-btn">
              <i class="fas fa-ban"></i>
@@ -206,7 +201,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         </div>
 
         <div class="bank-card-actions">
-          <a href="${getGumroadUrl()}" class="btn-primary full-width">
+          <a href="/subscription.html" class="btn-primary full-width">
             <i class="fas fa-credit-card"></i>
             <span>${tr('bc_subscribe_now')}</span>
           </a>
