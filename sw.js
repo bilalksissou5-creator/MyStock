@@ -1,7 +1,7 @@
 // ✅ Service Worker لدعم الإشعارات والعمل بدون إنترنت
 // ✅ مسح تلقائي للكاش القديم عند كل تحديث
 
-const CACHE_NAME = 'mystock-v202611091457'; 
+const CACHE_NAME = 'mystock-v202611091522'; 
 
 self.addEventListener('install', (e) => {
   self.skipWaiting(); // إجبار المتصفح على تفعيل النسخة الجديدة فوراً

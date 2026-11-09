@@ -3,6 +3,7 @@
 // ✅ بطاقة حركات المخزون (خطان)
 // ✅ بطاقة الأرباح (أعمدة)
 // ✅ دعم كامل للترجمة (تحديث فوري)
+// ✅ إضافة فلترة المنظمة لضمان دقة البيانات
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   const user = await requireAuth();
@@ -20,21 +21,16 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   const main = document.getElementById('main-content');
 
-  // 3. بناء واجهة لوحة التحكم مع إضافة data-i18n
+  // 3. بناء واجهة لوحة التحكم
   main.innerHTML = `
     <div class="page-header">
       <h2 data-i18n="dash_title">${tr('dash_title')}</h2>
     </div>
 
-    <!-- ══════════════════════════════════════
-         بطاقة حركات المخزون
-         ══════════════════════════════════════ -->
+    <!-- بطاقة حركات المخزون -->
     <div class="stock-value-card">
-
       <div class="stock-top-row">
-
         <div class="stock-right-col">
-
           <div class="stock-title-section">
             <div class="stock-title-text">
               <h3 id="chart-title" data-i18n="dash_stock_moves">${tr('dash_stock_moves')}</h3>
@@ -44,7 +40,6 @@ document.addEventListener('DOMContentLoaded', async () => {
               <i class="fas fa-chart-line"></i>
             </div>
           </div>
-
           <div class="stock-stats-row">
             <div class="stock-stat-card">
               <div class="stat-mini-label" data-i18n="dash_in_qty">${tr('dash_in_qty')}</div>
@@ -68,9 +63,7 @@ document.addEventListener('DOMContentLoaded', async () => {
               </div>
             </div>
           </div>
-
         </div>
-
         <div class="stock-hero-card">
           <div class="stock-hero-icon">
             <i class="fas fa-database"></i>
@@ -86,7 +79,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             </div>
           </div>
         </div>
-
       </div>
 
       <div class="stock-chart-section">
@@ -108,18 +100,12 @@ document.addEventListener('DOMContentLoaded', async () => {
           </div>
         </div>
       </div>
-
     </div>
 
-    <!-- ══════════════════════════════════════
-         ✅ بطاقة الأرباح
-         ══════════════════════════════════════ -->
+    <!-- بطاقة الأرباح -->
     <div class="profit-card">
-
       <div class="stock-top-row">
-
         <div class="stock-right-col">
-
           <div class="stock-title-section">
             <div class="stock-title-text">
               <h3 data-i18n="dash_profit">${tr('dash_profit')}</h3>
@@ -129,7 +115,6 @@ document.addEventListener('DOMContentLoaded', async () => {
               <i class="fas fa-coins"></i>
             </div>
           </div>
-
           <div class="stock-stats-row">
             <div class="stock-stat-card">
               <div class="stat-mini-label" data-i18n="dash_min_period">${tr('dash_min_period')}</div>
@@ -153,9 +138,7 @@ document.addEventListener('DOMContentLoaded', async () => {
               </div>
             </div>
           </div>
-
         </div>
-
         <div class="stock-hero-card profit-hero">
           <div class="stock-hero-icon">
             <i class="fas fa-coins"></i>
@@ -171,7 +154,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             </div>
           </div>
         </div>
-
       </div>
 
       <div class="stock-chart-section">
@@ -192,12 +174,9 @@ document.addEventListener('DOMContentLoaded', async () => {
           </div>
         </div>
       </div>
-
     </div>
 
-    <!-- ══════════════════════════════════════
-         البطاقات السريعة
-         ══════════════════════════════════════ -->
+    <!-- البطاقات السريعة -->
     <div class="stats-grid">
       <div class="stat-card">
         <div class="stat-label" data-i18n="dash_products">${tr('dash_products')}</div>
@@ -222,10 +201,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     </div>
   `;
 
-  // ✅ تطبيق الترجمة على العناصر التي تم إنشاؤها للتو
   if (window.applyLanguage) window.applyLanguage();
 
-  // 4. تحميل البيانات والرسوم البيانية
   await loadStats();
   await loadStockChart(30);
   await loadProfitChart(30);
@@ -253,7 +230,14 @@ async function loadStats() {
   if (el('stat-today')) el('stat-today').textContent = todayMovements;
 }
 
+// ✅ إضافة فلترة المنظمة هنا
 async function computeMovementsHistory(days) {
+  const { data: { user } } = await db.auth.getUser();
+  if (!user) return { mode: 'daily', dates: [], inSeries: [], outSeries: [] };
+  
+  const { data: profile } = await db.from('profiles').select('organization_id').eq('id', user.id).single();
+  if (!profile?.organization_id) return { mode: 'daily', dates: [], inSeries: [], outSeries: [] };
+
   const now = new Date();
   const startDate = new Date(Date.UTC(
     now.getUTCFullYear(),
@@ -265,6 +249,7 @@ async function computeMovementsHistory(days) {
   const { data: movements } = await db
     .from('stock_movements')
     .select('type, quantity, created_at')
+    .eq('organization_id', profile.organization_id) // <--- التعديل هنا
     .gte('created_at', startDate.toISOString())
     .order('created_at', { ascending: true });
 
@@ -479,7 +464,14 @@ async function loadStockChart(days) {
   stockChart.render();
 }
 
+// ✅ إضافة فلترة المنظمة هنا أيضاً
 async function computeProfitHistory(days) {
+  const { data: { user } } = await db.auth.getUser();
+  if (!user) return { mode: 'daily', dates: [], profits: [] };
+  
+  const { data: profile } = await db.from('profiles').select('organization_id').eq('id', user.id).single();
+  if (!profile?.organization_id) return { mode: 'daily', dates: [], profits: [] };
+
   const now = new Date();
   const startDate = new Date(Date.UTC(
     now.getUTCFullYear(),
@@ -491,6 +483,7 @@ async function computeProfitHistory(days) {
   const { data: receipts } = await db
     .from('receipts')
     .select('id, created_at')
+    .eq('organization_id', profile.organization_id) // <--- التعديل هنا
     .gte('created_at', startDate.toISOString())
     .order('created_at', { ascending: true });
 
