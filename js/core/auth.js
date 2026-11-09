@@ -13,7 +13,8 @@ async function signInWithGoogle() {
     const { error } = await db.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: window.location.origin + '/dashboard.html',
+        // ✅ التعديل هنا: التوجيه إلى صفحة العبور بدلاً من dashboard
+        redirectTo: window.location.origin + '/auth-callback.html',
         scopes: 'https://www.googleapis.com/auth/userinfo.email'
       }
     });
@@ -51,6 +52,7 @@ async function requireAuth() {
     currentPage.includes('login.html') ||
     currentPage.includes('register.html') ||
     currentPage.includes('complete-profile.html') ||
+    currentPage.includes('auth-callback.html') || // ✅ تمت الإضافة
     currentPage === '/' ||
     currentPage.includes('index.html')
   ) {
@@ -221,7 +223,8 @@ document.addEventListener('DOMContentLoaded', () => {
         btn.disabled = false;
         btn.querySelector('span').textContent = 'دخول';
       } else {
-        window.location.href = '/dashboard.html';
+        // ✅ التعديل هنا أيضاً: التوجيه إلى صفحة العبور بعد الدخول بالبريد
+        window.location.href = '/auth-callback.html';
       }
     });
   }
