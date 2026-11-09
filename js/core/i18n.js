@@ -2900,7 +2900,7 @@ let dbTranslations = {};
 
 // ✅ اسم كاش جديد تماماً v7 لمسح أي ذكريات قديمة
 function getCacheKey(lang) {
-  return `app_translations_v7_${lang}`; 
+  return `app_translations_v8_${lang}`; 
 }
 
 // 1. قراءة الكاش فوراً
