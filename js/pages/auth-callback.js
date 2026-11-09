@@ -1,10 +1,15 @@
 // ============================================
 // معالجة تسجيل الدخول (Callback)
-// ✅ ترجمة كاملة + توجيه ذكي
+// ✅ انتظار الترجمة من Supabase + توجيه ذكي
 // ============================================
 
 document.addEventListener('DOMContentLoaded', async () => {
-  // تفعيل الترجمة
+  // ✅ الانتظار حتى يتم جلب أحدث الترجمات من Supabase
+  if (typeof window.fetchSupabaseTranslations === 'function') {
+    await window.fetchSupabaseTranslations();
+  }
+
+  // تفعيل الترجمة بعد التحميل
   if (window.applyLanguage) await window.applyLanguage();
   const tr = (key) => (window.t ? window.t(key) : key);
 
@@ -12,7 +17,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const errBox = document.getElementById('error-details');
   const spinner = document.getElementById('spinner');
 
-  // ترجمة النصوص الأولية بشكل صريح (لضمان التحديث)
+  // ترجمة النصوص الأولية
   if (msg) {
     msg.innerHTML = `
       <span data-i18n="auth_cb_checking">${tr('auth_cb_checking')}</span>
