@@ -1,5 +1,5 @@
 // ============================================
-// صفحة البطاقة البنكية (Lemon Squeezy / Gumroad)
+// صفحة البطاقة البنكية (Gumroad Integration)
 // ✅ تقرأ وتكتب من جدول bank_cards المنفصل
 // ✅ تعمل مع جميع المستخدمين (Google / بريد إلكتروني)
 // ✅ تدعم عرض التاريخ بثلاث لغات (عربي، فرنسي، إنجليزي)
@@ -23,11 +23,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   if (window.applyLanguage) window.applyLanguage();
   const tr = (key) => (window.t ? window.t(key) : key);
-
-  // ✅ إعدادات اللغة للتواريخ
-  const lang = window.getCurrentLang ? window.getCurrentLang() : 'ar';
-  const localeMap = { ar: 'ar-MA', fr: 'fr-FR', en: 'en-US' };
-  const locale = localeMap[lang] || 'en-US';
 
   document.title = tr('bc_title_full');
 
@@ -267,7 +262,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             ${subscription.expires_at ? `
               <div class="bc-info-row">
                 <i class="fas fa-calendar"></i>
-                <span>${tr('bc_sub_expires')}: <strong>${new Date(subscription.expires_at).toLocaleDateString(locale)}</strong></span>
+                <span>${tr('bc_sub_expires')}: <strong>${window.formatAppDate ? window.formatAppDate(subscription.expires_at) : new Date(subscription.expires_at).toLocaleDateString()}</strong></span>
               </div>
             ` : ''}
           </div>

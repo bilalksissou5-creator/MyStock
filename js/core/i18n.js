@@ -3030,6 +3030,27 @@ document.addEventListener('DOMContentLoaded', () => {
     fetchSupabaseTranslations();
 });
 
+// ============================================
+// ✅ دالة موحدة لترجمة وعرض التواريخ بثلاث لغات
+// ============================================
+function formatAppDate(dateString) {
+  if (!dateString) return '—';
+  
+  const date = new Date(dateString);
+  if (isNaN(date.getTime())) return '—'; // حماية ضد التواريخ غير الصالحة
+
+  const lang = window.getCurrentLang ? window.getCurrentLang() : 'ar';
+  const localeMap = { ar: 'ar-MA', fr: 'fr-FR', en: 'en-US' };
+  const locale = localeMap[lang] || 'ar-MA';
+  
+  // تنسيق موحد يضمن ظهور اليوم والشهر والسنة (بدون تشوهات)
+  return date.toLocaleDateString(locale, { 
+    year: 'numeric', 
+    month: '2-digit', 
+    day: '2-digit' 
+  });
+}
+
 // 8. تصدير الدوال 
 window.t = t;
 window.tCountry = tCountry;
