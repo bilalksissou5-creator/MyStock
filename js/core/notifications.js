@@ -1,6 +1,6 @@
 // ============================================
 // الإشعارات
-// ✅ محرك ذكي لاختيار الصور تلقائياً حسب نوع الإشعار
+// ✅ دعم إشعارات الهاتف مع صور مخصصة (Banner) + محرك ذكي لاختيار الصور
 // ============================================
 
 async function getUnreadCount() {
@@ -17,9 +17,6 @@ async function getUnreadCount() {
   return count ?? 0;
 }
 
-// ============================================
-// إنشاء إشعار لمستخدم واحد
-// ============================================
 async function createNotification({
   userId,
   orgId,
@@ -28,7 +25,7 @@ async function createNotification({
   type = 'info',
   link = null,
   userName = null,
-  imageUrl = null, // يمكنك تركها فارغة ليقوم النظام باختيار الصورة تلقائياً
+  imageUrl = null,
 }) {
   const { error } = await db.from('notifications').insert({
     user_id: userId,
@@ -48,9 +45,6 @@ async function createNotification({
   return true;
 }
 
-// ============================================
-// إنشاء إشعار لكل عمال المنظمة
-// ============================================
 async function notifyOrganization({
   orgId,
   title,
@@ -163,7 +157,6 @@ function getSmartImage(notification) {
   if (notification.image_url) return notification.image_url;
 
   const link = (notification.link || '').toLowerCase();
-  const title = (notification.title || '').toLowerCase();
   const type = (notification.type || '').toLowerCase();
 
   // 2. تحليل الرابط (link) لمعرفة نوع الإشعار

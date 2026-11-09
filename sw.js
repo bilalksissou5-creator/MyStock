@@ -1,7 +1,7 @@
 // ✅ Service Worker لدعم الإشعارات والعمل بدون إنترنت
 // ✅ مسح تلقائي للكاش القديم عند كل تحديث
 
-const CACHE_NAME = 'mystock-v9';
+const CACHE_NAME = 'mystock-v10'; // يمكنك تغيير الرقم عند كل تحديث كبير
 
 self.addEventListener('install', (e) => {
   self.skipWaiting(); // إجبار المتصفح على تفعيل النسخة الجديدة فوراً
@@ -32,7 +32,7 @@ self.addEventListener('fetch', (e) => {
   );
 });
 
-// ✅ استقبال الإشعارات من الخادم
+// ✅ استقبال الإشعارات من الخادم (Push Notifications)
 self.addEventListener('push', function(event) {
   if (event.data) {
     const data = event.data.json();
@@ -41,7 +41,8 @@ self.addEventListener('push', function(event) {
     const options = {
       body: data.body,
       icon: baseUrl + '/assets/img/icon-192.png', // شعار التطبيق (يمين)
-      image: data.image_url || (baseUrl + '/assets/img/receipt-banner.png'), // صورة الإشعار (بانر)
+      // استخدام صورة البانر المرسلة من الخادم، أو الصورة الافتراضية
+      image: data.image_url || (baseUrl + '/assets/img/receipt-banner.png'), 
       badge: baseUrl + '/assets/img/badge.png', // أيقونة صغيرة (شريط الحالة)
       vibrate: [200, 100, 200],
       data: {
@@ -61,7 +62,7 @@ self.addEventListener('notificationclick', function(event) {
     clients.matchAll({ type: 'window', includeUncontrolled: true }).then(function(clientList) {
       const urlToOpen = new URL(event.notification.data.url, self.location.origin).href;
       
-      // إذا كان التطبيق مفتوحاً بالفعل، قم بتركيزه
+      // إذا كان التطبيق مفتوحاً بالفعل، قم بتركيزه على الصفحة المطلوبة
       for (let i = 0; i < clientList.length; i++) {
         const client = clientList[i];
         if (client.url === urlToOpen && 'focus' in client) {
