@@ -1,33 +1,27 @@
 // ============================================
 // صفحة لوحة التحكم
-// ✅ بطاقة حركات المخزون (خطان)
+// ✅ بطاقة حركات المخزون (خطان متزامنان)
 // ✅ بطاقة الأرباح (أعمدة)
 // ✅ دعم كامل للترجمة (تحديث فوري)
-// ✅ إضافة فلترة المنظمة لضمان دقة البيانات
+// ✅ تجميع البيانات (بالساعة/اليوم/الشهر) لضمان دقة الرسم
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   const user = await requireAuth();
   if (!user) return;
 
-  // 1. رسم الهيكل الأساسي
   renderLayout('dashboard.html');
-
-  // 2. انتظار جلب الترجمات من Supabase وتطبيقها
   if (window.applyLanguage) await window.applyLanguage();
   
   const tr = (key) => (window.t ? window.t(key) : key);
-
   document.title = tr('dash_title') || 'Dashboard';
 
   const main = document.getElementById('main-content');
 
-  // 3. بناء واجهة لوحة التحكم
   main.innerHTML = `
     <div class="page-header">
       <h2 data-i18n="dash_title">${tr('dash_title')}</h2>
     </div>
 
-    <!-- بطاقة حركات المخزون -->
     <div class="stock-value-card">
       <div class="stock-top-row">
         <div class="stock-right-col">
@@ -102,7 +96,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       </div>
     </div>
 
-    <!-- بطاقة الأرباح -->
     <div class="profit-card">
       <div class="stock-top-row">
         <div class="stock-right-col">
@@ -176,7 +169,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       </div>
     </div>
 
-    <!-- البطاقات السريعة -->
     <div class="stats-grid">
       <div class="stat-card">
         <div class="stat-label" data-i18n="dash_products">${tr('dash_products')}</div>
@@ -230,45 +222,71 @@ async function loadStats() {
   if (el('stat-today')) el('stat-today').textContent = todayMovements;
 }
 
-// ✅ إضافة فلترة المنظمة هنا
+// ✅ دالة موحدة لتجميع البيانات لكل الفترات
 async function computeMovementsHistory(days) {
   const { data: { user } } = await db.auth.getUser();
-  if (!user) return { mode: 'daily', dates: [], inSeries: [], outSeries: [] };
-  
+  if (!user) return { dates: [], inSeries: [], outSeries: [] };
+
   const { data: profile } = await db.from('profiles').select('organization_id').eq('id', user.id).single();
-  if (!profile?.organization_id) return { mode: 'daily', dates: [], inSeries: [], outSeries: [] };
+  if (!profile?.organization_id) return { dates: [], inSeries: [], outSeries: [] };
 
   const now = new Date();
-  const startDate = new Date(Date.UTC(
-    now.getUTCFullYear(),
-    now.getUTCMonth(),
-    now.getUTCDate() - days,
-    0, 0, 0, 0
-  ));
+  const startDate = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() - days, 0, 0, 0, 0));
 
   const { data: movements } = await db
     .from('stock_movements')
     .select('type, quantity, created_at')
-    .eq('organization_id', profile.organization_id) // <--- التعديل هنا
+    .eq('organization_id', profile.organization_id)
     .gte('created_at', startDate.toISOString())
     .order('created_at', { ascending: true });
 
-  if (days === 1) {
-    const inOps = [];
-    const outOps = [];
+  const dates = [];
+  const inSeries = [];
+  const outSeries = [];
 
+  // 1. وضع اليوم (تجميع بالساعة)
+  if (days === 1) {
+    const hourMap = {};
     (movements ?? []).forEach(m => {
-      const ts = new Date(m.created_at).getTime();
-      const point = { x: ts, y: Number(m.quantity ?? 0) };
-      if (m.type === 'in') inOps.push(point);
-      else if (m.type === 'out') outOps.push(point);
+      const date = new Date(m.created_at);
+      const hour = date.getUTCHours();
+      if (!hourMap[hour]) hourMap[hour] = { in: 0, out: 0 };
+      if (m.type === 'in') hourMap[hour].in += Number(m.quantity ?? 0);
+      else if (m.type === 'out') hourMap[hour].out += Number(m.quantity ?? 0);
     });
 
-    return { mode: 'per-operation', inOps, outOps };
+    const startOfDay = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), 0, 0, 0, 0));
+    for (let i = 0; i < 24; i++) {
+      const time = startOfDay.getTime() + (i * 60 * 60 * 1000);
+      dates.push(time);
+      inSeries.push(hourMap[i]?.in || 0);
+      outSeries.push(hourMap[i]?.out || 0);
+    }
+    return { dates, inSeries, outSeries };
   }
 
-  const dayMap = {};
+  // 2. وضع السنة (تجميع بالشهر)
+  if (days >= 365) {
+    const monthMap = {};
+    (movements ?? []).forEach(m => {
+      const month = m.created_at.slice(0, 7);
+      if (!monthMap[month]) monthMap[month] = { in: 0, out: 0 };
+      if (m.type === 'in') monthMap[month].in += Number(m.quantity ?? 0);
+      else if (m.type === 'out') monthMap[month].out += Number(m.quantity ?? 0);
+    });
 
+    for (let i = 11; i >= 0; i--) {
+      const d = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() - i, 1));
+      const monthKey = d.toISOString().slice(0, 7);
+      dates.push(d.getTime());
+      inSeries.push(monthMap[monthKey]?.in || 0);
+      outSeries.push(monthMap[monthKey]?.out || 0);
+    }
+    return { dates, inSeries, outSeries };
+  }
+
+  // 3. وضع 7 أو 30 يوم (تجميع باليوم)
+  const dayMap = {};
   (movements ?? []).forEach(m => {
     const day = m.created_at.slice(0, 10);
     if (!dayMap[day]) dayMap[day] = { in: 0, out: 0 };
@@ -276,40 +294,16 @@ async function computeMovementsHistory(days) {
     else if (m.type === 'out') dayMap[day].out += Number(m.quantity ?? 0);
   });
 
-  const dates = [];
-  const inSeries = [];
-  const outSeries = [];
-
-  if (days >= 365) {
-    const monthMap = {};
-    Object.keys(dayMap).forEach(day => {
-      const month = day.slice(0, 7);
-      if (!monthMap[month]) monthMap[month] = { in: 0, out: 0 };
-      monthMap[month].in += dayMap[day].in;
-      monthMap[month].out += dayMap[day].out;
-    });
-
-    const months = Object.keys(monthMap).sort();
-    months.forEach(m => {
-      dates.push(new Date(m + '-01T00:00:00Z').getTime());
-      inSeries.push(monthMap[m].in);
-      outSeries.push(monthMap[m].out);
-    });
-
-    return { mode: 'daily', dates, inSeries, outSeries };
-  }
-
   for (let i = 0; i <= days; i++) {
     const date = new Date(startDate.getTime() + i * 24 * 60 * 60 * 1000);
     const key = date.toISOString().slice(0, 10);
     const data = dayMap[key] ?? { in: 0, out: 0 };
-
     dates.push(date.getTime());
     inSeries.push(data.in);
     outSeries.push(data.out);
   }
 
-  return { mode: 'daily', dates, inSeries, outSeries };
+  return { dates, inSeries, outSeries };
 }
 
 let stockChart = null;
@@ -324,8 +318,7 @@ async function loadStockChart(days) {
     30: tr('dash_sub_30'),
     365: tr('dash_sub_365'),
   };
-  document.getElementById('stock-subtitle').textContent =
-    subtitleMap[days] ?? tr('dash_stock_moves');
+  document.getElementById('stock-subtitle').textContent = subtitleMap[days] ?? tr('dash_stock_moves');
 
   document.getElementById('chart-section-title').textContent = tr('dash_stock_moves');
   document.getElementById('chart-badge').innerHTML =
@@ -338,13 +331,8 @@ async function loadStockChart(days) {
   let countIn = 0;
   let countOut = 0;
 
-  if (data.mode === 'per-operation') {
-    data.inOps.forEach(o => { totalIn += o.y; countIn++; });
-    data.outOps.forEach(o => { totalOut += o.y; countOut++; });
-  } else {
-    data.inSeries.forEach(v => { totalIn += v; if (v > 0) countIn++; });
-    data.outSeries.forEach(v => { totalOut += v; if (v > 0) countOut++; });
-  }
+  data.inSeries.forEach(v => { totalIn += v; if (v > 0) countIn++; });
+  data.outSeries.forEach(v => { totalOut += v; if (v > 0) countOut++; });
 
   document.getElementById('hero-value').textContent = String(countIn + countOut);
 
@@ -356,9 +344,7 @@ async function loadStockChart(days) {
   document.getElementById('stat-avg-value').textContent = String(countIn + countOut);
   document.getElementById('stat-max-value').textContent = String(totalOut);
 
-  const hasData = data.mode === 'per-operation'
-    ? (data.inOps.length + data.outOps.length > 0)
-    : (data.inSeries.some(v => v > 0) || data.outSeries.some(v => v > 0));
+  const hasData = data.inSeries.some(v => v > 0) || data.outSeries.some(v => v > 0);
 
   if (!hasData) {
     if (stockChart) { stockChart.destroy(); stockChart = null; }
@@ -367,38 +353,14 @@ async function loadStockChart(days) {
     return;
   }
 
-  let series;
-  let xaxisConfig;
+  const series = [
+    { name: tr('dash_in'), data: data.inSeries },
+    { name: tr('dash_out'), data: data.outSeries },
+  ];
 
-  if (data.mode === 'per-operation') {
-    series = [
-      { name: tr('dash_in'), data: data.inOps },
-      { name: tr('dash_out'), data: data.outOps },
-    ];
-    xaxisConfig = {
-      type: 'datetime',
-      labels: {
-        style: { fontSize: '11px', colors: '#a3a3a3' },
-        datetimeUTC: true,
-        format: 'HH:mm',
-      },
-      tickAmount: 6,
-    };
-  } else {
-    series = [
-      { name: tr('dash_in'), data: data.inSeries },
-      { name: tr('dash_out'), data: data.outSeries },
-    ];
-    xaxisConfig = {
-      type: 'datetime',
-      categories: data.dates,
-      labels: {
-        style: { fontSize: '11px', colors: '#a3a3a3' },
-        datetimeUTC: true,
-        format: days >= 365 ? 'MMM yyyy' : 'dd MMM',
-      },
-    };
-  }
+  let format = 'dd MMM';
+  if (days === 1) format = 'HH:mm';
+  if (days >= 365) format = 'MMM yyyy';
 
   const options = {
     series,
@@ -413,19 +375,29 @@ async function loadStockChart(days) {
     colors: ['#2563eb', '#f97316'],
     dataLabels: { enabled: false },
     stroke: {
-      curve: data.mode === 'per-operation' ? 'straight' : 'smooth',
-      width: 2.5,
+      curve: 'smooth',
+      width: 3,
       colors: ['#2563eb', '#f97316'],
     },
     markers: {
-      size: data.mode === 'per-operation' ? 7 : 4,
+      size: 5,
       colors: ['#ffffff', '#ffffff'],
       strokeColors: ['#2563eb', '#f97316'],
-      strokeWidth: data.mode === 'per-operation' ? 3 : 2,
-      hover: { size: data.mode === 'per-operation' ? 10 : 7 },
+      strokeWidth: 2,
+      hover: { size: 7 },
       shape: 'circle',
     },
-    xaxis: { ...xaxisConfig, axisBorder: { show: false }, axisTicks: { show: false } },
+    xaxis: {
+      type: 'datetime',
+      categories: data.dates,
+      labels: {
+        style: { fontSize: '11px', colors: '#a3a3a3' },
+        datetimeUTC: true,
+        format: format,
+      },
+      axisBorder: { show: false },
+      axisTicks: { show: false },
+    },
     yaxis: {
       labels: {
         style: { fontSize: '11px', colors: '#a3a3a3' },
@@ -454,7 +426,7 @@ async function loadStockChart(days) {
     },
     tooltip: {
       theme: 'light',
-      x: { format: data.mode === 'per-operation' ? 'HH:mm:ss' : 'dd MMM yyyy' },
+      x: { format: format },
       y: { formatter: (val) => val.toString() },
     },
   };
@@ -464,7 +436,6 @@ async function loadStockChart(days) {
   stockChart.render();
 }
 
-// ✅ إضافة فلترة المنظمة هنا أيضاً
 async function computeProfitHistory(days) {
   const { data: { user } } = await db.auth.getUser();
   if (!user) return { mode: 'daily', dates: [], profits: [] };
@@ -473,17 +444,12 @@ async function computeProfitHistory(days) {
   if (!profile?.organization_id) return { mode: 'daily', dates: [], profits: [] };
 
   const now = new Date();
-  const startDate = new Date(Date.UTC(
-    now.getUTCFullYear(),
-    now.getUTCMonth(),
-    now.getUTCDate() - days,
-    0, 0, 0, 0
-  ));
+  const startDate = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() - days, 0, 0, 0, 0));
 
   const { data: receipts } = await db
     .from('receipts')
     .select('id, created_at')
-    .eq('organization_id', profile.organization_id) // <--- التعديل هنا
+    .eq('organization_id', profile.organization_id)
     .gte('created_at', startDate.toISOString())
     .order('created_at', { ascending: true });
 
@@ -567,8 +533,7 @@ async function loadProfitChart(days) {
     30: tr('dash_prof_sub_30'),
     365: tr('dash_prof_sub_365'),
   };
-  document.getElementById('profit-subtitle').textContent =
-    subtitleMap[days] ?? tr('dash_profit');
+  document.getElementById('profit-subtitle').textContent = subtitleMap[days] ?? tr('dash_profit');
 
   const profits = data.profits;
   const totalProfit = profits.reduce((s, v) => s + v, 0);
@@ -595,10 +560,7 @@ async function loadProfitChart(days) {
   }
 
   const options = {
-    series: [{
-      name: tr('dash_profit'),
-      data: profits,
-    }],
+    series: [{ name: tr('dash_profit'), data: profits }],
     chart: {
       type: 'bar',
       height: 380,
@@ -670,7 +632,6 @@ function setupChartFilters() {
     btn.addEventListener('click', async () => {
       document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
-
       const days = Number(btn.dataset.days);
       await loadStockChart(days);
     });
@@ -682,7 +643,6 @@ function setupProfitFilters() {
     btn.addEventListener('click', async () => {
       document.querySelectorAll('.profit-filter-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
-
       const days = Number(btn.dataset.days);
       await loadProfitChart(days);
     });
