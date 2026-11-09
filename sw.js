@@ -1,7 +1,7 @@
 // ✅ Service Worker لدعم الإشعارات والعمل بدون إنترنت
 // ✅ مسح تلقائي للكاش القديم عند كل تحديث
 
-const CACHE_NAME = 'mystock-v202611091140';
+const CACHE_NAME = 'mystock-v202611091200';
 
 self.addEventListener('install', (e) => {
   self.skipWaiting(); // إجبار المتصفح على تفعيل النسخة الجديدة فوراً
@@ -36,10 +36,12 @@ self.addEventListener('fetch', (e) => {
 self.addEventListener('push', function(event) {
   if (event.data) {
     const data = event.data.json();
+    const baseUrl = self.location.origin; // جلب رابط الموقع الأساسي لضمان تحميل الصور
+    
     const options = {
       body: data.body,
-      icon: '/assets/img/icon-192.png',
-      badge: '/assets/img/icon-192.png',
+      icon: baseUrl + '/assets/img/icon-192.png', // الشعار الكبير
+      image: baseUrl + '/assets/img/icon-512.png', // بانر كبير أسفل الإشعار
       vibrate: [200, 100, 200],
       data: {
         url: data.url || '/'
@@ -57,12 +59,16 @@ self.addEventListener('notificationclick', function(event) {
   event.waitUntil(
     clients.matchAll({ type: 'window', includeUncontrolled: true }).then(function(clientList) {
       const urlToOpen = new URL(event.notification.data.url, self.location.origin).href;
+      
+      // إذا كان التطبيق مفتوحاً بالفعل، قم بتركيزه
       for (let i = 0; i < clientList.length; i++) {
         const client = clientList[i];
         if (client.url === urlToOpen && 'focus' in client) {
           return client.focus();
         }
       }
+      
+      // إذا لم يكن مفتوحاً، افتح نافذة جديدة
       if (clients.openWindow) {
         return clients.openWindow(urlToOpen);
       }

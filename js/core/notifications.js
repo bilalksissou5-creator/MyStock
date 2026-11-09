@@ -209,7 +209,7 @@ function startNotifPolling() {
           
           if (user && payload.new && payload.new.user_id === user.id) {
             
-            // 1. تشغيل الصوت والاهتزاز (الكود القديم الخاص بك)
+            // 1. تشغيل الصوت والاهتزاز
             if (typeof window.playNotificationAlerts === 'function') {
               window.playNotificationAlerts();
             }
@@ -218,10 +218,12 @@ function startNotifPolling() {
             if ('Notification' in window && Notification.permission === 'granted') {
               try {
                 const reg = await navigator.serviceWorker.ready;
+                const baseUrl = window.location.origin;
+                
                 reg.showNotification(payload.new.title || 'إشعار جديد', {
                   body: payload.new.message || '',
-                  icon: '/assets/img/icon-192.png',
-                  badge: '/assets/img/icon-192.png',
+                  icon: baseUrl + '/assets/img/icon-192.png', // الشعار الكبير
+                  image: baseUrl + '/assets/img/icon-512.png', // بانر كبير أسفل الإشعار
                   vibrate: [200, 100, 200],
                   data: { url: payload.new.link || '/' }
                 });
