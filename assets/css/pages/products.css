@@ -176,9 +176,9 @@ html.in-iframe .products {
 
 /* ============================================
    ✅ الحل الجذري للشاشات الكبيرة (التابلت والحاسوب)
-   ✅ استخدام CSS Grid للمحاذاة بدون المساس بالتنسيقات الأصلية
+   ✅ تم تغيير 768px إلى 600px ليشمل التابلت العمودي
    ============================================ */
-@media (min-width: 768px) {
+@media (min-width: 600px) {
   /* تحويل الحاوية الرئيسية إلى شبكة من 3 أعمدة (عنوان - بحث - زر) */
   html:not(.in-iframe) .main,
   html:not(.in-iframe) #main-content {
@@ -189,7 +189,7 @@ html.in-iframe .products {
     column-gap: 20px !important;
     row-gap: 20px !important;
     
-    /* توسيط العناصر عمودياً لتكون على نفس الخط بفضل ارتفاعاتها الطبيعية */
+    /* توسيط العناصر عمودياً لتكون على نفس الخط */
     align-items: center !important;
     
     padding: 24px !important;
@@ -220,7 +220,6 @@ html.in-iframe .products {
     padding: 0 !important;
     width: 100% !important;
     max-width: none !important;
-    /* ✅ هنا لم نغير أي تنسيق للحقل، سيأخذ شكله الدائري وارتفاعه من common.css */
   }
 
   /* 3. زر إضافة منتج */
