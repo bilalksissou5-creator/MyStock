@@ -1,6 +1,6 @@
 /* ============================================
    صفحة تفاصيل المنتج - التصميم الشبكي المتجاوب
-   ✅ التعديل يفتح بشكل مثالي (بدون إزاحة أو اختفاء)
+   ✅ تعديل inline مثالي: بدون إزاحة، بدون قفز، وبدون تغيير حجم
    ============================================ */
 
 /* ✅ 1. إجبار العنوان وحاوية البطاقات على أخذ نفس العرض والتوسط */
@@ -210,34 +210,36 @@
    ✅ 6. التعديل المثالي (بدون إزاحة أو تأثير)
    ============================================ */
 
-/* 1. الحاوية: حجمها ثابت ولا يتأثر بأي تغيير */
+/* 1. الحاوية: حجمها ثابت ولا يتأثر */
 .edit-field { 
   display: inline-flex; 
   align-items: center; 
   justify-content: inherit; 
   cursor: pointer; 
-  padding: 4px 8px !important; /* حشوة ثابتة */
-  margin: -4px -8px !important; /* هوامش ثابتة */
-  border-radius: 6px; 
+  padding: 2px 6px !important; 
+  margin: -2px -6px !important; 
+  border-radius: 4px; 
   transition: background 0.15s; 
   font-size: inherit; 
-  position: relative !important; /* ضروري لكي يغطي الحقل الحاوية */
-  max-width: 100%; 
+  position: relative !important; 
+  box-sizing: border-box;
   white-space: nowrap; 
 }
 .edit-field:hover { background: rgba(0, 0, 0, 0.05); }
 
-/* عند التعديل: نحتفظ بنفس الحشوة ونخفي لون النص فقط */
+/* 2. حالة التعديل: النص الأصلي يصبح شفافاً (يبقى محتجزاً لمساحته) */
 .edit-field.editing { 
+  color: transparent !important; 
   background: #ffffff !important; 
-  cursor: text !important; 
-  color: transparent !important; /* إخفاء النص الأصلي لكي يظهر الحقل فوقه */
+  box-shadow: 0 0 0 1.5px #2563eb !important; /* إطار لا يستهلك مساحة */
   z-index: 20 !important; 
 }
 
-.edit-field.center { justify-content: center !important; text-align: center !important; width: 100% !important; }
+/* للحفاظ على التوسيط في الإحصائيات */
+.edit-field.center { justify-content: center !important; text-align: center !important; }
+.product-stats .edit-field.center { padding: 0 4px !important; margin: 0 -4px !important; }
 
-/* 2. الحقل الجديد: طبقة تغطي النص تماماً */
+/* 3. الحقل الجديد: يغطي الحاوية بالضبط */
 .inline-input { 
   position: absolute !important;
   top: 0 !important;
@@ -245,28 +247,22 @@
   width: 100% !important;
   height: 100% !important;
   margin: 0 !important;
-  padding: 0 8px !important; /* تعويض الحشوة لكي يبدأ النص من نفس المكان */
+  padding: 0 6px !important; 
   box-sizing: border-box !important;
-  border: none !important; /* إزالة الإطار */
-  outline: 2px solid #2563eb !important; /* إطار لا يستهلك مساحة */
-  outline-offset: -2px !important;
-  border-radius: 6px !important;
-  background: #ffffff !important; 
-  color: #171717 !important; /* لون النص */
-  text-align: inherit !important; /* يرث المحاذاة */
+  border: none !important; 
+  background: transparent !important;
+  color: #171717 !important; 
+  text-align: inherit !important; 
   font-family: inherit !important; 
   font-size: inherit !important; 
   font-weight: inherit !important; 
-  line-height: inherit !important; 
+  outline: none !important; 
   z-index: 100 !important;
+  -webkit-appearance: none !important;
+  appearance: none !important;
 }
 
-/* بالنسبة لبطاقات الإحصائيات: توسيط النص */
-.product-stats .edit-field.center { padding: 0 !important; margin: 0 !important; }
-.product-stats .inline-input { 
-  text-align: center !important; 
-  padding: 0 !important; 
-}
+.product-stats .inline-input { padding: 0 4px !important; text-align: center !important; }
 
 .save-indicator { color: #16a34a; font-size: 12px; margin-inline-start: 4px; animation: fadeInCheck 0.2s ease-out; }
 @keyframes fadeInCheck { from { opacity: 0; transform: scale(0.7); } to { opacity: 1; transform: scale(1); } }
