@@ -1,6 +1,6 @@
 /* ============================================
    صفحة تفاصيل المنتج - التصميم الشبكي المتجاوب
-   ✅ تعديل مباشر خالي من تمدد البطاقات (Zero Layout Shift)
+   ✅ تعديل مباشر ثابت 100% (لا يقفز ولا يغير اتجاه العناصر)
    ============================================ */
 
 /* ✅ 1. إجبار العنوان وحاوية البطاقات على أخذ نفس العرض والتوسط */
@@ -115,7 +115,6 @@
 .image-edit-btn i { font-size: 12px !important; line-height: 1 !important; }
 .image-edit-btn:hover { background: #171717 !important; transform: scale(1.08) !important; }
 
-/* ✅ التعديل: توحيد حجم اسم المنتج ليكون 18px */
 .detail-title { 
   font-size: 18px !important; 
   font-weight: 600 !important; 
@@ -208,42 +207,41 @@
 .field-hint { display: block; font-size: 11px; color: #a3a3a3; margin-top: 6px; text-align: start; }
 
 /* ============================================
-   ✅ 6. التعديل المباشر الاحترافي (بدون أي تمدد)
+   ✅ 6. التعديل المباشر (إصلاح القفز وتغيير الاتجاه)
    ============================================ */
 
-/* 1. الحاوية: نعطيها position relative لكي نتمكن من وضع الحقل فوقها */
+/* 1. الحاوية الأصلية: نحافظ على اتجاهها وحجمها */
 .edit-field { 
   display: inline-flex; 
   align-items: center; 
-  justify-content: inherit; 
+  justify-content: inherit; /* يرث المحاذاة (يمين أو يسار) */
+  gap: 4px; 
   cursor: pointer; 
-  padding: 0 4px; 
-  margin: 0 -4px; 
-  border-radius: 4px; 
-  position: relative; /* ضروري جداً */
-  font-size: inherit; 
-  line-height: inherit;
-  white-space: nowrap; 
+  padding: 4px 8px !important; 
+  margin: -4px -8px !important; 
+  border-radius: 6px; 
   transition: background 0.15s; 
+  min-height: 24px; 
+  font-size: inherit; 
+  position: relative; /* ضروري لتغطية الحقل */
+  max-width: 100%; 
+  overflow: hidden; 
+  text-overflow: ellipsis; 
+  white-space: nowrap; 
+  box-sizing: border-box !important;
 }
 .edit-field:hover { background: #f0f0f0; }
 
-/* 2. حالة التعديل: خلفية بيضاء وإطار أزرق لا يستهلك مساحة */
+/* 2. حالة التعديل: نخفي النص فقط (بدون تغيير display أو padding) */
 .edit-field.editing { 
   background: #ffffff !important; 
-  box-shadow: 0 0 0 1.5px #2563eb !important; 
+  cursor: text !important; 
   z-index: 20 !important; 
+  color: transparent !important; /* يخفي النص الأصلي ويحتفظ بمساحته */
+  box-shadow: 0 0 0 1.5px #2563eb !important; /* إطار لا يستهلك مساحة */
 }
 
-/* 3. السحر: إجبار الحاوية على أخذ عرض وارتفاع النص الأصلي حتى لو تم حذفه */
-.edit-field.editing::before {
-  content: attr(data-value);
-  display: inline-block;
-  visibility: hidden;
-  white-space: pre; /* الحفاظ على المسافات */
-}
-
-/* 4. الحقل نفسه: طبقة تغطي الحاوية بالضبط بدون التأثير على حجمها */
+/* 3. الحقل: طبقة تغطي النص بالضبط وترث اتجاهه */
 .inline-input { 
   position: absolute !important;
   top: 0 !important;
@@ -251,12 +249,12 @@
   width: 100% !important;
   height: 100% !important;
   margin: 0 !important;
-  padding: 0 4px !important; 
+  padding: 0 8px !important; /* تعويض حشوة الحاوية */
   box-sizing: border-box !important;
   border: none !important; 
   background: transparent !important; 
   color: #171717 !important; 
-  text-align: inherit !important; 
+  text-align: inherit !important; /* يرث اتجاه النص */
   font-size: inherit !important; 
   font-weight: inherit !important; 
   font-family: inherit !important; 
@@ -267,15 +265,15 @@
   appearance: none !important;
 }
 
-/* التخصيص لبطاقات الإحصائيات (الكمية، السعر) */
+/* 4. استثناء بطاقات الإحصائيات (الكمية، السعر) للتوسيط */
 .edit-field.center { 
   justify-content: center !important; 
   text-align: center !important; 
   width: 100% !important; 
 }
-.product-stats .edit-field.center {
+.product-stats .edit-field.center { 
   padding: 0 !important; 
-  margin: 0 !important;
+  margin: 0 !important; 
 }
 .product-stats .inline-input { 
   text-align: center !important; 
@@ -313,7 +311,7 @@
   [dir="rtl"] .switch input:checked + .switch-slider::before { transform: translateX(-20px); }
   
   .sell-price-input-group input[type="number"] { height: 34px !important; padding: 0 12px !important; font-size: 13px !important; }
-  .inline-input { font-size: 12px !important; }
+  .inline-input { font-size: 14px !important; }
 }
 
 /* ============================================
