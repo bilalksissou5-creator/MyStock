@@ -2,6 +2,7 @@
    صفحة تفاصيل المنتج - التصميم الشبكي المتجاوب
    ✅ محاذاة مضمونة 100% للعنوان مع البطاقات
    ✅ تفعيل التصميم العمودي للتابلت من 600px
+   ✅ توحيد حجم العناصر (الصورة، الخطوط، الحشوات) لتطابق صفحة المنتجات تماماً
    ============================================ */
 
 /* ✅ 1. إجبار العنوان وحاوية البطاقات على أخذ نفس العرض والتوسط */
@@ -10,7 +11,7 @@
   width: 100% !important;
   margin-left: auto !important;
   margin-right: auto !important;
-  padding: 0 !important; /* إزالة أي حشوة قد تسبب إزاحة */
+  padding: 0 !important;
   box-sizing: border-box !important;
 }
 
@@ -31,15 +32,15 @@
   width: 100%;
 }
 
-/* ✅ 2. التأكد من أن البطاقة تأخذ عرض العمود بالكامل بدون توسيط */
+/* ✅ 2. توحيد حشوة وحواف البطاقة لتطابق صفحة المنتجات */
 .product-card-detail {
   background: white;
-  border-radius: 10px;
-  padding: 12px;
+  border-radius: 10px !important; /* نفس حواف بطاقة المنتج */
+  padding: 12px !important; /* نفس حشوة بطاقة المنتج */
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
   width: 100% !important;
-  max-width: 100% !important; /* إلغاء أي عرض قديم كان يسبب المشكلة */
-  margin: 0 !important; /* إلغاء التوسيط */
+  max-width: 100% !important;
+  margin: 0 !important;
   box-sizing: border-box;
 }
 
@@ -49,8 +50,8 @@
 @media (min-width: 600px) {
   .details-layout {
     display: grid !important;
-    grid-template-columns: 1fr 1fr !important; /* عمودين متساويين */
-    align-items: stretch !important; /* إجبار العمودين على أخذ نفس الارتفاع */
+    grid-template-columns: 1fr 1fr !important;
+    align-items: stretch !important;
     gap: 16px !important;
   }
 
@@ -62,13 +63,13 @@
   }
 
   .main-col .product-card-detail {
-    height: 100% !important; /* البطاقة الأولى تأخذ كامل ارتفاع العمود */
+    height: 100% !important;
     display: flex !important;
     flex-direction: column !important;
   }
 
   .side-col .product-card-detail {
-    flex: 1 !important; /* البطاقتين الثانية والثالثة تقتسمان الارتفاع بالتساوي */
+    flex: 1 !important;
     display: flex !important;
     flex-direction: column !important;
     justify-content: flex-start !important;
@@ -76,23 +77,23 @@
 }
 
 /* ============================================
-   تنسيقات الصورة والحقول (كما هي)
+   ✅ 4. توحيد حجم الصورة والنصوص (تطابق صفحة المنتجات)
    ============================================ */
 .product-image {
   position: relative;
   background: #fafafa;
-  border-radius: 8px;
+  border-radius: 8px !important; /* نفس حواف صورة المنتج */
   width: 100%;
-  height: 140px; 
+  height: 140px !important; /* نفس ارتفاع صورة المنتج */
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  margin-bottom: 12px;
+  margin-bottom: 12px !important; /* نفس المسافة السفلية */
 }
 
 .product-image img { width: 100%; height: 100%; object-fit: cover; display: block; }
-.product-image i { font-size: 2.5rem; color: #d4d4d4; }
+.product-image i { font-size: 2.5rem !important; color: #d4d4d4; } /* نفس حجم الأيقونة */
 
 .image-edit-btn {
   position: absolute; bottom: 8px; inset-inline-start: 8px;
@@ -104,20 +105,59 @@
 .image-edit-btn i { font-size: 12px; line-height: 1; }
 .image-edit-btn:hover { background: #171717; transform: scale(1.08); }
 
-.detail-title { font-size: 1rem; font-weight: 600; margin-bottom: 6px; line-height: 1.3; text-align: start; }
-.detail-sku { color: #737373; font-size: 12px; margin-bottom: 12px; text-align: start; }
+/* ✅ تطابق حجم عنوان المنتج */
+.detail-title { 
+  font-size: 1rem !important; /* نفس حجم h3 في بطاقة المنتج */
+  font-weight: 600 !important; 
+  margin-bottom: 6px !important; 
+  line-height: 1.3; 
+  text-align: start; 
+}
 
-.product-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 12px; }
-.stat { background: #fafafa; border-radius: 6px; padding: 8px 4px; text-align: center; }
-.stat-label { font-size: 11px; color: #737373; margin-bottom: 4px; font-weight: 500; }
+/* ✅ تطابق حجم الـ SKU */
+.detail-sku { 
+  color: #737373; 
+  font-size: 12px !important; 
+  margin-bottom: 12px !important; 
+  text-align: start; 
+}
+
+/* ✅ تطابق شبكة الإحصائيات */
+.product-stats { 
+  display: grid; 
+  grid-template-columns: repeat(3, 1fr); 
+  gap: 6px !important; /* نفس المسافة بين المربعات */
+  margin-bottom: 12px !important; 
+}
+.stat { 
+  background: #fafafa; 
+  border-radius: 6px !important; /* نفس حواف المربع */
+  padding: 8px 4px !important; /* نفس حشوة المربع */
+  text-align: center; 
+}
+.stat-label { 
+  font-size: 11px !important; /* نفس حجم عنوان الإحصائية */
+  color: #737373; 
+  margin-bottom: 4px !important; 
+  font-weight: 500; 
+}
 
 .stat-value { 
-  font-size: 14px; font-weight: 600; color: #171717; 
-  display: flex; align-items: center; justify-content: center; 
-  gap: 4px; white-space: nowrap; overflow: hidden;
+  font-size: 14px !important; /* نفس حجم قيمة الإحصائية */
+  font-weight: 600 !important; 
+  color: #171717; 
+  display: flex; 
+  align-items: center; 
+  justify-content: center; 
+  gap: 4px; 
+  white-space: nowrap; 
+  overflow: hidden;
 }
 .stat-value.low { color: #dc2626; }
 
+/* ============================================
+   حقول الإعدادات (سعر البيع والمخزون)
+   ============================================ */
 .product-extra { border-top: 1px solid #f0f0f0; padding-top: 8px; margin-bottom: 18px; }
 .product-extra .row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #f5f5f5; font-size: 14px; }
 .product-extra .row:last-child { border-bottom: none; }
@@ -167,15 +207,40 @@
 .save-indicator { color: #16a34a; font-size: 12px; margin-inline-start: 4px; animation: fadeInCheck 0.2s ease-out; }
 @keyframes fadeInCheck { from { opacity: 0; transform: scale(0.7); } to { opacity: 1; transform: scale(1); } }
 
+/* ══════════════════════════════════════════
+   ✅ 5. توحيد حجم العناصر في شاشات الهاتف
+   ══════════════════════════════════════════ */
 @media (max-width: 599px) {
-  .product-card-detail { padding: 10px; border-radius: 10px; }
-  .product-image { height: 110px; border-radius: 8px; margin-bottom: 12px; }
-  .detail-title { font-size: 0.9rem; }
-  .detail-sku { font-size: 12px; margin-bottom: 12px; }
-  .product-stats { gap: 6px; margin-bottom: 12px; }
-  .stat { padding: 6px 2px; border-radius: 6px; }
-  .stat-label { font-size: 10px; }
-  .stat-value { font-size: 12px; }
+  .product-card-detail { 
+    padding: 10px !important; /* نفس حشوة الهاتف */
+    border-radius: 10px; 
+  }
+  .product-image { 
+    height: 110px !important; /* نفس ارتفاع الهاتف */
+    border-radius: 8px; 
+    margin-bottom: 12px; 
+  }
+  .detail-title { 
+    font-size: 0.9rem !important; /* نفس حجم خط الهاتف */
+  }
+  .detail-sku { 
+    font-size: 12px !important; 
+    margin-bottom: 12px; 
+  }
+  .product-stats { 
+    gap: 6px !important; 
+    margin-bottom: 12px; 
+  }
+  .stat { 
+    padding: 6px 2px !important; /* نفس حشوة الهاتف */
+    border-radius: 6px; 
+  }
+  .stat-label { 
+    font-size: 10px !important; /* نفس حجم خط الهاتف */
+  }
+  .stat-value { 
+    font-size: 12px !important; /* نفس حجم خط الهاتف */
+  }
   .product-extra .row { font-size: 13px; padding: 8px 0; }
   .image-edit-btn { width: 28px; height: 28px; bottom: 6px; inset-inline-start: 6px; }
   .image-edit-btn i { font-size: 11px; }
