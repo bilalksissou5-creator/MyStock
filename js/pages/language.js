@@ -2,7 +2,6 @@
 // صفحة اختيار اللغة (One UI) مع التحديث الفوري
 // ✅ اختيار + تطبيق فوري + علامة ✓
 // ✅ مزامنة اللغة بين الأجهزة عبر Supabase Realtime
-// ✅ إعادة تحميل الصفحة لضمان تطبيق الترجمة على كل التطبيق
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   if (window.applyLanguage) await window.applyLanguage();
@@ -50,9 +49,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     container.innerHTML = `
       <div class="lang-header">
         <h1 class="lang-header-title">${tr('lang_page_title')}</h1>
-        <button type="button" class="lang-edit-btn" id="edit-btn">
-          ${tr('lang_edit')}
-        </button>
+        <!-- ✅ تم إزالة زر التعديل (Edit) من هنا -->
       </div>
 
       <p class="lang-description">
@@ -79,24 +76,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('apply-btn')?.addEventListener('click', async () => {
       if (selectedLang === currentLang) return;
 
-      if (user && typeof db !== 'undefined') {
-        try {
-          await db.from('profiles').update({ app_lang: selectedLang }).eq('id', user.id);
-        } catch (e) { console.warn(e); }
-      }
-
-      if (window.setLanguage) {
-        await window.setLanguage(selectedLang);
-      } else {
-        localStorage.setItem('app_lang', selectedLang);
-      }
-
-      window.location.reload();
-    });
-
-    document.getElementById('edit-btn')?.addEventListener('click', async () => {
-      if (selectedLang === currentLang) return;
-      
       if (user && typeof db !== 'undefined') {
         try {
           await db.from('profiles').update({ app_lang: selectedLang }).eq('id', user.id);
