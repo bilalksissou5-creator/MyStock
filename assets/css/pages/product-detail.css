@@ -1,20 +1,21 @@
 /* ============================================
    صفحة تفاصيل المنتج - التصميم الشبكي المتجاوب
-   ✅ محاذاة العنوان والبطاقات
-   ✅ تصميم عمودين في شاشات التابلت (min-width: 700px)
+   ✅ محاذاة مضمونة 100% للعنوان مع البطاقات
+   ✅ تفعيل التصميم العمودي للتابلت من 600px
    ============================================ */
 
-/* ✅ الحاوية الرئيسية (تجمع العنوان والبطاقات لتكون محاذاتهم واحدة) */
+/* ✅ 1. إجبار العنوان وحاوية البطاقات على أخذ نفس العرض والتوسط */
 .page-header, .details-layout {
   max-width: 1060px !important;
   width: 100% !important;
-  margin-inline: auto !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  padding: 0 !important; /* إزالة أي حشوة قد تسبب إزاحة */
   box-sizing: border-box !important;
 }
 
 .page-header {
   margin-bottom: 16px !important;
-  padding: 0 !important;
 }
 
 .details-layout {
@@ -30,20 +31,22 @@
   width: 100%;
 }
 
-/* تنسيق البطاقة الأساسية */
+/* ✅ 2. التأكد من أن البطاقة تأخذ عرض العمود بالكامل بدون توسيط */
 .product-card-detail {
   background: white;
   border-radius: 10px;
   padding: 12px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
-  width: 100%;
+  width: 100% !important;
+  max-width: 100% !important; /* إلغاء أي عرض قديم كان يسبب المشكلة */
+  margin: 0 !important; /* إلغاء التوسيط */
   box-sizing: border-box;
 }
 
 /* ══════════════════════════════════════════
-   ✅ التصميم الجانبي (عمودين متجاورين)
+   ✅ 3. التصميم الجانبي (عمودين متجاورين)
    ══════════════════════════════════════════ */
-@media (min-width: 700px) {
+@media (min-width: 600px) {
   .details-layout {
     display: grid !important;
     grid-template-columns: 1fr 1fr !important; /* عمودين متساويين */
@@ -73,7 +76,7 @@
 }
 
 /* ============================================
-   تنسيقات الصورة والحقول (مطابقة لصفحة المنتجات)
+   تنسيقات الصورة والحقول (كما هي)
    ============================================ */
 .product-image {
   position: relative;
@@ -164,11 +167,7 @@
 .save-indicator { color: #16a34a; font-size: 12px; margin-inline-start: 4px; animation: fadeInCheck 0.2s ease-out; }
 @keyframes fadeInCheck { from { opacity: 0; transform: scale(0.7); } to { opacity: 1; transform: scale(1); } }
 
-@media (max-width: 699px) {
-  .page-header {
-    padding-inline: 16px !important;
-  }
-  
+@media (max-width: 599px) {
   .product-card-detail { padding: 10px; border-radius: 10px; }
   .product-image { height: 110px; border-radius: 8px; margin-bottom: 12px; }
   .detail-title { font-size: 0.9rem; }
