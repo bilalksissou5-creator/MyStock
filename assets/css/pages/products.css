@@ -1,7 +1,7 @@
 /* ============================================
    صفحة المنتجات (التصميم الأصلي)
    ✅ إصلاح اتجاه العملة ومنع نزولها لسطر جديد
-   ✅ محاذاة العناصر الثلاثة (العنوان، البحث، الزر) بدقة على نفس الخط
+   ✅ محاذاة العناصر الثلاثة بدقة على نفس الخط بنفس تنسيق الهاتف
    ✅ إصلاح جذري لتمدد البطاقات
    ============================================ */
 
@@ -175,28 +175,24 @@ html.in-iframe .products {
 }
 
 /* ============================================
-   ✅ المحاذاة الدقيقة للشاشات الكبيرة (التابلت والحاسوب)
+   ✅ المحاذاة الدقيقة للشاشات الكبيرة (تطابق الهاتف)
    ============================================ */
 @media (min-width: 768px) {
   .main, #main-content {
     display: grid !important;
-    /* العمود الأول للعنوان، الثاني للبحث، الثالث للزر */
     grid-template-columns: auto 1fr auto !important;
-    /* السطر الأول للعناصر الثلاثة بارتفاع ثابت (48px)، والسطر الثاني للمنتجات */
-    grid-template-rows: 48px 1fr !important;
+    grid-template-rows: auto 1fr !important; /* الارتفاع تلقائي بناءً على المحتوى */
     column-gap: 20px !important;
     row-gap: 20px !important;
     padding: 24px !important;
     height: 100% !important;
-    
-    /* ✅ السحر هنا: توسيط كل شيء عمودياً ليكونوا على خط واحد */
-    align-items: center !important; 
+    align-items: center !important; /* توسيط العناصر عمودياً */
     box-sizing: border-box !important;
     overflow-y: auto !important;
   }
 
   .page-header {
-    display: contents !important; /* إزالة الحاوية المؤقتة */
+    display: contents !important;
   }
 
   /* 1. العنوان */
@@ -206,10 +202,10 @@ html.in-iframe .products {
     margin: 0 !important;
     white-space: nowrap !important;
     font-size: 1.25rem !important;
-    line-height: 1 !important; /* منع التأثير على الارتفاع */
+    line-height: 1 !important;
   }
 
-  /* 2. شريط البحث */
+  /* 2. شريط البحث (نفس تنسيق الهاتف) */
   .search-bar {
     grid-column: 2 !important;
     grid-row: 1 !important;
@@ -223,27 +219,36 @@ html.in-iframe .products {
 
   .search-bar input {
     width: 100% !important;
-    height: 44px !important; /* ارتفاع ثابت ومحدد */
     margin: 0 !important;
-    border-radius: 8px !important;
+    /* ✅ تطبيق نفس الحشوة والحواف الدائرية للهاتف */
+    padding-block: 10px !important;
+    padding-inline: 12px 36px !important;
+    border-radius: 50px !important;
+    box-sizing: border-box !important;
+    /* إزالة أي ارتفاع إجباري */
+    height: auto !important;
   }
+  
   .search-bar i {
     top: 50% !important;
     transform: translateY(-50%) !important;
   }
 
-  /* 3. زر إضافة منتج */
+  /* 3. زر إضافة منتج (نفس تنسيق الهاتف) */
   .page-header a[href="add.html"] {
     grid-column: 3 !important;
     grid-row: 1 !important;
     margin: 0 !important;
-    height: 44px !important; /* نفس ارتفاع شريط البحث */
     display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
     white-space: nowrap !important;
-    padding-top: 0 !important;
-    padding-bottom: 0 !important;
+    /* ✅ تطبيق نفس الحشوة والحواف الدائرية للهاتف */
+    padding: 10px 16px !important;
+    border-radius: 8px !important;
+    box-sizing: border-box !important;
+    /* إزالة أي ارتفاع إجباري */
+    height: auto !important;
   }
 
   /* 4. شبكة المنتجات */
@@ -255,13 +260,10 @@ html.in-iframe .products {
     display: grid !important;
     grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)) !important;
     gap: 16px !important;
-    
-    /* إصلاح التمدد */
     align-items: start !important;
     align-content: start !important;
   }
 
-  /* إجبار البطاقة على الاحتفاظ بحجمها الطبيعي */
   .product-card {
     height: max-content !important;
     display: flex !important;
