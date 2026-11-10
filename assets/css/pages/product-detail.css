@@ -1,6 +1,6 @@
 /* ============================================
    صفحة تفاصيل المنتج - التصميم الشبكي المتجاوب
-   ✅ إصلاح جذري: حقول التعديل تظهر كطبقة (Overlay) ولا تحرك أي عنصر
+   ✅ تعديل ثابت 100%: منع قفز العناصر أثناء التعديل
    ============================================ */
 
 /* ✅ 1. إجبار العنوان وحاوية البطاقات على أخذ نفس العرض والتوسط */
@@ -215,57 +215,57 @@
   justify-content: flex-start; 
   gap: 4px; 
   cursor: pointer; 
-  padding: 4px 8px; 
-  margin: -4px -8px; 
+  padding: 0 8px !important; 
+  margin: 0 -8px !important; 
   border-radius: 6px; 
   transition: background 0.15s; 
-  min-height: 24px; 
+  height: 24px !important; /* تثبيت الارتفاع لمنع القفز العمودي */
   font-size: inherit; 
   position: relative; 
   max-width: 100%; 
   overflow: hidden; 
   text-overflow: ellipsis; 
   white-space: nowrap; 
+  box-sizing: border-box !important;
 }
 .edit-field:hover { background: #f0f0f0; }
 
-/* ✅ عند التعديل: الحاوية تحتفظ بحجمها بالكامل، والنص الأصلي يختفي فقط */
+/* ✅ عند التعديل: نستخدم box-shadow بدلاً من border لكي لا يتغير الحجم */
 .edit-field.editing { 
   background: #ffffff !important; 
   cursor: text !important; 
   z-index: 20 !important; 
-  color: transparent !important; /* إخفاء النص الأصلي فقط */
+  box-shadow: 0 0 0 1.5px #2563eb !important; 
 }
 
-.edit-field.center { justify-content: center; text-align: center; width: 100%; margin: -4px 0; }
-.product-stats .edit-field.center { width: auto; margin: 0; padding: 0; min-height: auto !important; }
+.edit-field.center { justify-content: center; text-align: center; width: 100%; margin: 0 !important; }
+.product-stats .edit-field.center { width: auto; margin: 0 !important; padding: 0 4px !important; height: 24px !important; }
 
-/* ✅ الحقل الجديد: يغطي الحاوية كطبقة شفافة فوق النص بدون التأثير على الحجم */
+/* ✅ الحقل الجديد: يغطي الحاوية بالكامل بدون التأثير على الحجم */
 .inline-input { 
   position: absolute !important;
-  top: -4px !important; /* تعويض الهوامش السلبية للحاوية */
-  left: -8px !important;
-  width: calc(100% + 16px) !important;
-  height: calc(100% + 8px) !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
   margin: 0 !important;
-  padding: 4px 8px !important; /* تعويض الحشوة الأصلية لكي يبقى النص في مكانه */
+  padding: 0 8px !important; 
   box-sizing: border-box !important;
-  border: 1.5px solid #171717 !important; 
+  border: none !important; /* إزالة الإطار لمنع تغيير الحجم */
   border-radius: 6px !important;
-  background: #ffffff !important; 
+  background: transparent !important; /* الشفافية لكي يظهر لون الحاوية */
   color: #171717 !important; 
-  text-align: inherit !important; /* الحفاظ على محاذاة النص (وسط أو يمين) */
+  text-align: inherit !important; 
   font-size: inherit !important; 
   font-weight: inherit !important; 
   font-family: inherit !important; 
   outline: none !important; 
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important; 
   z-index: 100 !important;
 }
 
-/* منع أي تغيير في اتجاه النص داخل الإحصائيات */
 .product-stats .inline-input { 
   text-align: center !important; 
+  padding: 0 4px !important;
 }
 
 .save-indicator { color: #16a34a; font-size: 12px; margin-inline-start: 4px; animation: fadeInCheck 0.2s ease-out; }
@@ -299,7 +299,9 @@
   [dir="rtl"] .switch input:checked + .switch-slider::before { transform: translateX(-20px); }
   
   .sell-price-input-group input[type="number"] { height: 34px !important; padding: 0 12px !important; font-size: 13px !important; }
-  .inline-input { font-size: 14px !important; }
+  
+  .edit-field { height: 20px !important; padding: 0 6px !important; margin: 0 -6px !important; }
+  .inline-input { font-size: 12px !important; padding: 0 6px !important; }
 }
 
 /* ============================================
