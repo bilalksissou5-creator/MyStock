@@ -1,7 +1,7 @@
 // ============================================
 // صفحة تفاصيل المنتج - الكود الكامل
 // ✅ تقسيم الصفحة إلى عمودين (بطاقة المنتج | بطاقات الإعدادات)
-// ✅ دعم التصميم الشبكي المتجاوب (شاشات كبيرة وتابلت)
+// ✅ وضع زر الحذف داخل البطاقة الأخيرة
 // ============================================
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -162,7 +162,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           </div>
         </div>
 
-        <!-- بطاقة المخزون المنخفض -->
+        <!-- بطاقة المخزون المنخفض + زر الحذف -->
         <div class="product-card-detail">
           <div class="sell-price-section" style="border: none; padding-top: 0; margin-top: 0;">
             <h3 class="sell-price-title">${tr('low_stock_section_title')}</h3>
@@ -172,18 +172,18 @@ document.addEventListener('DOMContentLoaded', async () => {
               <small class="field-hint">${tr('low_stock_field_hint')}</small>
             </div>
           </div>
+          
+          <!-- ✅ زر الحذف أصبح الآن داخل البطاقة الأخيرة -->
+          <div style="margin-top: 20px; padding-top: 16px; border-top: 1px solid #f0f0f0;">
+            <button class="btn-danger" id="delete-btn" style="width: 100%; display: flex; justify-content: center; gap: 8px;">
+              <i class="fas fa-trash"></i>
+              <span>${tr('prod_detail_delete')}</span>
+            </button>
+          </div>
         </div>
 
       </div>
 
-    </div>
-
-    <!-- ✅ أزرار التحكم (حذف المنتج) -->
-    <div class="actions" style="max-width: 1060px; margin: 20px auto 0 auto; width: 100%; display: flex; justify-content: center;">
-      <button class="btn-danger" id="delete-btn" style="min-width: 200px; justify-content: center;">
-        <i class="fas fa-trash"></i>
-        <span>${tr('prod_detail_delete')}</span>
-      </button>
     </div>
   `;
 
