@@ -2,6 +2,7 @@
    صفحة المنتجات (التصميم الأصلي)
    ✅ إصلاح اتجاه العملة ومنع نزولها لسطر جديد
    ✅ تصفيف (العنوان + البحث + زر الإضافة) أفقياً في الشاشات الكبيرة
+   ✅ إصلاح جذري لتمدد البطاقات وتداخل الإحصائيات
    ============================================ */
 
 .products {
@@ -175,19 +176,17 @@ html.in-iframe .products {
 
 /* ============================================
    ✅ التصفيف الأفقي للشاشات الكبيرة (التابلت والحاسوب)
-   ✅ السحر كله هنا: نجعل العناصر الثلاثة في سطر واحد
+   ✅ استخدام Flexbox بدلاً من Grid لحل مشكلة التمدد
    ============================================ */
 @media (min-width: 768px) {
-  /* تحويل الحاوية الرئيسية إلى شبكة (Grid) بثلاثة أعمدة */
+  /* تحويل الحاوية إلى Flexbox للسماح بالالتفاف */
   .main, #main-content {
-    display: grid !important;
-    grid-template-columns: auto 1fr auto !important; /* عمود للعنوان | عمود للبحث | عمود للزر */
-    grid-template-rows: auto 1fr !important;
+    display: flex !important;
+    flex-wrap: wrap !important;
+    align-items: center !important;
+    align-content: flex-start !important;
     gap: 16px !important;
-    height: 100% !important;
     padding: 24px !important;
-    box-sizing: border-box !important;
-    overflow: hidden !important;
   }
 
   /* إزالة الحاوية المؤقتة للعنوان والزر لكي يدخلا في الشبكة مباشرة */
@@ -197,49 +196,65 @@ html.in-iframe .products {
 
   /* 1. العنوان */
   .page-header h2 {
-    grid-column: 1 !important;
-    grid-row: 1 !important;
+    order: 1 !important;
+    flex: 0 0 auto !important;
     margin: 0 !important;
-    padding: 0 !important;
-    align-self: center !important;
     white-space: nowrap !important;
     font-size: 1.2rem !important;
   }
 
   /* 2. شريط البحث */
   .search-bar {
-    grid-column: 2 !important;
-    grid-row: 1 !important;
+    order: 2 !important;
+    flex: 1 1 auto !important; /* يأخذ المساحة المتبقية */
     margin: 0 !important;
-    padding: 0 !important;
     max-width: none !important;
-    width: 100% !important;
-    align-self: center !important;
-  }
-  .search-bar input { width: 100% !important; }
-  .search-bar i { inset-inline-end: 12px !important; }
-
-  /* 3. زر إضافة منتج (إظهاره وتنسيقه ليكون بجانب البحث) */
-  .page-header a[href="add.html"] {
-    grid-column: 3 !important;
-    grid-row: 1 !important;
-    margin: 0 !important;
-    align-self: center !important;
-    display: inline-flex !important; /* إظهار الزر الذي كان مخفياً */
-    white-space: nowrap !important;
     width: auto !important;
   }
+  .search-bar input { width: 100% !important; }
 
-  /* 4. شبكة المنتجات تأخذ السطر السفلي بالكامل */
-  .products {
-    grid-column: 1 / -1 !important;
-    grid-row: 2 !important;
+  /* 3. زر إضافة منتج */
+  .page-header a[href="add.html"] {
+    order: 3 !important;
+    flex: 0 0 auto !important;
     margin: 0 !important;
-    padding: 0 8px 24px 0 !important;
-    overflow-y: auto !important;
-    overflow-x: hidden !important;
-    min-height: 0 !important;
+    display: inline-flex !important;
+    white-space: nowrap !important;
+  }
+
+  /* 4. شبكة المنتجات */
+  .products {
+    order: 4 !important;
+    flex: 1 1 100% !important; /* يأخذ السطر بالكامل */
+    margin-top: 8px !important;
+    padding: 0 !important;
+    overflow: visible !important; /* نترك التمرير للحاوية الرئيسية */
+    
+    display: grid !important;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)) !important;
+    gap: 16px !important;
+    
+    /* إصلاح التمدد */
+    align-items: start !important;
     align-content: start !important;
-    -webkit-overflow-scrolling: touch !important;
+    grid-auto-rows: max-content !important;
+  }
+
+  /* ✅ إجبار البطاقة على الاحتفاظ بحجمها الطبيعي وشكلها */
+  .product-card {
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: flex-start !important;
+    background: #ffffff !important;
+    border: 1px solid #e5e5e5 !important;
+    border-radius: 10px !important;
+    padding: 12px !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06) !important;
+    height: max-content !important; /* يمنع التمدد الطولي */
+    box-sizing: border-box !important;
+  }
+
+  .product-card-image {
+    height: 140px !important;
   }
 }
