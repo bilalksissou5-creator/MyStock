@@ -1,6 +1,16 @@
 /* ============================================
    صفحة تفاصيل المنتج - النسخة النهائية المستقرة
    ============================================ */
+
+/* ✅ التعديل الجديد: محاذاة عنوان الصفحة مع حدود البطاقة */
+.page-header {
+  max-width: 520px !important;
+  width: 100% !important;
+  margin: 0 auto 16px auto !important;
+  padding: 0 !important;
+  box-sizing: border-box !important;
+}
+
 .product-card-detail {
   background: white;
   border-radius: 12px;
@@ -138,6 +148,11 @@
 @keyframes fadeInCheck { from { opacity: 0; transform: scale(0.7); } to { opacity: 1; transform: scale(1); } }
 
 @media (max-width: 768px) {
+  .page-header {
+    max-width: 100% !important;
+    padding-inline: 16px !important; /* للحفاظ على المسافة من الحواف في الهاتف */
+  }
+
   .product-card-detail { max-width: 100%; padding: 16px; border-radius: 12px; }
   .product-image { height: 160px; border-radius: 10px; margin-bottom: 14px; }
   .detail-title { font-size: 1.15rem; }
