@@ -2,6 +2,7 @@
 // صفحة تعديل المنظمة (للمدير فقط)
 // ✅ دعم كامل للترجمة + تحديث فوري + إشعارات
 // ✅ انتظار تحميل الترجمات قبل رسم قائمة العملات
+// ✅ إزالة زر العودة
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   const user = await requireAuth();
@@ -63,10 +64,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   main.innerHTML = `
     <div class="page-header">
       <h2>${tr('oe_title')}</h2>
-      <a href="/profile-dashboard.html" class="btn-secondary">
-        <i class="fas fa-arrow-right"></i>
-        <span>${tr('prod_detail_back')}</span>
-      </a>
+      <!-- ✅ تم إزالة زر العودة من هنا -->
     </div>
 
     <div class="alert alert-error" id="org-error" style="display:none;"></div>
