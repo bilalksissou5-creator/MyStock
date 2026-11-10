@@ -1,8 +1,6 @@
 // ============================================
 // صفحة تفاصيل المنتج - النسخة النهائية المستقرة
-// ✅ تقسيم الصفحة إلى 3 بطاقات منفصلة (المعلومات، سعر البيع، المخزون)
-// ✅ إصلاح اتجاه العملة (LTR) لتظهر 30.00 DH بدلاً من DH 30.00
-// ✅ إشعار واحد فقط لكل عملية تعديل (بدون تكرار)
+// ✅ تقسيم الصفحة إلى عمودين (بطاقة المنتج | بطاقات الإعدادات)
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   const user = await requireAuth();
@@ -65,131 +63,132 @@ document.addEventListener('DOMContentLoaded', async () => {
       <h2>${tr('prod_detail_title')}</h2>
     </div>
 
-    <div style="display: flex; flex-direction: column; gap: 20px; padding-bottom: 24px;">
+    <!-- ✅ الحاوية الرئيسية للتصميم الشبكي -->
+    <div class="details-layout">
 
-      <!-- ══════════════════════════════════════ -->
-      <!-- ✅ البطاقة الأولى: معلومات المنتج الأساسية -->
-      <!-- ══════════════════════════════════════ -->
-      <div class="product-card-detail">
-        
-        <div class="product-image" id="product-image-container">
-          ${product.image_url
-            ? `<img src="${product.image_url}" alt="${product.name ?? tr('products_no_name')}">`
-            : `<i class="fas fa-box-open"></i>`}
-          <button class="image-edit-btn" title="${tr('prod_detail_edit_image')}">
-            <i class="fas fa-camera"></i>
-          </button>
-        </div>
+      <!-- ✅ العمود الأول: بطاقة المنتج الأساسية -->
+      <div class="main-col">
+        <div class="product-card-detail">
+          
+          <div class="product-image" id="product-image-container">
+            ${product.image_url
+              ? `<img src="${product.image_url}" alt="${product.name ?? tr('products_no_name')}">`
+              : `<i class="fas fa-box-open"></i>`}
+            <button class="image-edit-btn" title="${tr('prod_detail_edit_image')}">
+              <i class="fas fa-camera"></i>
+            </button>
+          </div>
 
-        <h1 class="detail-title">
-          <span class="edit-field" id="f-name" data-value="${product.name ?? ''}"></span>
-        </h1>
-        <p class="detail-sku">
-          <span class="edit-field" id="f-sku" data-value="${product.sku ?? ''}"></span>
-        </p>
+          <h1 class="detail-title">
+            <span class="edit-field" id="f-name" data-value="${product.name ?? ''}"></span>
+          </h1>
+          <p class="detail-sku">
+            <span class="edit-field" id="f-sku" data-value="${product.sku ?? ''}"></span>
+          </p>
 
-        <div class="product-stats">
-          <div class="stat">
-            <div class="stat-label">${tr('products_qty')}</div>
-            <div class="stat-value ${isLowStock ? 'low' : ''}" id="qty-stat-value">
-              <span class="edit-field center" id="f-qty" data-value="${product.qty ?? 0}"></span>
+          <div class="product-stats">
+            <div class="stat">
+              <div class="stat-label">${tr('products_qty')}</div>
+              <div class="stat-value ${isLowStock ? 'low' : ''}" id="qty-stat-value">
+                <span class="edit-field center" id="f-qty" data-value="${product.qty ?? 0}"></span>
+              </div>
             </div>
-          </div>
-          <div class="stat">
-            <div class="stat-label">${tr('prod_detail_buy_price')}</div>
-            <div class="stat-value">
-              <span dir="ltr" style="display: inline-flex; align-items: center; gap: 4px;">
-                <span class="edit-field center" id="f-price" data-value="${product.price ?? 0}"></span>
-                ${currencySymbol ? `<span style="font-size: 0.9em; color: #171717; font-weight: 500;">${currencySymbol}</span>` : ''}
-              </span>
-            </div>
-          </div>
-          <div class="stat">
-            <div class="stat-label">${tr('products_total')}</div>
-            <div class="stat-value" id="f-total"><span dir="ltr">${total} ${currencySymbol}</span></div>
-          </div>
-        </div>
-
-        <div class="product-extra">
-          <div class="row">
-            <span>${tr('prod_detail_category')}</span>
-            <strong class="edit-field" id="f-category" data-value="${product.category ?? product.suppliers?.specialty ?? ''}"></strong>
-          </div>
-          <div class="row">
-            <span>${tr('prod_detail_supplier')}</span>
-            <strong>${product.suppliers?.name ?? '—'}</strong>
-          </div>
-          <div class="row">
-            <span>${tr('prod_detail_unit')}</span>
-            <strong class="edit-field" id="f-unit" data-value="${product.unit ?? ''}"></strong>
-          </div>
-          <div class="row">
-            <span>${tr('prod_detail_barcode')}</span>
-            <strong class="edit-field" id="f-qr_code" data-value="${product.qr_code ?? ''}"></strong>
-          </div>
-        </div>
-
-      </div>
-
-      <!-- ══════════════════════════════════════ -->
-      <!-- ✅ البطاقة الثانية: سعر البيع -->
-      <!-- ══════════════════════════════════════ -->
-      <div class="product-card-detail" style="padding-top: 16px; padding-bottom: 16px;">
-        <div class="sell-price-section" style="margin: 0;">
-          <h3 class="sell-price-title">💰 ${tr('prod_detail_sell_price')}</h3>
-
-          <div class="switch-item" style="margin-bottom: 16px;">
-            <div class="switch-content">
-              <div class="switch-header">
-                <strong class="switch-title">${tr('prod_detail_enable_sell')}</strong>
-                <span class="switch-status ${sellPriceEnabled ? 'on' : 'off'}" id="sell-price-status">
-                  ${sellPriceEnabled ? tr('prod_detail_enabled') : tr('prod_detail_disabled')}
+            <div class="stat">
+              <div class="stat-label">${tr('prod_detail_buy_price')}</div>
+              <div class="stat-value">
+                <span dir="ltr" style="display: inline-flex; align-items: center; gap: 4px;">
+                  <span class="edit-field center" id="f-price" data-value="${product.price ?? 0}"></span>
+                  ${currencySymbol ? `<span style="font-size: 0.9em; color: #171717; font-weight: 500;">${currencySymbol}</span>` : ''}
                 </span>
               </div>
-              <p class="switch-desc">${tr('prod_detail_sell_desc')}</p>
             </div>
-            <label class="switch">
-              <input type="checkbox" id="sell-price-toggle" ${sellPriceEnabled ? 'checked' : ''}>
-              <span class="switch-slider"></span>
-            </label>
+            <div class="stat">
+              <div class="stat-label">${tr('products_total')}</div>
+              <div class="stat-value" id="f-total"><span dir="ltr">${total} ${currencySymbol}</span></div>
+            </div>
           </div>
 
-          <div class="sell-price-input-group">
-            <label>${tr('prod_detail_sell_input')} (${currencySymbol || 'DH'})</label>
-            <input type="number" id="sell-price-input" value="${sellPrice}" min="0" step="0.01" dir="ltr" placeholder="0.00">
-            <small class="field-hint">${tr('prod_detail_sell_hint')}</small>
+          <div class="product-extra">
+            <div class="row">
+              <span>${tr('prod_detail_category')}</span>
+              <strong class="edit-field" id="f-category" data-value="${product.category ?? product.suppliers?.specialty ?? ''}"></strong>
+            </div>
+            <div class="row">
+              <span>${tr('prod_detail_supplier')}</span>
+              <strong>${product.suppliers?.name ?? '—'}</strong>
+            </div>
+            <div class="row">
+              <span>${tr('prod_detail_unit')}</span>
+              <strong class="edit-field" id="f-unit" data-value="${product.unit ?? ''}"></strong>
+            </div>
+            <div class="row">
+              <span>${tr('prod_detail_barcode')}</span>
+              <strong class="edit-field" id="f-qr_code" data-value="${product.qr_code ?? ''}"></strong>
+            </div>
           </div>
+
         </div>
       </div>
 
-      <!-- ══════════════════════════════════════ -->
-      <!-- ✅ البطاقة الثالثة: المخزون المنخفض -->
-      <!-- ══════════════════════════════════════ -->
-      <div class="product-card-detail" style="padding-top: 16px; padding-bottom: 16px;">
-        <div class="sell-price-section" style="margin: 0;">
-          <h3 class="sell-price-title">${tr('low_stock_section_title')}</h3>
+      <!-- ✅ العمود الثاني: بطاقات الإعدادات (سعر البيع + المخزون) -->
+      <div class="side-col">
+        
+        <!-- بطاقة سعر البيع -->
+        <div class="product-card-detail">
+          <div class="sell-price-section" style="border: none; padding-top: 0; margin-top: 0;">
+            <h3 class="sell-price-title">💰 ${tr('prod_detail_sell_price')}</h3>
 
-          <div class="sell-price-input-group">
-            <label>${tr('low_stock_field_label')}</label>
-            <input type="number" id="low-stock-input" value="${lowStockThreshold}" min="0" step="1" dir="ltr" placeholder="10">
-            <small class="field-hint">${tr('low_stock_field_hint')}</small>
+            <div class="switch-item" style="margin-bottom: 16px;">
+              <div class="switch-content">
+                <div class="switch-header">
+                  <strong class="switch-title">${tr('prod_detail_enable_sell')}</strong>
+                  <span class="switch-status ${sellPriceEnabled ? 'on' : 'off'}" id="sell-price-status">
+                    ${sellPriceEnabled ? tr('prod_detail_enabled') : tr('prod_detail_disabled')}
+                  </span>
+                </div>
+                <p class="switch-desc">${tr('prod_detail_sell_desc')}</p>
+              </div>
+              <label class="switch">
+                <input type="checkbox" id="sell-price-toggle" ${sellPriceEnabled ? 'checked' : ''}>
+                <span class="switch-slider"></span>
+              </label>
+            </div>
+
+            <div class="sell-price-input-group">
+              <label>${tr('prod_detail_sell_input')} (${currencySymbol || 'DH'})</label>
+              <input type="number" id="sell-price-input" value="${sellPrice}" min="0" step="0.01" dir="ltr" placeholder="0.00">
+              <small class="field-hint">${tr('prod_detail_sell_hint')}</small>
+            </div>
           </div>
         </div>
-      </div>
 
-      <!-- ══════════════════════════════════════ -->
-      <!-- ✅ أزرار التحكم (حذف المنتج) -->
-      <!-- ══════════════════════════════════════ -->
-      <div class="actions" style="margin-top: 8px;">
-        <button class="btn-danger" id="delete-btn">
-          <i class="fas fa-trash"></i>
-          <span>${tr('prod_detail_delete')}</span>
-        </button>
+        <!-- بطاقة المخزون المنخفض -->
+        <div class="product-card-detail">
+          <div class="sell-price-section" style="border: none; padding-top: 0; margin-top: 0;">
+            <h3 class="sell-price-title">${tr('low_stock_section_title')}</h3>
+
+            <div class="sell-price-input-group">
+              <label>${tr('low_stock_field_label')}</label>
+              <input type="number" id="low-stock-input" value="${lowStockThreshold}" min="0" step="1" dir="ltr" placeholder="10">
+              <small class="field-hint">${tr('low_stock_field_hint')}</small>
+            </div>
+          </div>
+        </div>
+
       </div>
 
     </div>
+
+    <!-- ✅ زر الحذف في الأسفل -->
+    <div class="actions" style="max-width: 1060px; margin: 20px auto 0 auto; width: 100%; display: flex; justify-content: center;">
+      <button class="btn-danger" id="delete-btn" style="min-width: 200px; justify-content: center;">
+        <i class="fas fa-trash"></i>
+        <span>${tr('prod_detail_delete')}</span>
+      </button>
+    </div>
   `;
 
+  // باقي كود الجافاسكريبت (وظائف التعديل، الحفظ، الحذف) كما هو تماماً...
   function updateQtyStyle() {
     const qtyEl = document.getElementById('qty-stat-value');
     if (!qtyEl) return;
@@ -221,31 +220,20 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   async function sendNotification(field, value) {
     if (typeof notifyOrganization !== 'function' || !profile?.organization_id) return;
-
     const threshold = Number(product.low_stock_threshold ?? 10);
     const isLow = field === 'qty' && Number(value) <= threshold;
-
     try {
       if (isLow) {
         await notifyOrganization({
-          orgId: profile.organization_id,
-          title: tr('low_stock_alert_title'),
-          message: tr('low_stock_alert_single')
-            .replace('{name}', product.name)
-            .replace('{qty}', value)
-            .replace('{threshold}', threshold),
-          type: 'warning',
-          link: `/products/detail.html?id=${productId}`,
-          userName: profile.full_name || null,
+          orgId: profile.organization_id, title: tr('low_stock_alert_title'),
+          message: tr('low_stock_alert_single').replace('{name}', product.name).replace('{qty}', value).replace('{threshold}', threshold),
+          type: 'warning', link: `/products/detail.html?id=${productId}`, userName: profile.full_name || null,
         });
       } else {
         await notifyOrganization({
-          orgId: profile.organization_id,
-          title: tr('prod_detail_notif_edit_title'),
+          orgId: profile.organization_id, title: tr('prod_detail_notif_edit_title'),
           message: `${profile.full_name || tr('prod_detail_user')} ${tr('prod_detail_notif_edit_msg')} ${fieldLabels[field] || field} "${product.name}" ${tr('prod_detail_to')} "${value}"`,
-          type: 'info',
-          link: `/products/detail.html?id=${productId}`,
-          userName: profile.full_name || null,
+          type: 'info', link: `/products/detail.html?id=${productId}`, userName: profile.full_name || null,
         });
       }
     } catch (e) { console.warn(e); }
@@ -264,22 +252,12 @@ document.addEventListener('DOMContentLoaded', async () => {
   fields.forEach(({ id, field, type }) => {
     const el = document.getElementById(id);
     if (!el) return;
-
     initialFieldValues[field] = String(el.dataset.value || '');
-
     inlineEdit({
-      el,
-      table: 'products',
-      id: productId,
-      field,
-      type,
+      el, table: 'products', id: productId, field, type,
       onSave: async (savedField, newValue) => {
         if (savedField === 'qty' || savedField === 'price') recalcTotal();
-        if (savedField === 'qty') {
-          el.dataset.value = newValue;
-          updateQtyStyle();
-        }
-
+        if (savedField === 'qty') { el.dataset.value = newValue; updateQtyStyle(); }
         if (String(newValue) !== String(initialFieldValues[field])) {
           await sendNotification(field, newValue);
           initialFieldValues[field] = String(newValue); 
@@ -290,49 +268,31 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   let lowStockSaveTimeout = null;
   const lowStockInput = document.getElementById('low-stock-input');
-
   if (lowStockInput) {
     lowStockInput.addEventListener('input', () => {
       clearTimeout(lowStockSaveTimeout);
       lowStockSaveTimeout = setTimeout(async () => {
         const newThreshold = Math.max(0, Number(lowStockInput.value) || 0);
-
         try {
-          const { error: updateError } = await db
-            .from('products')
-            .update({ low_stock_threshold: newThreshold })
-            .eq('id', productId);
-
+          const { error: updateError } = await db.from('products').update({ low_stock_threshold: newThreshold }).eq('id', productId);
           if (updateError) throw new Error(updateError.message);
-
           product.low_stock_threshold = newThreshold;
           updateQtyStyle();
-
           const currentQty = Number(product.qty ?? 0);
           if (currentQty <= newThreshold && typeof notifyOrganization === 'function' && profile?.organization_id) {
             await notifyOrganization({
-              orgId: profile.organization_id,
-              title: tr('low_stock_alert_title'),
-              message: tr('low_stock_alert_already')
-                .replace('{name}', product.name)
-                .replace('{qty}', currentQty)
-                .replace('{threshold}', newThreshold),
-              type: 'warning',
-              link: `/products/detail.html?id=${productId}`,
-              userName: profile.full_name || null,
+              orgId: profile.organization_id, title: tr('low_stock_alert_title'),
+              message: tr('low_stock_alert_already').replace('{name}', product.name).replace('{qty}', currentQty).replace('{threshold}', newThreshold),
+              type: 'warning', link: `/products/detail.html?id=${productId}`, userName: profile.full_name || null,
             });
           }
-        } catch (err) {
-          console.error('فشل حفظ حد التنبيه:', err);
-        }
+        } catch (err) { console.error('فشل حفظ حد التنبيه:', err); }
       }, 800);
     });
   }
 
   const imgContainer = document.getElementById('product-image-container');
-  if (imgContainer && typeof attachImageUpload === 'function') {
-    attachImageUpload(productId, imgContainer, product.image_url);
-  }
+  if (imgContainer && typeof attachImageUpload === 'function') attachImageUpload(productId, imgContainer, product.image_url);
 
   const sellPriceToggle = document.getElementById('sell-price-toggle');
   const sellPriceStatus = document.getElementById('sell-price-status');
@@ -342,35 +302,21 @@ document.addEventListener('DOMContentLoaded', async () => {
     sellPriceToggle.addEventListener('change', async () => {
       const newValue = sellPriceToggle.checked;
       sellPriceToggle.disabled = true;
-
       try {
-        const { error: updateError } = await db
-          .from('products')
-          .update({ sell_price_enabled: newValue })
-          .eq('id', productId);
-
+        const { error: updateError } = await db.from('products').update({ sell_price_enabled: newValue }).eq('id', productId);
         if (updateError) throw new Error(updateError.message);
-
         sellPriceStatus.textContent = newValue ? tr('prod_detail_enabled') : tr('prod_detail_disabled');
         sellPriceStatus.classList.toggle('on', newValue);
         sellPriceStatus.classList.toggle('off', !newValue);
-
         if (typeof notifyOrganization === 'function' && profile?.organization_id) {
           await notifyOrganization({
-            orgId: profile.organization_id,
-            title: tr('prod_detail_notif_sell_title'),
+            orgId: profile.organization_id, title: tr('prod_detail_notif_sell_title'),
             message: `${profile.full_name || tr('prod_detail_user')} ${newValue ? tr('prod_detail_notif_sell_on') : tr('prod_detail_notif_sell_off')} "${product.name}"`,
-            type: 'info',
-            link: `/products/detail.html?id=${productId}`,
-            userName: profile.full_name || null,
+            type: 'info', link: `/products/detail.html?id=${productId}`, userName: profile.full_name || null,
           });
         }
-      } catch (err) {
-        alert(tr('prod_detail_err') + ' ' + err.message);
-        sellPriceToggle.checked = !newValue;
-      } finally {
-        sellPriceToggle.disabled = false;
-      }
+      } catch (err) { alert(tr('prod_detail_err') + ' ' + err.message); sellPriceToggle.checked = !newValue; } 
+      finally { sellPriceToggle.disabled = false; }
     });
   }
 
@@ -380,28 +326,17 @@ document.addEventListener('DOMContentLoaded', async () => {
       clearTimeout(sellPriceSaveTimeout);
       sellPriceSaveTimeout = setTimeout(async () => {
         const newPrice = Number(sellPriceInput.value) || 0;
-
         try {
-          const { error: updateError } = await db
-            .from('products')
-            .update({ sell_price: newPrice })
-            .eq('id', productId);
-
+          const { error: updateError } = await db.from('products').update({ sell_price: newPrice }).eq('id', productId);
           if (updateError) throw new Error(updateError.message);
-
           if (typeof notifyOrganization === 'function' && profile?.organization_id) {
             await notifyOrganization({
-              orgId: profile.organization_id,
-              title: tr('prod_detail_notif_sell_title'),
+              orgId: profile.organization_id, title: tr('prod_detail_notif_sell_title'),
               message: `${profile.full_name || tr('prod_detail_user')} ${tr('prod_detail_notif_sell_edit')} "${product.name}" ${tr('prod_detail_to')} "${newPrice}"`,
-              type: 'info',
-              link: `/products/detail.html?id=${productId}`,
-              userName: profile.full_name || null,
+              type: 'info', link: `/products/detail.html?id=${productId}`, userName: profile.full_name || null,
             });
           }
-        } catch (err) {
-          console.error('فشل حفظ سعر البيع:', err);
-        }
+        } catch (err) { console.error('فشل حفظ سعر البيع:', err); }
       }, 800);
     });
   }
@@ -410,25 +345,15 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (deleteBtn) {
     deleteBtn.addEventListener('click', async () => {
       if (!confirm(tr('prod_detail_confirm_delete'))) return;
-
       const { error } = await db.from('products').delete().eq('id', productId);
-
-      if (error) {
-        alert(tr('prod_detail_err') + ' ' + error.message);
-        return;
-      }
-
+      if (error) { alert(tr('prod_detail_err') + ' ' + error.message); return; }
       if (typeof notifyOrganization === 'function' && profile?.organization_id) {
         await notifyOrganization({
-          orgId: profile.organization_id,
-          title: tr('prod_detail_notif_del_title'),
+          orgId: profile.organization_id, title: tr('prod_detail_notif_del_title'),
           message: `${profile.full_name || tr('prod_detail_user')} ${tr('prod_detail_notif_del_msg')} "${product.name}"`,
-          type: 'danger',
-          link: '/products/list.html',
-          userName: profile.full_name || null,
+          type: 'danger', link: '/products/list.html', userName: profile.full_name || null,
         });
       }
-
       window.location.href = 'list.html';
     });
   }
