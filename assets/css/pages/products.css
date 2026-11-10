@@ -3,6 +3,7 @@
    ✅ إصلاح اتجاه العملة ومنع نزولها لسطر جديد
    ✅ محاذاة العناصر الثلاثة بدون تغيير تنسيقاتها الأصلية
    ✅ إصلاح جذري لتمدد البطاقات
+   ✅ تقليل المسافة بين شريط البحث والمنتجات
    ============================================ */
 
 .products {
@@ -176,21 +177,23 @@ html.in-iframe .products {
 
 /* ============================================
    ✅ الحل الجذري للشاشات الكبيرة (التابلت والحاسوب)
-   ✅ تم تغيير 768px إلى 600px ليشمل التابلت العمودي
    ============================================ */
 @media (min-width: 600px) {
-  /* تحويل الحاوية الرئيسية إلى شبكة من 3 أعمدة (عنوان - بحث - زر) */
+  /* تحويل الحاوية الرئيسية إلى شبكة */
   html:not(.in-iframe) .main,
   html:not(.in-iframe) #main-content {
     display: grid !important;
-    /* ✅ العنوان (تلقائي) | البحث (يتمدد لكن لا يقل عن 150px) | الزر (تلقائي) */
-    grid-template-columns: auto minmax(150px, 1fr) auto !important; 
-    grid-template-rows: auto 1fr !important;
-    column-gap: 20px !important;
-    row-gap: 20px !important;
+    grid-template-columns: auto minmax(150px, 1fr) auto !important;
     
-    /* توسيط العناصر عمودياً لتكون على نفس الخط */
-    align-items: center !important;
+    /* ✅ التعديل هنا: السطرين يأخذون حجمهم الطبيعي بدلاً من تمديد الثاني */
+    grid-template-rows: auto auto !important; 
+    
+    column-gap: 20px !important;
+    row-gap: 24px !important; /* مسافة مناسبة بين شريط البحث والبطاقات */
+    
+    /* ✅ التعديل هنا: محاذاة العناصر لأعلى الشاشة بدلاً من المنتصف */
+    align-items: start !important; 
+    align-content: start !important;
     
     padding: 24px !important;
     height: 100% !important;
@@ -203,13 +206,14 @@ html.in-iframe .products {
     display: contents !important;
   }
 
-  /* 1. العنوان */
+  /* 1. العنوان (مع توسيطه عمودياً مع باقي العناصر) */
   html:not(.in-iframe) .page-header h2 {
     grid-column: 1 !important;
     grid-row: 1 !important;
     margin: 0 !important;
     white-space: nowrap !important;
     font-size: 1.25rem !important;
+    align-self: center !important; /* توسيط عمودي */
   }
 
   /* 2. شريط البحث */
@@ -220,6 +224,7 @@ html.in-iframe .products {
     padding: 0 !important;
     width: 100% !important;
     max-width: none !important;
+    align-self: center !important; /* توسيط عمودي */
   }
 
   /* 3. زر إضافة منتج */
@@ -231,6 +236,7 @@ html.in-iframe .products {
     align-items: center !important;
     justify-content: center !important;
     white-space: nowrap !important;
+    align-self: center !important; /* توسيط عمودي */
   }
 
   /* 4. شبكة المنتجات (تأخذ السطر الثاني بالكامل) */
