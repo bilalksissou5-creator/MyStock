@@ -1,7 +1,8 @@
 /* ============================================
    صفحة المنتجات (التصميم الأصلي)
-   ✅ محاذاة مضمونة (بدون التفاف) باستخدام CSS Grid
-   ✅ خانة البحث تتمدد وتتقلص حسب المساحة المتاحة
+   ✅ إصلاح اتجاه العملة ومنع نزولها لسطر جديد
+   ✅ محاذاة العناصر الثلاثة بدون تغيير تنسيقاتها الأصلية
+   ✅ إصلاح جذري لتمدد البطاقات
    ============================================ */
 
 .products {
@@ -175,20 +176,19 @@ html.in-iframe .products {
 
 /* ============================================
    ✅ الحل الجذري للشاشات الكبيرة (التابلت والحاسوب)
-   ✅ استخدام CSS Grid لمنع الالتفاف نهائياً
+   ✅ استخدام CSS Grid للمحاذاة بدون المساس بالتنسيقات الأصلية
    ============================================ */
 @media (min-width: 768px) {
   /* تحويل الحاوية الرئيسية إلى شبكة من 3 أعمدة (عنوان - بحث - زر) */
   html:not(.in-iframe) .main,
   html:not(.in-iframe) #main-content {
     display: grid !important;
-    /* العمود الأول: تلقائي للعنوان | العمود الثاني: مرن للبحث (لا يقل عن 150px) | العمود الثالث: تلقائي للزر */
-    grid-template-columns: auto minmax(150px, 1fr) auto !important;
+    grid-template-columns: auto 1fr auto !important; /* العنوان | البحث | الزر */
     grid-template-rows: auto 1fr !important;
     column-gap: 20px !important;
     row-gap: 20px !important;
     
-    /* توسيط العناصر عمودياً لتكون على نفس الخط */
+    /* توسيط العناصر عمودياً لتكون على نفس الخط بفضل ارتفاعاتها الطبيعية */
     align-items: center !important;
     
     padding: 24px !important;
@@ -202,7 +202,7 @@ html.in-iframe .products {
     display: contents !important;
   }
 
-  /* 1. العنوان (العمود الأول) */
+  /* 1. العنوان */
   html:not(.in-iframe) .page-header h2 {
     grid-column: 1 !important;
     grid-row: 1 !important;
@@ -211,36 +211,26 @@ html.in-iframe .products {
     font-size: 1.25rem !important;
   }
 
-  /* 2. شريط البحث (العمود الثاني - سيمتد ليملأ الفراغ) */
+  /* 2. شريط البحث */
   html:not(.in-iframe) .search-bar {
     grid-column: 2 !important;
     grid-row: 1 !important;
     margin: 0 !important;
     padding: 0 !important;
     width: 100% !important;
-    max-width: none !important; /* إلغاء الحد الأقصى القادم من common.css */
-    display: block !important;
+    max-width: none !important;
+    /* ✅ هنا لم نغير أي تنسيق للحقل، سيأخذ شكله الدائري وارتفاعه من common.css */
   }
 
-  html:not(.in-iframe) .search-bar input {
-    width: 100% !important;
-    height: 44px !important;
-    margin: 0 !important;
-    box-sizing: border-box !important;
-    border-radius: 8px !important; /* حواف متناسقة */
-  }
-
-  /* 3. زر إضافة منتج (العمود الثالث) */
+  /* 3. زر إضافة منتج */
   html:not(.in-iframe) .page-header a[href="add.html"] {
     grid-column: 3 !important;
     grid-row: 1 !important;
     margin: 0 !important;
-    height: 44px !important;
     display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
     white-space: nowrap !important;
-    box-sizing: border-box !important;
   }
 
   /* 4. شبكة المنتجات (تأخذ السطر الثاني بالكامل) */
