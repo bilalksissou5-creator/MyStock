@@ -3,7 +3,7 @@
    ✅ محاذاة مضمونة 100% للعنوان مع البطاقات
    ✅ تفعيل التصميم العمودي للتابلت من 600px
    ✅ توحيد حجم العناصر لتطابق صفحة المنتجات
-   ✅ إرجاع تنسيق أيقونة الكاميرا كما كان في ملفك الأصلي
+   ✅ إصلاح جذري لخروج أيقونة الكاميرا وتمدد الصورة
    ============================================ */
 
 /* ✅ 1. إجبار العنوان وحاوية البطاقات على أخذ نفس العرض والتوسط */
@@ -63,10 +63,10 @@
     height: 100% !important;
   }
 
+  /* البطاقة الأولى تأخذ كامل الارتفاع ولكن بدون flex عشوائي */
   .main-col .product-card-detail {
-    height: 100% !important;
-    display: flex !important;
-    flex-direction: column !important;
+    height: 100% !important; 
+    display: block !important; /* إلغاء الفليكس لمنع تمدد الصورة */
   }
 
   .side-col .product-card-detail {
@@ -78,52 +78,54 @@
 }
 
 /* ============================================
-   ✅ 4. توحيد حجم الصورة والنصوص
+   ✅ 4. توحيد حجم الصورة والنصوص (تطابق صفحة المنتجات)
    ============================================ */
 .product-image {
-  position: relative;
-  background: #fafafa;
+  position: relative !important;
+  background: #fafafa !important;
   border-radius: 8px !important;
-  width: 100%;
+  width: 100% !important;
   height: 140px !important;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
+  min-height: 140px !important; /* منع التمدد */
+  flex-shrink: 0 !important; /* منع الانكماش */
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  overflow: hidden !important; /* إخفاء أي شيء يخرج عن الحاوية */
   margin-bottom: 12px !important;
 }
 
 .product-image img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .product-image i { font-size: 2.5rem !important; color: #d4d4d4; }
 
-/* ✅ تنسيق أيقونة الكاميرا الأصلي (كما أرسلته أنت) */
+/* ✅ إصلاح جذري لأيقونة الكاميرا (تثبيت أبعادها ومكانها داخل الصورة) */
 .image-edit-btn {
-  position: absolute;
-  bottom: 8px;
-  inset-inline-start: 8px;
-  background: rgba(23, 23, 23, 0.9);
-  color: white;
-  border: none;
-  border-radius: 50%;
-  width: 32px;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  z-index: 2;
-  padding: 0;
-  transition: transform 0.2s, background 0.2s;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  position: absolute !important;
+  bottom: 8px !important;
+  left: 8px !important; /* اللغات التي تقرأ من اليسار */
+  background: rgba(23, 23, 23, 0.9) !important;
+  color: white !important;
+  border: none !important;
+  border-radius: 50% !important;
+  width: 32px !important;
+  height: 32px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  cursor: pointer !important;
+  z-index: 10 !important;
+  padding: 0 !important;
+  transition: transform 0.2s, background 0.2s !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
 }
-.image-edit-btn i { 
-  font-size: 12px; 
-  line-height: 1; 
+
+[dir="rtl"] .image-edit-btn {
+  left: auto !important;
+  right: 8px !important; /* اللغات التي تقرأ من اليمين */
 }
-.image-edit-btn:hover { 
-  background: #171717; 
-  transform: scale(1.08); 
-}
+
+.image-edit-btn i { font-size: 12px !important; line-height: 1 !important; }
+.image-edit-btn:hover { background: #171717 !important; transform: scale(1.08) !important; }
 
 /* ✅ تطابق حجم عنوان المنتج */
 .detail-title { 
@@ -237,6 +239,7 @@
   }
   .product-image { 
     height: 110px !important; 
+    min-height: 110px !important;
     border-radius: 8px; 
     margin-bottom: 12px; 
   }
@@ -263,15 +266,19 @@
   }
   .product-extra .row { font-size: 13px; padding: 8px 0; }
   
-  /* ✅ إرجاع تنسيق أيقونة الكاميرا في الهاتف كما كان */
+  /* ✅ إرجاع تنسيق أيقونة الكاميرا في الهاتف */
   .image-edit-btn { 
-    width: 28px; 
-    height: 28px; 
-    bottom: 6px; 
-    inset-inline-start: 6px; 
+    width: 28px !important; 
+    height: 28px !important; 
+    bottom: 6px !important; 
+    left: 6px !important; 
+  }
+  [dir="rtl"] .image-edit-btn {
+    left: auto !important;
+    right: 6px !important;
   }
   .image-edit-btn i { 
-    font-size: 11px; 
+    font-size: 11px !important; 
   }
   
   .sell-price-section { padding-top: 12px; margin-top: 12px; margin-bottom: 12px; }
