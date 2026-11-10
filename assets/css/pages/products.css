@@ -2,7 +2,7 @@
    صفحة المنتجات (التصميم الأصلي)
    ✅ إصلاح اتجاه العملة ومنع نزولها لسطر جديد
    ✅ محاذاة العناصر الثلاثة بدقة على نفس الخط بنفس تنسيق الهاتف
-   ✅ إصلاح جذري لتمدد البطاقات
+   ✅ استخدام Flexbox المرن ليتكيف مع التابلت والهاتف
    ============================================ */
 
 .products {
@@ -175,98 +175,92 @@ html.in-iframe .products {
 }
 
 /* ============================================
-   ✅ محاذاة العناصر الثلاثة بدقة (تثبيت مطلق)
+   ✅ المحاذاة المرنة للشاشات الكبيرة (التابلت والحاسوب)
    ============================================ */
 @media (min-width: 768px) {
-  /* الحاوية الرئيسية تأخذ التمرير وتترك مساحة علوية */
+  /* تحويل الحاوية الرئيسية إلى Flexbox يسمح بالالتفاف */
   .main, #main-content {
-    position: relative !important;
-    padding: 90px 24px 24px 24px !important; /* 90px مساحة للشريط العلوي */
-    display: block !important; 
+    display: flex !important;
+    flex-wrap: wrap !important;
+    align-items: center !important;
+    align-content: flex-start !important;
+    gap: 16px !important;
+    padding: 24px !important;
     height: 100% !important;
     overflow-y: auto !important;
     box-sizing: border-box !important;
   }
 
-  /* 1. شريط العنوان (العنوان + الزر) - مثبت في الأعلى */
+  /* إزالة الحاوية المؤقتة للعنوان والزر لكي يدخلا في الشبكة مباشرة */
   .page-header {
-    position: absolute !important;
-    top: 24px !important;
-    inset-inline-start: 24px !important; 
-    inset-inline-end: 24px !important;
-    height: 44px !important; /* ارتفاع ثابت لضمان المحاذاة */
-    margin: 0 !important;
-    padding: 0 !important;
-    display: flex !important;
-    justify-content: space-between !important;
-    align-items: center !important;
-    pointer-events: none !important; 
-    z-index: 100 !important;
+    display: contents !important;
   }
 
-  /* العنوان */
+  /* 1. العنوان */
   .page-header h2 {
+    order: 1 !important;
+    flex: 0 0 auto !important;
     margin: 0 !important;
-    pointer-events: auto !important;
     white-space: nowrap !important;
     font-size: 1.25rem !important;
-    line-height: 44px !important; /* نفس ارتفاع الشريط */
+    line-height: 1 !important;
   }
 
-  /* زر الإضافة (بنفس تنسيق الهاتف) */
-  .page-header a[href="add.html"] {
-    margin: 0 !important;
-    pointer-events: auto !important;
-    white-space: nowrap !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    height: 44px !important; /* نفس الارتفاع */
-    padding: 0 16px !important; 
-    border-radius: 8px !important; /* نفس حواف الهاتف */
-  }
-
-  /* 2. شريط البحث - مثبت في المنتصف */
+  /* 2. شريط البحث (يتكيف مع المساحة المتبقية) */
   .search-bar {
-    position: absolute !important;
-    top: 24px !important;
-    inset-inline-start: 180px !important; /* المسافة بعد العنوان */
-    inset-inline-end: 180px !important; /* المسافة قبل الزر */
-    height: 44px !important; /* نفس الارتفاع */
+    order: 2 !important;
+    flex: 1 1 200px !important; /* يتكيف مع العرض، وحد أدنى 200px */
     margin: 0 !important;
     padding: 0 !important;
     max-width: none !important;
-    width: auto !important;
     display: flex !important;
     align-items: center !important;
-    z-index: 100 !important;
   }
 
-  /* حقل البحث (بنفس تنسيق الهاتف) */
   .search-bar input {
     width: 100% !important;
-    height: 100% !important;
     margin: 0 !important;
-    padding-block: 0 !important; /* إزالة الحشوة العمودية للاعتماد على الارتفاع الثابت */
-    padding-inline: 16px 40px !important; 
-    border-radius: 50px !important; /* نفس حواف الهاتف */
+    /* نفس تنسيق الهاتف */
+    padding-block: 10px !important;
+    padding-inline: 12px 36px !important;
+    border-radius: 50px !important;
     box-sizing: border-box !important;
+    height: 44px !important; /* تثبيت الارتفاع للمحاذاة */
   }
-
+  
   .search-bar i {
     top: 50% !important;
     transform: translateY(-50%) !important;
   }
 
-  /* 3. شبكة المنتجات */
+  /* 3. زر إضافة منتج (بنفس تنسيق الهاتف) */
+  .page-header a[href="add.html"] {
+    order: 3 !important;
+    flex: 0 0 auto !important;
+    margin: 0 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    white-space: nowrap !important;
+    /* نفس تنسيق الهاتف */
+    padding: 10px 16px !important;
+    border-radius: 8px !important;
+    height: 44px !important; /* نفس ارتفاع البحث */
+    box-sizing: border-box !important;
+  }
+
+  /* 4. شبكة المنتجات (تأخذ السطر بالكامل) */
   .products {
+    order: 4 !important;
+    flex: 1 1 100% !important; /* إجبارها على النزول لسطر جديد */
+    margin-top: 8px !important;
+    padding: 0 !important;
     display: grid !important;
     grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)) !important;
     gap: 16px !important;
-    margin-top: 10px !important;
-    padding: 0 !important;
     
     /* إصلاح التمدد */
-    align-items: start !important; 
+    align-items: start !important;
     align-content: start !important;
   }
 
