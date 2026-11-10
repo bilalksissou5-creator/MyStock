@@ -4,6 +4,7 @@
    ✅ محاذاة العناصر الثلاثة بدون تغيير تنسيقاتها الأصلية
    ✅ إصلاح جذري لتمدد البطاقات
    ✅ تقليل المسافة بين شريط البحث والمنتجات
+   ✅ توحيد ارتفاع شريط البحث وزر الإضافة ليتطابقا مع الـ Header
    ============================================ */
 
 .products {
@@ -128,6 +129,26 @@
 }
 
 /* ============================================
+   ✅ توحيد ارتفاع شريط البحث وزر الإضافة (لكل الشاشات)
+   ============================================ */
+.search-bar input {
+  height: 42px !important;
+  box-sizing: border-box !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+.page-header a[href="add.html"] {
+  height: 42px !important;
+  box-sizing: border-box !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+/* ============================================
    ✅ إصلاح التمرير داخل Workspace (iframe)
    ============================================ */
 html.in-iframe, html.in-iframe body {
@@ -184,39 +205,30 @@ html.in-iframe .products {
   html:not(.in-iframe) #main-content {
     display: grid !important;
     grid-template-columns: auto minmax(150px, 1fr) auto !important;
-    
-    /* ✅ التعديل هنا: السطرين يأخذون حجمهم الطبيعي بدلاً من تمديد الثاني */
     grid-template-rows: auto auto !important; 
-    
     column-gap: 20px !important;
-    row-gap: 24px !important; /* مسافة مناسبة بين شريط البحث والبطاقات */
-    
-    /* ✅ التعديل هنا: محاذاة العناصر لأعلى الشاشة بدلاً من المنتصف */
+    row-gap: 24px !important; 
     align-items: start !important; 
     align-content: start !important;
-    
     padding: 24px !important;
     height: 100% !important;
     overflow-y: auto !important;
     box-sizing: border-box !important;
   }
 
-  /* إزالة الحاوية المؤقتة لكي تصبح عناصرها أبناء مباشرين للشبكة */
   html:not(.in-iframe) .page-header {
     display: contents !important;
   }
 
-  /* 1. العنوان (مع توسيطه عمودياً مع باقي العناصر) */
   html:not(.in-iframe) .page-header h2 {
     grid-column: 1 !important;
     grid-row: 1 !important;
     margin: 0 !important;
     white-space: nowrap !important;
     font-size: 1.25rem !important;
-    align-self: center !important; /* توسيط عمودي */
+    align-self: center !important;
   }
 
-  /* 2. شريط البحث */
   html:not(.in-iframe) .search-bar {
     grid-column: 2 !important;
     grid-row: 1 !important;
@@ -224,22 +236,17 @@ html.in-iframe .products {
     padding: 0 !important;
     width: 100% !important;
     max-width: none !important;
-    align-self: center !important; /* توسيط عمودي */
+    align-self: center !important; 
   }
 
-  /* 3. زر إضافة منتج */
   html:not(.in-iframe) .page-header a[href="add.html"] {
     grid-column: 3 !important;
     grid-row: 1 !important;
     margin: 0 !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
     white-space: nowrap !important;
-    align-self: center !important; /* توسيط عمودي */
+    align-self: center !important; 
   }
 
-  /* 4. شبكة المنتجات (تأخذ السطر الثاني بالكامل) */
   html:not(.in-iframe) .products {
     grid-column: 1 / -1 !important;
     grid-row: 2 !important;
@@ -252,7 +259,6 @@ html.in-iframe .products {
     align-content: start !important;
   }
 
-  /* منع تمدد البطاقات */
   html:not(.in-iframe) .product-card {
     height: max-content !important;
     display: flex !important;
