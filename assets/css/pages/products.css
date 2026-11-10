@@ -183,7 +183,8 @@ html.in-iframe .products {
   html:not(.in-iframe) .main,
   html:not(.in-iframe) #main-content {
     display: grid !important;
-    grid-template-columns: auto 1fr auto !important; /* العنوان | البحث | الزر */
+    /* ✅ العنوان (تلقائي) | البحث (يتمدد لكن لا يقل عن 150px) | الزر (تلقائي) */
+    grid-template-columns: auto minmax(150px, 1fr) auto !important; 
     grid-template-rows: auto 1fr !important;
     column-gap: 20px !important;
     row-gap: 20px !important;
