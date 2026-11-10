@@ -1,6 +1,7 @@
 // ============================================
 // صفحة الموردين (مع التحديث الفوري بسرعة البرق)
 // ✅ دعم كامل للترجمة
+// ✅ إعادة زر إضافة المورد
 // ============================================
 let suppliersChannel = null;
 let cachedSuppliers = []; // مخزن مؤقت
@@ -21,7 +22,12 @@ document.addEventListener('DOMContentLoaded', async () => {
   main.innerHTML = `
     <div class="page-header">
       <h2>${tr('sup_title')}</h2>
-      <!-- ✅ تم إزالة زر العودة من هنا -->
+      
+      <!-- ✅ إعادة زر إضافة المورد -->
+      <a href="/suppliers/add.html" class="btn-primary">
+        <i class="fas fa-plus"></i>
+        <span>${tr('sup_add')}</span>
+      </a>
     </div>
 
     <div class="search-bar">
