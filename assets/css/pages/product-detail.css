@@ -1,6 +1,6 @@
 /* ============================================
    صفحة تفاصيل المنتج - التصميم الشبكي المتجاوب
-   ✅ تعديل inline مثالي: بدون إزاحة، بدون قفز، وبدون تغيير حجم
+   ✅ توحيد حجم اسم المنتج ليكون 18px في كل الشاشات
    ============================================ */
 
 /* ✅ 1. إجبار العنوان وحاوية البطاقات على أخذ نفس العرض والتوسط */
@@ -115,6 +115,7 @@
 .image-edit-btn i { font-size: 12px !important; line-height: 1 !important; }
 .image-edit-btn:hover { background: #171717 !important; transform: scale(1.08) !important; }
 
+/* ✅ التعديل: توحيد حجم اسم المنتج ليكون 18px */
 .detail-title { 
   font-size: 18px !important; 
   font-weight: 600 !important; 
@@ -207,39 +208,43 @@
 .field-hint { display: block; font-size: 11px; color: #a3a3a3; margin-top: 6px; text-align: start; }
 
 /* ============================================
-   ✅ 6. التعديل المثالي (بدون إزاحة أو تأثير)
+   ✅ 6. إصلاح التعديل المباشر (بدون اختفاء الأرقام)
    ============================================ */
-
-/* 1. الحاوية: حجمها ثابت ولا يتأثر */
 .edit-field { 
   display: inline-flex; 
   align-items: center; 
-  justify-content: inherit; 
+  justify-content: flex-start; 
+  gap: 4px; 
   cursor: pointer; 
-  padding: 2px 6px !important; 
-  margin: -2px -6px !important; 
-  border-radius: 4px; 
+  padding: 4px 8px; 
+  margin: -4px -8px; 
+  border-radius: 6px; 
   transition: background 0.15s; 
+  min-height: 24px; 
   font-size: inherit; 
-  position: relative !important; 
-  box-sizing: border-box;
+  position: relative; 
+  max-width: 100%; 
+  overflow: hidden; 
+  text-overflow: ellipsis; 
   white-space: nowrap; 
 }
-.edit-field:hover { background: rgba(0, 0, 0, 0.05); }
+.edit-field:hover { background: #f0f0f0; }
 
-/* 2. حالة التعديل: النص الأصلي يصبح شفافاً (يبقى محتجزاً لمساحته) */
 .edit-field.editing { 
-  color: transparent !important; 
-  background: #ffffff !important; 
-  box-shadow: 0 0 0 1.5px #2563eb !important; /* إطار لا يستهلك مساحة */
+  background: transparent !important; 
+  padding: 0 !important; 
+  margin: 0 !important; 
+  cursor: text !important; 
   z-index: 20 !important; 
+  display: block !important;
+  width: 100% !important;
+  min-width: 50px !important;
+  height: 24px !important; 
 }
 
-/* للحفاظ على التوسيط في الإحصائيات */
-.edit-field.center { justify-content: center !important; text-align: center !important; }
-.product-stats .edit-field.center { padding: 0 4px !important; margin: 0 -4px !important; }
+.edit-field.center { justify-content: center; text-align: center; width: 100%; margin: -4px 0; }
+.product-stats .edit-field.center { width: auto; margin: 0; padding: 0; min-height: auto !important; }
 
-/* 3. الحقل الجديد: يغطي الحاوية بالضبط */
 .inline-input { 
   position: absolute !important;
   top: 0 !important;
@@ -247,22 +252,25 @@
   width: 100% !important;
   height: 100% !important;
   margin: 0 !important;
-  padding: 0 6px !important; 
+  padding: 0 4px !important;
   box-sizing: border-box !important;
-  border: none !important; 
-  background: transparent !important;
+  border: 2px solid #171717 !important; 
+  border-radius: 4px !important;
+  background: #ffffff !important; 
   color: #171717 !important; 
-  text-align: inherit !important; 
-  font-family: inherit !important; 
+  text-align: center !important;
   font-size: inherit !important; 
   font-weight: inherit !important; 
+  font-family: inherit !important; 
   outline: none !important; 
+  box-shadow: 0 2px 10px rgba(0,0,0,0.15) !important; 
   z-index: 100 !important;
-  -webkit-appearance: none !important;
-  appearance: none !important;
 }
 
-.product-stats .inline-input { padding: 0 4px !important; text-align: center !important; }
+.product-stats .inline-input { 
+  text-align: center !important; 
+  font-size: 14px !important; 
+}
 
 .save-indicator { color: #16a34a; font-size: 12px; margin-inline-start: 4px; animation: fadeInCheck 0.2s ease-out; }
 @keyframes fadeInCheck { from { opacity: 0; transform: scale(0.7); } to { opacity: 1; transform: scale(1); } }
@@ -273,7 +281,12 @@
 @media (max-width: 599px) {
   .product-card-detail { padding: 10px !important; border-radius: 10px; }
   .product-image { height: 110px !important; min-height: 110px !important; max-height: 110px !important; border-radius: 8px; margin-bottom: 12px; }
-  .detail-title { font-size: 18px !important; }
+  
+  /* ✅ التعديل: إبقاء حجم اسم المنتج 18px في الهاتف أيضاً */
+  .detail-title { 
+    font-size: 18px !important; 
+  }
+  
   .detail-sku { font-size: 12px !important; margin-bottom: 12px; }
   .product-stats { gap: 6px !important; margin-bottom: 12px; }
   .stat { padding: 6px 2px !important; border-radius: 6px; }
@@ -295,6 +308,7 @@
   [dir="rtl"] .switch input:checked + .switch-slider::before { transform: translateX(-20px); }
   
   .sell-price-input-group input[type="number"] { height: 34px !important; padding: 0 12px !important; font-size: 13px !important; }
+  .inline-input { font-size: 12px !important; }
 }
 
 /* ============================================
