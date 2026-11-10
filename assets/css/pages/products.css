@@ -1,8 +1,7 @@
 /* ============================================
    صفحة المنتجات (التصميم الأصلي)
-   ✅ إصلاح اتجاه العملة ومنع نزولها لسطر جديد
-   ✅ خانة البحث تتمدد وتتقلص (Flexbox) في الشاشات الكبيرة
-   ✅ إصلاح جذري لتمدد البطاقات
+   ✅ محاذاة مضمونة (بدون التفاف) باستخدام CSS Grid
+   ✅ خانة البحث تتمدد وتتقلص حسب المساحة المتاحة
    ============================================ */
 
 .products {
@@ -175,93 +174,89 @@ html.in-iframe .products {
 }
 
 /* ============================================
-   ✅ التمدد والتقلص الذكي للشاشات الكبيرة (التابلت والحاسوب)
+   ✅ الحل الجذري للشاشات الكبيرة (التابلت والحاسوب)
+   ✅ استخدام CSS Grid لمنع الالتفاف نهائياً
    ============================================ */
 @media (min-width: 768px) {
-  /* تحويل الحاوية الرئيسية إلى Flexbox مع السماح بالالتفاف */
-  html:not(.in-iframe) .main {
-    display: flex !important;
-    flex-wrap: wrap !important;
-    align-items: center !important; /* توسيط العناصر عمودياً */
-    align-content: flex-start !important;
-    gap: 16px !important;
+  /* تحويل الحاوية الرئيسية إلى شبكة من 3 أعمدة (عنوان - بحث - زر) */
+  html:not(.in-iframe) .main,
+  html:not(.in-iframe) #main-content {
+    display: grid !important;
+    /* العمود الأول: تلقائي للعنوان | العمود الثاني: مرن للبحث (لا يقل عن 150px) | العمود الثالث: تلقائي للزر */
+    grid-template-columns: auto minmax(150px, 1fr) auto !important;
+    grid-template-rows: auto 1fr !important;
+    column-gap: 20px !important;
+    row-gap: 20px !important;
+    
+    /* توسيط العناصر عمودياً لتكون على نفس الخط */
+    align-items: center !important;
+    
     padding: 24px !important;
     height: 100% !important;
     overflow-y: auto !important;
     box-sizing: border-box !important;
   }
 
-  /* إزالة الحاوية المؤقتة للعنوان والزر لكي يدخلا في الحساب مباشرة */
+  /* إزالة الحاوية المؤقتة لكي تصبح عناصرها أبناء مباشرين للشبكة */
   html:not(.in-iframe) .page-header {
     display: contents !important;
   }
 
-  /* 1. العنوان */
+  /* 1. العنوان (العمود الأول) */
   html:not(.in-iframe) .page-header h2 {
-    order: 1 !important;
-    flex: 0 0 auto !important; /* لا يتمدد ولا يتقلص */
+    grid-column: 1 !important;
+    grid-row: 1 !important;
     margin: 0 !important;
     white-space: nowrap !important;
     font-size: 1.25rem !important;
-    line-height: 1 !important;
   }
 
-  /* 2. شريط البحث (يتمدد ويتقلص) */
+  /* 2. شريط البحث (العمود الثاني - سيمتد ليملأ الفراغ) */
   html:not(.in-iframe) .search-bar {
-    order: 2 !important;
-    flex: 1 1 200px !important; /* ✅ السحر هنا: يتمدد ليملأ الفراغ، ويتقلص كحد أدنى 200px */
-    max-width: none !important; /* إلغاء الحد الأقصى 400px القادم من common.css */
+    grid-column: 2 !important;
+    grid-row: 1 !important;
     margin: 0 !important;
     padding: 0 !important;
-    display: flex !important;
-    align-items: center !important;
+    width: 100% !important;
+    max-width: none !important; /* إلغاء الحد الأقصى القادم من common.css */
+    display: block !important;
   }
 
   html:not(.in-iframe) .search-bar input {
     width: 100% !important;
     height: 44px !important;
     margin: 0 !important;
-    padding-block: 0 !important;
-    padding-inline: 16px 40px !important; 
-    border-radius: 50px !important;
     box-sizing: border-box !important;
+    border-radius: 8px !important; /* حواف متناسقة */
   }
 
-  html:not(.in-iframe) .search-bar i {
-    top: 50% !important;
-    transform: translateY(-50%) !important;
-  }
-
-  /* 3. زر إضافة منتج */
+  /* 3. زر إضافة منتج (العمود الثالث) */
   html:not(.in-iframe) .page-header a[href="add.html"] {
-    order: 3 !important;
-    flex: 0 0 auto !important; /* لا يتمدد ولا يتقلص */
+    grid-column: 3 !important;
+    grid-row: 1 !important;
     margin: 0 !important;
     height: 44px !important;
     display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
     white-space: nowrap !important;
-    padding: 0 16px !important;
-    border-radius: 8px !important;
     box-sizing: border-box !important;
   }
 
-  /* 4. شبكة المنتجات */
+  /* 4. شبكة المنتجات (تأخذ السطر الثاني بالكامل) */
   html:not(.in-iframe) .products {
-    order: 4 !important;
-    flex: 1 1 100% !important; /* تأخذ السطر بالكامل */
-    margin-top: 16px !important;
+    grid-column: 1 / -1 !important;
+    grid-row: 2 !important;
+    margin: 0 !important;
     padding: 0 !important;
     display: grid !important;
     grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)) !important;
     gap: 16px !important;
-    
-    /* إصلاح التمدد */
     align-items: start !important;
     align-content: start !important;
   }
 
+  /* منع تمدد البطاقات */
   html:not(.in-iframe) .product-card {
     height: max-content !important;
     display: flex !important;
