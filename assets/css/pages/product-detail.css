@@ -4,6 +4,7 @@
    ✅ تفعيل التصميم العمودي للتابلت من 600px
    ✅ توحيد حجم العناصر لتطابق صفحة المنتجات
    ✅ إصلاح جذري لأيقونة الكاميرا (منع خروجها وتمددها)
+   ✅ توحيد ارتفاع حشوات حقول الإدخال مع خانة البحث في صفحة المنتجات
    ============================================ */
 
 /* ✅ 1. إجبار العنوان وحاوية البطاقات على أخذ نفس العرض والتوسط */
@@ -87,8 +88,8 @@
   height: 140px !important;
   min-height: 140px !important;
   max-height: 140px !important;
-  display: block !important; /* التغيير لـ block لمنع التمدد */
-  overflow: hidden !important; /* إخفاء أي شيء يخرج عن الحاوية */
+  display: block !important;
+  overflow: hidden !important;
   margin-bottom: 12px !important;
 }
 
@@ -99,7 +100,6 @@
   display: block !important; 
 }
 
-/* توسيط أيقونة المنتج الافتراضية */
 .product-image > i { 
   position: absolute !important;
   top: 50% !important;
@@ -109,11 +109,10 @@
   color: #d4d4d4 !important; 
 }
 
-/* ✅ إصلاح جذري لأيقونة الكاميرا */
 .image-edit-btn {
   position: absolute !important;
   bottom: 8px !important;
-  inset-inline-start: 8px !important; /* مراعاة العربية والإنجليزية */
+  inset-inline-start: 8px !important;
   background: rgba(23, 23, 23, 0.9) !important;
   color: white !important;
   border: none !important;
@@ -225,8 +224,29 @@
 
 .sell-price-input-group { margin-top: 14px; margin-bottom: 0; }
 .sell-price-input-group label { display: block; font-size: 13px; font-weight: 600; color: #404040; margin-bottom: 6px; text-align: start; }
-.sell-price-input-group input[type="number"] { width: 100%; padding: 12px 14px; border: 1px solid #e5e5e5; border-radius: 10px; font-family: inherit; font-size: 15px; font-weight: 600; color: #171717; background: white; box-sizing: border-box; transition: border-color 0.15s; }
-.sell-price-input-group input[type="number"]:focus { outline: none; border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1); }
+
+/* ✅ التوحيد الجديد: حشوة وارتفاع حقول الإدخال لتطابق خانة البحث في صفحة المنتجات */
+.sell-price-input-group input[type="number"] { 
+  width: 100% !important; 
+  height: 34px !important; /* نفس ارتفاع خانة البحث */
+  padding: 0 12px !important; /* إزالة الحشوة العمودية */
+  font-size: 13px !important; /* نفس حجم خط خانة البحث */
+  font-weight: 600 !important;
+  border: 1px solid #e5e5e5 !important; 
+  border-radius: 50px !important; /* شكل دائري مثل البحث */
+  font-family: inherit !important; 
+  color: #171717 !important; 
+  background: white !important; 
+  box-sizing: border-box !important; 
+  transition: border-color 0.15s !important; 
+}
+
+.sell-price-input-group input[type="number"]:focus { 
+  outline: none !important; 
+  border-color: #2563eb !important; 
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1) !important; 
+}
+
 .field-hint { display: block; font-size: 11px; color: #a3a3a3; margin-top: 6px; text-align: start; }
 
 .actions { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; margin-top: 16px; }
@@ -299,7 +319,13 @@
   .switch-slider::before { height: 20px; width: 20px; inset-inline-start: 3px; top: 3px; }
   .switch input:checked + .switch-slider::before { transform: translateX(20px); }
   [dir="rtl"] .switch input:checked + .switch-slider::before { transform: translateX(-20px); }
-  .sell-price-input-group input[type="number"] { padding: 10px 12px; font-size: 14px; }
+  
+  /* ✅ توحيد حقول الإدخال في الهاتف */
+  .sell-price-input-group input[type="number"] { 
+    height: 34px !important; 
+    padding: 0 12px !important; 
+    font-size: 13px !important; 
+  }
 }
 
 /* ============================================
