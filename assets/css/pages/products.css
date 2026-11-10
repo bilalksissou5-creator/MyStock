@@ -1,7 +1,7 @@
 /* ============================================
    صفحة المنتجات (التصميم الأصلي)
    ✅ إصلاح اتجاه العملة ومنع نزولها لسطر جديد
-   ✅ تصفيف (العنوان + البحث + زر الإضافة) أفقياً بشكل مضمون
+   ✅ محاذاة العناصر الثلاثة (العنوان، البحث، الزر) بدقة على نفس الخط
    ✅ إصلاح جذري لتمدد البطاقات
    ============================================ */
 
@@ -175,79 +175,89 @@ html.in-iframe .products {
 }
 
 /* ============================================
-   ✅ التصفيف الأفقي المضمون للشاشات الكبيرة (التابلت والحاسوب)
-   ✅ استخدام التثبيت المطلق (Absolute Positioning) لمنع النزول لسطر جديد
+   ✅ المحاذاة الدقيقة للشاشات الكبيرة (التابلت والحاسوب)
    ============================================ */
 @media (min-width: 768px) {
-  /* الحاوية الرئيسية تأخذ التمرير وتترك مساحة علوية للشريط العلوي */
   .main, #main-content {
-    position: relative !important;
-    padding: 80px 24px 24px 24px !important; /* 80px مساحة فارغة في الأعلى */
-    display: block !important; 
+    display: grid !important;
+    /* العمود الأول للعنوان، الثاني للبحث، الثالث للزر */
+    grid-template-columns: auto 1fr auto !important;
+    /* السطر الأول للعناصر الثلاثة بارتفاع ثابت (48px)، والسطر الثاني للمنتجات */
+    grid-template-rows: 48px 1fr !important;
+    column-gap: 20px !important;
+    row-gap: 20px !important;
+    padding: 24px !important;
     height: 100% !important;
-    overflow-y: auto !important;
+    
+    /* ✅ السحر هنا: توسيط كل شيء عمودياً ليكونوا على خط واحد */
+    align-items: center !important; 
     box-sizing: border-box !important;
+    overflow-y: auto !important;
   }
 
-  /* 1. شريط العنوان (يحتوي على العنوان والزر) - مثبت في الأعلى */
   .page-header {
-    position: absolute !important;
-    top: 20px !important;
-    inset-inline-start: 24px !important; /* يراعي اللغة العربية والإنجليزية */
-    inset-inline-end: 24px !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    display: flex !important;
-    justify-content: space-between !important;
-    align-items: center !important;
-    pointer-events: none !important; /* النقر يمر من الفراغ إلى شريط البحث */
-    z-index: 100 !important;
+    display: contents !important; /* إزالة الحاوية المؤقتة */
   }
 
-  /* العنوان */
+  /* 1. العنوان */
   .page-header h2 {
+    grid-column: 1 !important;
+    grid-row: 1 !important;
     margin: 0 !important;
-    pointer-events: auto !important;
     white-space: nowrap !important;
-    font-size: 1.2rem !important;
+    font-size: 1.25rem !important;
+    line-height: 1 !important; /* منع التأثير على الارتفاع */
   }
 
-  /* زر الإضافة */
-  .page-header a[href="add.html"] {
-    margin: 0 !important;
-    pointer-events: auto !important;
-    white-space: nowrap !important;
-    display: inline-flex !important;
-  }
-
-  /* 2. شريط البحث - مثبت في المنتصف بين العنوان والزر */
+  /* 2. شريط البحث */
   .search-bar {
-    position: absolute !important;
-    top: 16px !important; /* ليتناسب مع ارتفاع العنوان والزر */
-    inset-inline-start: 150px !important; /* المسافة بعد العنوان */
-    inset-inline-end: 180px !important; /* المسافة قبل زر الإضافة */
+    grid-column: 2 !important;
+    grid-row: 1 !important;
     margin: 0 !important;
     padding: 0 !important;
+    width: 100% !important;
     max-width: none !important;
-    width: auto !important;
-    z-index: 100 !important;
+    display: flex !important;
+    align-items: center !important;
   }
 
   .search-bar input {
     width: 100% !important;
-    padding: 10px 16px !important;
+    height: 44px !important; /* ارتفاع ثابت ومحدد */
+    margin: 0 !important;
+    border-radius: 8px !important;
+  }
+  .search-bar i {
+    top: 50% !important;
+    transform: translateY(-50%) !important;
   }
 
-  /* 3. شبكة المنتجات - أسفل الشريط العلوي */
+  /* 3. زر إضافة منتج */
+  .page-header a[href="add.html"] {
+    grid-column: 3 !important;
+    grid-row: 1 !important;
+    margin: 0 !important;
+    height: 44px !important; /* نفس ارتفاع شريط البحث */
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    white-space: nowrap !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+  }
+
+  /* 4. شبكة المنتجات */
   .products {
+    grid-column: 1 / -1 !important;
+    grid-row: 2 !important;
+    margin: 0 !important;
+    padding: 0 !important;
     display: grid !important;
     grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)) !important;
     gap: 16px !important;
-    margin-top: 10px !important;
-    padding: 0 !important;
     
     /* إصلاح التمدد */
-    align-items: start !important; 
+    align-items: start !important;
     align-content: start !important;
   }
 
