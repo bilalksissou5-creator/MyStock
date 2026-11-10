@@ -1,8 +1,7 @@
 // ============================================
 // صفحة تفاصيل المنتج - النسخة النهائية المستقرة
 // ✅ تقسيم الصفحة إلى 3 بطاقات منفصلة (المعلومات، سعر البيع، المخزون)
-// ✅ إصلاح اتجاه العملة (LTR) لتظهر 30.00 DH بدلاً من DH 30.00
-// ✅ إشعار واحد فقط لكل عملية تعديل (بدون تكرار)
+// ✅ محاذاة العنوان مع بداية البطاقات
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   const user = await requireAuth();
@@ -61,133 +60,136 @@ document.addEventListener('DOMContentLoaded', async () => {
   const isLowStock = Number(product.qty ?? 0) <= lowStockThreshold;
 
   main.innerHTML = `
-    <div class="page-header">
-      <h2>${tr('prod_detail_title')}</h2>
-    </div>
+    <!-- ✅ حاوية رئيسية لتوسيط العنوان والبطاقات معاً -->
+    <div style="max-width: 800px; margin: 0 auto; width: 100%;">
+      
+      <div class="page-header" style="padding: 0; margin-bottom: 16px;">
+        <h2>${tr('prod_detail_title')}</h2>
+      </div>
 
-    <!-- ✅ حاوية رئيسية لترتيب البطاقات الثلاث بمسافات متساوية -->
-    <div style="display: flex; flex-direction: column; gap: 20px; padding-bottom: 24px;">
+      <div style="display: flex; flex-direction: column; gap: 20px; padding-bottom: 24px;">
 
-      <!-- ══════════════════════════════════════ -->
-      <!-- ✅ البطاقة الأولى: معلومات المنتج الأساسية -->
-      <!-- ══════════════════════════════════════ -->
-      <div class="product-card-detail">
-        
-        <div class="product-image" id="product-image-container">
-          ${product.image_url
-            ? `<img src="${product.image_url}" alt="${product.name ?? tr('products_no_name')}">`
-            : `<i class="fas fa-box-open"></i>`}
-          <button class="image-edit-btn" title="${tr('prod_detail_edit_image')}">
-            <i class="fas fa-camera"></i>
+        <!-- ══════════════════════════════════════ -->
+        <!-- ✅ البطاقة الأولى: معلومات المنتج الأساسية -->
+        <!-- ══════════════════════════════════════ -->
+        <div class="product-card-detail">
+          
+          <div class="product-image" id="product-image-container">
+            ${product.image_url
+              ? `<img src="${product.image_url}" alt="${product.name ?? tr('products_no_name')}">`
+              : `<i class="fas fa-box-open"></i>`}
+            <button class="image-edit-btn" title="${tr('prod_detail_edit_image')}">
+              <i class="fas fa-camera"></i>
+            </button>
+          </div>
+
+          <h1 class="detail-title">
+            <span class="edit-field" id="f-name" data-value="${product.name ?? ''}"></span>
+          </h1>
+          <p class="detail-sku">
+            <span class="edit-field" id="f-sku" data-value="${product.sku ?? ''}"></span>
+          </p>
+
+          <div class="product-stats">
+            <div class="stat">
+              <div class="stat-label">${tr('products_qty')}</div>
+              <div class="stat-value ${isLowStock ? 'low' : ''}" id="qty-stat-value">
+                <span class="edit-field center" id="f-qty" data-value="${product.qty ?? 0}"></span>
+              </div>
+            </div>
+            <div class="stat">
+              <div class="stat-label">${tr('prod_detail_buy_price')}</div>
+              <div class="stat-value">
+                <span dir="ltr" style="display: inline-flex; align-items: center; gap: 4px;">
+                  <span class="edit-field center" id="f-price" data-value="${product.price ?? 0}"></span>
+                  ${currencySymbol ? `<span style="font-size: 0.9em; color: #171717; font-weight: 500;">${currencySymbol}</span>` : ''}
+                </span>
+              </div>
+            </div>
+            <div class="stat">
+              <div class="stat-label">${tr('products_total')}</div>
+              <div class="stat-value" id="f-total"><span dir="ltr">${total} ${currencySymbol}</span></div>
+            </div>
+          </div>
+
+          <div class="product-extra">
+            <div class="row">
+              <span>${tr('prod_detail_category')}</span>
+              <strong class="edit-field" id="f-category" data-value="${product.category ?? product.suppliers?.specialty ?? ''}"></strong>
+            </div>
+            <div class="row">
+              <span>${tr('prod_detail_supplier')}</span>
+              <strong>${product.suppliers?.name ?? '—'}</strong>
+            </div>
+            <div class="row">
+              <span>${tr('prod_detail_unit')}</span>
+              <strong class="edit-field" id="f-unit" data-value="${product.unit ?? ''}"></strong>
+            </div>
+            <div class="row">
+              <span>${tr('prod_detail_barcode')}</span>
+              <strong class="edit-field" id="f-qr_code" data-value="${product.qr_code ?? ''}"></strong>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- ══════════════════════════════════════ -->
+        <!-- ✅ البطاقة الثانية: سعر البيع -->
+        <!-- ══════════════════════════════════════ -->
+        <div class="product-card-detail" style="padding-top: 16px; padding-bottom: 16px;">
+          <div class="sell-price-section" style="margin: 0;">
+            <h3 class="sell-price-title">💰 ${tr('prod_detail_sell_price')}</h3>
+
+            <div class="switch-item" style="margin-bottom: 16px;">
+              <div class="switch-content">
+                <div class="switch-header">
+                  <strong class="switch-title">${tr('prod_detail_enable_sell')}</strong>
+                  <span class="switch-status ${sellPriceEnabled ? 'on' : 'off'}" id="sell-price-status">
+                    ${sellPriceEnabled ? tr('prod_detail_enabled') : tr('prod_detail_disabled')}
+                  </span>
+                </div>
+                <p class="switch-desc">${tr('prod_detail_sell_desc')}</p>
+              </div>
+              <label class="switch">
+                <input type="checkbox" id="sell-price-toggle" ${sellPriceEnabled ? 'checked' : ''}>
+                <span class="switch-slider"></span>
+              </label>
+            </div>
+
+            <div class="sell-price-input-group">
+              <label>${tr('prod_detail_sell_input')} (${currencySymbol || 'DH'})</label>
+              <input type="number" id="sell-price-input" value="${sellPrice}" min="0" step="0.01" dir="ltr" placeholder="0.00">
+              <small class="field-hint">${tr('prod_detail_sell_hint')}</small>
+            </div>
+          </div>
+        </div>
+
+        <!-- ══════════════════════════════════════ -->
+        <!-- ✅ البطاقة الثالثة: المخزون المنخفض -->
+        <!-- ══════════════════════════════════════ -->
+        <div class="product-card-detail" style="padding-top: 16px; padding-bottom: 16px;">
+          <div class="sell-price-section" style="margin: 0;">
+            <h3 class="sell-price-title">${tr('low_stock_section_title')}</h3>
+
+            <div class="sell-price-input-group">
+              <label>${tr('low_stock_field_label')}</label>
+              <input type="number" id="low-stock-input" value="${lowStockThreshold}" min="0" step="1" dir="ltr" placeholder="10">
+              <small class="field-hint">${tr('low_stock_field_hint')}</small>
+            </div>
+          </div>
+        </div>
+
+        <!-- ══════════════════════════════════════ -->
+        <!-- ✅ أزرار التحكم (حذف المنتج) -->
+        <!-- ══════════════════════════════════════ -->
+        <div class="actions" style="margin-top: 8px;">
+          <button class="btn-danger" id="delete-btn">
+            <i class="fas fa-trash"></i>
+            <span>${tr('prod_detail_delete')}</span>
           </button>
         </div>
 
-        <h1 class="detail-title">
-          <span class="edit-field" id="f-name" data-value="${product.name ?? ''}"></span>
-        </h1>
-        <p class="detail-sku">
-          <span class="edit-field" id="f-sku" data-value="${product.sku ?? ''}"></span>
-        </p>
-
-        <div class="product-stats">
-          <div class="stat">
-            <div class="stat-label">${tr('products_qty')}</div>
-            <div class="stat-value ${isLowStock ? 'low' : ''}" id="qty-stat-value">
-              <span class="edit-field center" id="f-qty" data-value="${product.qty ?? 0}"></span>
-            </div>
-          </div>
-          <div class="stat">
-            <div class="stat-label">${tr('prod_detail_buy_price')}</div>
-            <div class="stat-value">
-              <span dir="ltr" style="display: inline-flex; align-items: center; gap: 4px;">
-                <span class="edit-field center" id="f-price" data-value="${product.price ?? 0}"></span>
-                ${currencySymbol ? `<span style="font-size: 0.9em; color: #171717; font-weight: 500;">${currencySymbol}</span>` : ''}
-              </span>
-            </div>
-          </div>
-          <div class="stat">
-            <div class="stat-label">${tr('products_total')}</div>
-            <div class="stat-value" id="f-total"><span dir="ltr">${total} ${currencySymbol}</span></div>
-          </div>
-        </div>
-
-        <div class="product-extra">
-          <div class="row">
-            <span>${tr('prod_detail_category')}</span>
-            <strong class="edit-field" id="f-category" data-value="${product.category ?? product.suppliers?.specialty ?? ''}"></strong>
-          </div>
-          <div class="row">
-            <span>${tr('prod_detail_supplier')}</span>
-            <strong>${product.suppliers?.name ?? '—'}</strong>
-          </div>
-          <div class="row">
-            <span>${tr('prod_detail_unit')}</span>
-            <strong class="edit-field" id="f-unit" data-value="${product.unit ?? ''}"></strong>
-          </div>
-          <div class="row">
-            <span>${tr('prod_detail_barcode')}</span>
-            <strong class="edit-field" id="f-qr_code" data-value="${product.qr_code ?? ''}"></strong>
-          </div>
-        </div>
-
       </div>
-
-      <!-- ══════════════════════════════════════ -->
-      <!-- ✅ البطاقة الثانية: سعر البيع -->
-      <!-- ══════════════════════════════════════ -->
-      <div class="product-card-detail" style="padding-top: 16px; padding-bottom: 16px;">
-        <div class="sell-price-section" style="margin: 0;">
-          <h3 class="sell-price-title">💰 ${tr('prod_detail_sell_price')}</h3>
-
-          <div class="switch-item" style="margin-bottom: 16px;">
-            <div class="switch-content">
-              <div class="switch-header">
-                <strong class="switch-title">${tr('prod_detail_enable_sell')}</strong>
-                <span class="switch-status ${sellPriceEnabled ? 'on' : 'off'}" id="sell-price-status">
-                  ${sellPriceEnabled ? tr('prod_detail_enabled') : tr('prod_detail_disabled')}
-                </span>
-              </div>
-              <p class="switch-desc">${tr('prod_detail_sell_desc')}</p>
-            </div>
-            <label class="switch">
-              <input type="checkbox" id="sell-price-toggle" ${sellPriceEnabled ? 'checked' : ''}>
-              <span class="switch-slider"></span>
-            </label>
-          </div>
-
-          <div class="sell-price-input-group">
-            <label>${tr('prod_detail_sell_input')} (${currencySymbol || 'DH'})</label>
-            <input type="number" id="sell-price-input" value="${sellPrice}" min="0" step="0.01" dir="ltr" placeholder="0.00">
-            <small class="field-hint">${tr('prod_detail_sell_hint')}</small>
-          </div>
-        </div>
-      </div>
-
-      <!-- ══════════════════════════════════════ -->
-      <!-- ✅ البطاقة الثالثة: المخزون المنخفض -->
-      <!-- ══════════════════════════════════════ -->
-      <div class="product-card-detail" style="padding-top: 16px; padding-bottom: 16px;">
-        <div class="sell-price-section" style="margin: 0;">
-          <h3 class="sell-price-title">${tr('low_stock_section_title')}</h3>
-
-          <div class="sell-price-input-group">
-            <label>${tr('low_stock_field_label')}</label>
-            <input type="number" id="low-stock-input" value="${lowStockThreshold}" min="0" step="1" dir="ltr" placeholder="10">
-            <small class="field-hint">${tr('low_stock_field_hint')}</small>
-          </div>
-        </div>
-      </div>
-
-      <!-- ══════════════════════════════════════ -->
-      <!-- ✅ أزرار التحكم (حذف المنتج) -->
-      <!-- ══════════════════════════════════════ -->
-      <div class="actions" style="margin-top: 8px;">
-        <button class="btn-danger" id="delete-btn">
-          <i class="fas fa-trash"></i>
-          <span>${tr('prod_detail_delete')}</span>
-        </button>
-      </div>
-
     </div>
   `;
 
