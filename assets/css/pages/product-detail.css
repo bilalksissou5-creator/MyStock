@@ -1,6 +1,7 @@
 /* ============================================
    صفحة تفاصيل المنتج - التصميم الشبكي المتجاوب
-   ✅ تعديل مباشر ثابت 100% (لا يقفز ولا يغير اتجاه العناصر)
+   ✅ توحيد حجم اسم المنتج ليكون 18px في كل الشاشات
+   ✅ تعديل مباشر ثابت 100% (بدون تحرك أي عنصر)
    ============================================ */
 
 /* ✅ 1. إجبار العنوان وحاوية البطاقات على أخذ نفس العرض والتوسط */
@@ -115,6 +116,7 @@
 .image-edit-btn i { font-size: 12px !important; line-height: 1 !important; }
 .image-edit-btn:hover { background: #171717 !important; transform: scale(1.08) !important; }
 
+/* ✅ التعديل: توحيد حجم اسم المنتج ليكون 18px */
 .detail-title { 
   font-size: 18px !important; 
   font-weight: 600 !important; 
@@ -207,41 +209,41 @@
 .field-hint { display: block; font-size: 11px; color: #a3a3a3; margin-top: 6px; text-align: start; }
 
 /* ============================================
-   ✅ 6. التعديل المباشر (إصلاح القفز وتغيير الاتجاه)
+   ✅ 6. إصلاح التعديل المباشر (ثبات مطلق للعناصر)
    ============================================ */
-
-/* 1. الحاوية الأصلية: نحافظ على اتجاهها وحجمها */
 .edit-field { 
   display: inline-flex; 
   align-items: center; 
-  justify-content: inherit; /* يرث المحاذاة (يمين أو يسار) */
+  justify-content: inherit; /* يرث اتجاه النص (يمين، يسار، أو وسط) */
   gap: 4px; 
   cursor: pointer; 
-  padding: 4px 8px !important; 
-  margin: -4px -8px !important; 
+  padding: 4px 8px; 
+  margin: -4px -8px; 
   border-radius: 6px; 
   transition: background 0.15s; 
   min-height: 24px; 
   font-size: inherit; 
-  position: relative; /* ضروري لتغطية الحقل */
+  position: relative; 
   max-width: 100%; 
   overflow: hidden; 
   text-overflow: ellipsis; 
   white-space: nowrap; 
-  box-sizing: border-box !important;
 }
 .edit-field:hover { background: #f0f0f0; }
 
-/* 2. حالة التعديل: نخفي النص فقط (بدون تغيير display أو padding) */
+/* ✅ التعديل: الحاوية تحتفظ بشكلها، ولا نغير حشوتها أو حجمها إطلاقاً */
 .edit-field.editing { 
   background: #ffffff !important; 
   cursor: text !important; 
   z-index: 20 !important; 
-  color: transparent !important; /* يخفي النص الأصلي ويحتفظ بمساحته */
-  box-shadow: 0 0 0 1.5px #2563eb !important; /* إطار لا يستهلك مساحة */
+  box-shadow: 0 0 0 1.5px #171717 !important; /* إطار وهمي لا يستهلك مساحة */
+  color: transparent !important; /* إخفاء النص الأصلي فقط */
 }
 
-/* 3. الحقل: طبقة تغطي النص بالضبط وترث اتجاهه */
+.edit-field.center { justify-content: center; text-align: center; width: 100%; margin: -4px 0; }
+.product-stats .edit-field.center { width: auto; margin: 0; padding: 0; min-height: auto !important; }
+
+/* ✅ الحقل: طبقة تغطي الحاوية بالضبط وبنفس الحشوة لمنع تحرك النص */
 .inline-input { 
   position: absolute !important;
   top: 0 !important;
@@ -249,9 +251,10 @@
   width: 100% !important;
   height: 100% !important;
   margin: 0 !important;
-  padding: 0 8px !important; /* تعويض حشوة الحاوية */
+  padding: 0 8px !important; /* تعويض الحشوة 8px لكي يبقى النص في مكانه */
   box-sizing: border-box !important;
-  border: none !important; 
+  border: none !important; /* إزالة الإطار الذي يسبب القفز */
+  border-radius: 6px !important;
   background: transparent !important; 
   color: #171717 !important; 
   text-align: inherit !important; /* يرث اتجاه النص */
@@ -261,23 +264,11 @@
   line-height: inherit !important;
   outline: none !important; 
   z-index: 100 !important;
-  -webkit-appearance: none !important;
-  appearance: none !important;
 }
 
-/* 4. استثناء بطاقات الإحصائيات (الكمية، السعر) للتوسيط */
-.edit-field.center { 
-  justify-content: center !important; 
-  text-align: center !important; 
-  width: 100% !important; 
-}
-.product-stats .edit-field.center { 
+.product-stats .edit-field.center .inline-input { 
   padding: 0 !important; 
-  margin: 0 !important; 
-}
-.product-stats .inline-input { 
   text-align: center !important; 
-  padding: 0 !important; 
 }
 
 .save-indicator { color: #16a34a; font-size: 12px; margin-inline-start: 4px; animation: fadeInCheck 0.2s ease-out; }
@@ -289,7 +280,9 @@
 @media (max-width: 599px) {
   .product-card-detail { padding: 10px !important; border-radius: 10px; }
   .product-image { height: 110px !important; min-height: 110px !important; max-height: 110px !important; border-radius: 8px; margin-bottom: 12px; }
+  
   .detail-title { font-size: 18px !important; }
+  
   .detail-sku { font-size: 12px !important; margin-bottom: 12px; }
   .product-stats { gap: 6px !important; margin-bottom: 12px; }
   .stat { padding: 6px 2px !important; border-radius: 6px; }
@@ -311,7 +304,7 @@
   [dir="rtl"] .switch input:checked + .switch-slider::before { transform: translateX(-20px); }
   
   .sell-price-input-group input[type="number"] { height: 34px !important; padding: 0 12px !important; font-size: 13px !important; }
-  .inline-input { font-size: 14px !important; }
+  .inline-input { font-size: 12px !important; }
 }
 
 /* ============================================
