@@ -21,10 +21,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   main.innerHTML = `
     <div class="page-header">
       <h2>${tr('sup_title')}</h2>
-      <a href="/suppliers/add.html" class="btn-primary">
-        <i class="fas fa-plus"></i>
-        <span>${tr('sup_add')}</span>
-      </a>
+      <!-- ✅ تم إزالة زر العودة من هنا -->
     </div>
 
     <div class="search-bar">

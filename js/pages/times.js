@@ -27,10 +27,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   main.innerHTML = `
     <div class="page-header">
       <h2>${tr('adm_title')}</h2>
-      <a href="/settings.html" class="btn-secondary">
-        <i class="fas fa-arrow-right"></i>
-        <span>${tr('prod_detail_back')}</span>
-      </a>
+      <!-- ✅ تم إزالة زر العودة من هنا -->
     </div>
 
     <div class="times-wrapper">
