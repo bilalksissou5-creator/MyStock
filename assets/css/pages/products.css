@@ -3,8 +3,7 @@
    ✅ إصلاح اتجاه العملة ومنع نزولها لسطر جديد
    ✅ محاذاة العناصر الثلاثة بدون تغيير تنسيقاتها الأصلية
    ✅ إصلاح جذري لتمدد البطاقات
-   ✅ تقليل المسافة بين شريط البحث والمنتجات
-   ✅ توحيد ارتفاع شريط البحث وزر الإضافة ليتطابقا مع الـ Header
+   ✅ تقليل الحشوة العمودية (الارتفاع) لشريط البحث والزر ليكون أنحف
    ============================================ */
 
 .products {
@@ -129,23 +128,35 @@
 }
 
 /* ============================================
-   ✅ توحيد ارتفاع شريط البحث وزر الإضافة (لكل الشاشات)
+   ✅ تقليل الحشوات العمودية وتوحيد الارتفاع (34px)
    ============================================ */
 .search-bar input {
-  height: 42px !important;
+  height: 34px !important; 
   box-sizing: border-box !important;
   padding-top: 0 !important;
   padding-bottom: 0 !important;
+  padding-inline: 14px 36px !important; /* الحفاظ على الحشوة الجانبية */
+  font-size: 13px !important; 
+  line-height: 34px !important; /* لضمان توسيط النص */
 }
 
 .page-header a[href="add.html"] {
-  height: 42px !important;
+  height: 34px !important; 
   box-sizing: border-box !important;
   padding-top: 0 !important;
   padding-bottom: 0 !important;
+  padding-inline: 16px !important; 
+  font-size: 13px !important; 
+  line-height: 34px !important;
   display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
+}
+
+/* توسيط أيقونة البحث */
+.search-bar i {
+  top: 50% !important;
+  transform: translateY(-50%) !important;
 }
 
 /* ============================================
@@ -200,7 +211,6 @@ html.in-iframe .products {
    ✅ الحل الجذري للشاشات الكبيرة (التابلت والحاسوب)
    ============================================ */
 @media (min-width: 600px) {
-  /* تحويل الحاوية الرئيسية إلى شبكة */
   html:not(.in-iframe) .main,
   html:not(.in-iframe) #main-content {
     display: grid !important;
