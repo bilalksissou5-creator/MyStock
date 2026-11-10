@@ -1,6 +1,6 @@
 /* ============================================
    صفحة تفاصيل المنتج - التصميم الشبكي المتجاوب
-   ✅ تصميم حقول التعديل مثل التطبيقات الاحترافية (بدون إزاحة)
+   ✅ تعديل مباشر خالي من تمدد البطاقات (Zero Layout Shift)
    ============================================ */
 
 /* ✅ 1. إجبار العنوان وحاوية البطاقات على أخذ نفس العرض والتوسط */
@@ -208,43 +208,79 @@
 .field-hint { display: block; font-size: 11px; color: #a3a3a3; margin-top: 6px; text-align: start; }
 
 /* ============================================
-   ✅ 6. التعديل المباشر الاحترافي (بدون قفز)
+   ✅ 6. التعديل المباشر الاحترافي (بدون أي تمدد)
    ============================================ */
 
-/* 1. النص العادي: يبدو كأنه نص عادي ولكن قابل للنقر */
+/* 1. الحاوية: نعطيها position relative لكي نتمكن من وضع الحقل فوقها */
 .edit-field { 
-  display: inline-block; 
+  display: inline-flex; 
+  align-items: center; 
+  justify-content: inherit; 
   cursor: pointer; 
-  padding: 2px 6px; 
-  margin: -2px -6px; 
+  padding: 0 4px; 
+  margin: 0 -4px; 
   border-radius: 4px; 
+  position: relative; /* ضروري جداً */
+  font-size: inherit; 
+  line-height: inherit;
+  white-space: nowrap; 
   transition: background 0.15s; 
-  border: 1px solid transparent; /* نضع إطاراً شفافاً مسبقاً لكي لا يتغير الحجم */
 }
 .edit-field:hover { background: #f0f0f0; }
 
-/* 2. الحقل عند التعديل: يأخذ نفس حجم النص بالضبط، مع خلفية خفيفة وإطار أزرق */
-.inline-input { 
-  display: inline-block;
-  width: 100%;
-  margin: -2px -6px !important; /* نفس هوامش النص */
-  padding: 2px 6px !important; /* نفس حشوة النص */
-  box-sizing: content-box !important; 
-  border: 1px solid #2563eb !important; /* إطار أزرق خفيف */
-  border-radius: 4px !important;
+/* 2. حالة التعديل: خلفية بيضاء وإطار أزرق لا يستهلك مساحة */
+.edit-field.editing { 
   background: #ffffff !important; 
+  box-shadow: 0 0 0 1.5px #2563eb !important; 
+  z-index: 20 !important; 
+}
+
+/* 3. السحر: إجبار الحاوية على أخذ عرض وارتفاع النص الأصلي حتى لو تم حذفه */
+.edit-field.editing::before {
+  content: attr(data-value);
+  display: inline-block;
+  visibility: hidden;
+  white-space: pre; /* الحفاظ على المسافات */
+}
+
+/* 4. الحقل نفسه: طبقة تغطي الحاوية بالضبط بدون التأثير على حجمها */
+.inline-input { 
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  margin: 0 !important;
+  padding: 0 4px !important; 
+  box-sizing: border-box !important;
+  border: none !important; 
+  background: transparent !important; 
   color: #171717 !important; 
+  text-align: inherit !important; 
   font-size: inherit !important; 
   font-weight: inherit !important; 
   font-family: inherit !important; 
   line-height: inherit !important;
   outline: none !important; 
-  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1) !important;
+  z-index: 100 !important;
+  -webkit-appearance: none !important;
+  appearance: none !important;
 }
 
-/* 3. التوسيط في بطاقات الإحصائيات */
-.edit-field.center { text-align: center !important; width: 100%; display: block; }
-.product-stats .inline-input { text-align: center !important; width: 90%; margin: 0 auto !important; }
+/* التخصيص لبطاقات الإحصائيات (الكمية، السعر) */
+.edit-field.center { 
+  justify-content: center !important; 
+  text-align: center !important; 
+  width: 100% !important; 
+}
+.product-stats .edit-field.center {
+  padding: 0 !important; 
+  margin: 0 !important;
+}
+.product-stats .inline-input { 
+  text-align: center !important; 
+  padding: 0 !important; 
+}
 
 .save-indicator { color: #16a34a; font-size: 12px; margin-inline-start: 4px; animation: fadeInCheck 0.2s ease-out; }
 @keyframes fadeInCheck { from { opacity: 0; transform: scale(0.7); } to { opacity: 1; transform: scale(1); } }
@@ -277,7 +313,7 @@
   [dir="rtl"] .switch input:checked + .switch-slider::before { transform: translateX(-20px); }
   
   .sell-price-input-group input[type="number"] { height: 34px !important; padding: 0 12px !important; font-size: 13px !important; }
-  .inline-input { font-size: 14px !important; }
+  .inline-input { font-size: 12px !important; }
 }
 
 /* ============================================
