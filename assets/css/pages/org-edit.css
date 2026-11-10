@@ -3,6 +3,7 @@
    ✅ CSS Switch احترافي (أزرق/رمادي)
    ✅ زر الحفظ ثابت بأسفل الشاشة بدون خلفية
    ✅ أشكال الشعار صغيرة تحت الصورة
+   ✅ إصلاح تداخل زر الحفظ مع القائمة الجانبية
    ============================================ */
 
 .org-edit-wrapper {
@@ -340,7 +341,7 @@
 .org-save-bar {
   position: fixed;
   bottom: 0;
-  left: 0;
+  left: 70px; /* مساحة للقائمة الجانبية في الهاتف (LTR) */
   right: 0;
   padding: 8px 16px;
   padding-bottom: calc(8px + env(safe-area-inset-bottom, 0px));
@@ -348,6 +349,12 @@
   display: flex;
   justify-content: center;
   pointer-events: none;
+}
+
+/* في حال كانت اللغة عربية (RTL)، القائمة تكون على اليمين */
+[dir="rtl"] .org-save-bar {
+  left: 0;
+  right: 70px;
 }
 
 .org-save-bar .btn-primary {
@@ -471,5 +478,16 @@
   .org-save-bar .btn-primary {
     padding: 10px 14px;
     font-size: 13px;
+  }
+}
+
+/* في الشاشات الكبيرة (التابلت والحاسوب) القائمة أوسع */
+@media (min-width: 768px) {
+  .org-save-bar {
+    left: 250px;
+  }
+  [dir="rtl"] .org-save-bar {
+    left: 0;
+    right: 250px;
   }
 }
