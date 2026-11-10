@@ -1,6 +1,6 @@
 /* ============================================
    صفحة تفاصيل المنتج - التصميم الشبكي المتجاوب
-   ✅ تعديل مباشر بدون أي قفز للعناصر (Zero Layout Shift)
+   ✅ تصميم حقول التعديل مثل التطبيقات الاحترافية (بدون إزاحة)
    ============================================ */
 
 /* ✅ 1. إجبار العنوان وحاوية البطاقات على أخذ نفس العرض والتوسط */
@@ -208,70 +208,43 @@
 .field-hint { display: block; font-size: 11px; color: #a3a3a3; margin-top: 6px; text-align: start; }
 
 /* ============================================
-   ✅ 6. التعديل المباشر بدون قفز (Zero Shift)
+   ✅ 6. التعديل المباشر الاحترافي (بدون قفز)
    ============================================ */
 
-/* 1. الحاوية: تحتفظ بحجمها وحشوتها الطبيعية */
+/* 1. النص العادي: يبدو كأنه نص عادي ولكن قابل للنقر */
 .edit-field { 
-  display: inline-flex; 
-  align-items: center; 
-  justify-content: flex-start; 
-  gap: 4px; 
+  display: inline-block; 
   cursor: pointer; 
-  padding: 4px 8px !important; /* تثبيت الحشوة */
-  margin: -4px -8px !important; /* تثبيت الهامش */
-  border-radius: 6px; 
+  padding: 2px 6px; 
+  margin: -2px -6px; 
+  border-radius: 4px; 
   transition: background 0.15s; 
-  min-height: 24px; 
-  font-size: inherit; 
-  position: relative; 
-  max-width: 100%; 
-  overflow: hidden; 
-  text-overflow: ellipsis; 
-  white-space: nowrap; 
+  border: 1px solid transparent; /* نضع إطاراً شفافاً مسبقاً لكي لا يتغير الحجم */
 }
 .edit-field:hover { background: #f0f0f0; }
 
-/* 2. حالة التعديل: إخفاء النص فقط (للحفاظ على المساحة) وإضافة ظل أزرق */
-.edit-field.editing { 
-  background: #ffffff !important; 
-  cursor: text !important; 
-  z-index: 20 !important; 
-  color: transparent !important; /* إخفاء النص الأصلي */
-  box-shadow: 0 0 0 1.5px #2563eb !important; /* إطار لا يزيد الحجم */
-}
-
-.edit-field.center { justify-content: center; text-align: center; width: 100%; margin: -4px 0; }
-.product-stats .edit-field.center { width: auto; margin: 0; padding: 0 !important; min-height: auto !important; }
-
-/* 3. الحقل نفسه: يغطي الحاوية بالضبط بدون أي تأثير على الحجم */
+/* 2. الحقل عند التعديل: يأخذ نفس حجم النص بالضبط، مع خلفية خفيفة وإطار أزرق */
 .inline-input { 
-  position: absolute !important;
-  top: 0 !important;
-  left: 0 !important;
-  width: 100% !important;
-  height: 100% !important;
-  margin: 0 !important;
-  padding: 0 8px !important; /* تعويض حشوة الحاوية للحفاظ على محاذاة النص */
-  box-sizing: border-box !important;
-  border: none !important; /* إزالة الإطار لمنع القفز */
-  background: transparent !important; /* الحفاظ على خلفية الحاوية */
-  color: #171717 !important; /* لون النص */
-  text-align: inherit !important; /* نفس محاذاة الحاوية */
+  display: inline-block;
+  width: 100%;
+  margin: -2px -6px !important; /* نفس هوامش النص */
+  padding: 2px 6px !important; /* نفس حشوة النص */
+  box-sizing: content-box !important; 
+  border: 1px solid #2563eb !important; /* إطار أزرق خفيف */
+  border-radius: 4px !important;
+  background: #ffffff !important; 
+  color: #171717 !important; 
   font-size: inherit !important; 
   font-weight: inherit !important; 
   font-family: inherit !important; 
   line-height: inherit !important;
   outline: none !important; 
-  z-index: 100 !important;
-  -webkit-appearance: none !important;
-  appearance: none !important;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1) !important;
 }
 
-.product-stats .inline-input { 
-  text-align: center !important; 
-  padding: 0 4px !important; 
-}
+/* 3. التوسيط في بطاقات الإحصائيات */
+.edit-field.center { text-align: center !important; width: 100%; display: block; }
+.product-stats .inline-input { text-align: center !important; width: 90%; margin: 0 auto !important; }
 
 .save-indicator { color: #16a34a; font-size: 12px; margin-inline-start: 4px; animation: fadeInCheck 0.2s ease-out; }
 @keyframes fadeInCheck { from { opacity: 0; transform: scale(0.7); } to { opacity: 1; transform: scale(1); } }
@@ -282,9 +255,7 @@
 @media (max-width: 599px) {
   .product-card-detail { padding: 10px !important; border-radius: 10px; }
   .product-image { height: 110px !important; min-height: 110px !important; max-height: 110px !important; border-radius: 8px; margin-bottom: 12px; }
-  
   .detail-title { font-size: 18px !important; }
-  
   .detail-sku { font-size: 12px !important; margin-bottom: 12px; }
   .product-stats { gap: 6px !important; margin-bottom: 12px; }
   .stat { padding: 6px 2px !important; border-radius: 6px; }
