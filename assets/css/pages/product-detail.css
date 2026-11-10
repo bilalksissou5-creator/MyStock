@@ -1,10 +1,6 @@
 /* ============================================
    صفحة تفاصيل المنتج - التصميم الشبكي المتجاوب
-   ✅ محاذاة مضمونة 100% للعنوان مع البطاقات
-   ✅ توحيد حجم العناصر لتطابق صفحة المنتجات
-   ✅ إصلاح جذري لأيقونة الكاميرا
-   ✅ توحيد ارتفاع (34px) لحقول الإدخال فقط
-   ✅ محاذاة الأرقام في البطاقات الثلاث على نفس المستوى
+   ✅ إصلاح جذري: الحقل لا يؤثر على ارتفاع البطاقة (position: absolute)
    ============================================ */
 
 /* ✅ 1. إجبار العنوان وحاوية البطاقات على أخذ نفس العرض والتوسط */
@@ -122,9 +118,9 @@
 .detail-title { font-size: 1rem !important; font-weight: 600 !important; margin-bottom: 6px !important; line-height: 1.3; text-align: start; }
 .detail-sku { color: #737373; font-size: 12px !important; margin-bottom: 12px !important; text-align: start; }
 
-/* ✅ 5. إحصائيات المنتج (الكمية، السعر، المجموع) - محاذاة دقيقة */
+/* ✅ 5. إحصائيات المنتج (الكمية، السعر، المجموع) */
 .product-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px !important; margin-bottom: 12px !important; }
-.stat { background: #fafafa; border-radius: 6px !important; padding: 8px 4px !important; text-align: center; display: flex; flex-direction: column; justify-content: center; }
+.stat { background: #fafafa; border-radius: 6px !important; padding: 8px 4px !important; text-align: center; display: flex; flex-direction: column; justify-content: center; position: relative; }
 .stat-label { font-size: 11px !important; color: #737373; margin-bottom: 4px !important; font-weight: 500; }
 
 .stat-value { 
@@ -137,8 +133,9 @@
   gap: 4px; 
   white-space: nowrap; 
   overflow: hidden;
-  min-height: 24px; /* توحيد الارتفاع لجميع الخانات */
+  min-height: 24px; 
   line-height: 1;
+  position: relative; /* ضروري لعمل الحقل المطلق */
 }
 
 .stat-value > span { display: flex; align-items: center; justify-content: center; line-height: 1; }
@@ -180,7 +177,6 @@
 .sell-price-input-group { margin-top: 14px; margin-bottom: 0; }
 .sell-price-input-group label { display: block; font-size: 13px; font-weight: 600; color: #404040; margin-bottom: 6px; text-align: start; }
 
-/* ✅ التصحيح: حشوة وارتفاع حقول الإدخال فقط (بدون تغيير الحواف) */
 .sell-price-input-group input[type="number"] { 
   width: 100% !important; 
   height: 34px !important; 
@@ -204,9 +200,9 @@
 
 .field-hint { display: block; font-size: 11px; color: #a3a3a3; margin-top: 6px; text-align: start; }
 
-.actions { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; margin-top: 16px; }
-
-/* ✅ إعادة خانات التعديل المباشر إلى حجمها الطبيعي */
+/* ============================================
+   ✅ 6. الحل الجذري: إخفاء الحقل وعدم تأثيره على الارتفاع
+   ============================================ */
 .edit-field { 
   display: inline-flex; 
   align-items: center; 
@@ -219,50 +215,51 @@
   transition: background 0.15s; 
   min-height: 24px; 
   font-size: inherit; 
-  position: relative; 
+  position: relative; /* ضروري */
   max-width: 100%; 
   overflow: hidden; 
   text-overflow: ellipsis; 
   white-space: nowrap; 
 }
 .edit-field:hover { background: #f0f0f0; }
-.edit-field.editing { background: transparent; padding: 0; margin: 0; cursor: text; }
+.edit-field.editing { background: transparent; padding: 0; margin: 0; cursor: text; z-index: 20; }
 .edit-field.center { justify-content: center; text-align: center; width: 100%; margin: -4px 0; }
+.product-stats .edit-field.center { width: auto; margin: 0; padding: 0; min-height: auto !important; }
 
-/* ✅ إصلاح تداخل خانات التعديل داخل الإحصائيات */
-.product-stats .edit-field.center { 
-  width: auto; 
-  margin: 0; 
-  padding: 0; 
-  min-height: auto !important; /* إزالة الارتفاع الأدنى لكي تصطف الأرقام */
-}
-
-.inline-display { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-
-/* ✅ إعادة حقل التعديل عند الضغط عليه لحجمه الطبيعي */
+/* ✅ إخفاء الحقل وجعله طبقة فوق النص */
 .inline-input { 
-  border: 2px solid #171717; 
-  border-radius: 6px; 
-  padding: 6px 10px; 
-  font-size: inherit; 
-  font-weight: inherit; 
-  font-family: inherit; 
-  color: inherit; 
-  background: white; 
-  outline: none; 
-  width: 100%; 
-  min-width: 60px; 
-  max-width: 100%; 
-  box-sizing: border-box; 
-  box-shadow: 0 0 0 4px rgba(23, 23, 23, 0.05); 
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  margin: 0 !important;
+  padding: 0 4px !important;
+  box-sizing: border-box !important;
+  border: 1px solid #171717 !important;
+  border-radius: 4px !important;
+  background: #ffffff !important; 
+  text-align: center !important;
+  font-size: inherit !important; 
+  font-weight: inherit !important; 
+  font-family: inherit !important; 
+  color: inherit !important; 
+  outline: none !important; 
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1) !important; 
+  z-index: 10 !important;
 }
-.product-stats .inline-input { text-align: center; font-size: 1rem; padding: 6px; }
+
+.product-stats .inline-input { 
+  text-align: center !important; 
+  font-size: 14px !important; 
+  padding: 0 !important; 
+}
 
 .save-indicator { color: #16a34a; font-size: 12px; margin-inline-start: 4px; animation: fadeInCheck 0.2s ease-out; }
 @keyframes fadeInCheck { from { opacity: 0; transform: scale(0.7); } to { opacity: 1; transform: scale(1); } }
 
 /* ══════════════════════════════════════════
-   ✅ 6. توحيد حجم العناصر في شاشات الهاتف
+   ✅ 7. توحيد حجم العناصر في شاشات الهاتف
    ══════════════════════════════════════════ */
 @media (max-width: 599px) {
   .product-card-detail { padding: 10px !important; border-radius: 10px; }
@@ -289,6 +286,7 @@
   [dir="rtl"] .switch input:checked + .switch-slider::before { transform: translateX(-20px); }
   
   .sell-price-input-group input[type="number"] { height: 34px !important; padding: 0 12px !important; font-size: 13px !important; }
+  .inline-input { font-size: 12px !important; }
 }
 
 /* ============================================
