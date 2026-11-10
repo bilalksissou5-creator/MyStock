@@ -485,7 +485,8 @@ h6 { font-size: 0.8125rem; font-weight: 600; color: #404040; } /* 13px */
 .search-bar {
   position: relative;
   margin-bottom: 20px;
-  max-width: 400px;
+  max-width: 100%; /* ✅ تم إزالة الحد الأقصى 400px ليتمدد بحرية */
+  width: 100%;
 }
 
 .search-bar i {
