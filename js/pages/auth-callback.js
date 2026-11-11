@@ -1,6 +1,7 @@
 // ============================================
 // معالجة تسجيل الدخول (Callback)
 // ✅ ترجمة كاملة + توجيه ذكي
+// ✅ إخفاء رسالة النجاح
 // ============================================
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -55,8 +56,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         .eq('id', user.id)
         .single();
 
-      // عرض رسالة النجاح
-      if (msg) msg.innerHTML = `<span style="color: green;" data-i18n="auth_cb_success">${tr('auth_cb_success')}</span>`;
+      // ✅ التعديل هنا: إخفاء الرسالة ودائرة التحميل تماماً
+      if (msg) msg.style.display = 'none';
       if (spinner) spinner.style.display = 'none';
 
       // 5. التوجيه الذكي
