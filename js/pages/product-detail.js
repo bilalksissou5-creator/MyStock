@@ -185,7 +185,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           <div class="sell-price-section" style="border: none; padding-top: 0; margin-top: 0;">
             <!-- ✅ استبدال ⚠️ بأيقونة Font Awesome وحذف الرمز من الترجمة -->
             <h3 class="sell-price-title">
-              <i class="fas fa-triangle-exclamation" style="color: #ef4444; margin-inline-end: 6px;"></i>
+              <i class="fas fa-triangle-exclamation" style="color: #f59e0b; margin-inline-end: 6px;"></i>
               ${tr('low_stock_section_title').replace('⚠️', '').trim()}
             </h3>
             <div class="sell-price-input-group">

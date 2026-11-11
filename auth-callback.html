@@ -5,19 +5,34 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>MyStock</title>
   
-  <link rel="stylesheet" href="/assets/css/pages/auth-callback.css?v=4">
+  <link rel="stylesheet" href="/assets/css/pages/auth-callback.css?v=5">
+  <!-- ✅ مكتبة الأيقونات -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 <body class="auth-callback-page">
   
   <div class="auth-callback-box">
+    
+    <!-- ✅ الشعار -->
+    <div class="auth-logo">
+      <i class="fas fa-boxes-stacked"></i>
+      <!-- أو يمكنك استخدام صورة: <img src="/assets/img/logo.png" alt="MyStock"> -->
+    </div>
+
+    <!-- ✅ اسم التطبيق (التحكم في حجمه من الـ CSS) -->
+    <h1 class="auth-app-name">MyStock</h1>
+    
+    <!-- ✅ دائرة التحميل -->
     <div class="auth-spinner" id="spinner"></div>
     
+    <!-- ✅ رسالة التحميل (يتم التحكم بها من JS) -->
     <h2 id="msg">
       <span data-i18n="auth_cb_checking">جاري التحقق من حسابك...</span>
       <br>
-      <span style="font-size: 13px; color: #888; font-weight: normal;" data-i18n="auth_cb_wait">يرجى الانتظار لحظة.</span>
+      <span class="auth-subtext" data-i18n="auth_cb_wait">يرجى الانتظار لحظة.</span>
     </h2>
     
+    <!-- ✅ صندوق الأخطاء -->
     <div id="error-details" class="auth-callback-error"></div>
   </div>
 
