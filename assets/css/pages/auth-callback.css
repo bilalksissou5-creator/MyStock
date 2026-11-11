@@ -1,6 +1,5 @@
 /* ============================================
    صفحة استقبال تسجيل الدخول (Auth Callback)
-   ✅ تصميم شاشة تحميل احترافية
    ============================================ */
 
 body.auth-callback-page {
@@ -8,7 +7,7 @@ body.auth-callback-page {
   justify-content: center;
   align-items: center;
   height: 100vh;
-  font-family: 'Nunito', system-ui, -apple-system, sans-serif;
+  font-family: system-ui, -apple-system, sans-serif;
   background: #f5f5f5;
   margin: 0;
   padding: 20px;
@@ -18,77 +17,28 @@ body.auth-callback-page {
 .auth-callback-box {
   text-align: center;
   background: white;
-  padding: 40px 32px;
-  border-radius: 20px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+  padding: 32px 24px;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
   max-width: 100%;
-  width: 400px;
+  width: 380px;
   box-sizing: border-box;
-  animation: fadeIn 0.5s ease-out;
 }
 
-/* ✅ الشعار */
-.auth-logo {
-  width: 80px;
-  height: 80px;
-  background: #171717;
-  color: white;
-  border-radius: 20px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 36px;
-  margin: 0 auto 20px auto;
-  box-shadow: 0 8px 20px rgba(23, 23, 23, 0.2);
-  animation: pulse 2s infinite ease-in-out;
-}
-
-.auth-logo img {
-  width: 50px;
-  height: 50px;
-  object-fit: contain;
-}
-
-/* ✅ اسم التطبيق (يمكنك تغيير حجمه من هنا) */
-.auth-app-name {
-  margin: 0 0 24px 0;
-  color: #171717;
-  font-size: 26px; /* 👈 التحكم في حجم اسم التطبيق */
-  font-weight: 800;
-  letter-spacing: 0.5px;
-}
-
-/* ✅ نصوص التحميل */
 .auth-callback-box h2 {
-  margin: 10px 0 0 0;
+  margin: 0 0 10px 0;
   color: #171717;
-  font-size: 1.1rem;
-  font-weight: 600;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
+  font-size: 1.2rem;
+  font-weight: 700;
 }
 
-.auth-subtext {
-  font-size: 13px;
-  color: #737373;
-  font-weight: 400;
+.auth-callback-box p {
+  color: #6b7280;
+  font-size: 14px;
+  margin: 0;
+  line-height: 1.5;
 }
 
-/* ✅ مؤشر التحميل */
-.auth-spinner {
-  display: inline-block;
-  width: 26px;
-  height: 26px;
-  border: 3px solid #e5e5e5;
-  border-top-color: #171717;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-  margin-bottom: 10px;
-}
-
-/* ✅ صندوق الأخطاء */
 .auth-callback-error {
   color: #dc2626;
   margin-top: 20px;
@@ -100,21 +50,21 @@ body.auth-callback-page {
   padding: 12px;
   border-radius: 8px;
   border: 1px solid #fecaca;
-  font-family: monospace;
+  font-family: monospace; /* لقراءة الأكواد والأخطاء بوضوح */
 }
 
-/* ✅ الحركات */
+/* مؤشر تحميل بسيط (Spinner) */
+.auth-spinner {
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  border: 3px solid #e5e5e5;
+  border-top-color: #171717;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 16px;
+}
+
 @keyframes spin {
   to { transform: rotate(360deg); }
-}
-
-@keyframes pulse {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.05); }
-  100% { transform: scale(1); }
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
 }
