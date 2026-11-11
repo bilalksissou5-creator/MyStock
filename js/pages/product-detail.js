@@ -2,6 +2,7 @@
 // صفحة تفاصيل المنتج - الكود الكامل
 // ✅ تقسيم الصفحة إلى عمودين (بطاقة المنتج | بطاقات الإعدادات)
 // ✅ وضع زر الحذف داخل البطاقة الأخيرة
+// ✅ إصلاح ظهور الباركود (الربط بين SKU وجدول الباركودات)
 // ============================================
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -34,6 +35,17 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (main) main.innerHTML = `<div class="alert alert-error">${tr('prod_detail_not_found')}</div>`;
     return;
   }
+
+  // ✅ جلب الباركود من جدول product_barcodes أو من خانة SKU كاحتياط
+  const { data: barcodes } = await db
+    .from('product_barcodes')
+    .select('barcode')
+    .eq('product_id', productId)
+    .limit(1);
+
+  const mainBarcode = (barcodes && barcodes.length > 0) 
+      ? barcodes[0].barcode 
+      : (product.qr_code || product.sku || '');
 
   const { data: profile } = await db
     .from('profiles')
@@ -125,7 +137,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             </div>
             <div class="row">
               <span>${tr('prod_detail_barcode')}</span>
-              <strong class="edit-field" id="f-qr_code" data-value="${product.qr_code ?? ''}"></strong>
+              <!-- ✅ استخدام mainBarcode بدلاً من qr_code -->
+              <strong class="edit-field" id="f-qr_code" data-value="${mainBarcode}"></strong>
             </div>
           </div>
 
