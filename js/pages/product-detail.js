@@ -3,6 +3,7 @@
 // ✅ تقسيم الصفحة إلى عمودين (بطاقة المنتج | بطاقات الإعدادات)
 // ✅ وضع زر الحذف داخل البطاقة الأخيرة
 // ✅ إصلاح ظهور الباركود (الربط بين SKU وجدول الباركودات)
+// ✅ استبدال الرموز التعبيرية بأيقونات Font Awesome
 // ============================================
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -151,7 +152,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         <!-- بطاقة سعر البيع -->
         <div class="product-card-detail">
           <div class="sell-price-section" style="border: none; padding-top: 0; margin-top: 0;">
-            <h3 class="sell-price-title">💰 ${tr('prod_detail_sell_price')}</h3>
+            <!-- ✅ استبدال 💰 بأيقونة Font Awesome -->
+            <h3 class="sell-price-title">
+              <i class="fas fa-coins" style="color: #f59e0b; margin-inline-end: 6px;"></i>
+              ${tr('prod_detail_sell_price')}
+            </h3>
             <div class="switch-item" style="margin-bottom: 16px;">
               <div class="switch-content">
                 <div class="switch-header">
@@ -178,7 +183,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         <!-- بطاقة المخزون المنخفض + زر الحذف -->
         <div class="product-card-detail">
           <div class="sell-price-section" style="border: none; padding-top: 0; margin-top: 0;">
-            <h3 class="sell-price-title">${tr('low_stock_section_title')}</h3>
+            <!-- ✅ استبدال ⚠️ بأيقونة Font Awesome وحذف الرمز من الترجمة -->
+            <h3 class="sell-price-title">
+              <i class="fas fa-triangle-exclamation" style="color: #ef4444; margin-inline-end: 6px;"></i>
+              ${tr('low_stock_section_title').replace('⚠️', '').trim()}
+            </h3>
             <div class="sell-price-input-group">
               <label>${tr('low_stock_field_label')}</label>
               <input type="number" id="low-stock-input" value="${lowStockThreshold}" min="0" step="1" dir="ltr" placeholder="10">
