@@ -1,21 +1,19 @@
 // ============================================
 // معالجة تسجيل الدخول (Callback)
 // ✅ ترجمة كاملة + توجيه ذكي
-// ✅ إخفاء رسالة النجاح
+// ✅ إخفاء المربع الأبيض بالكامل
 // ============================================
 
 document.addEventListener('DOMContentLoaded', async () => {
-  // 1. تفعيل الترجمة (ستقوم بترجمة النصوص التي تحمل data-i18n في الـ HTML)
+  // 1. تفعيل الترجمة
   if (window.applyLanguage) await window.applyLanguage();
   
-  // دالة الترجمة
   const tr = (key) => (window.t ? window.t(key) : key);
 
   const msg = document.getElementById('msg');
   const errBox = document.getElementById('error-details');
   const spinner = document.getElementById('spinner');
 
-  // دالة مساعدة لعرض الأخطاء
   function showError(title, details) {
     if (spinner) spinner.style.display = 'none';
     if (msg) { 
@@ -56,13 +54,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         .eq('id', user.id)
         .single();
 
-      // ✅ التعديل هنا: إخفاء الرسالة ودائرة التحميل تماماً
-      if (msg) msg.style.display = 'none';
-      if (spinner) spinner.style.display = 'none';
+      // ✅ التعديل هنا: إخفاء المربع الأبيض بالكامل
+      const box = document.querySelector('.auth-callback-box');
+      if (box) box.style.display = 'none';
 
       // 5. التوجيه الذكي
       if (profile?.onboarding_completed) {
-        // البحث عن آخر صفحة تمت زيارتها
         const lastVisitedPage = localStorage.getItem('mystock_last_visited_page');
         
         if (lastVisitedPage && lastVisitedPage !== '/index.html' && lastVisitedPage !== '/auth-callback.html' && lastVisitedPage !== '/') {
