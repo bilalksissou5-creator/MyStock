@@ -1,7 +1,7 @@
 // ============================================
 // صفحة البطاقة البنكية (Lemon Squeezy / Gumroad)
 // ✅ تقرأ وتكتب من جدول bank_cards المنفصل
-// ✅ تعمل مع جميع المستخدمين (Google / بريد إلكتروني)
+// ✅ إرجاع زر إعادة التفعيل مع رابط Gumroad
 // ============================================
 
 // ⚠️ رابط الباقة الأساسية في Gumroad (تستخدم عند إضافة بطاقة جديدة)
@@ -157,7 +157,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     main.innerHTML = `
       <div class="page-header">
         <h2>${tr('bc_title')}</h2>
-        <!-- ✅ تم إزالة زر العودة من هنا -->
       </div>
     `;
 
@@ -197,9 +196,7 @@ document.addEventListener('DOMContentLoaded', async () => {
              <span>${tr('bc_inactive')}</span>
            </div>`;
 
-      // ✅ التعديل الجوهري هنا: 
-      // إذا كانت نشطة -> زر إلغاء التفعيل
-      // إذا كانت ملغاة -> زر إضافة بطاقة جديدة (يربط بـ Gumroad)
+      // ✅ التعديل هنا: إرجاع زر إعادة التفعيل عند إلغاء البطاقة
       let actions = '';
       if (isActive) {
         actions = `
@@ -210,7 +207,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         `;
       } else {
         actions = `
-          <a href="${getGumroadUrl()}" class="btn-primary full-width" style="margin-top:8px;">
+          <button type="button" class="btn-primary full-width" id="reactivate-btn">
+            <i class="fas fa-check"></i>
+            <span>${tr('bc_reactivate')}</span>
+          </button>
+          <a href="${getGumroadUrl()}" class="btn-secondary full-width" style="margin-top:8px;">
             <i class="fas fa-plus"></i>
             <span>${tr('bc_add_new')}</span>
           </a>
@@ -261,7 +262,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             ${subscription.expires_at ? `
               <div class="bc-info-row">
                 <i class="fas fa-calendar"></i>
-                <span>${tr('bc_sub_expires')}: <strong>${new Date(subscription.expires_at).toLocaleDateString()}</strong></span>
+                <span>${tr('bc_sub_expires')}: <strong>${window.formatAppDate ? window.formatAppDate(subscription.expires_at) : new Date(subscription.expires_at).toLocaleDateString()}</strong></span>
               </div>
             ` : ''}
           </div>
@@ -331,6 +332,42 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         showSuccess(tr('bc_deactivated'));
+        setTimeout(() => render(), 800);
+      }
+    });
+
+    // ✅ إرجاع حدث زر إعادة التفعيل
+    document.getElementById('reactivate-btn')?.addEventListener('click', async () => {
+      const btn = document.getElementById('reactivate-btn');
+      btn.disabled = true;
+      btn.querySelector('span').textContent = tr('pe_saving');
+
+      const { error } = await db
+        .from('bank_cards')
+        .update({
+          active: true,
+          deactivated_at: null,
+          warning_sent: 0,
+        })
+        .eq('profile_id', user.id);
+
+      if (profile?.organization_id) {
+        await db
+          .from('organizations')
+          .update({ payment_blocked: false })
+          .eq('id', profile.organization_id);
+      }
+
+      if (error) {
+        showError(error.message);
+        btn.disabled = false;
+        btn.querySelector('span').textContent = tr('bc_reactivate');
+      } else {
+        card.active = true;
+        card.deactivated_at = null;
+        card.warning_sent = 0;
+
+        showSuccess(tr('bc_reactivated'));
         setTimeout(() => render(), 800);
       }
     });
