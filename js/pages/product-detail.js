@@ -4,7 +4,7 @@
 // ✅ وضع زر الحذف داخل البطاقة الأخيرة
 // ✅ إصلاح ظهور الباركود (الربط بين SKU وجدول الباركودات)
 // ✅ استبدال الرموز التعبيرية بأيقونات Font Awesome
-// ✅ إضافة ترجمة ديناميكية لأنواع الوحدة (قطعة، كغ، إلخ)
+// ✅ ترجمة ديناميكية لأنواع الوحدة (قطعة، كغ، إلخ)
 // ============================================
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -312,19 +312,13 @@ document.addEventListener('DOMContentLoaded', async () => {
       id: productId, 
       field, 
       type,
+      // ✅ السطر السحري: تمرير دالة الترجمة لحقل الوحدة فقط
+      displayFormatter: field === 'unit' ? translateUnit : null,
       onSave: async (savedField, newValue) => {
         if (savedField === 'qty' || savedField === 'price') recalcTotal();
         if (savedField === 'qty') { 
           el.dataset.value = newValue; 
           updateQtyStyle(); 
-        }
-        
-        // ✅ ترجمة الوحدة فوراً بعد الحفظ
-        if (savedField === 'unit') {
-           setTimeout(() => {
-             const span = el.querySelector('.inline-display');
-             if (span) span.textContent = translateUnit(newValue);
-           }, 10);
         }
 
         if (String(newValue) !== String(initialFieldValues[field])) {

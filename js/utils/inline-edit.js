@@ -1,10 +1,9 @@
 // ============================================
 // تعديل مباشر احترافي (Inline Edit 2.0)
-// ============================================
-// الاستخدام: inlineEdit({ el, table, id, field, type, onSave })
+// ✅ دعم الترجمة والعرض المخصص (displayFormatter)
 // ============================================
 
-function inlineEdit({ el, table, id, field, type = 'text', onSave }) {
+function inlineEdit({ el, table, id, field, type = 'text', onSave, displayFormatter }) {
   if (!el) return;
 
   const initialValue = el.dataset.value !== undefined
@@ -25,7 +24,11 @@ function inlineEdit({ el, table, id, field, type = 'text', onSave }) {
 
     const span = document.createElement('span');
     span.className = 'inline-display';
-    span.textContent = (currentValue === '' || currentValue == null) ? '—' : currentValue;
+    
+    // ✅ تطبيق دالة التنسيق (الترجمة) إذا كانت موجودة
+    const displayValue = displayFormatter ? displayFormatter(currentValue) : currentValue;
+    
+    span.textContent = (displayValue === '' || displayValue == null) ? '—' : displayValue;
     el.appendChild(span);
   }
 
