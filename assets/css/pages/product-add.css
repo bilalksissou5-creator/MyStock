@@ -172,7 +172,6 @@
    ✅ التصميم الشبكي للشاشات الكبيرة (سكرول مستقل تماماً)
    ============================================ */
 @media (min-width: 700px) {
-  /* ✅ التعديل السحري: التحكم في الحاوية الرئيسية لمنع تداخل السكرول */
   .main {
     overflow: hidden !important;
     padding: 16px !important;
@@ -182,8 +181,10 @@
   }
 
   .add-form {
-    max-width: 1100px;
-    margin: 0 auto;
+    /* ✅ إزالة التوسيط والحد الأقصى للعرض ليتمدد ليملأ الشاشة */
+    max-width: 100%; 
+    width: 100%;
+    margin: 0;
     display: flex; 
     flex-direction: row; 
     gap: 0; 
