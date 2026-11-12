@@ -237,7 +237,7 @@
 .workspace-iframe .form-actions { position: relative; z-index: 10; }
 
 /* ============================================
-   ✅ تعديلات الماسح الضوئي (تقييد صارم للكاميرا المربعة)
+   ✅ تعديلات الماسح الضوئي (تقييد صارم وحل مشكلة التركيز)
    ============================================ */
 .scanner-modal { 
   position: fixed; 
@@ -254,7 +254,7 @@
   border-radius: 16px; 
   padding: 16px; 
   width: 100%; 
-  max-width: 400px; /* ✅ تصغير النافذة بالكامل */
+  max-width: 380px; /* ✅ تصغير النافذة */
   display: flex; 
   flex-direction: column; 
   gap: 12px; 
@@ -266,11 +266,11 @@
 .scanner-close { background: rgba(255, 255, 255, 0.1); border: none; color: #ffffff; width: 36px; height: 36px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 16px; transition: background 0.15s; }
 .scanner-close:hover { background: rgba(255, 255, 255, 0.2); }
 
-/* ✅ إجبار الحاوية على البقاء مربعة وبحجم صغير يناسب جميع الشاشات */
+/* ✅ تصغير الحاوية بمقدار 30 بكسل (من 300 إلى 270) وإبقائها مربعة */
 .scanner-reader { 
   width: 100% !important; 
-  max-width: min(100%, 300px, 50vh) !important; /* أقصى عرض 300px أو 50% من ارتفاع الشاشة */
-  aspect-ratio: 1 / 1 !important; /* مربع دائماً */
+  max-width: min(100%, 270px, 45vh) !important; 
+  aspect-ratio: 1 / 1 !important; 
   margin: 0 auto !important; 
   border-radius: 12px; 
   overflow: hidden !important; 
@@ -278,23 +278,13 @@
   position: relative !important;
 }
 
-/* ✅ إجبار الفيديو على ملء المربع (مع تجاهل الأكواد التي تضيفها مكتبة الباركود) */
+/* ✅ إزالة position:absolute لكي لا تختفي علامة التركيز البيضاء */
 .scanner-reader video,
-.scanner-reader canvas,
 #scanner-reader video {
   width: 100% !important; 
   height: 100% !important; 
   object-fit: cover !important; 
-  position: absolute !important;
-  top: 0 !important;
-  left: 0 !important;
   border-radius: 12px !important;
-}
-
-/* ✅ إخفاء أي عناصر إضافية تسبب تمدد الشاشة */
-#scanner-reader__dashboard_section_csr,
-#scanner-reader__header_message {
-  display: none !important;
 }
 
 .scanner-hint { color: #a3a3a3; font-size: 13px; text-align: center; margin: 0; flex-shrink: 0; }
