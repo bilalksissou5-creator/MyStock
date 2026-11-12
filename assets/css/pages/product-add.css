@@ -1,6 +1,6 @@
 /* ============================================
    صفحة إضافة منتجات
-   ✅ تصميم مستقل للشاشات الكبيرة (سكرول منفصل في منتصف المسافة)
+   ✅ تصميم مستقل للشاشات الكبيرة (سكرول منفصل تماماً)
    ============================================ */
 
 .add-form {
@@ -161,15 +161,17 @@
 }
 
 /* ============================================
-   ✅ التصميم الشبكي للشاشات الكبيرة (سكرول في منتصف 16px)
+   ✅ التصميم الشبكي للشاشات الكبيرة (سكرول مستقل تماماً)
    ============================================ */
 @media (min-width: 700px) {
   .add-form {
     max-width: 1100px;
     display: grid;
     grid-template-columns: 1fr 1.5fr;
-    gap: 0; /* ✅ تم إلغاء الـ gap لنتمكن من التحكم بالمسافة والسكرول يدوياً */
-    height: calc(100vh - 100px); 
+    gap: 0; 
+    /* ✅ استخدام 100% بدلاً من calc لضمان الدقة */
+    height: 100%; 
+    max-height: 100vh;
     overflow: hidden;
   }
 
@@ -177,20 +179,24 @@
     height: 100%;
     overflow-y: auto; 
     padding-bottom: 20px;
-    /* ✅ 7px مسافة + 2px شريط التمرير = 9px */
     padding-inline-end: 9px; 
+    border-inline-end: 1px solid #e5e5e5;
+    /* ✅ إجبار العنصر على الانكماش والسماح بالتمرير الداخلي */
+    min-height: 0; 
+    box-sizing: border-box;
   }
 
   .form-right-col {
     height: 100%;
     overflow-y: auto; 
-    /* ✅ 7px مسافة من شريط التمرير */
     padding-inline-start: 7px; 
     padding-inline-end: 8px; 
     padding-bottom: 20px;
+    /* ✅ إجبار العنصر على الانكماش والسماح بالتمرير الداخلي */
+    min-height: 0;
+    box-sizing: border-box;
   }
 
-  /* ✅ تخصيص شريط التمرير ليكون رفيعاً جداً (2px) ليتناسب مع التقسيم */
   .form-left-col::-webkit-scrollbar,
   .form-right-col::-webkit-scrollbar {
     width: 2px;
@@ -204,10 +210,6 @@
     background: #cbd5e1;
     border-radius: 10px;
   }
-  .form-left-col::-webkit-scrollbar-thumb:hover,
-  .form-right-col::-webkit-scrollbar-thumb:hover {
-    background: #94a3b8;
-  }
 
   .card-added {
     position: static;
@@ -218,18 +220,9 @@
   .product-input-card .form-grid { grid-template-columns: 1fr 1fr; }
   .product-input-card .form-group:first-child { grid-column: 1 / -1; }
 
-  .added-product-card {
-    gap: 8px;
-    padding: 10px;
-  }
-  .added-product-image {
-    width: 40px;
-    height: 40px;
-  }
-  .stat-mini {
-    min-width: 45px;
-    padding: 4px 6px;
-  }
+  .added-product-card { gap: 8px; padding: 10px; }
+  .added-product-image { width: 40px; height: 40px; }
+  .stat-mini { min-width: 45px; padding: 4px 6px; }
   .stat-mini span { font-size: 9px; }
   .stat-mini b { font-size: 11px; }
 }
@@ -257,6 +250,7 @@ html.in-iframe .add-form {
   overflow: hidden !important;
   padding: 0 !important;
   box-sizing: border-box !important;
+  min-height: 0 !important; /* ✅ ضروري جداً لعمل السكرول الداخلي */
 }
 
 @media (max-width: 699px) {
