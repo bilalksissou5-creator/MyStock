@@ -88,14 +88,11 @@
 .empty-added i { font-size: 2rem; margin-bottom: 8px; color: #d4d4d4; display: block; }
 .empty-added p { font-size: 13px; }
 
-/* ✅ تعديل بطاقة المنتج لتكون على سطرين (تمنع قطع النص) */
+/* ✅ بطاقة المنتج في صف واحد (أفقي) لجميع الشاشات كما كانت */
 .added-product-card { 
   display: grid; 
-  grid-template-columns: 48px minmax(0, 1fr) auto; 
-  grid-template-areas: 
-    "img info delete"
-    "img stats stats";
-  gap: 8px 12px; 
+  grid-template-columns: 44px minmax(0, 1fr) auto auto; 
+  gap: 10px; 
   align-items: center; 
   padding: 12px; 
   background: #fafafa; 
@@ -109,10 +106,8 @@
 .added-product-card:hover { background: #f5f5f5; }
 
 .added-product-image { 
-  grid-area: img; 
-  align-self: start; 
-  width: 48px; 
-  height: 48px; 
+  width: 44px; 
+  height: 44px; 
   border-radius: 8px; 
   background: white; 
   display: flex; 
@@ -127,40 +122,49 @@
 .added-product-image i { color: #a3a3a3; font-size: 20px; }
 
 .added-product-info { 
-  grid-area: info; 
   display: flex; 
   flex-direction: column; 
   gap: 2px; 
   min-width: 0; 
+  text-align: start;
 }
 
-.added-product-info strong { font-size: 14px; font-weight: 600; color: #171717; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.added-product-info span { font-size: 11px; color: #737373; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.added-product-info strong { font-size: 13px; font-weight: 600; color: #171717; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.added-product-info span { font-size: 10px; color: #737373; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
 .added-product-stats { 
-  grid-area: stats; 
   display: flex; 
   gap: 6px; 
-  flex-wrap: wrap; 
-  justify-content: flex-start; 
-  margin-top: 4px;
+  flex-shrink: 0;
+  justify-content: flex-end;
 }
 
-.stat-mini { display: flex; flex-direction: column; align-items: center; padding: 6px 8px; background: white; border-radius: 6px; min-width: 50px; border: 1px solid #f0f0f0; }
+.stat-mini { 
+  display: flex; 
+  flex-direction: column; 
+  align-items: center; 
+  justify-content: center;
+  padding: 6px 8px; 
+  background: white; 
+  border-radius: 6px; 
+  min-width: 50px; 
+  border: 1px solid #f0f0f0; 
+}
+
 .stat-mini.highlight { background: #171717; border-color: #171717; }
-.stat-mini span { font-size: 10px; color: #737373; margin-bottom: 2px; }
+.stat-mini span { font-size: 9px; color: #737373; margin-bottom: 2px; }
 .stat-mini.highlight span { color: #d4d4d4; }
-.stat-mini b { font-size: 12px; font-weight: 700; color: #171717; }
+.stat-mini b { font-size: 11px; font-weight: 700; color: #171717; }
 .stat-mini.highlight b { color: white; }
 
 .added-product-delete { 
-  grid-area: delete; 
-  align-self: start; 
   background: none; 
   border: none; 
   color: #d4d4d4; 
   cursor: pointer; 
-  padding: 6px; 
+  padding: 0; 
+  width: 32px;
+  height: 32px;
   border-radius: 6px; 
   font-size: 14px; 
   display: flex; 
@@ -193,7 +197,7 @@
 .scanner-hint { color: #a3a3a3; font-size: 13px; text-align: center; margin: 0; }
 
 /* ============================================
-   ✅ تصميم الهواتف (الحفاظ على الترتيب الأصلي 100%)
+   ✅ تصميم الهواتف 
    ============================================ */
 @media (max-width: 699px) {
   .form-left-col, 
@@ -212,16 +216,7 @@
   .product-input-card .form-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
   .product-input-card .form-group:first-child { grid-column: 1 / -1; }
   
-  .added-product-card { 
-    grid-template-columns: 44px minmax(0, 1fr) 32px; 
-    gap: 8px; 
-  }
-  .added-product-image { width: 44px; height: 44px; }
-  .added-product-delete { width: 32px; height: 32px; padding: 0; }
-  .added-product-stats { grid-column: 1 / -1; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; width: 100%; }
-  .stat-mini { padding: 6px 4px; min-width: 0; width: 100%; box-sizing: border-box; }
-  .stat-mini span { font-size: 9px; margin-bottom: 2px; }
-  .stat-mini b { font-size: 11px; }
+  /* ✅ تم إزالة أي تعديل خاص بالبطاقة هنا، لتبقى صفاً واحداً كما طلبت */
 
   .form-summary { grid-template-columns: 1fr; gap: 8px; }
   .summary-row { flex-direction: row; justify-content: space-between; text-align: right; padding: 8px 12px; }
@@ -303,7 +298,7 @@
   .product-input-card .form-group:first-child { grid-column: 1 / -1; }
 
   .added-product-card { 
-    grid-template-columns: 40px minmax(0, 1fr) auto; 
+    grid-template-columns: 40px minmax(0, 1fr) auto auto; 
     padding: 10px;
   }
   .added-product-image { width: 40px; height: 40px; }
@@ -311,15 +306,14 @@
   .stat-mini span { font-size: 9px; }
   .stat-mini b { font-size: 11px; }
 
-  /* ✅ تثبيت الهيدر (Add Products + Scan) ليبقى دائماً في الأعلى عند التمرير */
   .form-left-col .page-header {
     position: sticky;
     top: 0;
-    background: #f5f5f5; /* مطابق للون الخلفية ليكون متصلاً */
+    background: #f5f5f5; 
     z-index: 20;
     padding-top: 8px;
     padding-bottom: 8px;
-    margin-top: -8px; /* لضبط الإزاحة عند التثبيت */
+    margin-top: -8px; 
   }
 }
 
