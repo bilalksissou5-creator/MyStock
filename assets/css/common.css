@@ -398,7 +398,7 @@ h6 { font-size: 0.8125rem; font-weight: 600; color: #404040; } /* 13px */
   overflow-y: auto;
   overflow-x: hidden;
   padding: 24px;
-  padding-bottom: 5px; /* ✅ تم تعديلها من 80px إلى 24px */
+  padding-bottom: 24px; /* ✅ تم تعديلها من 80px إلى 24px */
   min-height: 0;
   min-width: 0;
   height: 100%;
