@@ -237,32 +237,64 @@
 .workspace-iframe .form-actions { position: relative; z-index: 10; }
 
 /* ============================================
-   ✅ تعديلات الماسح الضوئي (Scanner) - كاميرا مربعة
+   ✅ تعديلات الماسح الضوئي (تقييد صارم للكاميرا المربعة)
    ============================================ */
-.scanner-modal { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.85); z-index: 10000; display: none; align-items: center; justify-content: center; padding: 20px; }
-.scanner-box { background: #171717; border-radius: 16px; padding: 20px; max-width: 500px; width: 100%; display: flex; flex-direction: column; gap: 16px; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5); max-height: 90vh; }
+.scanner-modal { 
+  position: fixed; 
+  inset: 0; 
+  background: rgba(0, 0, 0, 0.85); 
+  z-index: 10000; 
+  display: none; 
+  align-items: center; 
+  justify-content: center; 
+  padding: 16px; 
+}
+.scanner-box { 
+  background: #171717; 
+  border-radius: 16px; 
+  padding: 16px; 
+  width: 100%; 
+  max-width: 400px; /* ✅ تصغير النافذة بالكامل */
+  display: flex; 
+  flex-direction: column; 
+  gap: 12px; 
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5); 
+  max-height: 90vh; 
+}
 .scanner-header { display: flex; align-items: center; justify-content: space-between; color: #ffffff; flex-shrink: 0; }
 .scanner-header h3 { font-size: 16px; font-weight: 700; margin: 0; }
 .scanner-close { background: rgba(255, 255, 255, 0.1); border: none; color: #ffffff; width: 36px; height: 36px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 16px; transition: background 0.15s; }
 .scanner-close:hover { background: rgba(255, 255, 255, 0.2); }
 
-/* ✅ جعل الحاوية مربعة تماماً (1:1) مع تحديد أقصى حجم لتناسب كل الشاشات */
+/* ✅ إجبار الحاوية على البقاء مربعة وبحجم صغير يناسب جميع الشاشات */
 .scanner-reader { 
-  width: min(100%, 400px, 60vh); 
-  aspect-ratio: 1 / 1; 
-  margin: 0 auto; /* توسيط المربع */
+  width: 100% !important; 
+  max-width: min(100%, 300px, 50vh) !important; /* أقصى عرض 300px أو 50% من ارتفاع الشاشة */
+  aspect-ratio: 1 / 1 !important; /* مربع دائماً */
+  margin: 0 auto !important; 
   border-radius: 12px; 
-  overflow: hidden; 
+  overflow: hidden !important; 
   background: #000000; 
-  position: relative; /* لضمان بقاء علامة التركيز فوق الفيديو */
+  position: relative !important;
 }
 
-/* ✅ الفيديو يملأ المربع بالكامل دون تشوه */
-.scanner-reader video { 
-  border-radius: 12px; 
+/* ✅ إجبار الفيديو على ملء المربع (مع تجاهل الأكواد التي تضيفها مكتبة الباركود) */
+.scanner-reader video,
+.scanner-reader canvas,
+#scanner-reader video {
   width: 100% !important; 
   height: 100% !important; 
   object-fit: cover !important; 
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  border-radius: 12px !important;
+}
+
+/* ✅ إخفاء أي عناصر إضافية تسبب تمدد الشاشة */
+#scanner-reader__dashboard_section_csr,
+#scanner-reader__header_message {
+  display: none !important;
 }
 
 .scanner-hint { color: #a3a3a3; font-size: 13px; text-align: center; margin: 0; flex-shrink: 0; }
@@ -295,8 +327,6 @@
   .summary-row { flex-direction: row; justify-content: space-between; text-align: right; padding: 8px 12px; }
   .form-actions { flex-direction: column; }
   .form-actions .btn-primary, .form-actions .btn-secondary { width: 100%; justify-content: center; }
-  
-  .scanner-box { padding: 16px; }
 }
 
 /* ============================================
