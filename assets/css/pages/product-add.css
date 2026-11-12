@@ -176,15 +176,15 @@
     max-width: 1100px;
     display: grid;
     grid-template-columns: 1fr 1.5fr;
-    grid-template-rows: 1fr; 
+    grid-template-rows: minmax(0, 1fr); /* ✅ السطر السحري الذي يحل مشكلة القطع نهائياً */
     gap: 0; 
     overflow: hidden;
     min-height: 0;
-    height: 100%; /* ✅ إعادة الارتفاع لضمان عمل السكرول المستقل */
+    height: 100%; 
   }
 
   .form-left-col {
-    height: 100%; /* ✅ لملء الصف بالكامل */
+    height: 100%; 
     min-height: 0;
     overflow-y: auto; 
     overflow-x: hidden; 
@@ -195,7 +195,7 @@
   }
 
   .form-right-col {
-    height: 100%; /* ✅ لملء الصف بالكامل */
+    height: 100%; 
     min-height: 0;
     overflow-y: auto; 
     overflow-x: hidden; 
