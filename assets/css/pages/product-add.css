@@ -1,42 +1,16 @@
 /* ============================================
    صفحة إضافة منتجات
-   ✅ تقسيم الشاشة لعمودين (العمود الأول يحتوي على الهيدر والأزرار)
+   ✅ الترتيب الصحيح للهاتف + تصميم شبكي للشاشات الكبيرة
    ============================================ */
 
 .add-form {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
   max-width: 800px;
   margin: 0 auto;
-}
-
-.form-left-col, .form-right-col {
   display: flex;
   flex-direction: column;
   gap: 16px;
-  width: 100%;
 }
 
-/* تعديل الهيدر ليكون متناسقاً */
-.page-header {
-  margin-bottom: 0;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 12px;
-}
-
-/* زر المسح */
-.scan-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  width: auto;
-}
-
-/* باقي التنسيقات كما هي */
 .product-input-card {
   background: white;
   border-radius: 10px;
@@ -59,6 +33,12 @@
   width: 100%;
   justify-content: center;
   margin-top: 12px;
+}
+
+.scan-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .supplier-group {
@@ -436,7 +416,7 @@
 }
 
 /* ============================================
-   ✅ التصميم للهواتف
+   ✅ التصميم للهواتف (نفس الترتيب الأصلي)
    ============================================ */
 @media (max-width: 699px) {
   .product-input-card .form-grid {
@@ -533,25 +513,33 @@
 }
 
 /* ============================================
-   ✅ التصميم الشبكي للشاشات الكبيرة (التابلت والكمبيوتر)
+   ✅ التصميم الشبكي للشاشات الكبيرة (السلة في جهة والمدخلات في جهة)
    ============================================ */
 @media (min-width: 700px) {
   .add-form {
     max-width: 1100px;
     display: grid;
     grid-template-columns: 1fr 1fr;
+    grid-template-areas: 
+      "header cart"
+      "alerts cart"
+      "supplier cart"
+      "fields cart"
+      "summary cart"
+      "actions cart";
     align-items: start;
     gap: 20px;
   }
 
-  /* إزالة الهوامش السفلية من الأزرار */
-  .form-actions {
-    margin-bottom: 0;
-    padding-bottom: 0;
-  }
+  .page-header { grid-area: header; margin-bottom: 0; }
+  .alert-error, .alert-success { grid-area: alerts; }
+  .card-supplier { grid-area: supplier; }
+  .card-fields { grid-area: fields; }
+  .card-summary { grid-area: summary; }
+  .card-actions { grid-area: actions; margin-bottom: 0; padding-bottom: 0; }
   
-  /* السلة ثابتة أثناء التمرير */
   .card-added { 
+    grid-area: cart; 
     position: sticky;
     top: 20px;
     max-height: calc(100vh - 120px); 
