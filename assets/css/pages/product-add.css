@@ -97,7 +97,7 @@
   gap: 10px; 
   align-items: center; 
   padding: 12px; 
-  padding-top: 30px; /* ✅ زيادة المساحة العلوية لتساوي المسافة أسفل الزر */
+  padding-top: 30px; 
   background: #fafafa; 
   border-radius: 10px; 
   border: 1px solid #f0f0f0; 
@@ -160,11 +160,11 @@
 .stat-mini b { font-size: 11px; font-weight: 700; color: #171717; }
 .stat-mini.highlight b { color: white; }
 
-/* ✅ زر الحذف في الزاوية 90 درجة بمسافات متساوية */
+/* ✅ زر الحذف في الزاوية 90 درجة */
 .added-product-delete { 
   position: absolute; 
-  top: 6px; /* مسافة 6px من الأعلى */
-  inset-inline-end: 6px; /* مسافة 6px من اليمين */
+  top: 6px; 
+  inset-inline-end: 6px; 
   background: transparent; 
   border: none; 
   color: #b0b0b0; 
@@ -238,7 +238,7 @@
 }
 
 /* ============================================
-   ✅ التصميم الشبكي للشاشات الكبيرة (سكرول مستقل تماماً)
+   ✅ التصميم الشبكي للشاشات الكبيرة (سكرول داخل البطاقة)
    ============================================ */
 @media (min-width: 700px) {
   .main {
@@ -272,36 +272,51 @@
     box-sizing: border-box;
   }
 
+  /* ✅ إخفاء التمرير من العمود الأيمن بالكامل */
   .form-right-col {
     flex: 1.5; 
     height: 100%; 
     min-height: 0;
-    overflow-y: auto; 
-    overflow-x: hidden; 
+    overflow: hidden; /* إخفاء التمرير الخارجي */
     padding-inline-start: 7px; 
     padding-inline-end: 8px; 
-    padding-bottom: 20px;
+    padding-bottom: 16px;
     box-sizing: border-box;
   }
 
+  /* ✅ جعل البطاقة تأخذ الارتفاع كاملاً وتوزع محتواها */
+  .card-added {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    margin-bottom: 0;
+  }
+
+  /* ✅ تطبيق التمرير على قائمة المنتجات داخل البطاقة */
+  .added-products {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto; 
+    overflow-x: hidden; 
+    /* سحب الشريط ليلامس الحافة الداخلية للبطاقة */
+    margin-inline-end: -16px; 
+    padding-inline-end: 12px; 
+  }
+
+  /* ✅ تحويل تخصيص شريط التمرير من العمود إلى القائمة */
   .form-left-col::-webkit-scrollbar,
-  .form-right-col::-webkit-scrollbar {
+  .added-products::-webkit-scrollbar {
     width: 4px; 
   }
   .form-left-col::-webkit-scrollbar-track,
-  .form-right-col::-webkit-scrollbar-track {
+  .added-products::-webkit-scrollbar-track {
     background: transparent;
   }
   .form-left-col::-webkit-scrollbar-thumb,
-  .form-right-col::-webkit-scrollbar-thumb {
+  .added-products::-webkit-scrollbar-thumb {
     background: #cbd5e1;
     border-radius: 10px;
-  }
-
-  .card-added {
-    position: static;
-    max-height: none;
-    overflow: visible;
   }
 
   .product-input-card .form-grid { grid-template-columns: 1fr 1fr; }
@@ -310,7 +325,7 @@
   .added-product-card { 
     grid-template-columns: 40px minmax(0, 1fr) auto; 
     padding: 10px;
-    padding-top: 28px; /* ✅ الحفاظ على المسافة المتساوية في الشاشات الكبيرة */
+    padding-top: 28px; 
   }
   .added-product-image { width: 40px; height: 40px; }
   .stat-mini { min-width: 45px; padding: 4px 6px; }
