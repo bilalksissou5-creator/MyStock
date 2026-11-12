@@ -215,7 +215,7 @@
 
 .summary-row span { font-size: 11px; color: #737373; }
 
-/* ✅ تم تعديل حجم الخط هنا إلى 15px */
+/* ✅ حجم الخط 15px */
 .summary-row strong { 
   font-size: 15px; 
   font-weight: 700; 
@@ -227,7 +227,13 @@
   font-size: 15px; 
 }
 
-.form-actions { display: flex; gap: 10px; margin-bottom: 40px; padding-bottom: 20px; }
+/* ✅ تقليل المسافة السفلية للأزرار */
+.form-actions { 
+  display: flex; 
+  gap: 10px; 
+  margin-bottom: 16px; /* كان 40px */
+  padding-bottom: 0; /* كان 20px */
+}
 .workspace-iframe .form-actions { position: relative; z-index: 10; }
 
 .scanner-modal { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.85); z-index: 10000; display: none; align-items: center; justify-content: center; padding: 20px; }
@@ -244,6 +250,11 @@
    ✅ تصميم الهواتف 
    ============================================ */
 @media (max-width: 699px) {
+  /* ✅ تقليل المسافة السفلية للحاوية الرئيسية لتختفي المساحة البيضاء */
+  .main {
+    padding-bottom: 16px !important; 
+  }
+
   .form-left-col, 
   .form-right-col {
     display: contents; 
