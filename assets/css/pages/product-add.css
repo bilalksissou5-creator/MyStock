@@ -89,14 +89,15 @@
 .empty-added i { font-size: 2rem; margin-bottom: 8px; color: #d4d4d4; display: block; }
 .empty-added p { font-size: 13px; }
 
-/* ✅ تعديل البطاقة لتصبح relative وإزالة العمود المخصص لزر الحذف */
+/* ✅ تعديل البطاقة: إضافة حشوة من اليمين لإبعاد الإحصائيات عن الزاوية */
 .added-product-card { 
-  position: relative; /* ✅ ضروري لكي يطفو الزر فوق البطاقة */
+  position: relative; 
   display: grid; 
-  grid-template-columns: 44px minmax(0, 1fr) auto; /* ✅ تم إزالة auto الأخيرة الخاصة بالزر */
+  grid-template-columns: 44px minmax(0, 1fr) auto; 
   gap: 10px; 
   align-items: center; 
   padding: 12px; 
+  padding-inline-end: 32px; /* ✅ إضافة مساحة إضافية من اليمين لزر الحذف */
   background: #fafafa; 
   border-radius: 10px; 
   border: 1px solid #f0f0f0; 
@@ -129,7 +130,6 @@
   gap: 2px; 
   min-width: 0; 
   text-align: start;
-  padding-inline-end: 24px; /* ✅ مساحة صغيرة لكي لا يتداخل النص مع الزر */
 }
 
 .added-product-info strong { font-size: 13px; font-weight: 600; color: #171717; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -160,18 +160,18 @@
 .stat-mini b { font-size: 11px; font-weight: 700; color: #171717; }
 .stat-mini.highlight b { color: white; }
 
-/* ✅ وضع زر الحذف في الزاوية العلوية */
+/* ✅ زر الحذف في الزاوية العلوية بحرية تامة */
 .added-product-delete { 
-  position: absolute; /* ✅ يطفو في الزاوية */
+  position: absolute; 
   top: 6px; 
-  inset-inline-end: 6px; /* ✅ يتكيف مع اللغتين العربية والإنجليزية */
+  inset-inline-end: 6px; 
   background: none; 
   border: none; 
   color: #d4d4d4; 
   cursor: pointer; 
   padding: 0; 
-  width: 28px;
-  height: 28px;
+  width: 24px;
+  height: 24px;
   border-radius: 6px; 
   font-size: 14px; 
   display: flex; 
@@ -308,8 +308,9 @@
   .product-input-card .form-group:first-child { grid-column: 1 / -1; }
 
   .added-product-card { 
-    grid-template-columns: 40px minmax(0, 1fr) auto; /* ✅ تم إزالة auto الأخيرة هنا أيضاً */
+    grid-template-columns: 40px minmax(0, 1fr) auto; 
     padding: 10px;
+    padding-inline-end: 30px; /* ✅ مساحة لزر الحذف في الشاشات الكبيرة */
   }
   .added-product-image { width: 40px; height: 40px; }
   .stat-mini { min-width: 45px; padding: 4px 6px; }
