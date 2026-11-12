@@ -168,10 +168,9 @@
     max-width: 1100px;
     display: grid;
     grid-template-columns: 1fr 1.5fr;
+    grid-template-rows: 1fr; /* ✅ السطر السحري: يمنع تمدد الصف ويجبر السكرول الداخلي على العمل */
     gap: 0; 
-    /* ✅ استخدام 100% بدلاً من calc لضمان الدقة */
     height: 100%; 
-    max-height: 100vh;
     overflow: hidden;
   }
 
@@ -181,7 +180,6 @@
     padding-bottom: 20px;
     padding-inline-end: 9px; 
     border-inline-end: 1px solid #e5e5e5;
-    /* ✅ إجبار العنصر على الانكماش والسماح بالتمرير الداخلي */
     min-height: 0; 
     box-sizing: border-box;
   }
@@ -192,14 +190,13 @@
     padding-inline-start: 7px; 
     padding-inline-end: 8px; 
     padding-bottom: 20px;
-    /* ✅ إجبار العنصر على الانكماش والسماح بالتمرير الداخلي */
     min-height: 0;
     box-sizing: border-box;
   }
 
   .form-left-col::-webkit-scrollbar,
   .form-right-col::-webkit-scrollbar {
-    width: 2px;
+    width: 4px; /* زيادة السماكة قليلاً لتكون مرئية أكثر */
   }
   .form-left-col::-webkit-scrollbar-track,
   .form-right-col::-webkit-scrollbar-track {
@@ -250,7 +247,7 @@ html.in-iframe .add-form {
   overflow: hidden !important;
   padding: 0 !important;
   box-sizing: border-box !important;
-  min-height: 0 !important; /* ✅ ضروري جداً لعمل السكرول الداخلي */
+  min-height: 0 !important; 
 }
 
 @media (max-width: 699px) {
