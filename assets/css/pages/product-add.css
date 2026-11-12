@@ -97,7 +97,7 @@
   gap: 10px; 
   align-items: center; 
   padding: 12px; 
-  padding-top: 28px; /* مساحة علوية لكي لا يتداخل الزر مع المحتوى */
+  padding-top: 30px; /* ✅ زيادة المساحة العلوية لتساوي المسافة أسفل الزر */
   background: #fafafa; 
   border-radius: 10px; 
   border: 1px solid #f0f0f0; 
@@ -160,17 +160,17 @@
 .stat-mini b { font-size: 11px; font-weight: 700; color: #171717; }
 .stat-mini.highlight b { color: white; }
 
-/* ✅ زر الحذف في الزاوية 90 درجة بالضبط */
+/* ✅ زر الحذف في الزاوية 90 درجة بمسافات متساوية */
 .added-product-delete { 
   position: absolute; 
-  top: 8px; /* تم ضبطها لتكون في الزاوية تماماً */
-  inset-inline-end: 8px; /* تم ضبطها لتكون في الزاوية تماماً */
+  top: 6px; /* مسافة 6px من الأعلى */
+  inset-inline-end: 6px; /* مسافة 6px من اليمين */
   background: transparent; 
   border: none; 
   color: #b0b0b0; 
   cursor: pointer; 
   padding: 0; 
-  width: 18px; /* تصغير الحجم قليلاً */
+  width: 18px; 
   height: 18px;
   border-radius: 4px; 
   font-size: 13px; 
@@ -310,7 +310,7 @@
   .added-product-card { 
     grid-template-columns: 40px minmax(0, 1fr) auto; 
     padding: 10px;
-    padding-top: 24px;
+    padding-top: 28px; /* ✅ الحفاظ على المسافة المتساوية في الشاشات الكبيرة */
   }
   .added-product-image { width: 40px; height: 40px; }
   .stat-mini { min-width: 45px; padding: 4px 6px; }
