@@ -1,6 +1,11 @@
 // ============================================
 // صفحة إكمال البيانات (حفظ مباشر + إنشاء اشتراك pending)
+// ✅ استخدام صور أعلام حقيقية (flagcdn)
+// ✅ اكتشاف تلقائي ودقيق للبلد
+// ✅ مفتاح الدولة (Dial Code) ديناميكي ودمجه مع رقم الهاتف
+// ✅ إصلاح مشكلة اختفاء اسم البلد
 // ============================================
+
 document.addEventListener('DOMContentLoaded', async () => {
   if (window.applyLanguage) await window.applyLanguage();
 
@@ -17,6 +22,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   const countryName = document.getElementById('country-name');
   const countryDropdown = document.getElementById('country-dropdown');
   const countryCodeInput = document.getElementById('country_code');
+  
+  // ✅ عناصر حقل الهاتف الجديد
+  const phoneFlag = document.getElementById('phone-flag');
+  const phoneDialCode = document.getElementById('phone-dial-code');
 
   // ✅ انتظار الجلسة (المستخدم مسجل دخول بالفعل عبر Google)
   const session = await window.authReadyPromise;
@@ -27,11 +36,50 @@ document.addEventListener('DOMContentLoaded', async () => {
     return;
   }
 
+  // ✅ خريطة مفاتيح الدول (Dial Codes)
+  const dialCodes = {
+    MA: '+212', DZ: '+213', TN: '+216', LY: '+218', EG: '+20', MR: '+222',
+    SA: '+966', AE: '+971', QA: '+974', KW: '+965', BH: '+973', OM: '+968',
+    JO: '+962', LB: '+961', SY: '+963', IQ: '+964', PS: '+970', YE: '+967',
+    SD: '+249', SO: '+252', TR: '+90', FR: '+33', ES: '+34', US: '+1',
+    CA: '+1', GB: '+44', DE: '+49'
+  };
+
   // ============================================
   // تعبئة قائمة البلد
   // ============================================
   if (countryPicker && countryTrigger) {
-    let selectedCountry = localStorage.getItem('app_country') || 'MA';
+
+    // ✅ خوارزمية اكتشاف البلد تلقائياً
+    async function detectCountry() {
+      const saved = localStorage.getItem('app_country');
+      if (saved && window.countries?.[saved]) return saved;
+
+      try {
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 2000);
+        const res = await fetch('https://ipapi.co/json/', { signal: controller.signal });
+        clearTimeout(timeout);
+
+        if (res.ok) {
+          const data = await res.json();
+          const code = (data.country_code || '').toUpperCase();
+          if (code && window.countries?.[code]) return code;
+        }
+      } catch (e) {}
+
+      const browserRegion = (navigator.language || '').split('-')[1];
+      if (browserRegion && window.countries?.[browserRegion.toUpperCase()]) {
+        return browserRegion.toUpperCase();
+      }
+
+      return 'MA';
+    }
+
+    let selectedCountry = await detectCountry();
+
+    // ✅ دالة مساعدة لجلب صورة العلم
+    const getFlagUrl = (code) => `https://flagcdn.com/w40/${code.toLowerCase()}.png`;
 
     function buildCountryDropdown() {
       const countriesObj = window.countries || {};
@@ -40,11 +88,11 @@ document.addEventListener('DOMContentLoaded', async () => {
       countryDropdown.innerHTML = Object.keys(countriesObj).map(code => {
         const c = countriesObj[code];
         const name = c[currentLangCode] || c.ar;
-        const flag = name.match(/\p{Emoji}/u)?.[0] || '🌍';
-        const nameText = name.replace(/\p{Emoji}/gu, '').trim();
+        const nameText = name.replace(/[\u{1F1E6}-\u{1F1FF}]/gu, '').trim(); // إزالة الإيموجي
+
         return `
           <button type="button" class="picker-option" data-country="${code}">
-            <span class="picker-flag">${flag}</span>
+            <img src="${getFlagUrl(code)}" class="picker-flag-img" alt="${code}">
             <span class="picker-name">${nameText}</span>
             <i class="fas fa-check picker-check"></i>
           </button>
@@ -62,13 +110,24 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     function updateCountryDisplay() {
       if (!selectedCountry) return;
+      
       const name = window.tCountry ? window.tCountry(selectedCountry) : selectedCountry;
-      const flag = name.match(/\p{Emoji}/u)?.[0] || '🌍';
-      const nameText = name.replace(/\p{Emoji}/gu, '').trim();
-      countryFlag.textContent = flag;
+      const nameText = name.replace(/[\u{1F1E6}-\u{1F1FF}]/gu, '').trim();
+      const flagImgHtml = `<img src="${getFlagUrl(selectedCountry)}" class="picker-flag-img" alt="${selectedCountry}">`;
+
+      // تحديث قائمة البلد
+      countryFlag.innerHTML = flagImgHtml;
       countryName.textContent = nameText;
+      countryName.removeAttribute('data-i18n'); // ✅ منع الترجمة من مسح الاسم
       countryCodeInput.value = selectedCountry;
       localStorage.setItem('app_country', selectedCountry);
+
+      // ✅ تحديث علم حقل الهاتف ومفتاح الدولة
+      if (phoneFlag) phoneFlag.innerHTML = flagImgHtml;
+      if (phoneDialCode && dialCodes[selectedCountry]) {
+        phoneDialCode.textContent = dialCodes[selectedCountry];
+      }
+
       countryDropdown.querySelectorAll('.picker-option').forEach(opt => {
         opt.classList.toggle('active', opt.dataset.country === selectedCountry);
       });
@@ -96,13 +155,19 @@ document.addEventListener('DOMContentLoaded', async () => {
     e.preventDefault();
 
     const orgName = document.getElementById('org_name').value.trim();
-    const phone = document.getElementById('phone').value.trim();
+    
+    // ✅ دمج مفتاح الدولة مع الرقم المحلي
+    const dialCode = phoneDialCode ? phoneDialCode.textContent.trim() : '';
+    const localPhone = document.getElementById('phone').value.trim();
+    const cleanLocalPhone = localPhone.startsWith('0') ? localPhone.substring(1) : localPhone;
+    const phone = dialCode + cleanLocalPhone; 
+    
     const country = localStorage.getItem('app_country') || 'MA';
 
     // التحقق من الحقول
     if (!orgName) { errBox.textContent = 'اسم المنظمة مطلوب'; errBox.style.display = 'block'; return; }
     if (!country) { errBox.textContent = 'الرجاء اختيار البلد'; errBox.style.display = 'block'; return; }
-    if (!phone || phone.length < 8) { errBox.textContent = 'رقم الهاتف مطلوب (8 أرقام على الأقل)'; errBox.style.display = 'block'; return; }
+    if (!localPhone || localPhone.length < 6) { errBox.textContent = 'رقم الهاتف مطلوب ويجب أن يكون صحيحاً'; errBox.style.display = 'block'; return; }
 
     btn.disabled = true;
     btn.querySelector('span').textContent = 'جارٍ الحفظ...';
@@ -110,7 +175,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     successBox.style.display = 'none';
 
     try {
-      // 1. جلب المنظمة التي أنشأها الـ Trigger تلقائياً عند تسجيل Google
+      // 1. جلب المنظمة
       const { data: profile, error: profileErr } = await db
         .from('profiles')
         .select('organization_id')
@@ -145,17 +210,17 @@ document.addEventListener('DOMContentLoaded', async () => {
       const { error: updateErr } = await db
         .from('profiles')
         .update({
-          phone: phone,
+          phone: phone, // ✅ حفظ الرقم مع مفتاح الدولة
           country: country,
           organization_id: orgId,
           onboarding_completed: true,
-          avatar_url: googleAvatar || null // ✅ حفظ صورة Google
+          avatar_url: googleAvatar || null 
       })
       .eq('id', user.id);
 
       if (updateErr) throw new Error('خطأ في تحديث الملف: ' + updateErr.message);
 
-      // 4. ✅ إنشاء اشتراك بحالة pending (إن لم يكن موجوداً)
+      // 4. إنشاء اشتراك بحالة pending (إن لم يكن موجوداً)
       const { data: existingSub } = await db
         .from('subscriptions')
         .select('id')
@@ -175,7 +240,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (subErr) console.error('خطأ في إنشاء الاشتراك:', subErr);
       }
 
-      // 5. النجاح! التوجيه إلى صفحة الاشتراك
+      // 5. النجاح
       successBox.textContent = '✅ تم حفظ البيانات! جارٍ تحويلك إلى صفحة الاشتراك...';
       successBox.style.display = 'block';
       

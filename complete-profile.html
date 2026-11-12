@@ -14,7 +14,8 @@
   </script>
 
   <link rel="stylesheet" href="/assets/css/common.css">
-  <link rel="stylesheet" href="/assets/css/pages/register.css">
+  <!-- نستخدم نفس ملف CSS الخاص بالتسجيل لأن التصميم موحد -->
+  <link rel="stylesheet" href="/assets/css/pages/register.css?v=14"> 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 <body class="register-page">
@@ -30,12 +31,14 @@
       <input type="text" id="org_name" required>
     </div>
 
+    <!-- ✅ قائمة اختيار البلد (تم تحديثها) -->
     <div class="form-group">
       <label data-i18n="welcome_country">البلد *</label>
       <div class="picker" id="country-picker">
         <button type="button" class="picker-trigger" id="country-trigger">
-          <span class="picker-flag" id="country-flag">🌍</span>
-          <span class="picker-name" id="country-name" data-i18n="welcome_select_country">-- اختر البلد --</span>
+          <span class="picker-flag" id="country-flag"></span>
+          <!-- ✅ إزالة data-i18n لكي لا يتدخل ملف الترجمة -->
+          <span class="picker-name" id="country-name">-- اختر البلد --</span>
           <i class="fas fa-chevron-down picker-arrow"></i>
         </button>
         <div class="picker-dropdown" id="country-dropdown"></div>
@@ -43,9 +46,14 @@
       <input type="hidden" id="country_code" name="country_code">
     </div>
 
+    <!-- ✅ حقل رقم الهاتف الموحد (علم + مفتاح + رقم) -->
     <div class="form-group">
       <label data-i18n="register_phone">رقم الهاتف *</label>
-      <input type="tel" id="phone" placeholder="+212 600000000" required dir="ltr">
+      <div class="phone-input-wrapper">
+        <span class="phone-flag" id="phone-flag"></span>
+        <span class="phone-dial-code" id="phone-dial-code" dir="ltr">+212</span>
+        <input type="tel" id="phone" placeholder="600000000" required dir="ltr">
+      </div>
     </div>
 
     <button type="submit" class="btn-primary" style="width:100%; justify-content:center; margin-top: 20px;" id="complete-btn">
@@ -57,6 +65,6 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="/js/core/supabase.js"></script>
   <script src="/js/core/i18n.js"></script>
-  <script src="/js/pages/complete-profile.js"></script>
+  <script src="/js/pages/complete-profile.js?v=2"></script>
 </body>
 </html>
