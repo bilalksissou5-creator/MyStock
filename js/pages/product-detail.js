@@ -4,6 +4,7 @@
 // ✅ وضع زر الحذف داخل البطاقة الأخيرة
 // ✅ إصلاح ظهور الباركود (الربط بين SKU وجدول الباركودات)
 // ✅ استبدال الرموز التعبيرية بأيقونات Font Awesome
+// ✅ إضافة ترجمة ديناميكية لأنواع الوحدة (قطعة، كغ، إلخ)
 // ============================================
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -24,6 +25,25 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (!productId) {
     if (main) main.innerHTML = `<div class="alert alert-error">${tr('prod_detail_no_id')}</div>`;
     return;
+  }
+
+  // ✅ دالة لترجمة أنواع الوحدة ديناميكياً
+  function translateUnit(unit) {
+    if (!unit) return '';
+    const lang = window.getCurrentLang ? window.getCurrentLang() : 'ar';
+    if (lang === 'ar') return unit;
+    
+    const translations = {
+      'قطعة': { en: 'Piece', fr: 'Pièce' },
+      'كرتونة': { en: 'Carton', fr: 'Carton' },
+      'كيلوغرام': { en: 'Kilogram', fr: 'Kilogramme' },
+      'كغ': { en: 'Kg', fr: 'Kg' },
+      'لتر': { en: 'Liter', fr: 'Litre' },
+      'متر': { en: 'Meter', fr: 'Mètre' },
+      'علبة': { en: 'Box', fr: 'Boîte' }
+    };
+    
+    return translations[unit] && translations[unit][lang] ? translations[unit][lang] : unit;
   }
 
   const { data: product, error } = await db
@@ -134,11 +154,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             </div>
             <div class="row">
               <span>${tr('prod_detail_unit')}</span>
-              <strong class="edit-field" id="f-unit" data-value="${product.unit ?? ''}"></strong>
+              <!-- ✅ استخدام دالة الترجمة هنا -->
+              <strong class="edit-field" id="f-unit" data-value="${product.unit ?? ''}">${translateUnit(product.unit)}</strong>
             </div>
             <div class="row">
               <span>${tr('prod_detail_barcode')}</span>
-              <!-- ✅ استخدام mainBarcode بدلاً من qr_code -->
               <strong class="edit-field" id="f-qr_code" data-value="${mainBarcode}"></strong>
             </div>
           </div>
@@ -152,7 +172,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         <!-- بطاقة سعر البيع -->
         <div class="product-card-detail">
           <div class="sell-price-section" style="border: none; padding-top: 0; margin-top: 0;">
-            <!-- ✅ استبدال 💰 بأيقونة Font Awesome -->
             <h3 class="sell-price-title">
               <i class="fas fa-coins" style="color: #f59e0b; margin-inline-end: 6px;"></i>
               ${tr('prod_detail_sell_price')}
@@ -183,7 +202,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         <!-- بطاقة المخزون المنخفض + زر الحذف -->
         <div class="product-card-detail">
           <div class="sell-price-section" style="border: none; padding-top: 0; margin-top: 0;">
-            <!-- ✅ استبدال ⚠️ بأيقونة Font Awesome وحذف الرمز من الترجمة -->
             <h3 class="sell-price-title">
               <i class="fas fa-triangle-exclamation" style="color: #f59e0b; margin-inline-end: 6px;"></i>
               ${tr('low_stock_section_title').replace('⚠️', '').trim()}
@@ -299,6 +317,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (savedField === 'qty') { 
           el.dataset.value = newValue; 
           updateQtyStyle(); 
+        }
+        
+        // ✅ ترجمة الوحدة فوراً بعد الحفظ
+        if (savedField === 'unit') {
+           setTimeout(() => {
+             const span = el.querySelector('.inline-display');
+             if (span) span.textContent = translateUnit(newValue);
+           }, 10);
         }
 
         if (String(newValue) !== String(initialFieldValues[field])) {
