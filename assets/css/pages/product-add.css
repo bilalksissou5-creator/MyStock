@@ -1,6 +1,6 @@
 /* ============================================
    صفحة إضافة منتجات
-   ✅ تصميم مستقل للشاشات الكبيرة (سكرول منفصل) مع خط فاصل
+   ✅ تصميم مستقل للشاشات الكبيرة (سكرول منفصل في منتصف المسافة)
    ============================================ */
 
 .add-form {
@@ -80,21 +80,7 @@
 .empty-added i { font-size: 2rem; margin-bottom: 8px; color: #d4d4d4; display: block; }
 .empty-added p { font-size: 13px; }
 
-/* ✅ تعديل بطاقة المنتج لمنع خروج المحتوى */
-.added-product-card { 
-  display: grid; 
-  grid-template-columns: 48px minmax(0, 1fr) auto auto; 
-  gap: 12px; 
-  align-items: center; 
-  padding: 12px; 
-  background: #fafafa; 
-  border-radius: 10px; 
-  border: 1px solid #f0f0f0; 
-  transition: background 0.15s; 
-  max-width: 100%; 
-  box-sizing: border-box;
-}
-
+.added-product-card { display: grid; grid-template-columns: 48px minmax(0, 1fr) auto auto; gap: 12px; align-items: center; padding: 12px; background: #fafafa; border-radius: 10px; border: 1px solid #f0f0f0; transition: background 0.15s; max-width: 100%; box-sizing: border-box; }
 .added-product-card:hover { background: #f5f5f5; }
 .added-product-image { width: 48px; height: 48px; border-radius: 8px; background: white; display: flex; align-items: center; justify-content: center; flex-shrink: 0; border: 1px solid #e5e5e5; overflow: hidden; }
 .added-product-image img { width: 100%; height: 100%; object-fit: cover; }
@@ -103,25 +89,8 @@
 .added-product-info strong { font-size: 14px; font-weight: 600; color: #171717; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .added-product-info span { font-size: 11px; color: #737373; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-/* ✅ السماح للإحصائيات بالانكماش أو الالتفاف */
-.added-product-stats { 
-  display: flex; 
-  gap: 6px; 
-  flex-wrap: wrap; 
-  justify-content: flex-end;
-}
-
-.stat-mini { 
-  display: flex; 
-  flex-direction: column; 
-  align-items: center; 
-  padding: 6px 8px; 
-  background: white; 
-  border-radius: 6px; 
-  min-width: 50px; 
-  border: 1px solid #f0f0f0; 
-}
-
+.added-product-stats { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+.stat-mini { display: flex; flex-direction: column; align-items: center; padding: 6px 8px; background: white; border-radius: 6px; min-width: 50px; border: 1px solid #f0f0f0; }
 .stat-mini.highlight { background: #171717; border-color: #171717; }
 .stat-mini span { font-size: 10px; color: #737373; margin-bottom: 2px; }
 .stat-mini.highlight span { color: #d4d4d4; }
@@ -141,7 +110,6 @@
 .form-actions { display: flex; gap: 10px; margin-bottom: 40px; padding-bottom: 20px; }
 .workspace-iframe .form-actions { position: relative; z-index: 10; }
 
-/* الماسح الضوئي */
 .scanner-modal { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.85); z-index: 10000; display: none; align-items: center; justify-content: center; padding: 20px; }
 .scanner-box { background: #171717; border-radius: 16px; padding: 20px; max-width: 500px; width: 100%; display: flex; flex-direction: column; gap: 16px; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5); }
 .scanner-header { display: flex; align-items: center; justify-content: space-between; color: #ffffff; }
@@ -193,40 +161,39 @@
 }
 
 /* ============================================
-   ✅ التصميم الشبكي للشاشات الكبيرة (سكرول مستقل + خط فاصل)
+   ✅ التصميم الشبكي للشاشات الكبيرة (سكرول في منتصف 16px)
    ============================================ */
 @media (min-width: 700px) {
   .add-form {
     max-width: 1100px;
     display: grid;
     grid-template-columns: 1fr 1.5fr;
-    gap: 16px; /* المسافة بين القسمين 16px */
+    gap: 0; /* ✅ تم إلغاء الـ gap لنتمكن من التحكم بالمسافة والسكرول يدوياً */
     height: calc(100vh - 100px); 
     overflow: hidden;
   }
 
-  /* ✅ القسم الأول */
   .form-left-col {
     height: 100%;
     overflow-y: auto; 
     padding-bottom: 20px;
-    padding-inline-end: 16px; /* مساحة لشريط التمرير */
-    border-inline-end: 1px solid #e5e5e5; /* الخط الفاصل في المنتصف */
+    /* ✅ 7px مسافة + 2px شريط التمرير = 9px */
+    padding-inline-end: 9px; 
   }
 
-  /* ✅ القسم الثاني */
   .form-right-col {
     height: 100%;
     overflow-y: auto; 
-    padding-inline-start: 16px; /* إبعاد المحتوى عن الخط الفاصل */
-    padding-bottom: 20px;
+    /* ✅ 7px مسافة من شريط التمرير */
+    padding-inline-start: 7px; 
     padding-inline-end: 8px; 
+    padding-bottom: 20px;
   }
 
-  /* ✅ تخصيص شكل شريط التمرير ليكون رفيعاً وأنيقاً (مثل خط رفيع) */
+  /* ✅ تخصيص شريط التمرير ليكون رفيعاً جداً (2px) ليتناسب مع التقسيم */
   .form-left-col::-webkit-scrollbar,
   .form-right-col::-webkit-scrollbar {
-    width: 6px;
+    width: 2px;
   }
   .form-left-col::-webkit-scrollbar-track,
   .form-right-col::-webkit-scrollbar-track {
@@ -234,12 +201,12 @@
   }
   .form-left-col::-webkit-scrollbar-thumb,
   .form-right-col::-webkit-scrollbar-thumb {
-    background: #d4d4d4;
+    background: #cbd5e1;
     border-radius: 10px;
   }
   .form-left-col::-webkit-scrollbar-thumb:hover,
   .form-right-col::-webkit-scrollbar-thumb:hover {
-    background: #a3a3a3;
+    background: #94a3b8;
   }
 
   .card-added {
