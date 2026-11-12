@@ -11,6 +11,7 @@
   gap: 16px;
 }
 
+/* ✅ إزالة أي هوامش افتراضية من الهيدر لتوحيد المسافة تحت زر Scan */
 .page-header {
   margin-bottom: 0;
 }
@@ -420,7 +421,7 @@
 }
 
 /* ============================================
-   ✅ التصميم للهواتف (نفس الترتيب الأصلي)
+   ✅ التصميم للهواتف
    ============================================ */
 @media (max-width: 699px) {
   .product-input-card .form-grid {
@@ -524,18 +525,35 @@
     max-width: 1100px;
     display: grid;
     grid-template-columns: 1fr 1fr;
-    grid-template-areas: 
-      "header cart"
-      "alerts cart"
-      "supplier cart"
-      "fields cart"
-      "summary cart"
-      "actions cart";
     align-items: start;
     gap: 16px;
   }
 
-  /* ✅ التعديل الجديد: جعل حقلي الكمية والسعر أسفل اسم المنتج في الشاشات الكبيرة */
+  /* ✅ وضع جميع عناصر النموذج في العمود الأول (بدون grid-template-areas لتجنب الفراغات) */
+  .page-header,
+  .alert-error,
+  .alert-success,
+  .card-supplier,
+  .card-fields,
+  .card-summary,
+  .card-actions {
+    grid-column: 1;
+  }
+
+  .page-header { margin-bottom: 0; }
+  .card-actions { margin-bottom: 0; padding-bottom: 0; }
+
+  /* ✅ وضع السلة في العمود الثاني لتمتد وتثبت أثناء التمرير */
+  .card-added { 
+    grid-column: 2;
+    grid-row: 1 / span 20; 
+    position: sticky;
+    top: 20px;
+    max-height: calc(100vh - 120px); 
+    overflow-y: auto; 
+  }
+
+  /* ✅ جعل حقلي الكمية والسعر أسفل اسم المنتج مباشرة */
   .product-input-card .form-grid {
     grid-template-columns: 1fr 1fr;
   }
@@ -543,26 +561,10 @@
   .product-input-card .form-group:first-child {
     grid-column: 1 / -1;
   }
-  /* ========================================================= */
-
-  .page-header { grid-area: header; margin-bottom: 0; }
-  .alert-error, .alert-success { grid-area: alerts; }
-  .card-supplier { grid-area: supplier; }
-  .card-fields { grid-area: fields; }
-  .card-summary { grid-area: summary; }
-  .card-actions { grid-area: actions; margin-bottom: 0; padding-bottom: 0; }
-  
-  .card-added { 
-    grid-area: cart; 
-    position: sticky;
-    top: 20px;
-    max-height: calc(100vh - 120px); 
-    overflow-y: auto; 
-  }
 }
 
 /* ============================================
-   ✅ إصلاح التمرير داخل Workspace (الجزء الأول)
+   ✅ إصلاح التمرير داخل Workspace 
    ============================================ */
 html.in-iframe, html.in-iframe body {
   height: 100% !important;
