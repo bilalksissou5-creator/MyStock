@@ -311,9 +311,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       qtyInput.value = '1';
       skuInput.value = value;
       scannedImageUrl = localProduct.image_url || null;
-      nameInput.focus(); 
-      // ✅ التعديل الأول لمنع كسر التصميم
-      nameInput.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); 
+      // ✅ تم إزالة أوامر التمرير والتركيز التلقائي هنا
       return;
     }
 
@@ -332,18 +330,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (p.image_url) scannedImageUrl = p.image_url;
         skuInput.value = value;
         qtyInput.value = '1';
-        nameInput.focus(); 
-        // ✅ التعديل الثاني لمنع كسر التصميم
-        nameInput.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); 
+        // ✅ تم إزالة أوامر التمرير والتركيز التلقائي هنا
         return;
       }
     } catch (err) { console.warn('Open Food Facts error:', err); }
 
     skuInput.value = value;
     scannedImageUrl = null;
-    nameInput.focus(); 
-    // ✅ التعديل الثالث لمنع كسر التصميم
-    nameInput.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); 
+    // ✅ تم إزالة أوامر التمرير والتركيز التلقائي هنا
   }
 
   scanBtn.addEventListener('click', startScanner);
@@ -448,7 +442,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       priceInput.value = '0';
       skuInput.value = '';
       scannedImageUrl = null;
-      nameInput.focus();
+      // ✅ تم إزالة أمر التركيز التلقائي هنا بعد إضافة المنتج
       renderAddedProducts();
     } finally {
       doneBtn.dataset.busy = '';
