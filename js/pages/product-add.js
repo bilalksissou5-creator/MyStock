@@ -150,7 +150,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         <div class="scanner-actions">
           <button type="button" class="scanner-flip" id="scanner-flip">
             <i class="fas fa-camera-rotate"></i>
-            <span>قلب الكاميرا</span>
           </button>
         </div>
 
