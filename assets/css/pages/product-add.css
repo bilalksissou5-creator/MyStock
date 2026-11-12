@@ -215,7 +215,6 @@
 
 .summary-row span { font-size: 11px; color: #737373; }
 
-/* ✅ حجم الخط 15px */
 .summary-row strong { 
   font-size: 15px; 
   font-weight: 700; 
@@ -227,12 +226,11 @@
   font-size: 15px; 
 }
 
-/* ✅ تقليل المسافة السفلية للأزرار */
 .form-actions { 
   display: flex; 
   gap: 10px; 
-  margin-bottom: 16px; /* كان 40px */
-  padding-bottom: 0; /* كان 20px */
+  margin-bottom: 16px; 
+  padding-bottom: 0; 
 }
 .workspace-iframe .form-actions { position: relative; z-index: 10; }
 
@@ -250,7 +248,6 @@
    ✅ تصميم الهواتف 
    ============================================ */
 @media (max-width: 699px) {
-  /* ✅ تقليل المسافة السفلية للحاوية الرئيسية لتختفي المساحة البيضاء */
   .main {
     padding-bottom: 16px !important; 
   }
@@ -281,7 +278,7 @@
 }
 
 /* ============================================
-   ✅ التصميم الشبكي للشاشات الكبيرة (تثبيت الهيدر بشكل مثالي)
+   ✅ التصميم الشبكي للشاشات الكبيرة
    ============================================ */
 @media (min-width: 700px) {
   .main {
@@ -336,6 +333,7 @@
     flex-direction: column;
     min-height: 0;
     margin-bottom: 0;
+    margin-top: 0; /* ✅ ضمان عدم وجود أي هامش علوي */
     box-sizing: border-box;
   }
 
@@ -375,14 +373,15 @@
   .stat-mini span { font-size: 9px; }
   .stat-mini b { font-size: 11px; }
 
+  /* ✅ إصلاح محاذاة الهيدر مع بطاقة السلة (إزالة الهوامش السالبة) */
   .form-left-col .page-header {
     position: sticky;
     top: 0;
     background: #f5f5f5; 
     z-index: 100; 
-    padding-top: 8px; 
+    padding-top: 0; 
+    margin-top: 0; 
     padding-bottom: 16px; 
-    margin-top: -8px; 
     margin-bottom: -16px; 
   }
 }
