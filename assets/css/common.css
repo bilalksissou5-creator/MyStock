@@ -322,7 +322,7 @@ h6 { font-size: 0.8125rem; font-weight: 600; color: #404040; } /* 13px */
    Sidebar
    ============================================ */
 .sidebar {
-  width: 200px;
+  width: 170px;
   min-width: 0;
   background: #fff;
   border-inline-start: 1px solid #e5e5e5;
