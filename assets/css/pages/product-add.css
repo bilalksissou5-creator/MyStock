@@ -1,6 +1,6 @@
 /* ============================================
    صفحة إضافة منتجات
-   ✅ تصميم مستقل للشاشات الكبيرة (سكرول منفصل) مع الحفاظ على تصميم الهاتف
+   ✅ تصميم مستقل للشاشات الكبيرة (سكرول منفصل) مع خط فاصل
    ============================================ */
 
 .add-form {
@@ -193,32 +193,53 @@
 }
 
 /* ============================================
-   ✅ التصميم الشبكي للشاشات الكبيرة (سكرول مستقل)
+   ✅ التصميم الشبكي للشاشات الكبيرة (سكرول مستقل + خط فاصل)
    ============================================ */
 @media (min-width: 700px) {
   .add-form {
     max-width: 1100px;
     display: grid;
     grid-template-columns: 1fr 1.5fr;
-    gap: 16px;
+    gap: 16px; /* المسافة بين القسمين 16px */
     height: calc(100vh - 100px); 
-    /* ✅ تم إزالة align-items: start; لتمتد الأعمدة وتعمل السكرول بشكل صحيح */
     overflow: hidden;
   }
 
-  /* ✅ إزالة الحشوة الجانبية من العمود الأول لضمان أن المسافة 16px بالضبط */
+  /* ✅ القسم الأول */
   .form-left-col {
     height: 100%;
     overflow-y: auto; 
     padding-bottom: 20px;
+    padding-inline-end: 16px; /* مساحة لشريط التمرير */
+    border-inline-end: 1px solid #e5e5e5; /* الخط الفاصل في المنتصف */
   }
 
-  /* ✅ الحفاظ على الحشوة في العمود الثاني فقط لإبعاد المحتوى عن شريط التمرير */
+  /* ✅ القسم الثاني */
   .form-right-col {
     height: 100%;
     overflow-y: auto; 
-    padding-inline-end: 8px; 
+    padding-inline-start: 16px; /* إبعاد المحتوى عن الخط الفاصل */
     padding-bottom: 20px;
+    padding-inline-end: 8px; 
+  }
+
+  /* ✅ تخصيص شكل شريط التمرير ليكون رفيعاً وأنيقاً (مثل خط رفيع) */
+  .form-left-col::-webkit-scrollbar,
+  .form-right-col::-webkit-scrollbar {
+    width: 6px;
+  }
+  .form-left-col::-webkit-scrollbar-track,
+  .form-right-col::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .form-left-col::-webkit-scrollbar-thumb,
+  .form-right-col::-webkit-scrollbar-thumb {
+    background: #d4d4d4;
+    border-radius: 10px;
+  }
+  .form-left-col::-webkit-scrollbar-thumb:hover,
+  .form-right-col::-webkit-scrollbar-thumb:hover {
+    background: #a3a3a3;
   }
 
   .card-added {
