@@ -524,34 +524,37 @@
 }
 
 /* ============================================
-   ✅ التصميم الشبكي للشاشات الكبيرة
+   ✅ التصميم الشبكي للشاشات الكبيرة (الحل الجذري للمسافات)
    ============================================ */
 @media (min-width: 700px) {
   .add-form {
     max-width: 1100px;
     display: grid;
     grid-template-columns: 1fr 1fr;
+    grid-template-areas:
+      "header ."
+      "alerts ."
+      "supplier ."
+      "fields ."
+      "summary ."
+      "actions .";
     align-items: start;
-    gap: 16px;
+    column-gap: 16px;
+    row-gap: 0; /* ✅ إزالة الفراغات بين الصفوف وتعويضها بالهوامش */
   }
 
-  .page-header,
-  .alert-error,
-  .alert-success,
-  .card-supplier,
-  .card-fields,
-  .card-summary,
-  .card-actions {
-    grid-column: 1;
-  }
+  /* توزيع العناصر على المناطق المحددة */
+  .page-header { grid-area: header; margin-bottom: 16px; }
+  .alert-error, .alert-success { grid-area: alerts; margin-bottom: 16px; }
+  .card-supplier { grid-area: supplier; margin-bottom: 16px; }
+  .card-fields { grid-area: fields; margin-bottom: 16px; }
+  .card-summary { grid-area: summary; margin-bottom: 16px; }
+  .card-actions { grid-area: actions; margin-bottom: 0; padding-bottom: 0; }
 
-  .page-header { margin-bottom: 0; }
-  .card-actions { margin-bottom: 0; padding-bottom: 0; }
-
+  /* ✅ السلة تبدأ من الصف الثالث (نفس صف المورد) وتمتد للأسفل */
   .card-added { 
     grid-column: 2;
-    /* ✅ جعل السلة تبدأ من نفس مستوى بطاقة المورد */
-    grid-row: 2 / -1; 
+    grid-row: 3 / -1; 
     position: sticky;
     top: 20px;
     max-height: calc(100vh - 120px); 
