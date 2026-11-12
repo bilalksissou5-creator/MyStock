@@ -8,7 +8,7 @@
   margin: 0 auto;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 12px;
 }
 
 .product-input-card {
@@ -22,7 +22,7 @@
   display: grid;
   grid-template-columns: 2fr 1fr 1fr;
   gap: 12px;
-  margin-bottom: 0px;
+  margin-bottom: 12px;
 }
 
 .product-input-card .form-group {
@@ -32,7 +32,7 @@
 .add-product-btn {
   width: 100%;
   justify-content: center;
-  margin-top: 0px;
+  margin-top: 0;
 }
 
 .scan-btn {
@@ -528,7 +528,7 @@
       "summary cart"
       "actions cart";
     align-items: start;
-    gap: 20px;
+    gap: 12px;
   }
 
   .page-header { grid-area: header; margin-bottom: 0; }
