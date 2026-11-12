@@ -187,7 +187,7 @@
   color: #dc2626; 
 }
 
-/* ✅ إصلاح شبكة الملخص وتعديل حجم الخط إلى 18px */
+/* ✅ شبكة الملخص */
 .form-summary { 
   background: white; 
   border-radius: 10px; 
@@ -215,16 +215,16 @@
 
 .summary-row span { font-size: 11px; color: #737373; }
 
-/* ✅ تعديل حجم الخط هنا إلى 18px */
+/* ✅ تم تعديل حجم الخط هنا إلى 15px */
 .summary-row strong { 
-  font-size: 18px; 
+  font-size: 15px; 
   font-weight: 700; 
   color: #171717; 
 }
 
 .summary-row.highlight strong { 
   color: white; 
-  font-size: 18px; 
+  font-size: 15px; 
 }
 
 .form-actions { display: flex; gap: 10px; margin-bottom: 40px; padding-bottom: 20px; }
