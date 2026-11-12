@@ -3,7 +3,7 @@
 // ✅ اكتشاف تلقائي ودقيق للبلد (IP -> لغة المتصفح -> افتراضي)
 // ✅ استخدام صور أعلام حقيقية (flagcdn)
 // ✅ مفتاح الدولة (Dial Code) ديناميكي ودمجه مع رقم الهاتف
-// ✅ منع Enter/Go/Done من إرسال الفورم
+// ✅ إصلاح مشكلة اختفاء اسم البلد
 // ============================================
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -39,7 +39,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       const saved = localStorage.getItem('app_country');
       if (saved && window.countries?.[saved]) return saved;
 
-      // الأولوية 2: تحديد الموقع عبر IP (الأدق لأن المستخدم قد يكون في المغرب وهاتفه بالإنجليزية)
+      // الأولوية 2: تحديد الموقع عبر IP
       try {
         const controller = new AbortController();
         const timeout = setTimeout(() => controller.abort(), 2000);
@@ -58,14 +58,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         console.warn("فشل تحديد الدولة عبر IP، سيتم استخدام لغة المتصفح.");
       }
 
-      // الأولوية 3: لغة المتصفح (مثلاً ar-MA تعني المغرب)
+      // الأولوية 3: لغة المتصفح
       const browserRegion = (navigator.language || '').split('-')[1];
       if (browserRegion && window.countries?.[browserRegion.toUpperCase()]) {
         console.log('🌍 تم اكتشاف البلد عبر لغة المتصفح:', browserRegion);
         return browserRegion.toUpperCase();
       }
 
-      // الأولوية 4: الافتراضي (المغرب)
+      // الأولوية 4: الافتراضي
       console.log('🌍 تم اختيار البلد الافتراضي: MA');
       return 'MA';
     }
@@ -85,7 +85,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       countryDropdown.innerHTML = Object.keys(countriesObj).map(code => {
         const c = countriesObj[code];
         const name = c[currentLangCode] || c.ar;
-        const nameText = name.replace(/\p{Emoji}/gu, '').trim(); // إزالة الإيموجي من النص
+        // إزالة الإيموجي من النص
+        const nameText = name.replace(/[\u{1F1E6}-\u{1F1FF}]/gu, '').trim();
 
         return `
           <button type="button" class="picker-option" data-country="${code}">
@@ -112,12 +113,17 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (!selectedCountry) return;
       
       const name = window.tCountry ? window.tCountry(selectedCountry) : selectedCountry;
-      const nameText = name.replace(/\p{Emoji}/gu, '').trim();
+      // إزالة إيموجي العلم بأمان
+      const nameText = name.replace(/[\u{1F1E6}-\u{1F1FF}]/gu, '').trim();
+      
       const flagImgHtml = `<img src="${getFlagUrl(selectedCountry)}" class="picker-flag-img" alt="${selectedCountry}">`;
 
       // تحديث قائمة البلد
       countryFlag.innerHTML = flagImgHtml;
       countryName.textContent = nameText;
+      // ✅ إزالة مراقبة الترجمة لهذا العنصر لكي لا يمسح الاسم
+      countryName.removeAttribute('data-i18n'); 
+      
       countryCodeInput.value = selectedCountry;
       localStorage.setItem('app_country', selectedCountry);
 
@@ -204,7 +210,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // ✅ دمج مفتاح الدولة مع الرقم المحلي
     const dialCode = phoneDialCode ? phoneDialCode.textContent.trim() : '';
     const localPhone = phoneInput ? phoneInput.value.trim() : '';
-    // إزالة الأصفار من بداية الرقم المحلي إذا كان المستخدم قد كتبها (لتجنب +2120600...)
+    // إزالة الأصفار من بداية الرقم المحلي
     const cleanLocalPhone = localPhone.startsWith('0') ? localPhone.substring(1) : localPhone;
     const phone = dialCode + cleanLocalPhone; 
     

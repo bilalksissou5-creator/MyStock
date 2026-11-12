@@ -7,6 +7,7 @@
 
   <meta name="robots" content="noindex, nofollow">
 
+  <!-- ✅ تطبيق اللغة والاتجاه فوراً قبل أي CSS لمنع وميض اللغة -->
   <script>
     (function() {
       var lang = localStorage.getItem('app_lang') || 'ar';
@@ -51,7 +52,8 @@
       <div class="picker" id="country-picker">
         <button type="button" class="picker-trigger" id="country-trigger">
           <span class="picker-flag" id="country-flag"></span>
-          <span class="picker-name" id="country-name" data-i18n="welcome_select_country">-- اختر البلد --</span>
+          <!-- ✅ تم إزالة data-i18n من هنا لكي لا يتدخل ملف الترجمة -->
+          <span class="picker-name" id="country-name">-- اختر البلد --</span>
           <i class="fas fa-chevron-down picker-arrow"></i>
         </button>
         <div class="picker-dropdown" id="country-dropdown"></div>
@@ -59,7 +61,7 @@
       <input type="hidden" id="country_code" name="country_code">
     </div>
 
-    <!-- ✅ حقل رقم الهاتف الموحد (علم + مفتاح + رقم) -->
+    <!-- ✅ حقل رقم الهاتف الموحد -->
     <div class="form-group">
       <label data-i18n="register_phone">رقم الهاتف *</label>
       <div class="phone-input-wrapper">

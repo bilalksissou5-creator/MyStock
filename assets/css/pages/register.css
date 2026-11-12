@@ -222,7 +222,7 @@ body.register-page {
   border-color: #171717;
 }
 
-/* ✅ تنسيق صورة العلم داخل القائمة */
+/* ✅ تنسيق صورة العلم */
 .register-page .picker-flag-img {
   width: 24px;
   height: 18px;
@@ -320,7 +320,6 @@ body.register-page {
   border-color: #171717;
 }
 
-/* مربع العلم داخل حقل الهاتف */
 .register-page .phone-flag {
   display: flex;
   align-items: center;
@@ -331,7 +330,6 @@ body.register-page {
   height: 42px;
 }
 
-/* مفتاح الدولة (مثل +212) */
 .register-page .phone-dial-code {
   display: flex;
   align-items: center;
@@ -345,7 +343,6 @@ body.register-page {
   user-select: none;
 }
 
-/* حقل إدخال الرقم */
 .register-page .phone-input-wrapper input {
   border: none !important;
   border-radius: 0 !important;
