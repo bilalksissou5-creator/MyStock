@@ -88,23 +88,87 @@
 .empty-added i { font-size: 2rem; margin-bottom: 8px; color: #d4d4d4; display: block; }
 .empty-added p { font-size: 13px; }
 
-.added-product-card { display: grid; grid-template-columns: 48px minmax(0, 1fr) auto auto; gap: 12px; align-items: center; padding: 12px; background: #fafafa; border-radius: 10px; border: 1px solid #f0f0f0; transition: background 0.15s; max-width: 100%; box-sizing: border-box; }
+/* ✅ تعديل بطاقة المنتج لتكون على سطرين (تمنع قطع النص) */
+.added-product-card { 
+  display: grid; 
+  grid-template-columns: 48px minmax(0, 1fr) auto; 
+  grid-template-areas: 
+    "img info delete"
+    "img stats stats";
+  gap: 8px 12px; 
+  align-items: center; 
+  padding: 12px; 
+  background: #fafafa; 
+  border-radius: 10px; 
+  border: 1px solid #f0f0f0; 
+  transition: background 0.15s; 
+  max-width: 100%; 
+  box-sizing: border-box;
+}
+
 .added-product-card:hover { background: #f5f5f5; }
-.added-product-image { width: 48px; height: 48px; border-radius: 8px; background: white; display: flex; align-items: center; justify-content: center; flex-shrink: 0; border: 1px solid #e5e5e5; overflow: hidden; }
+
+.added-product-image { 
+  grid-area: img; 
+  align-self: start; 
+  width: 48px; 
+  height: 48px; 
+  border-radius: 8px; 
+  background: white; 
+  display: flex; 
+  align-items: center; 
+  justify-content: center; 
+  flex-shrink: 0; 
+  border: 1px solid #e5e5e5; 
+  overflow: hidden; 
+}
+
 .added-product-image img { width: 100%; height: 100%; object-fit: cover; }
 .added-product-image i { color: #a3a3a3; font-size: 20px; }
-.added-product-info { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+
+.added-product-info { 
+  grid-area: info; 
+  display: flex; 
+  flex-direction: column; 
+  gap: 2px; 
+  min-width: 0; 
+}
+
 .added-product-info strong { font-size: 14px; font-weight: 600; color: #171717; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .added-product-info span { font-size: 11px; color: #737373; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-.added-product-stats { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+.added-product-stats { 
+  grid-area: stats; 
+  display: flex; 
+  gap: 6px; 
+  flex-wrap: wrap; 
+  justify-content: flex-start; 
+  margin-top: 4px;
+}
+
 .stat-mini { display: flex; flex-direction: column; align-items: center; padding: 6px 8px; background: white; border-radius: 6px; min-width: 50px; border: 1px solid #f0f0f0; }
 .stat-mini.highlight { background: #171717; border-color: #171717; }
 .stat-mini span { font-size: 10px; color: #737373; margin-bottom: 2px; }
 .stat-mini.highlight span { color: #d4d4d4; }
 .stat-mini b { font-size: 12px; font-weight: 700; color: #171717; }
 .stat-mini.highlight b { color: white; }
-.added-product-delete { background: none; border: none; color: #d4d4d4; cursor: pointer; padding: 6px; border-radius: 6px; font-size: 14px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: color 0.15s, background 0.15s; }
+
+.added-product-delete { 
+  grid-area: delete; 
+  align-self: start; 
+  background: none; 
+  border: none; 
+  color: #d4d4d4; 
+  cursor: pointer; 
+  padding: 6px; 
+  border-radius: 6px; 
+  font-size: 14px; 
+  display: flex; 
+  align-items: center; 
+  justify-content: center; 
+  flex-shrink: 0; 
+  transition: color 0.15s, background 0.15s; 
+}
 .added-product-delete:hover, .added-product-delete:active { color: #dc2626; background: #fee2e2; }
 
 .form-summary { background: white; border-radius: 10px; padding: 16px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06); display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
@@ -148,14 +212,14 @@
   .product-input-card .form-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
   .product-input-card .form-group:first-child { grid-column: 1 / -1; }
   
-  .added-product-card { display: grid; grid-template-columns: 44px 1fr 32px; grid-template-rows: auto auto; gap: 10px 8px; padding: 12px 10px; align-items: center; }
-  .added-product-image { grid-column: 1; grid-row: 1 / 3; width: 44px; height: 44px; align-self: start; }
-  .added-product-info { grid-column: 2; grid-row: 1; min-width: 0; text-align: right; }
-  .added-product-info strong { font-size: 13px; }
-  .added-product-info span { font-size: 10px; }
-  .added-product-delete { grid-column: 3; grid-row: 1; align-self: start; width: 32px; height: 32px; padding: 0; }
-  .added-product-stats { grid-column: 1 / -1; grid-row: 2; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; width: 100%; margin-top: 4px; }
-  .stat-mini { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 6px 4px; min-width: 0; width: 100%; box-sizing: border-box; }
+  .added-product-card { 
+    grid-template-columns: 44px minmax(0, 1fr) 32px; 
+    gap: 8px; 
+  }
+  .added-product-image { width: 44px; height: 44px; }
+  .added-product-delete { width: 32px; height: 32px; padding: 0; }
+  .added-product-stats { grid-column: 1 / -1; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; width: 100%; }
+  .stat-mini { padding: 6px 4px; min-width: 0; width: 100%; box-sizing: border-box; }
   .stat-mini span { font-size: 9px; margin-bottom: 2px; }
   .stat-mini b { font-size: 11px; }
 
@@ -181,7 +245,6 @@
   }
 
   .add-form {
-    /* ✅ إزالة التوسيط والحد الأقصى للعرض ليتمدد ليملأ الشاشة */
     max-width: 100%; 
     width: 100%;
     margin: 0;
@@ -239,11 +302,25 @@
   .product-input-card .form-grid { grid-template-columns: 1fr 1fr; }
   .product-input-card .form-group:first-child { grid-column: 1 / -1; }
 
-  .added-product-card { gap: 8px; padding: 10px; }
+  .added-product-card { 
+    grid-template-columns: 40px minmax(0, 1fr) auto; 
+    padding: 10px;
+  }
   .added-product-image { width: 40px; height: 40px; }
   .stat-mini { min-width: 45px; padding: 4px 6px; }
   .stat-mini span { font-size: 9px; }
   .stat-mini b { font-size: 11px; }
+
+  /* ✅ تثبيت الهيدر (Add Products + Scan) ليبقى دائماً في الأعلى عند التمرير */
+  .form-left-col .page-header {
+    position: sticky;
+    top: 0;
+    background: #f5f5f5; /* مطابق للون الخلفية ليكون متصلاً */
+    z-index: 20;
+    padding-top: 8px;
+    padding-bottom: 8px;
+    margin-top: -8px; /* لضبط الإزاحة عند التثبيت */
+  }
 }
 
 /* ============================================
