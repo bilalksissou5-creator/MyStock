@@ -169,21 +169,20 @@
 }
 
 /* ============================================
-   ✅ التصميم الشبكي للشاشات الكبيرة (سكرول مستقل تماماً)
+   ✅ التصميم الشبكي للشاشات الكبيرة (تحويل إلى Flexbox لضمان الارتفاع)
    ============================================ */
 @media (min-width: 700px) {
   .add-form {
     max-width: 1100px;
-    display: grid;
-    grid-template-columns: 1fr 1.5fr;
-    grid-template-rows: minmax(0, 1fr); /* ✅ السطر السحري الذي يحل مشكلة القطع نهائياً */
+    display: flex; /* ✅ تغيير من grid إلى flex */
+    flex-direction: row; /* ✅ جعل الأعمدة بجانب بعضها */
     gap: 0; 
-    overflow: hidden;
-    min-height: 0;
     height: 100%; 
+    overflow: hidden;
   }
 
   .form-left-col {
+    flex: 1; /* ✅ القسم الأول أصغر (40%) */
     height: 100%; 
     min-height: 0;
     overflow-y: auto; 
@@ -195,6 +194,7 @@
   }
 
   .form-right-col {
+    flex: 1.5; /* ✅ القسم الثاني أكبر (60%) */
     height: 100%; 
     min-height: 0;
     overflow-y: auto; 
