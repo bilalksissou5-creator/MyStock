@@ -169,20 +169,30 @@
 }
 
 /* ============================================
-   ✅ التصميم الشبكي للشاشات الكبيرة (تحويل إلى Flexbox لضمان الارتفاع)
+   ✅ التصميم الشبكي للشاشات الكبيرة (سكرول مستقل تماماً)
    ============================================ */
 @media (min-width: 700px) {
+  /* ✅ التعديل السحري: التحكم في الحاوية الرئيسية لمنع تداخل السكرول */
+  .main {
+    overflow: hidden !important;
+    padding: 16px !important;
+    height: 100vh !important;
+    box-sizing: border-box !important;
+    padding-bottom: 16px !important;
+  }
+
   .add-form {
     max-width: 1100px;
-    display: flex; /* ✅ تغيير من grid إلى flex */
-    flex-direction: row; /* ✅ جعل الأعمدة بجانب بعضها */
+    margin: 0 auto;
+    display: flex; 
+    flex-direction: row; 
     gap: 0; 
     height: 100%; 
     overflow: hidden;
   }
 
   .form-left-col {
-    flex: 1; /* ✅ القسم الأول أصغر (40%) */
+    flex: 1; 
     height: 100%; 
     min-height: 0;
     overflow-y: auto; 
@@ -194,7 +204,7 @@
   }
 
   .form-right-col {
-    flex: 1.5; /* ✅ القسم الثاني أكبر (60%) */
+    flex: 1.5; 
     height: 100%; 
     min-height: 0;
     overflow-y: auto; 
