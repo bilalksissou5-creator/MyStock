@@ -187,13 +187,45 @@
   color: #dc2626; 
 }
 
-.form-summary { background: white; border-radius: 10px; padding: 16px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06); display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-.summary-row { display: flex; flex-direction: column; gap: 4px; text-align: center; padding: 10px; border-radius: 8px; background: #fafafa; }
+/* ✅ إصلاح شبكة الملخص وتعديل حجم الخط إلى 18px */
+.form-summary { 
+  background: white; 
+  border-radius: 10px; 
+  padding: 12px; 
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06); 
+  display: grid; 
+  grid-template-columns: repeat(3, minmax(0, 1fr)); 
+  gap: 8px; 
+}
+
+.summary-row { 
+  display: flex; 
+  flex-direction: column; 
+  gap: 4px; 
+  text-align: center; 
+  padding: 10px 4px; 
+  border-radius: 8px; 
+  background: #fafafa; 
+  min-width: 0; 
+  box-sizing: border-box;
+}
+
 .summary-row.highlight { background: #171717; color: white; }
 .summary-row.highlight span { color: #d4d4d4; }
-.summary-row.highlight strong { color: white; font-size: 1.4rem; }
-.summary-row span { font-size: 12px; color: #737373; }
-.summary-row strong { font-size: 1.1rem; font-weight: 700; color: #171717; }
+
+.summary-row span { font-size: 11px; color: #737373; }
+
+/* ✅ تعديل حجم الخط هنا إلى 18px */
+.summary-row strong { 
+  font-size: 18px; 
+  font-weight: 700; 
+  color: #171717; 
+}
+
+.summary-row.highlight strong { 
+  color: white; 
+  font-size: 18px; 
+}
 
 .form-actions { display: flex; gap: 10px; margin-bottom: 40px; padding-bottom: 20px; }
 .workspace-iframe .form-actions { position: relative; z-index: 10; }
@@ -332,16 +364,15 @@
   .stat-mini span { font-size: 9px; }
   .stat-mini b { font-size: 11px; }
 
-  /* ✅ تثبيت الهيدر بشكل مثالي (خلفية صلبة + طبقة عليا) */
   .form-left-col .page-header {
     position: sticky;
     top: 0;
-    background: #f5f5f5; /* ✅ لون مطابق للخلفية ليغطي العناصر */
-    z-index: 100; /* ✅ طبقة عليا لمنع تداخل البطاقات */
+    background: #f5f5f5; 
+    z-index: 100; 
     padding-top: 8px; 
-    padding-bottom: 16px; /* مساحة سفلية لتفصل الهيدر عن البطاقة */
+    padding-bottom: 16px; 
     margin-top: -8px; 
-    margin-bottom: -16px; /* إلغاء مسافة الـ gap لتبدو المسافة متساوية */
+    margin-bottom: -16px; 
   }
 }
 
