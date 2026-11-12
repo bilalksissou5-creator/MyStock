@@ -22,7 +22,7 @@
   display: grid;
   grid-template-columns: 2fr 1fr 1fr;
   gap: 12px;
-  margin-bottom: 12px;
+  margin-bottom: 0px;
 }
 
 .product-input-card .form-group {
