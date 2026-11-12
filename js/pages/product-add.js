@@ -263,7 +263,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     scannerHint.textContent = tr('prod_add_scan_hint');
     try {
       html5QrCode = new Html5Qrcode("scanner-reader");
-      const qrSize = Math.max(120, Math.min(180, Math.floor(window.innerWidth * 0.6)));
+      const qrSize = Math.max(125, Math.min(180, Math.floor(window.innerWidth * 0.6)));
       const config = { fps: 10, qrbox: { width: qrSize, height: qrSize }, aspectRatio: 1.0 };
       await html5QrCode.start({ facingMode: "environment" }, config,
         async (decodedText) => {
