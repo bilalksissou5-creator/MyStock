@@ -279,14 +279,13 @@
 }
 
 /* ============================================
-   ✅ التصميم الشبكي للشاشات الكبيرة (تمديد العناصر للأسفل)
+   ✅ التصميم الشبكي للشاشات الكبيرة (إصلاح الارتفاع)
    ============================================ */
 @media (min-width: 700px) {
-  /* ✅ إجبار الحاوية الرئيسية على أخذ كامل الارتفاع وتوزيع المساحات */
   .main {
     overflow: hidden !important;
     padding: 16px !important;
-    height: 100vh !important; 
+    height: 100% !important; /* ✅ استخدام 100% بدلاً من 100vh ليتكيف مع شريط المتصفح */
     box-sizing: border-box !important;
     padding-bottom: 16px !important;
     display: flex;
@@ -300,8 +299,8 @@
     display: flex; 
     flex-direction: row; 
     gap: 0; 
-    flex: 1; /* ✅ التمدد لملء المساحة المتبقية */
-    min-height: 0; /* ✅ ضروري لعمل السكرول الداخلي */
+    flex: 1;
+    min-height: 0; 
     overflow: hidden;
   }
 
@@ -311,7 +310,7 @@
     min-height: 0;
     overflow-y: auto; 
     overflow-x: hidden; 
-    padding-bottom: 20px;
+    padding-bottom: 32px; /* ✅ زيادة الحشوة السفلية لضمان ظهور الزر بالكامل */
     padding-inline-end: 9px; 
     border-inline-end: 1px solid #e5e5e5;
     box-sizing: border-box;
@@ -332,7 +331,7 @@
   }
 
   .card-added {
-    flex: 1; /* ✅ البطاقة تتمدد لتملأ العمود بالكامل */
+    flex: 1; 
     display: flex;
     flex-direction: column;
     min-height: 0;
@@ -347,6 +346,7 @@
     overflow-x: hidden; 
     margin-inline-end: -16px; 
     padding-inline-end: 12px; 
+    padding-bottom: 16px;
   }
 
   .form-left-col::-webkit-scrollbar,
@@ -376,7 +376,6 @@
   .stat-mini span { font-size: 9px; }
   .stat-mini b { font-size: 11px; }
 
-  /* ✅ تثبيت الهيدر بشكل مثالي (بدون هوامش سالبة) */
   .form-left-col .page-header {
     position: sticky;
     top: 0;
