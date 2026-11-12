@@ -89,7 +89,7 @@
 .empty-added i { font-size: 2rem; margin-bottom: 8px; color: #d4d4d4; display: block; }
 .empty-added p { font-size: 13px; }
 
-/* ✅ تعديل البطاقة: إضافة حشوة من اليمين لإبعاد الإحصائيات عن الزاوية */
+/* ✅ بطاقة المنتج: إضافة مساحة من الأعلى لتفريغ الزاوية للزر */
 .added-product-card { 
   position: relative; 
   display: grid; 
@@ -97,7 +97,7 @@
   gap: 10px; 
   align-items: center; 
   padding: 12px; 
-  padding-inline-end: 32px; /* ✅ إضافة مساحة إضافية من اليمين لزر الحذف */
+  padding-top: 28px; /* ✅ مساحة علوية لكي لا يتداخل الزر مع المحتوى */
   background: #fafafa; 
   border-radius: 10px; 
   border: 1px solid #f0f0f0; 
@@ -160,25 +160,26 @@
 .stat-mini b { font-size: 11px; font-weight: 700; color: #171717; }
 .stat-mini.highlight b { color: white; }
 
-/* ✅ زر الحذف في الزاوية العلوية بحرية تامة */
+/* ✅ زر الحذف في الزاوية العلوية اليمنى داخل البطاقة */
 .added-product-delete { 
   position: absolute; 
-  top: 6px; 
-  inset-inline-end: 6px; 
-  background: none; 
+  top: 6px; /* مسافة من الحافة العلوية */
+  inset-inline-end: 6px; /* مسافة من الحافة اليمنى (داخل البطاقة) */
+  background: transparent; 
   border: none; 
-  color: #d4d4d4; 
+  color: #a3a3a3; 
   cursor: pointer; 
   padding: 0; 
-  width: 24px;
-  height: 24px;
-  border-radius: 6px; 
+  width: 20px;
+  height: 20px;
+  border-radius: 4px; 
   font-size: 14px; 
   display: flex; 
   align-items: center; 
   justify-content: center; 
   flex-shrink: 0; 
   transition: color 0.15s, background 0.15s; 
+  z-index: 10;
 }
 
 .added-product-delete:hover, 
@@ -310,7 +311,7 @@
   .added-product-card { 
     grid-template-columns: 40px minmax(0, 1fr) auto; 
     padding: 10px;
-    padding-inline-end: 30px; /* ✅ مساحة لزر الحذف في الشاشات الكبيرة */
+    padding-top: 24px; /* ✅ الحفاظ على المساحة في الشاشات الكبيرة */
   }
   .added-product-image { width: 40px; height: 40px; }
   .stat-mini { min-width: 45px; padding: 4px 6px; }
