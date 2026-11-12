@@ -550,7 +550,8 @@
 
   .card-added { 
     grid-column: 2;
-    /* ✅ تم حذف grid-row التي كانت تسبب الفراغ الكبير */
+    /* ✅ جعل السلة تبدأ من نفس مستوى بطاقة المورد */
+    grid-row: 2 / -1; 
     position: sticky;
     top: 20px;
     max-height: calc(100vh - 120px); 
