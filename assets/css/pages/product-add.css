@@ -46,7 +46,6 @@
   margin-bottom: 0;
 }
 
-/* ✅ إضافة scroll-margin-top لمنع انكسار التصميم عند التمرير التلقائي من كاميرا Scan */
 .product-input-card input,
 .product-input-card select,
 .product-input-card textarea {
@@ -90,10 +89,11 @@
 .empty-added i { font-size: 2rem; margin-bottom: 8px; color: #d4d4d4; display: block; }
 .empty-added p { font-size: 13px; }
 
-/* ✅ بطاقة المنتج في صف واحد (أفقي) لجميع الشاشات */
+/* ✅ تعديل البطاقة لتصبح relative وإزالة العمود المخصص لزر الحذف */
 .added-product-card { 
+  position: relative; /* ✅ ضروري لكي يطفو الزر فوق البطاقة */
   display: grid; 
-  grid-template-columns: 44px minmax(0, 1fr) auto auto; 
+  grid-template-columns: 44px minmax(0, 1fr) auto; /* ✅ تم إزالة auto الأخيرة الخاصة بالزر */
   gap: 10px; 
   align-items: center; 
   padding: 12px; 
@@ -129,6 +129,7 @@
   gap: 2px; 
   min-width: 0; 
   text-align: start;
+  padding-inline-end: 24px; /* ✅ مساحة صغيرة لكي لا يتداخل النص مع الزر */
 }
 
 .added-product-info strong { font-size: 13px; font-weight: 600; color: #171717; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -159,14 +160,18 @@
 .stat-mini b { font-size: 11px; font-weight: 700; color: #171717; }
 .stat-mini.highlight b { color: white; }
 
+/* ✅ وضع زر الحذف في الزاوية العلوية */
 .added-product-delete { 
+  position: absolute; /* ✅ يطفو في الزاوية */
+  top: 6px; 
+  inset-inline-end: 6px; /* ✅ يتكيف مع اللغتين العربية والإنجليزية */
   background: none; 
   border: none; 
   color: #d4d4d4; 
   cursor: pointer; 
   padding: 0; 
-  width: 32px;
-  height: 32px;
+  width: 28px;
+  height: 28px;
   border-radius: 6px; 
   font-size: 14px; 
   display: flex; 
@@ -175,7 +180,12 @@
   flex-shrink: 0; 
   transition: color 0.15s, background 0.15s; 
 }
-.added-product-delete:hover, .added-product-delete:active { color: #dc2626; background: #fee2e2; }
+
+.added-product-delete:hover, 
+.added-product-delete:active { 
+  color: #dc2626; 
+  background: #fee2e2; 
+}
 
 .form-summary { background: white; border-radius: 10px; padding: 16px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06); display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
 .summary-row { display: flex; flex-direction: column; gap: 4px; text-align: center; padding: 10px; border-radius: 8px; background: #fafafa; }
@@ -298,7 +308,7 @@
   .product-input-card .form-group:first-child { grid-column: 1 / -1; }
 
   .added-product-card { 
-    grid-template-columns: 40px minmax(0, 1fr) auto auto; 
+    grid-template-columns: 40px minmax(0, 1fr) auto; /* ✅ تم إزالة auto الأخيرة هنا أيضاً */
     padding: 10px;
   }
   .added-product-image { width: 40px; height: 40px; }
@@ -306,7 +316,6 @@
   .stat-mini span { font-size: 9px; }
   .stat-mini b { font-size: 11px; }
 
-  /* ✅ التثبيت الصحيح للهيدر بدون أي مسافات علوية زائدة */
   .form-left-col .page-header {
     position: sticky;
     top: 0;
