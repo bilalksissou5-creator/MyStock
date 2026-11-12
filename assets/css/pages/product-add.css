@@ -325,7 +325,7 @@
     height: 100%; 
     min-height: 0;
     overflow: hidden; 
-    padding-inline-start: 7px; 
+    padding-inline-start: 8px; 
     padding-inline-end: 0; /* ✅ تم تغييرها من 8px إلى 0 لتصبح المسافة الإجمالية 16px فقط من .main */
     padding-bottom: 0; 
     box-sizing: border-box;
