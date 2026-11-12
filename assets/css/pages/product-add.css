@@ -39,10 +39,19 @@
 
 .product-input-card .form-group {
   margin-bottom: 16px;
+  min-width: 0; /* ✅ منع تجاوز العرض */
 }
 
 .product-input-card .form-grid .form-group {
   margin-bottom: 0;
+}
+
+/* ✅ ضمان عدم تجاوز المدخلات لعرض الحاوية */
+.product-input-card input,
+.product-input-card select,
+.product-input-card textarea {
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .add-product-btn {
@@ -168,35 +177,37 @@
     max-width: 1100px;
     display: grid;
     grid-template-columns: 1fr 1.5fr;
-    grid-template-rows: 1fr; /* ✅ السطر السحري: يمنع تمدد الصف ويجبر السكرول الداخلي على العمل */
+    grid-template-rows: 1fr; 
     gap: 0; 
-    height: 100%; 
+    /* ✅ تمت إزالة height: 100% والاعتماد على flex: 1 من iframe */
     overflow: hidden;
+    min-height: 0;
   }
 
   .form-left-col {
-    height: 100%;
+    /* ✅ تمت إزالة height: 100% */
+    min-height: 0;
     overflow-y: auto; 
+    overflow-x: hidden; /* ✅ منع الشريط الأفقي */
     padding-bottom: 20px;
     padding-inline-end: 9px; 
     border-inline-end: 1px solid #e5e5e5;
-    min-height: 0; 
     box-sizing: border-box;
   }
 
   .form-right-col {
-    height: 100%;
+    min-height: 0;
     overflow-y: auto; 
+    overflow-x: hidden; /* ✅ منع الشريط الأفقي */
     padding-inline-start: 7px; 
     padding-inline-end: 8px; 
     padding-bottom: 20px;
-    min-height: 0;
     box-sizing: border-box;
   }
 
   .form-left-col::-webkit-scrollbar,
   .form-right-col::-webkit-scrollbar {
-    width: 4px; /* زيادة السماكة قليلاً لتكون مرئية أكثر */
+    width: 4px; 
   }
   .form-left-col::-webkit-scrollbar-track,
   .form-right-col::-webkit-scrollbar-track {
