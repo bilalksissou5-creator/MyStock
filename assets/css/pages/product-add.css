@@ -1,6 +1,6 @@
 /* ============================================
    صفحة إضافة منتجات
-   ✅ تصميم مستقل للشاشات الكبيرة (سكرول منفصل تماماً)
+   ✅ تصميم مستقل للشاشات الكبيرة (سكرول داخل البطاقة)
    ============================================ */
 
 .add-form {
@@ -238,7 +238,7 @@
 }
 
 /* ============================================
-   ✅ التصميم الشبكي للشاشات الكبيرة (سكرول داخل البطاقة)
+   ✅ التصميم الشبكي للشاشات الكبيرة (تمديد البطاقة للارتفاع الكامل)
    ============================================ */
 @media (min-width: 700px) {
   .main {
@@ -257,6 +257,7 @@
     flex-direction: row; 
     gap: 0; 
     height: 100%; 
+    min-height: 0;
     overflow: hidden;
   }
 
@@ -272,25 +273,28 @@
     box-sizing: border-box;
   }
 
-  /* ✅ إخفاء التمرير من العمود الأيمن بالكامل */
+  /* ✅ إخفاء التمرير من العمود الأيمن */
   .form-right-col {
     flex: 1.5; 
     height: 100%; 
     min-height: 0;
-    overflow: hidden; /* إخفاء التمرير الخارجي */
+    overflow: hidden; 
     padding-inline-start: 7px; 
     padding-inline-end: 8px; 
-    padding-bottom: 16px;
+    padding-bottom: 0; /* إزالة المسافة السفلية لتمتد البطاقة للأسفل تماماً */
     box-sizing: border-box;
-  }
-
-  /* ✅ جعل البطاقة تأخذ الارتفاع كاملاً وتوزع محتواها */
-  .card-added {
-    height: 100%;
     display: flex;
     flex-direction: column;
-    box-sizing: border-box;
+  }
+
+  /* ✅ استخدام flex: 1 بدلاً من height: 100% لإجبار البطاقة على التمدد */
+  .card-added {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
     margin-bottom: 0;
+    box-sizing: border-box;
   }
 
   /* ✅ تطبيق التمرير على قائمة المنتجات داخل البطاقة */
@@ -299,12 +303,11 @@
     min-height: 0;
     overflow-y: auto; 
     overflow-x: hidden; 
-    /* سحب الشريط ليلامس الحافة الداخلية للبطاقة */
     margin-inline-end: -16px; 
     padding-inline-end: 12px; 
   }
 
-  /* ✅ تحويل تخصيص شريط التمرير من العمود إلى القائمة */
+  /* ✅ تحويل تخصيص شريط التمرير */
   .form-left-col::-webkit-scrollbar,
   .added-products::-webkit-scrollbar {
     width: 4px; 
