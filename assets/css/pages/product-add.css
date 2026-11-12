@@ -287,6 +287,35 @@
   border-radius: 12px !important;
 }
 
+/* ✅ تنسيقات زر قلب الكاميرا الجديد */
+.scanner-actions {
+  display: flex;
+  justify-content: center;
+  margin-top: 4px;
+  flex-shrink: 0;
+}
+
+.scanner-flip { 
+  background: rgba(255, 255, 255, 0.1); 
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #ffffff; 
+  padding: 8px 20px; 
+  border-radius: 50px; 
+  cursor: pointer; 
+  display: inline-flex; 
+  align-items: center; 
+  justify-content: center; 
+  gap: 8px;
+  font-size: 14px; 
+  font-weight: 600;
+  transition: background 0.15s, border-color 0.15s; 
+}
+
+.scanner-flip:hover { 
+  background: rgba(255, 255, 255, 0.2); 
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
 .scanner-hint { color: #a3a3a3; font-size: 13px; text-align: center; margin: 0; flex-shrink: 0; }
 
 /* ============================================

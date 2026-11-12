@@ -142,7 +142,18 @@ document.addEventListener('DOMContentLoaded', async () => {
           <h3>${tr('prod_add_scan_title')}</h3>
           <button type="button" class="scanner-close" id="scanner-close"><i class="fas fa-xmark"></i></button>
         </div>
+        
+        <!-- الكاميرا -->
         <div id="scanner-reader" class="scanner-reader"></div>
+        
+        <!-- ✅ زر قلب الكاميرا في الأسفل -->
+        <div class="scanner-actions">
+          <button type="button" class="scanner-flip" id="scanner-flip">
+            <i class="fas fa-camera-rotate"></i>
+            <span>قلب الكاميرا</span>
+          </button>
+        </div>
+
         <p class="scanner-hint" id="scanner-hint">${tr('prod_add_scan_hint')}</p>
       </div>
     </div>
@@ -163,6 +174,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const scannerModal = document.getElementById('scanner-modal');
   const scannerReader = document.getElementById('scanner-reader');
   const scannerClose = document.getElementById('scanner-close');
+  const scannerFlipBtn = document.getElementById('scanner-flip'); // ✅ زر قلب الكاميرا
   const scannerHint = document.getElementById('scanner-hint');
   const errBox = document.getElementById('form-error');
   const successBox = document.getElementById('form-success');
@@ -174,6 +186,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   let isScanning = false;
   let html5QrCode = null;
   let scannedImageUrl = null;
+  let currentFacingMode = 'environment'; // ✅ تتبع حالة الكاميرا (خلفية أو أمامية)
 
   function showErr(msg) { errBox.textContent = msg; errBox.style.display = 'block'; successBox.style.display = 'none'; }
   function showSuccess(msg) { successBox.textContent = msg; successBox.style.display = 'block'; errBox.style.display = 'none'; }
@@ -256,22 +269,31 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (!e.target.closest('.supplier-group')) suggestions.style.display = 'none';
   });
 
+  // ✅ دالة مساعدة لتشغيل الكاميرا بوضعية معينة (خلفية/أمامية)
+  async function startCameraWithMode(mode) {
+    if (html5QrCode) {
+      try { await html5QrCode.stop(); await html5QrCode.clear(); } catch (e) {}
+    }
+    scannerReader.innerHTML = '';
+    html5QrCode = new Html5Qrcode("scanner-reader");
+    const qrSize = Math.max(125, Math.min(180, Math.floor(window.innerWidth * 0.6)));
+    const config = { fps: 10, qrbox: { width: qrSize, height: qrSize }, aspectRatio: 1.0 };
+    
+    await html5QrCode.start({ facingMode: mode }, config,
+      async (decodedText) => {
+        if (isScanning) return;
+        isScanning = true;
+        try { await handleScan(decodedText); }
+        finally { await stopScanner(); isScanning = false; }
+      }, () => {});
+  }
+
   async function startScanner() {
     if (typeof Html5Qrcode === 'undefined') { showErr(tr('prod_add_scanner_err', 'Scanner library not loaded')); return; }
     scannerModal.style.display = 'flex';
-    scannerReader.innerHTML = '';
     scannerHint.textContent = tr('prod_add_scan_hint');
     try {
-      html5QrCode = new Html5Qrcode("scanner-reader");
-      const qrSize = Math.max(125, Math.min(180, Math.floor(window.innerWidth * 0.6)));
-      const config = { fps: 10, qrbox: { width: qrSize, height: qrSize }, aspectRatio: 1.0 };
-      await html5QrCode.start({ facingMode: "environment" }, config,
-        async (decodedText) => {
-          if (isScanning) return;
-          isScanning = true;
-          try { await handleScan(decodedText); }
-          finally { await stopScanner(); isScanning = false; }
-        }, () => {});
+      await startCameraWithMode(currentFacingMode);
     } catch (err) {
       showErr(tr('prod_add_camera_err', 'Camera error') + ' ' + (err.message || ''));
       scannerModal.style.display = 'none';
@@ -286,6 +308,23 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
     scannerModal.style.display = 'none';
   }
+
+  // ✅ حدث النقر على زر قلب الكاميرا
+  scannerFlipBtn.addEventListener('click', async () => {
+    if (!html5QrCode) return;
+    
+    // التبديل بين الأمام والخلف
+    currentFacingMode = currentFacingMode === 'environment' ? 'user' : 'environment';
+    
+    try {
+      await startCameraWithMode(currentFacingMode);
+    } catch (err) {
+      console.error("Camera flip error:", err);
+      // في حال عدم وجود كاميرا أمامية، نرجع للخلفية
+      currentFacingMode = currentFacingMode === 'environment' ? 'user' : 'environment';
+      try { await startCameraWithMode(currentFacingMode); } catch (e) {}
+    }
+  });
 
   async function handleScan(barcode) {
     const value = String(barcode).trim();
@@ -311,7 +350,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       qtyInput.value = '1';
       skuInput.value = value;
       scannedImageUrl = localProduct.image_url || null;
-      // ✅ تم إزالة أوامر التمرير والتركيز التلقائي هنا
       return;
     }
 
@@ -330,14 +368,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (p.image_url) scannedImageUrl = p.image_url;
         skuInput.value = value;
         qtyInput.value = '1';
-        // ✅ تم إزالة أوامر التمرير والتركيز التلقائي هنا
         return;
       }
     } catch (err) { console.warn('Open Food Facts error:', err); }
 
     skuInput.value = value;
     scannedImageUrl = null;
-    // ✅ تم إزالة أوامر التمرير والتركيز التلقائي هنا
   }
 
   scanBtn.addEventListener('click', startScanner);
@@ -442,7 +478,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       priceInput.value = '0';
       skuInput.value = '';
       scannedImageUrl = null;
-      // ✅ تم إزالة أمر التركيز التلقائي هنا بعد إضافة المنتج
       renderAddedProducts();
     } finally {
       doneBtn.dataset.busy = '';
