@@ -30,15 +30,20 @@
   margin-bottom: 16px;
 }
 
+/* ✅ إعطاء مسافة 16px لجميع الحقول بشكل افتراضي */
 .product-input-card .form-group {
+  margin-bottom: 16px;
+}
+
+/* ✅ إلغاء المسافة للحقول داخل form-grid (لأنها تعتمد على gap) */
+.product-input-card .form-grid .form-group {
   margin-bottom: 0;
 }
 
-/* ✅ تم تعديل هذا الجزء لإضافة مسافة تحت حقل الباركود */
 .add-product-btn {
   width: 100%;
   justify-content: center;
-  margin-top: 16px; /* كان 0، والآن 16px ليفصل الزر عن حقل الباركود */
+  margin-top: 0; /* حقل الباركود الآن يوفر المسافة من تحته */
 }
 
 .scan-btn {
@@ -49,7 +54,7 @@
 
 .supplier-group {
   position: relative;
-  margin-bottom: 0;
+  margin-bottom: 0; /* الحقل الوحيد في بطاقته، لا يحتاج مسافة سفلية */
 }
 
 .suggestions-box {
@@ -530,7 +535,6 @@
     gap: 16px;
   }
 
-  /* ✅ وضع جميع عناصر النموذج في العمود الأول */
   .page-header,
   .alert-error,
   .alert-success,
@@ -544,7 +548,6 @@
   .page-header { margin-bottom: 0; }
   .card-actions { margin-bottom: 0; padding-bottom: 0; }
 
-  /* ✅ وضع السلة في العمود الثاني لتمتد وتثبت أثناء التمرير */
   .card-added { 
     grid-column: 2;
     grid-row: 1 / span 20; 
@@ -554,7 +557,6 @@
     overflow-y: auto; 
   }
 
-  /* ✅ جعل حقلي الكمية والسعر أسفل اسم المنتج مباشرة */
   .product-input-card .form-grid {
     grid-template-columns: 1fr 1fr;
   }
