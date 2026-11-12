@@ -4,7 +4,7 @@
    ============================================ */
 
 .add-form {
-  max-width: 800px;
+  max-width: 100%; /* ✅ بدلاً من 800px */
   margin: 0 auto;
   display: flex;
   flex-direction: column;
