@@ -34,10 +34,11 @@
   margin-bottom: 0;
 }
 
+/* ✅ تم تعديل هذا الجزء لإضافة مسافة تحت حقل الباركود */
 .add-product-btn {
   width: 100%;
   justify-content: center;
-  margin-top: 0;
+  margin-top: 16px; /* كان 0، والآن 16px ليفصل الزر عن حقل الباركود */
 }
 
 .scan-btn {
@@ -529,7 +530,7 @@
     gap: 16px;
   }
 
-  /* ✅ وضع جميع عناصر النموذج في العمود الأول (بدون grid-template-areas لتجنب الفراغات) */
+  /* ✅ وضع جميع عناصر النموذج في العمود الأول */
   .page-header,
   .alert-error,
   .alert-success,
