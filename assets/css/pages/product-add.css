@@ -237,51 +237,35 @@
 .workspace-iframe .form-actions { position: relative; z-index: 10; }
 
 /* ============================================
-   ✅ تعديلات الماسح الضوئي (Scanner) لحل مشكلة الحجم
+   ✅ تعديلات الماسح الضوئي (Scanner) - كاميرا مربعة
    ============================================ */
 .scanner-modal { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.85); z-index: 10000; display: none; align-items: center; justify-content: center; padding: 20px; }
 .scanner-box { background: #171717; border-radius: 16px; padding: 20px; max-width: 500px; width: 100%; display: flex; flex-direction: column; gap: 16px; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5); max-height: 90vh; }
-.scanner-header { display: flex; align-items: center; justify-content: space-between; color: #ffffff; }
+.scanner-header { display: flex; align-items: center; justify-content: space-between; color: #ffffff; flex-shrink: 0; }
 .scanner-header h3 { font-size: 16px; font-weight: 700; margin: 0; }
 .scanner-close { background: rgba(255, 255, 255, 0.1); border: none; color: #ffffff; width: 36px; height: 36px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 16px; transition: background 0.15s; }
 .scanner-close:hover { background: rgba(255, 255, 255, 0.2); }
 
-/* ✅ تعديل هنا: وضع حد أقصى للارتفاع واستخدام object-fit للكاميرا */
+/* ✅ جعل الحاوية مربعة تماماً (1:1) مع تحديد أقصى حجم لتناسب كل الشاشات */
 .scanner-reader { 
-  width: 100%; 
+  width: min(100%, 400px, 60vh); 
+  aspect-ratio: 1 / 1; 
+  margin: 0 auto; /* توسيط المربع */
   border-radius: 12px; 
   overflow: hidden; 
   background: #000000; 
-  min-height: 250px; 
-  max-height: 60vh; 
-  display: flex; 
-  align-items: center; 
-  justify-content: center; 
-  position: relative;
+  position: relative; /* لضمان بقاء علامة التركيز فوق الفيديو */
 }
+
+/* ✅ الفيديو يملأ المربع بالكامل دون تشوه */
 .scanner-reader video { 
   border-radius: 12px; 
   width: 100% !important; 
   height: 100% !important; 
   object-fit: cover !important; 
-  position: absolute;
-  top: 0;
-  left: 0;
 }
-.scanner-hint { color: #a3a3a3; font-size: 13px; text-align: center; margin: 0; }
 
-/* ✅ إضافة ميديا كويري مخصصة للشاشات المقلوبة والعريضة لتصغير حجم الكاميرا */
-@media (orientation: landscape) and (max-height: 600px) {
-  .scanner-box { 
-    max-width: 60%; 
-    padding: 12px; 
-    gap: 10px; 
-  }
-  .scanner-reader { 
-    max-height: 50vh; 
-    min-height: 200px; 
-  }
-}
+.scanner-hint { color: #a3a3a3; font-size: 13px; text-align: center; margin: 0; flex-shrink: 0; }
 
 /* ============================================
    ✅ تصميم الهواتف 
@@ -313,7 +297,6 @@
   .form-actions .btn-primary, .form-actions .btn-secondary { width: 100%; justify-content: center; }
   
   .scanner-box { padding: 16px; }
-  .scanner-reader { min-height: 200px; }
 }
 
 /* ============================================
@@ -362,7 +345,7 @@
     min-height: 0;
     overflow: hidden; 
     padding-inline-start: 8px; 
-    padding-inline-end: 0;
+    padding-inline-end: 0; 
     padding-bottom: 0; 
     box-sizing: border-box;
     display: flex;
