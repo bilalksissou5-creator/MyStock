@@ -39,14 +39,13 @@
 
 .product-input-card .form-group {
   margin-bottom: 16px;
-  min-width: 0; /* ✅ منع تجاوز العرض */
+  min-width: 0;
 }
 
 .product-input-card .form-grid .form-group {
   margin-bottom: 0;
 }
 
-/* ✅ ضمان عدم تجاوز المدخلات لعرض الحاوية */
 .product-input-card input,
 .product-input-card select,
 .product-input-card textarea {
@@ -179,16 +178,16 @@
     grid-template-columns: 1fr 1.5fr;
     grid-template-rows: 1fr; 
     gap: 0; 
-    /* ✅ تمت إزالة height: 100% والاعتماد على flex: 1 من iframe */
     overflow: hidden;
     min-height: 0;
+    height: 100%; /* ✅ إعادة الارتفاع لضمان عمل السكرول المستقل */
   }
 
   .form-left-col {
-    /* ✅ تمت إزالة height: 100% */
+    height: 100%; /* ✅ لملء الصف بالكامل */
     min-height: 0;
     overflow-y: auto; 
-    overflow-x: hidden; /* ✅ منع الشريط الأفقي */
+    overflow-x: hidden; 
     padding-bottom: 20px;
     padding-inline-end: 9px; 
     border-inline-end: 1px solid #e5e5e5;
@@ -196,9 +195,10 @@
   }
 
   .form-right-col {
+    height: 100%; /* ✅ لملء الصف بالكامل */
     min-height: 0;
     overflow-y: auto; 
-    overflow-x: hidden; /* ✅ منع الشريط الأفقي */
+    overflow-x: hidden; 
     padding-inline-start: 7px; 
     padding-inline-end: 8px; 
     padding-bottom: 20px;
