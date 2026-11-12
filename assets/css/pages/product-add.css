@@ -43,7 +43,7 @@
 .add-product-btn {
   width: 100%;
   justify-content: center;
-  margin-top: 0; /* حقل الباركود الآن يوفر المسافة من تحته */
+  margin-top: 0;
 }
 
 .scan-btn {
@@ -54,7 +54,7 @@
 
 .supplier-group {
   position: relative;
-  margin-bottom: 0; /* الحقل الوحيد في بطاقته، لا يحتاج مسافة سفلية */
+  margin-bottom: 0;
 }
 
 .suggestions-box {
@@ -524,7 +524,7 @@
 }
 
 /* ============================================
-   ✅ التصميم الشبكي للشاشات الكبيرة (السلة في جهة والمدخلات في جهة)
+   ✅ التصميم الشبكي للشاشات الكبيرة
    ============================================ */
 @media (min-width: 700px) {
   .add-form {
@@ -550,7 +550,7 @@
 
   .card-added { 
     grid-column: 2;
-    grid-row: 1 / span 20; 
+    /* ✅ تم حذف grid-row التي كانت تسبب الفراغ الكبير */
     position: sticky;
     top: 20px;
     max-height: calc(100vh - 120px); 
