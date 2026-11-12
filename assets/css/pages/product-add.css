@@ -230,7 +230,7 @@
 .form-actions { 
   display: flex; 
   gap: 10px; 
-  margin-bottom: 5px; 
+  margin-bottom: 2px; 
   padding-bottom: 0; 
 }
 .workspace-iframe .form-actions { position: relative; z-index: 10; }
