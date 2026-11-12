@@ -294,3 +294,48 @@ body.register-page {
 .register-page .picker-option.active .picker-check {
   opacity: 1;
 }
+
+/* ============================================
+   ✅ إضافة: تنسيقات حقل رقم الهاتف الموحد (العلم + الرقم)
+   ============================================ */
+.register-page .phone-input-wrapper {
+  display: flex;
+  align-items: center;
+  border: 1px solid #d4d4d4;
+  border-radius: 8px;
+  background: white;
+  transition: border-color 0.15s;
+  width: 100%;
+  box-sizing: border-box;
+  overflow: hidden; /* لضمان بقاء خلفية العلم داخل الحواف الدائرية */
+}
+
+.register-page .phone-input-wrapper:focus-within {
+  border-color: #171717;
+}
+
+.register-page .phone-flag {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 14px;
+  font-size: 20px;
+  background: #fafafa;
+  height: 40px; /* نفس ارتفاع حقل الإدخال */
+  border-inline-end: 1px solid #d4d4d4; /* فاصل ديناميكي حسب اتجاه الشاشة */
+  user-select: none;
+}
+
+/* تخصيص حقل الإدخال ليتناسب مع الحاوية */
+.register-page .phone-input-wrapper input,
+.register-page .phone-input-wrapper input:focus {
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  padding: 10px 12px !important;
+  height: 40px !important;
+  width: 100%;
+  box-sizing: border-box;
+  outline: none !important;
+}

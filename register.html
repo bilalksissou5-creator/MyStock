@@ -17,7 +17,7 @@
   </script>
 
   <link rel="stylesheet" href="/assets/css/common.css?v=11">
-  <link rel="stylesheet" href="/assets/css/pages/register.css?v=12"> <!-- تم تحديث الإصدار لتحديث الكاش -->
+  <link rel="stylesheet" href="/assets/css/pages/register.css?v=13"> <!-- تم تحديث الإصدار لتحديث الكاش -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 <body class="register-page">
@@ -46,7 +46,7 @@
       <input type="text" id="org_name" required>
     </div>
 
-    <!-- ✅ قائمة اختيار البلد (أُضيفت هنا قبل رقم الهاتف) -->
+    <!-- ✅ قائمة اختيار البلد -->
     <div class="form-group">
       <label data-i18n="welcome_country">البلد *</label>
       <div class="picker" id="country-picker">
@@ -61,10 +61,13 @@
       <input type="hidden" id="country_code" name="country_code">
     </div>
 
-    <!-- ✅ حقل رقم الهاتف -->
+    <!-- ✅ حقل رقم الهاتف الموحد (العلم + الرقم) -->
     <div class="form-group">
       <label data-i18n="register_phone">رقم الهاتف *</label>
-      <input type="tel" id="phone" placeholder="+212 600000000" required dir="ltr">
+      <div class="phone-input-wrapper">
+        <span class="phone-flag" id="phone-flag">🌍</span>
+        <input type="tel" id="phone" placeholder="600000000" required dir="ltr">
+      </div>
     </div>
 
     <div class="form-group">
@@ -116,14 +119,26 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="/js/core/supabase.js"></script>
   <script src="/js/core/i18n.js?v=11"></script>
-  <script src="/js/core/register.js?v=12"></script> <!-- تم تحديث الإصدار -->
+  <script src="/js/core/register.js?v=12"></script> 
   
-  <!-- ✅ تفعيل الترجمة عند فتح الصفحة -->
+  <!-- ✅ تفعيل الترجمة عند فتح الصفحة + ربط العلم -->
   <script>
     document.addEventListener('DOMContentLoaded', async () => {
-      // ننتظر تطبيق الترجمة (i18n.js سيقوم بجلبها من Supabase أو الكاش)
+      // ننتظر تطبيق الترجمة
       if (window.applyLanguage) {
         await window.applyLanguage();
+      }
+
+      // ✅ ربط علم حقل الهاتف بعلم قائمة اختيار البلد
+      const mainFlag = document.getElementById('country-flag');
+      const phoneFlag = document.getElementById('phone-flag');
+
+      if (mainFlag && phoneFlag) {
+        const observer = new MutationObserver(() => {
+          phoneFlag.textContent = mainFlag.textContent;
+        });
+        // مراقبة أي تغيير يحدث في علم البلد الرئيسي
+        observer.observe(mainFlag, { childList: true, characterData: true, subtree: true });
       }
     });
   </script>

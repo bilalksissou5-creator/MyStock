@@ -6,6 +6,7 @@
 // ✅ يُحوّل إلى subscription.html بعد التسجيل
 // ✅ منع Enter/Go/Done من إرسال الفورم
 // ✅ حفظ رقم الهاتف واللغة في Supabase
+// ✅ تحديث علم حقل الهاتف تلقائياً
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
 
@@ -88,6 +89,12 @@ document.addEventListener('DOMContentLoaded', async () => {
       countryName.textContent = nameText;
       countryCodeInput.value = selectedCountry;
       localStorage.setItem('app_country', selectedCountry);
+
+      // ✅ التعديل هنا: تحديث علم حقل الهاتف تلقائياً
+      const phoneFlag = document.getElementById('phone-flag');
+      if (phoneFlag) {
+        phoneFlag.textContent = flag;
+      }
 
       countryDropdown.querySelectorAll('.picker-option').forEach(opt => {
         opt.classList.toggle('active', opt.dataset.country === selectedCountry);
