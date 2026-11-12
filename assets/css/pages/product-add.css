@@ -1,6 +1,5 @@
 /* ============================================
    صفحة إضافة منتجات (التصميم الأصلي)
-   ✅ السلة في العمود الثاني، وباقي العناصر في العمود الأول
    ============================================ */
 
 .add-form {
@@ -36,9 +35,9 @@
 }
 
 .scan-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
+  width: 100%;
+  justify-content: center;
+  margin-top: 12px;
 }
 
 .supplier-group {
@@ -536,11 +535,10 @@
     grid-row: 1 / 5; 
     position: sticky;
     top: 20px;
-    max-height: calc(100vh - 120px); /* لكي لا تخرج عن الشاشة */
-    overflow-y: auto; /* إضافة شريط تمرير داخلي إذا كثرت المنتجات */
+    max-height: calc(100vh - 120px); 
+    overflow-y: auto; 
   }
   
-  /* إزالة الهامش السفلي من الأزرار في الوضع الشبكي */
   .form-actions {
     margin-bottom: 0;
   }

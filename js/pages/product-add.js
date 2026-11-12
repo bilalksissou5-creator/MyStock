@@ -1,7 +1,6 @@
 // ============================================
 // صفحة إضافة منتجات
-// ✅ الكود يحدّث qty مباشرة (لا يعتمد على trigger)
-// ⚠️ يجب حذف trigger stock_movements من DB أولاً
+// ✅ تم نقل زر المسح (Scan) إلى القسم الأول (بطاقة الحقول)
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   if (window.__productAddLoaded) return;
@@ -59,13 +58,12 @@ document.addEventListener('DOMContentLoaded', async () => {
   main.innerHTML = `
     <div class="page-header">
       <h2>${tr('prod_add_title')}</h2>
-      <button type="button" class="btn-primary scan-btn" id="scan-btn">
-        <i class="fas fa-barcode"></i>
-        <span>${tr('prod_add_scan')}</span>
-      </button>
+      <!-- ✅ تم إزالة زر المسح من هنا -->
     </div>
+    
     <div class="alert alert-error" id="form-error" style="display:none;"></div>
     <div class="alert alert-success" id="form-success" style="display:none;"></div>
+    
     <div class="add-form">
       <div class="product-input-card card-supplier">
         <div class="form-group supplier-group">
@@ -75,6 +73,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           <input type="hidden" id="supplier_id">
         </div>
       </div>
+      
       <div class="product-input-card card-fields">
         <div class="form-grid">
           <div class="form-group">
@@ -98,22 +97,32 @@ document.addEventListener('DOMContentLoaded', async () => {
           <label>${tr('prod_add_barcode')}</label>
           <input type="text" id="product-sku" placeholder="${tr('prod_add_barcode_ph')}" dir="ltr">
         </div>
+        
+        <!-- ✅ زر المسح أصبح هنا في القسم الأول -->
+        <button type="button" class="btn-secondary scan-btn" id="scan-btn" style="width: 100%; justify-content: center; margin-top: 12px; margin-bottom: 8px;">
+          <i class="fas fa-barcode"></i>
+          <span>${tr('prod_add_scan')}</span>
+        </button>
+
         <button type="button" class="btn-primary add-product-btn" id="done-btn">
           <i class="fas fa-check"></i>
           <span>${tr('prod_add_done')}</span>
         </button>
       </div>
+      
       <div class="added-products-section card-added">
         <label class="section-label">${tr('prod_add_added')}</label>
         <div id="added-products" class="added-products">
           <div class="empty-added"><i class="fas fa-box-open"></i><p>${tr('prod_add_empty')}</p></div>
         </div>
       </div>
+      
       <div class="form-summary card-summary">
         <div class="summary-row"><span>${tr('prod_add_sum_count')}</span><strong id="sum-rows">0</strong></div>
         <div class="summary-row"><span>${tr('prod_add_sum_qty')}</span><strong id="sum-qty">0</strong></div>
         <div class="summary-row highlight"><span>${tr('prod_add_sum_total')}</span><strong id="sum-total">0.00</strong></div>
       </div>
+      
       <div class="form-actions card-actions">
         <button type="button" class="btn-primary" id="save-all-btn">
           <i class="fas fa-save"></i><span>${tr('prod_add_save')}</span>
@@ -121,6 +130,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         <a href="/products/list.html" class="btn-secondary">${tr('prod_add_cancel')}</a>
       </div>
     </div>
+    
     <div class="scanner-modal" id="scanner-modal" style="display:none;">
       <div class="scanner-box">
         <div class="scanner-header">
@@ -518,7 +528,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         let productId;
 
         if (matchedProduct) {
-          // ✅ تحديث qty مباشرة (جمع رقمي)
           productId = matchedProduct.id;
           const newQty = Number(matchedProduct.qty || 0) + Number(p.qty);
           const { error: updErr } = await db.from('products').update({
@@ -527,7 +536,6 @@ document.addEventListener('DOMContentLoaded', async () => {
           }).eq('id', productId);
           if (updErr) throw new Error(tr('prod_add_err_link') + ' ' + updErr.message);
         } else {
-          // ✅ إنشاء مع qty صحيح مباشرة
           const { data: newProduct, error: insertError } = await db.from('products').insert({
             organization_id: profile.organization_id,
             name: p.name,
@@ -556,7 +564,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             .upsert(aliasRows, { onConflict: 'organization_id,barcode', ignoreDuplicates: true });
         }
 
-        // ✅ stock_movement للسجل فقط (trigger يجب أن يكون محذوفاً)
         await db.from('stock_movements').insert({
           organization_id: profile.organization_id,
           product_id: productId,
