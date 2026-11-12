@@ -1,6 +1,6 @@
 // ============================================
 // صفحة إضافة منتجات
-// ✅ تم نقل زر المسح (Scan) إلى القسم الأول (بطاقة الحقول)
+// ✅ الهيدر وزر المسح داخل القسم الأول
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   if (window.__productAddLoaded) return;
@@ -56,79 +56,85 @@ document.addEventListener('DOMContentLoaded', async () => {
   const main = document.getElementById('main-content');
 
   main.innerHTML = `
-    <div class="page-header">
-      <h2>${tr('prod_add_title')}</h2>
-      <!-- ✅ تم إزالة زر المسح من هنا -->
-    </div>
-    
-    <div class="alert alert-error" id="form-error" style="display:none;"></div>
-    <div class="alert alert-success" id="form-success" style="display:none;"></div>
-    
     <div class="add-form">
-      <div class="product-input-card card-supplier">
-        <div class="form-group supplier-group">
-          <label>${tr('prod_add_supplier')}</label>
-          <input type="text" id="supplier-input" placeholder="${tr('prod_add_supplier_ph')}" autocomplete="off">
-          <div id="supplier-suggestions" class="suggestions-box"></div>
-          <input type="hidden" id="supplier_id">
-        </div>
-      </div>
       
-      <div class="product-input-card card-fields">
-        <div class="form-grid">
-          <div class="form-group">
-            <label>${tr('prod_add_name')}</label>
-            <input type="text" id="product-name" placeholder="${tr('prod_add_name_ph')}">
-          </div>
-          <div class="form-group">
-            <label>${tr('prod_add_qty')}</label>
-            <input type="number" id="product-qty" value="1" min="1">
-          </div>
-          <div class="form-group">
-            <label>${tr('prod_add_price')}</label>
-            <input type="number" id="product-price" value="0" min="0" step="0.01">
-          </div>
+      <!-- ✅ العمود الأول: الهيدر، المورد، الحقول، الملخص، الأزرار -->
+      <div class="form-left-col">
+        
+        <div class="page-header">
+          <h2>${tr('prod_add_title')}</h2>
+          <button type="button" class="btn-primary scan-btn" id="scan-btn">
+            <i class="fas fa-barcode"></i>
+            <span>${tr('prod_add_scan')}</span>
+          </button>
         </div>
-        <div class="form-group">
-          <label>${tr('prod_add_category')}</label>
-          <input type="text" id="product-category" placeholder="${tr('prod_add_category_ph')}">
-        </div>
-        <div class="form-group">
-          <label>${tr('prod_add_barcode')}</label>
-          <input type="text" id="product-sku" placeholder="${tr('prod_add_barcode_ph')}" dir="ltr">
+
+        <div class="alert alert-error" id="form-error" style="display:none;"></div>
+        <div class="alert alert-success" id="form-success" style="display:none;"></div>
+
+        <div class="product-input-card card-supplier">
+          <div class="form-group supplier-group">
+            <label>${tr('prod_add_supplier')}</label>
+            <input type="text" id="supplier-input" placeholder="${tr('prod_add_supplier_ph')}" autocomplete="off">
+            <div id="supplier-suggestions" class="suggestions-box"></div>
+            <input type="hidden" id="supplier_id">
+          </div>
         </div>
         
-        <!-- ✅ زر المسح أصبح هنا في القسم الأول -->
-        <button type="button" class="btn-secondary scan-btn" id="scan-btn" style="width: 100%; justify-content: center; margin-top: 12px; margin-bottom: 8px;">
-          <i class="fas fa-barcode"></i>
-          <span>${tr('prod_add_scan')}</span>
-        </button>
-
-        <button type="button" class="btn-primary add-product-btn" id="done-btn">
-          <i class="fas fa-check"></i>
-          <span>${tr('prod_add_done')}</span>
-        </button>
-      </div>
-      
-      <div class="added-products-section card-added">
-        <label class="section-label">${tr('prod_add_added')}</label>
-        <div id="added-products" class="added-products">
-          <div class="empty-added"><i class="fas fa-box-open"></i><p>${tr('prod_add_empty')}</p></div>
+        <div class="product-input-card card-fields">
+          <div class="form-grid">
+            <div class="form-group">
+              <label>${tr('prod_add_name')}</label>
+              <input type="text" id="product-name" placeholder="${tr('prod_add_name_ph')}">
+            </div>
+            <div class="form-group">
+              <label>${tr('prod_add_qty')}</label>
+              <input type="number" id="product-qty" value="1" min="1">
+            </div>
+            <div class="form-group">
+              <label>${tr('prod_add_price')}</label>
+              <input type="number" id="product-price" value="0" min="0" step="0.01">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>${tr('prod_add_category')}</label>
+            <input type="text" id="product-category" placeholder="${tr('prod_add_category_ph')}">
+          </div>
+          <div class="form-group">
+            <label>${tr('prod_add_barcode')}</label>
+            <input type="text" id="product-sku" placeholder="${tr('prod_add_barcode_ph')}" dir="ltr">
+          </div>
+          
+          <button type="button" class="btn-primary add-product-btn" id="done-btn">
+            <i class="fas fa-check"></i>
+            <span>${tr('prod_add_done')}</span>
+          </button>
+        </div>
+        
+        <div class="form-summary card-summary">
+          <div class="summary-row"><span>${tr('prod_add_sum_count')}</span><strong id="sum-rows">0</strong></div>
+          <div class="summary-row"><span>${tr('prod_add_sum_qty')}</span><strong id="sum-qty">0</strong></div>
+          <div class="summary-row highlight"><span>${tr('prod_add_sum_total')}</span><strong id="sum-total">0.00</strong></div>
+        </div>
+        
+        <div class="form-actions card-actions">
+          <button type="button" class="btn-primary" id="save-all-btn">
+            <i class="fas fa-save"></i><span>${tr('prod_add_save')}</span>
+          </button>
+          <a href="/products/list.html" class="btn-secondary">${tr('prod_add_cancel')}</a>
         </div>
       </div>
-      
-      <div class="form-summary card-summary">
-        <div class="summary-row"><span>${tr('prod_add_sum_count')}</span><strong id="sum-rows">0</strong></div>
-        <div class="summary-row"><span>${tr('prod_add_sum_qty')}</span><strong id="sum-qty">0</strong></div>
-        <div class="summary-row highlight"><span>${tr('prod_add_sum_total')}</span><strong id="sum-total">0.00</strong></div>
+
+      <!-- ✅ العمود الثاني: السلة فقط -->
+      <div class="form-right-col">
+        <div class="added-products-section card-added">
+          <label class="section-label">${tr('prod_add_added')}</label>
+          <div id="added-products" class="added-products">
+            <div class="empty-added"><i class="fas fa-box-open"></i><p>${tr('prod_add_empty')}</p></div>
+          </div>
+        </div>
       </div>
-      
-      <div class="form-actions card-actions">
-        <button type="button" class="btn-primary" id="save-all-btn">
-          <i class="fas fa-save"></i><span>${tr('prod_add_save')}</span>
-        </button>
-        <a href="/products/list.html" class="btn-secondary">${tr('prod_add_cancel')}</a>
-      </div>
+
     </div>
     
     <div class="scanner-modal" id="scanner-modal" style="display:none;">

@@ -1,15 +1,42 @@
 /* ============================================
-   صفحة إضافة منتجات (التصميم الأصلي)
+   صفحة إضافة منتجات
+   ✅ تقسيم الشاشة لعمودين (العمود الأول يحتوي على الهيدر والأزرار)
    ============================================ */
 
 .add-form {
-  max-width: 800px;
-  margin: 0 auto;
   display: flex;
   flex-direction: column;
   gap: 16px;
+  max-width: 800px;
+  margin: 0 auto;
 }
 
+.form-left-col, .form-right-col {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+}
+
+/* تعديل الهيدر ليكون متناسقاً */
+.page-header {
+  margin-bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+/* زر المسح */
+.scan-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  width: auto;
+}
+
+/* باقي التنسيقات كما هي */
 .product-input-card {
   background: white;
   border-radius: 10px;
@@ -29,12 +56,6 @@
 }
 
 .add-product-btn {
-  width: 100%;
-  justify-content: center;
-  margin-top: 12px;
-}
-
-.scan-btn {
   width: 100%;
   justify-content: center;
   margin-top: 12px;
@@ -512,7 +533,7 @@
 }
 
 /* ============================================
-   ✅ التصميم الشبكي للشاشات الكبيرة (السلة في عمود، والمدخلات في عمود)
+   ✅ التصميم الشبكي للشاشات الكبيرة (التابلت والكمبيوتر)
    ============================================ */
 @media (min-width: 700px) {
   .add-form {
@@ -523,24 +544,18 @@
     gap: 20px;
   }
 
-  /* العمود الأول: كل شيء ما عدا السلة */
-  .card-supplier { grid-column: 1; grid-row: 1; }
-  .card-fields { grid-column: 1; grid-row: 2; }
-  .card-summary { grid-column: 1; grid-row: 3; }
-  .card-actions { grid-column: 1; grid-row: 4; }
-
-  /* العمود الثاني: السلة فقط (تمتد على طول الشاشة) */
+  /* إزالة الهوامش السفلية من الأزرار */
+  .form-actions {
+    margin-bottom: 0;
+    padding-bottom: 0;
+  }
+  
+  /* السلة ثابتة أثناء التمرير */
   .card-added { 
-    grid-column: 2; 
-    grid-row: 1 / 5; 
     position: sticky;
     top: 20px;
     max-height: calc(100vh - 120px); 
     overflow-y: auto; 
-  }
-  
-  .form-actions {
-    margin-bottom: 0;
   }
 }
 
@@ -560,14 +575,6 @@ html.in-iframe .main {
   padding: 16px !important; 
   box-sizing: border-box !important;
   overflow: hidden !important;
-}
-
-html.in-iframe .page-header {
-  flex: 0 0 auto !important;
-  padding: 0 0 16px 0 !important;
-  margin: 0 !important;
-  background: transparent !important;
-  z-index: 10 !important;
 }
 
 html.in-iframe .add-form {
