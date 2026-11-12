@@ -164,8 +164,8 @@
 /* ✅ زر الحذف في الزاوية 90 درجة */
 .added-product-delete { 
   position: absolute; 
-  top: 6px; 
-  inset-inline-end: 6px; 
+  top: 0px; 
+  inset-inline-end: 0px; 
   background: transparent; 
   border: none; 
   color: #b0b0b0; 
