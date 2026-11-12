@@ -4,7 +4,8 @@
    ============================================ */
 
 .add-form {
-  max-width: 100%; /* ✅ بدلاً من 800px */
+  max-width: 100%; 
+  width: 100%;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
@@ -279,13 +280,13 @@
 }
 
 /* ============================================
-   ✅ التصميم الشبكي للشاشات الكبيرة (إصلاح الارتفاع)
+   ✅ التصميم الشبكي للشاشات الكبيرة (إصلاح الارتفاع والعرض)
    ============================================ */
 @media (min-width: 700px) {
   .main {
     overflow: hidden !important;
     padding: 16px !important;
-    height: 100% !important; /* ✅ استخدام 100% بدلاً من 100vh ليتكيف مع شريط المتصفح */
+    height: 100% !important; 
     box-sizing: border-box !important;
     padding-bottom: 1px !important;
     display: flex;
@@ -293,9 +294,11 @@
   }
 
   .add-form {
-    max-width: 100%; 
-    width: 100%;
-    margin: 0;
+    /* ✅ التصحيح: إجبار النموذج على ملء عرض الشاشة وإلغاء أي قيود قديمة */
+    max-width: none !important; 
+    width: 100% !important;
+    margin: 0 !important;
+    
     display: flex; 
     flex-direction: row; 
     gap: 0; 
@@ -310,7 +313,7 @@
     min-height: 0;
     overflow-y: auto; 
     overflow-x: hidden; 
-    padding-bottom: 1px; /* ✅ زيادة الحشوة السفلية لضمان ظهور الزر بالكامل */
+    padding-bottom: 1px; 
     padding-inline-end: 9px; 
     border-inline-end: 1px solid #e5e5e5;
     box-sizing: border-box;
