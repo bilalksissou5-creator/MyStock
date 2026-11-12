@@ -11,6 +11,11 @@
   gap: 16px;
 }
 
+/* ✅ إصلاح المسافة تحت الهيدر (زر Scan) ليكون متساوياً مع البطاقات */
+.page-header {
+  margin-bottom: 0;
+}
+
 .product-input-card {
   background: white;
   border-radius: 10px;
