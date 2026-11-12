@@ -199,15 +199,21 @@
   .add-form {
     max-width: 1100px;
     display: grid;
-    /* ✅ التعديل هنا: القسم الأول 1fr والقسم الثاني 1.5fr */
-    grid-template-columns: 1fr 1.5fr; 
-    gap: 16px;
+    grid-template-columns: 1fr 1.5fr; /* القسم الأول أصغر من الثاني */
+    gap: 16px; /* المسافة بين العمودين 16px */
     height: calc(100vh - 100px); 
     align-items: start;
     overflow: hidden;
   }
 
-  .form-left-col,
+  /* ✅ إزالة الحشوة الجانبية من العمود الأول لضمان أن المسافة 16px بالضبط */
+  .form-left-col {
+    height: 100%;
+    overflow-y: auto; 
+    padding-bottom: 20px;
+  }
+
+  /* ✅ الحفاظ على الحشوة في العمود الثاني فقط لإبعاد المحتوى عن شريط التمرير */
   .form-right-col {
     height: 100%;
     overflow-y: auto; 
@@ -224,7 +230,6 @@
   .product-input-card .form-grid { grid-template-columns: 1fr 1fr; }
   .product-input-card .form-group:first-child { grid-column: 1 / -1; }
 
-  /* ✅ تصغير طفيف لعناصر السلة في الشاشات الكبيرة لضمان عدم خروجها */
   .added-product-card {
     gap: 8px;
     padding: 10px;
