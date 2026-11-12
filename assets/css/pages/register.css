@@ -192,7 +192,7 @@ body.register-page {
 }
 
 /* ============================================
-   ✅ إضافة: تنسيقات قائمة اختيار البلد
+   ✅ تنسيقات قائمة اختيار البلد
    ============================================ */
 .register-page .picker {
   position: relative;
@@ -222,8 +222,14 @@ body.register-page {
   border-color: #171717;
 }
 
-.register-page .picker-flag {
-  font-size: 18px;
+/* ✅ تنسيق صورة العلم داخل القائمة */
+.register-page .picker-flag-img {
+  width: 24px;
+  height: 18px;
+  object-fit: cover;
+  border-radius: 3px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  flex-shrink: 0;
 }
 
 .register-page .picker-name {
@@ -296,7 +302,7 @@ body.register-page {
 }
 
 /* ============================================
-   ✅ إضافة: تنسيقات حقل رقم الهاتف الموحد (العلم + الرقم)
+   ✅ تنسيقات حقل رقم الهاتف الموحد (علم + مفتاح + رقم)
    ============================================ */
 .register-page .phone-input-wrapper {
   display: flex;
@@ -307,34 +313,46 @@ body.register-page {
   transition: border-color 0.15s;
   width: 100%;
   box-sizing: border-box;
-  overflow: hidden; /* لضمان بقاء خلفية العلم داخل الحواف الدائرية */
+  overflow: hidden;
 }
 
 .register-page .phone-input-wrapper:focus-within {
   border-color: #171717;
 }
 
+/* مربع العلم داخل حقل الهاتف */
 .register-page .phone-flag {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0 14px;
-  font-size: 20px;
+  padding-inline-start: 12px;
+  padding-inline-end: 6px;
   background: #fafafa;
-  height: 40px; /* نفس ارتفاع حقل الإدخال */
-  border-inline-end: 1px solid #d4d4d4; /* فاصل ديناميكي حسب اتجاه الشاشة */
+  height: 42px;
+}
+
+/* مفتاح الدولة (مثل +212) */
+.register-page .phone-dial-code {
+  display: flex;
+  align-items: center;
+  padding-inline-end: 12px;
+  background: #fafafa;
+  height: 42px;
+  border-inline-end: 1px solid #d4d4d4;
+  font-weight: 600;
+  color: #171717;
+  font-size: 14px;
   user-select: none;
 }
 
-/* تخصيص حقل الإدخال ليتناسب مع الحاوية */
-.register-page .phone-input-wrapper input,
-.register-page .phone-input-wrapper input:focus {
+/* حقل إدخال الرقم */
+.register-page .phone-input-wrapper input {
   border: none !important;
   border-radius: 0 !important;
   box-shadow: none !important;
   background: transparent !important;
   padding: 10px 12px !important;
-  height: 40px !important;
+  height: 42px !important;
   width: 100%;
   box-sizing: border-box;
   outline: none !important;
