@@ -280,7 +280,7 @@
 }
 
 /* ============================================
-   ✅ التصميم الشبكي للشاشات الكبيرة (إصلاح الارتفاع والعرض)
+   ✅ التصميم الشبكي للشاشات الكبيرة (إصلاح المسافة 16px)
    ============================================ */
 @media (min-width: 700px) {
   .main {
@@ -294,7 +294,7 @@
   }
 
   .add-form {
-    /* ✅ التصحيح: إجبار النموذج على ملء عرض الشاشة وإلغاء أي قيود قديمة */
+    /* ✅ إجبار النموذج على التمدد لملء الشاشة وإلغاء أي قيود قديمة */
     max-width: none !important; 
     width: 100% !important;
     margin: 0 !important;
@@ -326,7 +326,7 @@
     min-height: 0;
     overflow: hidden; 
     padding-inline-start: 7px; 
-    padding-inline-end: 8px; 
+    padding-inline-end: 0; /* ✅ تم تغييرها من 8px إلى 0 لتصبح المسافة الإجمالية 16px فقط من .main */
     padding-bottom: 0; 
     box-sizing: border-box;
     display: flex;
