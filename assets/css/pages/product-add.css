@@ -199,10 +199,10 @@
   .add-form {
     max-width: 1100px;
     display: grid;
-    grid-template-columns: 1fr 1.5fr; /* القسم الأول أصغر من الثاني */
-    gap: 16px; /* المسافة بين العمودين 16px */
+    grid-template-columns: 1fr 1.5fr;
+    gap: 16px;
     height: calc(100vh - 100px); 
-    align-items: start;
+    /* ✅ تم إزالة align-items: start; لتمتد الأعمدة وتعمل السكرول بشكل صحيح */
     overflow: hidden;
   }
 
