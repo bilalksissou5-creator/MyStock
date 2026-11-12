@@ -311,7 +311,9 @@ document.addEventListener('DOMContentLoaded', async () => {
       qtyInput.value = '1';
       skuInput.value = value;
       scannedImageUrl = localProduct.image_url || null;
-      nameInput.focus(); nameInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      nameInput.focus(); 
+      // ✅ التعديل الأول لمنع كسر التصميم
+      nameInput.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); 
       return;
     }
 
@@ -330,14 +332,18 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (p.image_url) scannedImageUrl = p.image_url;
         skuInput.value = value;
         qtyInput.value = '1';
-        nameInput.focus(); nameInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        nameInput.focus(); 
+        // ✅ التعديل الثاني لمنع كسر التصميم
+        nameInput.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); 
         return;
       }
     } catch (err) { console.warn('Open Food Facts error:', err); }
 
     skuInput.value = value;
     scannedImageUrl = null;
-    nameInput.focus(); nameInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    nameInput.focus(); 
+    // ✅ التعديل الثالث لمنع كسر التصميم
+    nameInput.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); 
   }
 
   scanBtn.addEventListener('click', startScanner);
