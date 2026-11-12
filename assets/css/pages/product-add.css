@@ -11,7 +11,6 @@
   gap: 16px;
 }
 
-/* الحاويات الجديدة */
 .form-left-col,
 .form-right-col {
   display: flex;
@@ -81,7 +80,21 @@
 .empty-added i { font-size: 2rem; margin-bottom: 8px; color: #d4d4d4; display: block; }
 .empty-added p { font-size: 13px; }
 
-.added-product-card { display: grid; grid-template-columns: 48px 1fr auto auto; gap: 12px; align-items: center; padding: 12px; background: #fafafa; border-radius: 10px; border: 1px solid #f0f0f0; transition: background 0.15s; }
+/* ✅ تعديل بطاقة المنتج لمنع خروج المحتوى */
+.added-product-card { 
+  display: grid; 
+  grid-template-columns: 48px minmax(0, 1fr) auto auto; 
+  gap: 12px; 
+  align-items: center; 
+  padding: 12px; 
+  background: #fafafa; 
+  border-radius: 10px; 
+  border: 1px solid #f0f0f0; 
+  transition: background 0.15s; 
+  max-width: 100%; 
+  box-sizing: border-box;
+}
+
 .added-product-card:hover { background: #f5f5f5; }
 .added-product-image { width: 48px; height: 48px; border-radius: 8px; background: white; display: flex; align-items: center; justify-content: center; flex-shrink: 0; border: 1px solid #e5e5e5; overflow: hidden; }
 .added-product-image img { width: 100%; height: 100%; object-fit: cover; }
@@ -89,8 +102,26 @@
 .added-product-info { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
 .added-product-info strong { font-size: 14px; font-weight: 600; color: #171717; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .added-product-info span { font-size: 11px; color: #737373; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.added-product-stats { display: flex; gap: 8px; flex-shrink: 0; }
-.stat-mini { display: flex; flex-direction: column; align-items: center; padding: 6px 10px; background: white; border-radius: 6px; min-width: 60px; border: 1px solid #f0f0f0; }
+
+/* ✅ السماح للإحصائيات بالانكماش أو الالتفاف */
+.added-product-stats { 
+  display: flex; 
+  gap: 6px; 
+  flex-wrap: wrap; 
+  justify-content: flex-end;
+}
+
+.stat-mini { 
+  display: flex; 
+  flex-direction: column; 
+  align-items: center; 
+  padding: 6px 8px; 
+  background: white; 
+  border-radius: 6px; 
+  min-width: 50px; 
+  border: 1px solid #f0f0f0; 
+}
+
 .stat-mini.highlight { background: #171717; border-color: #171717; }
 .stat-mini span { font-size: 10px; color: #737373; margin-bottom: 2px; }
 .stat-mini.highlight span { color: #d4d4d4; }
@@ -125,18 +156,16 @@
    ✅ تصميم الهواتف (الحفاظ على الترتيب الأصلي 100%)
    ============================================ */
 @media (max-width: 699px) {
-  /* إلغاء تأثير الحاويات لتعود العناصر كأبناء مباشرين */
   .form-left-col, 
   .form-right-col {
     display: contents; 
   }
 
-  /* إعادة ترتيب العناصر في الهاتف كما كانت تماماً (السلة في المنتصف) */
   .page-header { order: 1; }
   .alert-error, .alert-success { order: 2; }
   .card-supplier { order: 3; }
   .card-fields { order: 4; }
-  .card-added { order: 5; } /* السلة هنا */
+  .card-added { order: 5; }
   .card-summary { order: 6; }
   .card-actions { order: 7; }
 
@@ -170,9 +199,10 @@
   .add-form {
     max-width: 1100px;
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    /* ✅ التعديل هنا: القسم الأول 1fr والقسم الثاني 1.5fr */
+    grid-template-columns: 1fr 1.5fr; 
     gap: 16px;
-    height: calc(100vh - 100px); /* ارتفاع ثابت لتفعيل السكرول الداخلي */
+    height: calc(100vh - 100px); 
     align-items: start;
     overflow: hidden;
   }
@@ -180,7 +210,7 @@
   .form-left-col,
   .form-right-col {
     height: 100%;
-    overflow-y: auto; /* شريط تمرير مستقل لكل قسم */
+    overflow-y: auto; 
     padding-inline-end: 8px; 
     padding-bottom: 20px;
   }
@@ -193,6 +223,22 @@
 
   .product-input-card .form-grid { grid-template-columns: 1fr 1fr; }
   .product-input-card .form-group:first-child { grid-column: 1 / -1; }
+
+  /* ✅ تصغير طفيف لعناصر السلة في الشاشات الكبيرة لضمان عدم خروجها */
+  .added-product-card {
+    gap: 8px;
+    padding: 10px;
+  }
+  .added-product-image {
+    width: 40px;
+    height: 40px;
+  }
+  .stat-mini {
+    min-width: 45px;
+    padding: 4px 6px;
+  }
+  .stat-mini span { font-size: 9px; }
+  .stat-mini b { font-size: 11px; }
 }
 
 /* ============================================
@@ -220,7 +266,6 @@ html.in-iframe .add-form {
   box-sizing: border-box !important;
 }
 
-/* استثناء الهواتف داخل الإطار: السماح للصفحة بالتمرير بشكل طبيعي */
 @media (max-width: 699px) {
   html.in-iframe .add-form {
     overflow-y: auto !important;
