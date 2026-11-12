@@ -1,6 +1,7 @@
 // ============================================
 // تعديل مباشر احترافي (Inline Edit 2.0)
 // ✅ دعم الترجمة والعرض المخصص (displayFormatter)
+// ✅ فتح الحقل بالقيمة المترجمة ومنع الحفظ العشوائي
 // ============================================
 
 function inlineEdit({ el, table, id, field, type = 'text', onSave, displayFormatter }) {
@@ -25,10 +26,9 @@ function inlineEdit({ el, table, id, field, type = 'text', onSave, displayFormat
     const span = document.createElement('span');
     span.className = 'inline-display';
     
-    // ✅ تطبيق دالة التنسيق (الترجمة) إذا كانت موجودة
     const displayValue = displayFormatter ? displayFormatter(currentValue) : currentValue;
-    
     span.textContent = (displayValue === '' || displayValue == null) ? '—' : displayValue;
+    
     el.appendChild(span);
   }
 
@@ -38,7 +38,11 @@ function inlineEdit({ el, table, id, field, type = 'text', onSave, displayFormat
 
     const input = document.createElement('input');
     input.type = inputType;
-    input.value = currentValue;
+    
+    // ✅ التعديل هنا: عرض القيمة المترجمة داخل الحقل عند فتحه للتعديل
+    const displayValue = displayFormatter ? displayFormatter(currentValue) : currentValue;
+    input.value = (displayValue === '' || displayValue == null) ? '' : displayValue;
+    
     input.className = 'inline-input';
     if (isNumber) input.step = 'any';
     el.appendChild(input);
@@ -74,8 +78,10 @@ function inlineEdit({ el, table, id, field, type = 'text', onSave, displayFormat
     if (!input) return;
 
     const newValue = isNumber ? (input.value === '' ? 0 : Number(input.value)) : input.value.trim();
+    const displayValue = displayFormatter ? displayFormatter(currentValue) : currentValue;
 
-    if (String(newValue) === String(currentValue)) {
+    // ✅ التعديل هنا: إذا لم يقم المستخدم بتغيير النص المترجم، نلغي التعديل ولا نحفظ
+    if (String(newValue) === String(displayValue)) {
       editing = false;
       renderDisplay();
       return;
