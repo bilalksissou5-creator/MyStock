@@ -98,7 +98,7 @@
   gap: 10px; 
   align-items: center; 
   padding: 12px; 
-  padding-top: 30px; 
+  padding-top: 15px; 
   background: #fafafa; 
   border-radius: 10px; 
   border: 1px solid #f0f0f0; 
@@ -417,7 +417,7 @@
     overflow-x: hidden; 
     margin-inline-end: -16px; 
     padding-inline-end: 12px; 
-    padding-bottom: 16px;
+    padding-bottom: 15px;
   }
 
   .form-left-col::-webkit-scrollbar,
@@ -440,7 +440,7 @@
   .added-product-card { 
     grid-template-columns: 40px minmax(0, 1fr) auto; 
     padding: 10px;
-    padding-top: 28px; 
+    padding-top: 5px; 
   }
   .added-product-image { width: 40px; height: 40px; }
   .stat-mini { min-width: 45px; padding: 4px 6px; }
