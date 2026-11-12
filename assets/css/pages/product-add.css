@@ -310,7 +310,7 @@
     min-height: 0;
     overflow-y: auto; 
     overflow-x: hidden; 
-    padding-bottom: 1px; /* ✅ زيادة الحشوة السفلية لضمان ظهور الزر بالكامل */
+    padding-bottom: 6px; /* ✅ زيادة الحشوة السفلية لضمان ظهور الزر بالكامل */
     padding-inline-end: 9px; 
     border-inline-end: 1px solid #e5e5e5;
     box-sizing: border-box;
