@@ -166,7 +166,8 @@ function renderProductsToDOM() {
     }
   }
 
-  const isDesktop = window.innerWidth >= 1024;
+  // ✅ التعديل هنا: اكتشاف عرض الشاشة الحقيقي حتى لو كنا داخل إطار
+  const isDesktop = (window.self !== window.top ? window.parent.innerWidth : window.innerWidth) >= 1024;
 
   container.innerHTML = grouped.map(p => {
     const total = (Number(p.qty ?? 0) * Number(p.price ?? 0));
