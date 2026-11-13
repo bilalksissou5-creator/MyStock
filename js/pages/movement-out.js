@@ -184,86 +184,95 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   await Printer.loadSaved();
 
+  // ✅ تم تحديث الهيكل ليطابق صفحة إضافة المنتجات
   main.innerHTML = `
-    <div class="page-header">
-      <h2>${tr('mout_title')}</h2>
-      <button type="button" class="btn-primary scan-btn" id="scan-btn">
-        <i class="fas fa-barcode"></i><span>${tr('mout_scan')}</span>
-      </button>
-    </div>
-
-    <div class="alert alert-error" id="form-error" style="display:none;"></div>
-    <div class="alert alert-success" id="form-success" style="display:none;"></div>
-
-    <div class="out-form">
-      <div class="product-input-card">
-        <div class="form-group">
-          <label>${tr('mout_note')}</label>
-          <input type="text" id="note" placeholder="${tr('mout_note_ph')}">
-        </div>
-      </div>
-
-      <div class="product-input-card">
-        <div class="form-group" style="position:relative;margin-bottom:12px;">
-          <label>${tr('mout_product')}</label>
-          <input type="text" id="product-input" placeholder="${tr('mout_product_ph')}" autocomplete="off">
-          <div id="product-suggestions" class="suggestions-box"></div>
-          <input type="hidden" id="product_id">
+    <div class="add-form">
+      
+      <!-- ✅ الحاوية اليسرى (النموذج) -->
+      <div class="form-left-col">
+        <div class="page-header">
+          <h2>${tr('mout_title')}</h2>
+          <button type="button" class="btn-primary scan-btn" id="scan-btn">
+            <i class="fas fa-barcode"></i><span>${tr('mout_scan')}</span>
+          </button>
         </div>
 
-        <div class="form-grid">
+        <div class="alert alert-error" id="form-error" style="display:none;"></div>
+        <div class="alert alert-success" id="form-success" style="display:none;"></div>
+
+        <div class="product-input-card card-supplier">
           <div class="form-group">
-            <label>${tr('mout_qty')}</label>
-            <input type="number" id="quantity" value="" placeholder="1" min="0.01" step="0.01">
-          </div>
-          <div class="form-group">
-            <label>${tr('mout_price')}</label>
-            <input type="number" id="price" value="0" min="0" step="0.01">
-          </div>
-          <div class="form-group">
-            <label>${tr('mout_available')}</label>
-            <input type="text" id="available-qty" value="—" disabled>
+            <label>${tr('mout_note')}</label>
+            <input type="text" id="note" placeholder="${tr('mout_note_ph')}">
           </div>
         </div>
 
-        <button type="button" class="btn-primary add-product-btn" id="add-product-btn">
-          <i class="fas fa-plus"></i>
-          <span>${tr('mout_add_product')}</span>
-        </button>
+        <div class="product-input-card card-fields">
+          <div class="form-group" style="position:relative;margin-bottom:16px;">
+            <label>${tr('mout_product')}</label>
+            <input type="text" id="product-input" placeholder="${tr('mout_product_ph')}" autocomplete="off">
+            <div id="product-suggestions" class="suggestions-box"></div>
+            <input type="hidden" id="product_id">
+          </div>
+
+          <div class="form-grid">
+            <div class="form-group">
+              <label>${tr('mout_qty')}</label>
+              <input type="number" id="quantity" value="" placeholder="1" min="0.01" step="0.01">
+            </div>
+            <div class="form-group">
+              <label>${tr('mout_price')}</label>
+              <input type="number" id="price" value="0" min="0" step="0.01">
+            </div>
+            <div class="form-group">
+              <label>${tr('mout_available')}</label>
+              <input type="text" id="available-qty" value="—" disabled>
+            </div>
+          </div>
+
+          <button type="button" class="btn-primary add-product-btn" id="add-product-btn">
+            <i class="fas fa-plus"></i>
+            <span>${tr('mout_add_product')}</span>
+          </button>
+        </div>
+
+        <div class="form-summary card-summary">
+          <div class="summary-row">
+            <span>${tr('mout_sum_count')}</span>
+            <strong id="sum-rows">0</strong>
+          </div>
+          <div class="summary-row">
+            <span>${tr('mout_sum_qty')}</span>
+            <strong id="sum-qty">0</strong>
+          </div>
+          <div class="summary-row highlight">
+            <span>${tr('mout_sum_total')}</span>
+            <strong id="sum-total">0.00</strong>
+          </div>
+        </div>
+
+        <div class="form-actions card-actions">
+          <button type="button" class="btn-primary" id="save-btn">
+            <i class="fas fa-save"></i>
+            <span>${tr('mout_save')}</span>
+          </button>
+          <a href="/movements/list.html" class="btn-secondary">${tr('mout_cancel')}</a>
+        </div>
       </div>
 
-      <div class="added-products-section">
-        <label class="section-label">${tr('mout_added')}</label>
-        <div id="added-products" class="added-products">
-          <div class="empty-added">
-            <i class="fas fa-box-open"></i>
-            <p>${tr('mout_empty')}</p>
+      <!-- ✅ الحاوية اليمنى (السلة) -->
+      <div class="form-right-col">
+        <div class="added-products-section card-added">
+          <label class="section-label">${tr('mout_added')}</label>
+          <div id="added-products" class="added-products">
+            <div class="empty-added">
+              <i class="fas fa-box-open"></i>
+              <p>${tr('mout_empty')}</p>
+            </div>
           </div>
         </div>
       </div>
-
-      <div class="form-summary">
-        <div class="summary-row">
-          <span>${tr('mout_sum_count')}</span>
-          <strong id="sum-rows">0</strong>
-        </div>
-        <div class="summary-row">
-          <span>${tr('mout_sum_qty')}</span>
-          <strong id="sum-qty">0</strong>
-        </div>
-        <div class="summary-row highlight">
-          <span>${tr('mout_sum_total')}</span>
-          <strong id="sum-total">0.00</strong>
-        </div>
-      </div>
-
-      <div class="form-actions">
-        <button type="button" class="btn-primary" id="save-btn">
-          <i class="fas fa-save"></i>
-          <span>${tr('mout_save')}</span>
-        </button>
-        <a href="/movements/list.html" class="btn-secondary">${tr('mout_cancel')}</a>
-      </div>
+      
     </div>
 
     <div class="scanner-modal" id="scanner-modal" style="display:none;">
