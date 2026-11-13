@@ -312,7 +312,7 @@ h6 { font-size: 0.8125rem; font-weight: 600; color: #404040; }
    Sidebar
    ============================================ */
 .sidebar {
-  width: 170px; /* ✅ تم التعديل إلى 170px */
+  width: 180px; /* ✅ تم التعديل إلى 180px */
   min-width: 0;
   background: #fff;
   border-inline-start: 1px solid #e5e5e5;
@@ -645,8 +645,8 @@ h6 { font-size: 0.8125rem; font-weight: 600; color: #404040; }
   .logo { font-size: 1rem; }
   .search input { padding-block: 6px; padding-inline: 10px 32px; font-size: 12px; }
 
-  /* ✅ تم التعديل إلى 170px */
-  .sidebar { width: 170px; min-width: 170px; max-width: 170px; }
+  /* ✅ تم التعديل إلى 180px */
+  .sidebar { width: 180px; min-width: 180px; max-width: 180px; }
   .nav { padding: 6px 8px; gap: 2px; }
   .nav-item { padding: 6px 10px; font-size: 12px; gap: 8px; }
   .nav-item i { font-size: 14px; width: 18px; }
@@ -755,9 +755,9 @@ html.in-iframe .main {
     font-size: 18px; 
   }
 
-  /* ✅ تم تعديل عرض التمرير إلى 170px */
+  /* ✅ تم تعديل عرض التمرير إلى 180px */
   .body.sidebar-mini .sidebar:hover {
-    width: 170px; 
+    width: 180px; 
     box-shadow: 2px 0 10px rgba(0,0,0,0.1); 
     z-index: 100;
   }
