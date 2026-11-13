@@ -12,18 +12,14 @@
   padding: 0;
   box-sizing: border-box;
   font-family: 'Nunito', 'Cairo', system-ui, -apple-system, sans-serif;
-  
-  /* ✅ إزالة التظليل الأزرق عند اللمس في الهواتف */
   -webkit-tap-highlight-color: transparent !important; 
 }
 
-/* ✅ ضمان أن الحقول والأزرار تأخذ نفس الخط ولا يظهر لها إطار أزرق */
 input, textarea, select, button {
   font-family: inherit;
   outline: none;
 }
 
-/* ✅ إزالة التظليل عن الروابط والأزرار بشكل خاص */
 a, button, .nav-item, .times-item, .switch, .btn-primary, .btn-secondary, .btn-danger, .lang-item {
   -webkit-tap-highlight-color: transparent !important;
   outline: none !important;
@@ -62,12 +58,12 @@ h1, h2, h3, h4, h5, h6 {
   line-height: 1.3;
 }
 
-h1 { font-size: 1.25rem; font-weight: 900; } /* 20px */
-h2 { font-size: 1.125rem; font-weight: 800; } /* 18px */
-h3 { font-size: 1rem; font-weight: 700; } /* 16px */
-h4 { font-size: 0.9375rem; font-weight: 700; } /* 15px */
-h5 { font-size: 0.875rem; font-weight: 600; } /* 14px */
-h6 { font-size: 0.8125rem; font-weight: 600; color: #404040; } /* 13px */
+h1 { font-size: 1.25rem; font-weight: 900; }
+h2 { font-size: 1.125rem; font-weight: 800; }
+h3 { font-size: 1rem; font-weight: 700; }
+h4 { font-size: 0.9375rem; font-weight: 700; }
+h5 { font-size: 0.875rem; font-weight: 600; }
+h6 { font-size: 0.8125rem; font-weight: 600; color: #404040; }
 
 @media (max-width: 768px) {
   h1 { font-size: 1rem; }
@@ -101,7 +97,6 @@ h6 { font-size: 0.8125rem; font-weight: 600; color: #404040; } /* 13px */
   flex-shrink: 0;
 }
 
-/* ✅ خانة البحث في الهيدر (شكل دائري) */
 .search {
   flex: 1;
   max-width: 500px;
@@ -180,7 +175,6 @@ h6 { font-size: 0.8125rem; font-weight: 600; color: #404040; } /* 13px */
 .search-result-item:hover,
 .search-result-item.active { background: #f5f5f5; }
 
-/* ✅ حاوية الأيقونة (المربع) */
 .search-result-icon {
   width: 36px;
   height: 36px;
@@ -193,7 +187,6 @@ h6 { font-size: 0.8125rem; font-weight: 600; color: #404040; } /* 13px */
   position: relative;
 }
 
-/* ✅ الأيقونة نفسها - إصلاح الاختفاء */
 .search-result-icon > i {
   font-family: "Font Awesome 6 Free", "Font Awesome 5 Free", sans-serif !important;
   font-weight: 900 !important;
@@ -203,7 +196,6 @@ h6 { font-size: 0.8125rem; font-weight: 600; color: #404040; } /* 13px */
   color: inherit !important;
 }
 
-/* ✅ ألوان كل نوع */
 .search-result-icon.product { background: #dbeafe; color: #2563eb; }
 .search-result-icon.supplier { background: #fef3c7; color: #d97706; }
 .search-result-icon.invoice { background: #f3e8ff; color: #9333ea; }
@@ -322,7 +314,7 @@ h6 { font-size: 0.8125rem; font-weight: 600; color: #404040; } /* 13px */
    Sidebar
    ============================================ */
 .sidebar {
-  width: 185px;
+  width: 170px; /* ✅ تم تصغير العرض هنا (كان 185px) */
   min-width: 0;
   background: #fff;
   border-inline-start: 1px solid #e5e5e5;
@@ -398,7 +390,7 @@ h6 { font-size: 0.8125rem; font-weight: 600; color: #404040; } /* 13px */
   overflow-y: auto;
   overflow-x: hidden;
   padding: 24px;
-  padding-bottom: 24px; /* ✅ تم تعديلها من 80px إلى 24px */
+  padding-bottom: 24px; 
   min-height: 0;
   min-width: 0;
   height: 100%;
@@ -485,7 +477,7 @@ h6 { font-size: 0.8125rem; font-weight: 600; color: #404040; } /* 13px */
 .search-bar {
   position: relative;
   margin-bottom: 20px;
-  max-width: 100%; /* ✅ تم إزالة الحد الأقصى 400px ليتمدد بحرية */
+  max-width: 100%; 
   width: 100%;
 }
 
@@ -641,7 +633,7 @@ h6 { font-size: 0.8125rem; font-weight: 600; color: #404040; } /* 13px */
 }
 
 /* ============================================
-   ✅ الموبايل
+   ✅ الموبايل (الهواتف فقط)
    ============================================ */
 @media (max-width: 768px) {
   .header { padding: 0 12px; gap: 10px; }
@@ -669,7 +661,6 @@ h6 { font-size: 0.8125rem; font-weight: 600; color: #404040; } /* 13px */
   .sidebar-footer .nav-item { padding: 12px 4px; justify-content: center; }
   .sidebar-footer .nav-item i { font-size: 18px; }
 
-  /* ✅ تم تعديل الحشوة السفلية من 80px إلى 16px */
   .main { 
     padding: 12px; 
     padding-bottom: 16px; 
@@ -681,7 +672,6 @@ h6 { font-size: 0.8125rem; font-weight: 600; color: #404040; } /* 13px */
     border-inline-start-width: 0;
   }
 
-  /* ✅ البحث على الهاتف */
   .global-search-dropdown {
     position: fixed;
     top: 68px;
@@ -692,14 +682,15 @@ h6 { font-size: 0.8125rem; font-weight: 600; color: #404040; } /* 13px */
 }
 
 /* ============================================
-   Landscape
+   ✅ الوضع الأفقي (Landscape)
    ============================================ */
 @media (orientation: landscape) and (max-height: 500px) {
   .header { height: 45px; padding: 0 12px; gap: 10px; }
   .logo { font-size: 1rem; }
   .search input { padding-block: 6px; padding-inline: 10px 32px; font-size: 12px; }
 
-  .sidebar { width: 200px; min-width: 200px; max-width: 200px; }
+  /* ✅ تم تصغير العرض هنا أيضاً ليكون متناسقاً */
+  .sidebar { width: 160px; min-width: 160px; max-width: 160px; }
   .nav { padding: 6px 8px; gap: 2px; }
   .nav-item { padding: 6px 10px; font-size: 12px; gap: 8px; }
   .nav-item i { font-size: 14px; width: 18px; }
@@ -707,7 +698,6 @@ h6 { font-size: 0.8125rem; font-weight: 600; color: #404040; } /* 13px */
   .sidebar-footer .nav-item { padding: 6px 10px; font-size: 12px; }
   .sidebar-footer .nav-item i { font-size: 14px; }
   
-  /* ✅ تم تعديل الحشوة السفلية من 40px إلى 16px */
   .main { 
     padding: 12px; 
     padding-bottom: 16px; 
