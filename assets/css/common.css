@@ -662,15 +662,30 @@ h6 { font-size: 0.8125rem; font-weight: 600; color: #404040; }
 }
 
 /* ============================================
-   ✅ إصلاح جذري لصفحات الـ Workspace (iframe)
+   ✅ إصلاح جذري لصفحات الـ Workspace (iframe) - محدث
    ============================================ */
-.in-iframe .main {
+html.in-iframe, html.in-iframe body {
+  height: 100% !important;
+  overflow: hidden !important;
+  margin: 0 !important;
+}
+
+html.in-iframe .main {
   display: flex !important;
   flex-direction: column !important;
-  overflow: hidden !important;
-  padding: 0 !important;
+  overflow-y: auto !important; /* ✅ السماح بالتمرير لأسفل */
+  overflow-x: hidden !important;
+  padding: 24px !important; /* ✅ إرجاع المسافات الجانبية */
   height: 100% !important;
-  padding-bottom: 0 !important;
+  padding-bottom: 24px !important;
+  box-sizing: border-box !important;
+}
+
+@media (max-width: 768px) {
+  html.in-iframe .main {
+    padding: 12px !important; /* مسافة أقل للهاتف */
+    padding-bottom: 16px !important;
+  }
 }
 
 /* ============================================
