@@ -314,7 +314,7 @@ h6 { font-size: 0.8125rem; font-weight: 600; color: #404040; }
    Sidebar (الوضع المفتوح الأساسي)
    ============================================ */
 .sidebar {
-  width: 240px; /* ✅ تم تكبير العرض الأساسي للشاشات الكبيرة */
+  width: 240px; 
   min-width: 0;
   background: #fff;
   border-inline-start: 1px solid #e5e5e5;
@@ -674,9 +674,11 @@ h6 { font-size: 0.8125rem; font-weight: 600; color: #404040; }
 }
 
 /* ============================================
-   ✅ وضع القائمة المصغرة (أيقونات فقط) للشاشات الكبيرة
+   ✅ وضع القائمة المصغرة (أيقونات فقط) + تأثير التمرير
    ============================================ */
 @media (min-width: 769px) {
+  
+  /* الوضع المصغر الأساسي (أيقونات فقط) */
   .body.sidebar-mini .sidebar {
     width: 65px; 
   }
@@ -710,12 +712,48 @@ h6 { font-size: 0.8125rem; font-weight: 600; color: #404040; }
     font-size: 18px; 
   }
 
-  /* ✅ تكبير الخط والحشوات للعناصر في الشاشات الكبيرة (الوضع المفتوح) */
+  /* تكبير الخط للشاشات الكبيرة في الوضع المفتوح */
   .body:not(.sidebar-mini) .nav-item {
-    font-size: 15px; /* تكبير الخط قليلاً */
-    padding: 14px 16px; /* مساحات أوسع */
+    font-size: 15px; 
+    padding: 14px 16px; 
   }
   .body:not(.sidebar-mini) .nav-item i {
-    font-size: 18px; /* أيقونات أكبر */
+    font-size: 18px; 
+  }
+
+  /* ✅ تأثير التمرير (Hover) على القائمة المصغرة */
+  .body.sidebar-mini .sidebar:hover {
+    width: 240px; /* تتوسع عند تمرير الماوس */
+    box-shadow: 2px 0 10px rgba(0,0,0,0.1); /* ظل خفيف ليبدو كقائمة عائمة */
+    z-index: 100;
+  }
+  
+  .body.sidebar-mini .sidebar:hover .nav-item {
+    justify-content: flex-start;
+    padding: 14px 16px;
+    gap: 12px;
+    font-size: 15px; 
+  }
+  
+  .body.sidebar-mini .sidebar:hover .nav-item span { 
+    display: inline; /* إظهار النص */
+  }
+  
+  .body.sidebar-mini .sidebar:hover .nav-item i { 
+    font-size: 18px; 
+    width: 24px; 
+  }
+  
+  .body.sidebar-mini .sidebar:hover .sidebar-footer { 
+    padding: 12px; 
+  }
+  
+  .body.sidebar-mini .sidebar:hover .sidebar-footer .nav-item { 
+    justify-content: flex-start; 
+    padding: 14px 16px; 
+  }
+  
+  .body.sidebar-mini .sidebar:hover .sidebar-footer .nav-item i { 
+    font-size: 18px; 
   }
 }
