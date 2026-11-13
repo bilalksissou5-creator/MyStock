@@ -322,9 +322,8 @@ h6 { font-size: 0.8125rem; font-weight: 600; color: #404040; }
   overflow: hidden;
   height: 100%;
   
-  transition: width 0.2s ease-in-out,
-              opacity 0.2s ease-in-out,
-              border-inline-start-width 0.2s ease-in-out;
+  /* ✅ إزالة الأنيميشن (Transition) لمنع اهتزاز العناصر نهائياً */
+  transition: none !important; 
 }
 
 .body.sidebar-closed .sidebar {
@@ -351,7 +350,7 @@ h6 { font-size: 0.8125rem; font-weight: 600; color: #404040; }
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 12px 17.5px; /* ✅ الحشوة السحرية الثابتة */
+  padding: 12px 17.5px;
   border-radius: 8px;
   color: #171717;
   font-size: 15px;
@@ -363,7 +362,8 @@ h6 { font-size: 0.8125rem; font-weight: 600; color: #404040; }
   text-align: start;
   flex-shrink: 0;
   white-space: nowrap;
-  transition: background 0.15s;
+  /* ✅ إزالة الأنيميشن لمنع أي حركة */
+  transition: none !important;
 }
 
 .nav-item i { 
@@ -723,20 +723,17 @@ html.in-iframe .main {
     width: 65px; 
   }
   
-  /* الحفاظ على الحشوة الثابتة لمنع أي حركة */
   .body.sidebar-mini .nav-item {
     justify-content: flex-start !important;
-    padding: 12px 17.5px !important; /* ✅ هذه المسافة تجعل الأيقونة في منتصف الـ 65px تماماً */
+    padding: 12px 23.5px !important; /* ✅ الحشوة السحرية التي تمنع الحركة */
     gap: 12px !important;
-    transition: background 0.15s !important;
+    transition: none !important; /* ✅ إزالة الأنيميشن تماماً */
   }
   
-  /* إخفاء النص تماماً */
   .body.sidebar-mini .nav-item span { 
     display: none !important; 
   }
 
-  /* تثبيت حجم الأيقونة */
   .body.sidebar-mini .nav-item i,
   .body.sidebar-mini .sidebar-footer .nav-item i { 
     font-size: 18px !important; 
@@ -748,8 +745,9 @@ html.in-iframe .main {
   .body:not(.sidebar-mini) .nav-item,
   .body.sidebar-mini .sidebar:hover .nav-item {
     justify-content: flex-start !important;
-    padding: 12px 17.5px !important; /* ✅ نفس المسافة بالضبط، الأيقونة لن تتحرك */
+    padding: 12px 23.5px !important; /* ✅ نفس المسافة بالضبط */
     gap: 12px !important;
+    transition: none !important; 
   }
 
   .body:not(.sidebar-mini) .nav-item span,
@@ -770,6 +768,7 @@ html.in-iframe .main {
     width: 200px !important; 
     box-shadow: 2px 0 10px rgba(0,0,0,0.1); 
     z-index: 100;
+    transition: none !important; /* ✅ إزالة الأنيميشن */
   }
 }
 
