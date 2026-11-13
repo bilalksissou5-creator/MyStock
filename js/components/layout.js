@@ -1,6 +1,8 @@
 // ============================================
 // الهيكل المشترك (Header + Sidebar)
 // ✅ تحديث: استخدام iframe لمنع إعادة تحميل الصفحة
+// ✅ إصلاح المسافات المزدوجة (تغيير كلاس الإطار)
+// ✅ جعل الوضع الافتراضي للقائمة (مصغرة - أيقونات فقط)
 // ============================================
 
 const ALLOWED_PAGES = [
@@ -124,6 +126,7 @@ function renderLayout(activePage) {
         </div>
       </aside>
       
+      <!-- ✅ تم تغيير الكلاس إلى main-iframe لإزالة المسافات المزدوجة -->
       <iframe class="main-iframe" id="main-content" name="content-frame" src="${currentPath}"></iframe>
       
     </div>
@@ -152,9 +155,15 @@ function renderLayout(activePage) {
       bodyEl.classList.add('sidebar-hidden-mobile');
     } else {
       bodyEl.classList.remove('sidebar-hidden-mobile', 'sidebar-closed');
-      const isMini = localStorage.getItem('sidebar_mini') === 'true';
-      if (isMini) bodyEl.classList.add('sidebar-mini');
-      else bodyEl.classList.remove('sidebar-mini');
+      
+      // ✅ التعديل هنا: إذا لم تكن هناك قيمة محفوظة، أو كانت القيمة true، نطبق وضع الأيقونات
+      const isMini = localStorage.getItem('sidebar_mini') !== 'false'; 
+      
+      if (isMini) {
+        bodyEl.classList.add('sidebar-mini');
+      } else {
+        bodyEl.classList.remove('sidebar-mini');
+      }
     }
   };
 
@@ -167,6 +176,7 @@ function renderLayout(activePage) {
         bodyEl.classList.toggle('sidebar-hidden-mobile');
       } else {
         bodyEl.classList.toggle('sidebar-mini');
+        // حفظ الحالة: إذا كانت مصغرة نحفظ true، وإذا كانت مفتوحة نحفظ false
         localStorage.setItem('sidebar_mini', bodyEl.classList.contains('sidebar-mini'));
       }
     });
@@ -365,6 +375,7 @@ async function initGlobalSearch() {
     dropdown.classList.add('show');
     activeIndex = -1;
 
+    // ✅ تصحيح: استخدام iframe.src بدلاً من window.location.href
     dropdown.querySelectorAll('.search-result-item').forEach(el => {
       el.addEventListener('mousedown', (e) => {
         e.preventDefault(); 
