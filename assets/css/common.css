@@ -709,75 +709,49 @@ html.in-iframe .main {
 }
 
 /* ============================================
-   ✅ الوضع المصغر (أيقونات فقط)
+   ✅ الحل الرياضي الصارم (ثبات تام بدون أي اهتزاز)
    ============================================ */
 @media (min-width: 769px) {
   
+  /* 1. تثبيت المسافة من اليسار (20px) لكل الحالات */
+  .nav-item,
+  .sidebar-footer .nav-item {
+    padding: 12px 20px !important; /* مسافة ثابتة لا تتغير */
+    justify-content: flex-start !important; /* محاذاة ثابتة دائماً */
+    gap: 12px !important; /* مسافة ثابتة بين الأيقونة والنص */
+  }
+
+  .nav-item i,
+  .sidebar-footer .nav-item i {
+    width: 24px !important;
+    flex-shrink: 0 !important;
+  }
+
+  /* 2. في الوضع المصغر (إخفاء النص فقط) */
   .body.sidebar-mini .sidebar {
     width: 65px; 
   }
   
-  .body.sidebar-mini .nav-item,
-  .body.sidebar-mini .sidebar-footer .nav-item {
-    justify-content: center !important;
-    padding: 12px 0 !important;
-    gap: 0 !important;
-  }
-  
   .body.sidebar-mini .nav-item span { 
-    display: none !important; 
-  }
-  
-  .body.sidebar-mini .nav-item i { 
-    font-size: 18px !important; 
-    width: auto !important; 
-  }
-  
-  .body.sidebar-mini .sidebar-footer { 
-    padding: 8px 4px; 
-  }
-  
-  .body.sidebar-mini .sidebar-footer .nav-item { 
-    justify-content: center; 
-    padding: 12px 4px; 
-  }
-  
-  .body.sidebar-mini .sidebar-footer .nav-item i { 
-    font-size: 18px; 
+    display: inline-block !important;
+    opacity: 0 !important; /* إخفاء النص */
+    width: 0 !important; /* تصفير عرضه */
+    overflow: hidden;
+    margin: 0 !important;
   }
 
-  /* ✅ عند تمرير الماوس (Hover) */
+  /* 3. في الوضع المفتوح (إظهار النص) */
+  .body:not(.sidebar-mini) .nav-item span,
+  .body.sidebar-mini .sidebar:hover .nav-item span {
+    opacity: 1 !important;
+    width: auto !important; 
+    transition: opacity 0.2s ease-in-out !important;
+  }
+
+  /* 4. القائمة المفتوحة عند تمرير الماوس */
   .body.sidebar-mini .sidebar:hover {
     width: 180px; 
     box-shadow: 2px 0 10px rgba(0,0,0,0.1); 
     z-index: 100;
-  }
-  
-  .body.sidebar-mini .sidebar:hover .nav-item {
-    justify-content: flex-start;
-    padding: 12px 10px;
-    gap: 8px;
-    font-size: 15px; 
-  }
-  
-  .body.sidebar-mini .sidebar:hover .nav-item span { 
-    display: inline-block;
-    width: auto;
-    opacity: 1;
-    margin-inline-start: 0;
-  }
-  
-  .body.sidebar-mini .sidebar:hover .nav-item i { 
-    font-size: 18px; 
-    width: 24px; 
-  }
-  
-  .body.sidebar-mini .sidebar:hover .sidebar-footer { 
-    padding: 12px; 
-  }
-  
-  .body.sidebar-mini .sidebar:hover .sidebar-footer .nav-item { 
-    justify-content: flex-start; 
-    padding: 12px 10px; 
   }
 }
