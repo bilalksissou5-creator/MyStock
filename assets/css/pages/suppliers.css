@@ -1,77 +1,121 @@
 /* ============================================
    صفحة الموردين
+   ✅ إصلاح شريط البحث والعرض داخل الإطار
    ============================================ */
+
+/* ✅ إصلاح شامل لشريط البحث ليمتد بعرض الشاشة */
+.search-bar {
+  position: relative !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  margin-bottom: 20px !important;
+}
+
+.search-bar input {
+  width: 100% !important;
+  height: 40px !important;
+  padding-block: 0 !important;
+  padding-inline: 14px 36px !important;
+  border: 1px solid #d4d4d4 !important;
+  border-radius: 50px !important; /* إعادة الشكل الدائري */
+  background: white !important;
+  outline: none !important;
+  font-size: 14px !important;
+  box-sizing: border-box !important;
+  transition: border-color 0.2s, box-shadow 0.2s !important;
+}
+
+.search-bar input:focus {
+  border-color: #171717 !important;
+  box-shadow: 0 0 0 3px rgba(23, 23, 23, 0.05) !important;
+}
+
+.search-bar i {
+  position: absolute !important;
+  inset-inline-end: 12px !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  color: #a3a3a3 !important;
+  font-size: 14px !important;
+  z-index: 2 !important;
+  pointer-events: none !important;
+}
 
 /* قائمة الموردين */
 .suppliers-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 16px;
+  display: grid !important;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)) !important; /* عرض أدنى مناسب */
+  gap: 16px !important;
+  width: 100% !important;
 }
 
 .supplier-card {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  background: white;
-  padding: 16px;
-  border-radius: 10px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
-  text-decoration: none;
-  color: inherit;
-  transition: box-shadow 0.15s, transform 0.15s;
+  display: flex !important;
+  align-items: center !important;
+  gap: 14px !important;
+  background: white !important;
+  padding: 16px !important;
+  border-radius: 10px !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06) !important;
+  text-decoration: none !important;
+  color: inherit !important;
+  transition: box-shadow 0.15s, transform 0.15s !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+  min-width: 0 !important; /* منع تمدد البطاقة */
 }
 
 .supplier-card:hover {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+  transform: translateY(-2px) !important;
 }
 
 .supplier-avatar {
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  background: #f0f0f0;
-  color: #404040;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  font-size: 20px;
+  width: 50px !important;
+  height: 50px !important;
+  border-radius: 50% !important;
+  background: #f0f0f0 !important;
+  color: #404040 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex-shrink: 0 !important;
+  font-size: 20px !important;
 }
 
 .supplier-info {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  min-width: 0;
-  flex: 1;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 4px !important;
+  min-width: 0 !important;
+  flex: 1 !important;
 }
 
 .supplier-info strong {
-  font-size: 15px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  font-size: 15px !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  color: #171717 !important;
 }
 
 .supplier-phone,
 .supplier-email {
-  font-size: 12px;
-  color: #737373;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  display: flex;
-  align-items: center;
-  gap: 6px;
+  font-size: 12px !important;
+  color: #737373 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 6px !important;
 }
 
 .supplier-phone i,
 .supplier-email i {
-  font-size: 11px;
-  color: #a3a3a3;
-  width: 14px;
+  font-size: 11px !important;
+  color: #a3a3a3 !important;
+  width: 14px !important;
 }
 
 /* ============================================
@@ -309,23 +353,23 @@
    ============================================ */
 @media (max-width: 768px) {
   .suppliers-grid {
-    grid-template-columns: 1fr;
-    gap: 10px;
+    grid-template-columns: 1fr !important;
+    gap: 10px !important;
   }
 
   .supplier-card {
-    padding: 12px;
-    gap: 12px;
+    padding: 12px !important;
+    gap: 12px !important;
   }
 
   .supplier-avatar {
-    width: 42px;
-    height: 42px;
-    font-size: 18px;
+    width: 42px !important;
+    height: 42px !important;
+    font-size: 18px !important;
   }
 
   .supplier-info strong {
-    font-size: 14px;
+    font-size: 14px !important;
   }
 
   .add-form {
