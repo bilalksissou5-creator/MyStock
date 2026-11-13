@@ -4,6 +4,7 @@
    ✅ تقليل الحشوات العمودية لشريط البحث والزر
    ✅ إصلاح شكل خانة البحث لتعود دائرية وبعرض كامل
    ✅ إصلاح قطع النصوص داخل بطاقات المنتجات
+   ✅ إجبار عرض بطاقتين في شاشة الهاتف
    ============================================ */
 
 /* تنسيق شبكة المنتجات الأساسي */
@@ -77,15 +78,16 @@
 .product-stats {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 4px; /* ✅ تقليل الفراغ بين المربعات */
+  gap: 4px; 
   text-align: center;
   margin-top: auto;
 }
 
+/* ✅ تم تعديل الحشوة إلى 2px كما طلبت */
 .stat {
   background: #fafafa;
   border-radius: 6px;
-  padding: 6px 2px; /* ✅ تقليل الحشوة الداخلية */
+  padding: 2px; /* ✅ 2px لجميع الجهات */
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -93,7 +95,7 @@
 }
 
 .stat-label {
-  font-size: 10px; /* ✅ تصغير الخط */
+  font-size: 10px; 
   color: #737373;
   margin-bottom: 2px;
   white-space: nowrap;
@@ -102,7 +104,7 @@
 }
 
 .stat-value {
-  font-size: 13px; /* ✅ تصغير الخط ليتسع للسعر */
+  font-size: 12px; /* تصغير الخط قليلاً ليتناسب مع الحشوة 2px */
   font-weight: 700;
   white-space: nowrap;
   overflow: hidden;
@@ -116,16 +118,39 @@
 
 /* ══════ شاشات الهاتف ══════ */
 @media (max-width: 768px) {
+  /* ✅ إجبار الشبكة على عرض بطاقتين بالضبط (عمودين) */
   .products {
-    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-    gap: 10px;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important; 
+    gap: 8px !important; /* تقليل الفراغ بين البطاقتين */
   }
-  .product-card { padding: 10px; }
-  .product-card-image { height: 110px; }
-  .product-card h3 { font-size: 14px; }
-  .stat { padding: 6px 2px; }
-  .stat-label { font-size: 10px; }
-  .stat-value { font-size: 12px; }
+  
+  .product-card { 
+    padding: 8px; /* تقليل الحشوة الداخلية للبطاقة لتتسع */
+  }
+  
+  .product-card-image { 
+    height: 100px; /* تصغير الصورة قليلاً */
+  }
+  
+  .product-card h3 { 
+    font-size: 13px; 
+    margin-bottom: 4px;
+  }
+
+  .product-card .sku {
+    font-size: 11px;
+    margin-bottom: 8px;
+  }
+  
+  .stat { 
+    padding: 2px !important; 
+  }
+  .stat-label { 
+    font-size: 9px; 
+  }
+  .stat-value { 
+    font-size: 11px; 
+  }
 }
 
 /* ============================================
@@ -216,14 +241,22 @@ html.in-iframe .search-bar {
   z-index: 99 !important;
 }
 
-/* ✅ تكبير عرض البطاقة داخل الإطار لمنع قطع النصوص */
+/* ✅ إزالة قاعدة minmax(260px) التي كانت تجبر البطاقة على التمدد في الهاتف */
 html.in-iframe .products {
   display: grid !important;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)) !important; /* ✅ تم التعديل من 190px إلى 260px */
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)) !important; /* تم إرجاعها للوضع الطبيعي */
   gap: 16px !important;
   padding: 0 !important;
   margin: 0 !important;
   align-content: start !important;
+}
+
+/* ✅ تطبيق قاعدة الهاتف (عمودين) داخل الإطار أيضاً */
+@media (max-width: 768px) {
+  html.in-iframe .products {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 8px !important;
+  }
 }
 
 /* ============================================
