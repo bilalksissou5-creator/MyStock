@@ -18,7 +18,6 @@ async function autoCheckPaymentBlock() {
   try {
     if (typeof db === 'undefined') return;
     
-    // ✅ استخدام getSession بدلاً من getUser لسرعة الاستجابة
     const { data: { session } } = await db.auth.getSession();
     const user = session?.user;
     if (!user) return;
@@ -78,7 +77,6 @@ if (document.readyState === 'loading') document.addEventListener('DOMContentLoad
 else autoCheckPaymentBlock();
 
 function renderLayout(activePage) {
-  // ✅ إذا كنا داخل iframe، اعرض Main فقط (لإخفاء الهيدر والسايدبار)
   if (window.self !== window.top) {
     document.documentElement.classList.add('in-iframe');
     const app = document.querySelector('.app');
@@ -100,7 +98,6 @@ function renderLayout(activePage) {
     { href: '/settings.html', labelKey: 'nav_settings', icon: 'fa-gear' },
   ];
 
-  // ✅ إضافة target="content-frame" لكل الروابط
   const navHTML = navItems.map(item => `
     <a href="${item.href}" target="content-frame" class="nav-item ${activePage === item.href ? 'active' : ''}">
       <i class="fas ${item.icon}"></i>
@@ -130,7 +127,6 @@ function renderLayout(activePage) {
         </div>
       </aside>
       
-      <!-- ✅ استبدال Main بـ iframe -->
       <iframe class="main" id="main-content" name="content-frame" src="${currentPath}" style="border:none; width:100%; height:100%; background: #f5f5f5;"></iframe>
       
     </div>
@@ -357,7 +353,6 @@ async function initGlobalSearch() {
       if (!g.items.length) return;
       html += `<div class="search-result-group"><div class="search-result-group-title">${g.title}</div>`;
       g.items.forEach(item => {
-        // ✅ إضافة target="content-frame" لنتائج البحث
         html += `<a href="${escapeHtml(item.url)}" target="content-frame" class="search-result-item" style="text-decoration:none; color:inherit;">
           <div class="search-result-icon ${item.type}"><i class="fas ${item.icon}"></i></div>
           <div class="search-result-info">
@@ -373,19 +368,26 @@ async function initGlobalSearch() {
     dropdown.classList.add('show');
     activeIndex = -1;
 
-    // تحديث active state للقائمة الجانبية عند النقر على نتيجة بحث
+    // ✅ تصحيح: استخدام iframe.src بدلاً من window.location.href
     dropdown.querySelectorAll('.search-result-item').forEach(el => {
-      el.addEventListener('mousedown', () => {
-        saveToHistory(currentQuery);
-        hideDropdown();
-        // تحديث الـ active في السايدبار
-        document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
-        
-        // تصغير السايدبار إذا لم تكن في الهاتف
-        const bodyEl = document.getElementById('app-body');
-        if (bodyEl && !window.matchMedia('(max-width: 768px)').matches) {
-          bodyEl.classList.add('sidebar-mini');
-          localStorage.setItem('sidebar_mini', 'true');
+      el.addEventListener('mousedown', (e) => {
+        e.preventDefault(); 
+        const url = el.getAttribute('href');
+        if (url) {
+          saveToHistory(currentQuery);
+          hideDropdown();
+          
+          const iframe = document.getElementById('main-content');
+          if (iframe) iframe.src = url;
+
+          document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
+          const bodyEl = document.getElementById('app-body');
+          if (bodyEl && !window.matchMedia('(max-width: 768px)').matches) {
+            bodyEl.classList.add('sidebar-mini');
+            localStorage.setItem('sidebar_mini', 'true');
+          } else if (bodyEl) {
+            bodyEl.classList.add('sidebar-hidden-mobile');
+          }
         }
       });
     });
@@ -664,11 +666,21 @@ async function initGlobalSearch() {
       e.preventDefault();
       const target = items[activeIndex] || items[0];
       if (target) {
-        const url = target.dataset.url;
+        const url = target.getAttribute('href');
         if (url) {
           saveToHistory(currentQuery || input.value);
-          window.open(url, 'content-frame'); // فتح في الإطار
           hideDropdown();
+          
+          // ✅ تصحيح: استخدام iframe.src بدلاً من window.location.href
+          const iframe = document.getElementById('main-content');
+          if (iframe) iframe.src = url;
+          
+          document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
+          const bodyEl = document.getElementById('app-body');
+          if (bodyEl && !window.matchMedia('(max-width: 768px)').matches) {
+            bodyEl.classList.add('sidebar-mini');
+            localStorage.setItem('sidebar_mini', 'true');
+          }
         } else if (target.dataset.query) {
           input.value = target.dataset.query;
           performSearch(target.dataset.query);
