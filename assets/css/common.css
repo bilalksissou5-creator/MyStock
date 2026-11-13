@@ -368,7 +368,7 @@ h6 { font-size: 0.8125rem; font-weight: 600; color: #404040; }
 
 .nav-item i { 
   width: 26px; 
-  font-size: 18px; /* ✅ تم التعديل إلى 18px */
+  font-size: 18px; 
   text-align: center; 
   flex-shrink: 0; 
 }
@@ -714,36 +714,38 @@ html.in-iframe .main {
 }
 
 /* ============================================
-   ✅ وضع القائمة المصغرة (ثبات تام وبدون قطع نصوص)
+   ✅ وضع القائمة المصغرة (ثبات مطلق 0px بدون أي حركة)
    ============================================ */
 @media (min-width: 769px) {
   
+  /* 1. الوضع المغلق (القائمة بعرض 65px) */
   .body.sidebar-mini .sidebar {
     width: 65px; 
   }
   
   .body.sidebar-mini .nav-item {
-    justify-content: center !important;
-    padding: 12px 0 !important; 
-    gap: 0 !important;
+    justify-content: flex-start !important; /* ✅ إلغاء التوسيط لتثبيت النقطة */
+    padding: 12px 13.5px !important; /* ✅ حشوة دقيقة جداً (13.5px) لتبدو في المنتصف */
+    gap: 12px !important;
     transition: background 0.15s !important;
   }
   
   .body.sidebar-mini .nav-item span { 
-    display: none !important; 
+    display: none !important; /* إخفاء النص تماماً */
   }
 
   .body.sidebar-mini .nav-item i,
   .body.sidebar-mini .sidebar-footer .nav-item i { 
-    font-size: 18px !important; /* ✅ تم التعديل إلى 18px */
+    font-size: 18px !important; 
     width: 26px !important; 
     flex-shrink: 0 !important;
   }
   
+  /* 2. الوضع المفتوح (عند الفتح أو التمرير) */
   .body:not(.sidebar-mini) .nav-item,
   .body.sidebar-mini .sidebar:hover .nav-item {
     justify-content: flex-start !important;
-    padding: 12px 14px !important;
+    padding: 12px 13.5px !important; /* ✅ نفس الحشوة الدقيقة (13.5px) */
     gap: 12px !important;
   }
 
@@ -756,10 +758,11 @@ html.in-iframe .main {
 
   .body:not(.sidebar-mini) .nav-item i,
   .body.sidebar-mini .sidebar:hover .nav-item i {
-    font-size: 18px !important; /* ✅ تم التعديل إلى 18px */
+    font-size: 18px !important; 
     width: 26px !important; 
   }
 
+  /* 3. توسيع القائمة */
   .body.sidebar-mini .sidebar:hover {
     width: 210px !important; 
     box-shadow: 2px 0 10px rgba(0,0,0,0.1); 
