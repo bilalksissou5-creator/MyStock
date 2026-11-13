@@ -55,7 +55,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   const main = document.getElementById('main-content');
 
-  // ✅ الترتيب محدث لدعم السكرول المستقل في الشاشات الكبيرة
   main.innerHTML = `
     <div class="add-form">
       
@@ -143,10 +142,8 @@ document.addEventListener('DOMContentLoaded', async () => {
           <button type="button" class="scanner-close" id="scanner-close"><i class="fas fa-xmark"></i></button>
         </div>
         
-        <!-- الكاميرا -->
         <div id="scanner-reader" class="scanner-reader"></div>
         
-        <!-- ✅ زر قلب الكاميرا في الأسفل -->
         <div class="scanner-actions">
           <button type="button" class="scanner-flip" id="scanner-flip">
             <i class="fas fa-camera-rotate"></i>
@@ -173,7 +170,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const scannerModal = document.getElementById('scanner-modal');
   const scannerReader = document.getElementById('scanner-reader');
   const scannerClose = document.getElementById('scanner-close');
-  const scannerFlipBtn = document.getElementById('scanner-flip'); // ✅ زر قلب الكاميرا
+  const scannerFlipBtn = document.getElementById('scanner-flip');
   const scannerHint = document.getElementById('scanner-hint');
   const errBox = document.getElementById('form-error');
   const successBox = document.getElementById('form-success');
@@ -185,7 +182,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   let isScanning = false;
   let html5QrCode = null;
   let scannedImageUrl = null;
-  let currentFacingMode = 'environment'; // ✅ تتبع حالة الكاميرا (خلفية أو أمامية)
+  let currentFacingMode = 'environment'; 
 
   function showErr(msg) { errBox.textContent = msg; errBox.style.display = 'block'; successBox.style.display = 'none'; }
   function showSuccess(msg) { successBox.textContent = msg; successBox.style.display = 'block'; errBox.style.display = 'none'; }
@@ -268,7 +265,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (!e.target.closest('.supplier-group')) suggestions.style.display = 'none';
   });
 
-  // ✅ دالة مساعدة لتشغيل الكاميرا بوضعية معينة (خلفية/أمامية)
   async function startCameraWithMode(mode) {
     if (html5QrCode) {
       try { await html5QrCode.stop(); await html5QrCode.clear(); } catch (e) {}
@@ -308,18 +304,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     scannerModal.style.display = 'none';
   }
 
-  // ✅ حدث النقر على زر قلب الكاميرا
   scannerFlipBtn.addEventListener('click', async () => {
     if (!html5QrCode) return;
-    
-    // التبديل بين الأمام والخلف
     currentFacingMode = currentFacingMode === 'environment' ? 'user' : 'environment';
-    
     try {
       await startCameraWithMode(currentFacingMode);
     } catch (err) {
       console.error("Camera flip error:", err);
-      // في حال عدم وجود كاميرا أمامية، نرجع للخلفية
       currentFacingMode = currentFacingMode === 'environment' ? 'user' : 'environment';
       try { await startCameraWithMode(currentFacingMode); } catch (e) {}
     }
