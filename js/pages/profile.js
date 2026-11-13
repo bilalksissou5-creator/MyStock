@@ -1,6 +1,7 @@
 // ============================================
 // صفحة الملف الشخصي — تصميم Facebook + Accordion
 // ✅ دعم كامل للترجمة
+// ✅ إصلاح ظهور البريد الإلكتروني
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   const user = await requireAuth();
@@ -28,6 +29,9 @@ document.addEventListener('DOMContentLoaded', async () => {
       user.user_metadata?.picture ||
       null;
   }
+
+  // ✅ إصلاح: جلب البريد الإلكتروني بطريقة آمنة
+  const userEmail = profile?.email || user.email || '—';
 
   const currentRole = profile?.role;
   const isAdmin = currentRole === 'admin';
@@ -143,7 +147,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       <div class="info-row">
         <i class="fas fa-envelope info-icon"></i>
-        <span class="info-text" dir="ltr">${user.email}</span>
+        <!-- ✅ إضافة أنماط إجبارية لضمان الظهور -->
+        <span class="info-text" dir="ltr" style="display: block !important; visibility: visible !important; opacity: 1 !important;">${userEmail}</span>
       </div>
 
       <div class="info-row">
@@ -179,7 +184,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       <div class="profile-fb-info">
         <h3>${profile?.full_name ?? tr('products_no_name')}</h3>
-        <p class="profile-fb-email" dir="ltr">${user.email}</p>
+        <!-- ✅ إضافة أنماط إجبارية لضمان الظهور هنا أيضاً -->
+        <p class="profile-fb-email" dir="ltr" style="display: block !important; visibility: visible !important; opacity: 1 !important; margin-top: 4px;">${userEmail}</p>
         <div class="profile-fb-badges">
           <span class="badge-role">${roleLabel}</span>
         </div>
