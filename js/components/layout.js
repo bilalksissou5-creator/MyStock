@@ -1,9 +1,7 @@
 // ============================================
 // الهيكل المشترك (Header + Sidebar)
 // ✅ تحديث: استخدام iframe لمنع إعادة تحميل الصفحة
-// ✅ فحص تلقائي + تحذيرات + ترجمة كاملة (تحديث ديناميكي)
-// ✅ محرك التنبيهات (نغمات متعددة + اهتزاز)
-// ✅ البحث الذكي الشامل (دقيق + سجل + تسامح مع الأخطاء)
+// ✅ إصلاح المسافات المزدوجة (تغيير كلاس الإطار)
 // ============================================
 
 const ALLOWED_PAGES = [
@@ -127,7 +125,8 @@ function renderLayout(activePage) {
         </div>
       </aside>
       
-      <iframe class="main" id="main-content" name="content-frame" src="${currentPath}" style="border:none; width:100%; height:100%; background: #f5f5f5;"></iframe>
+      <!-- ✅ تم تغيير الكلاس إلى main-iframe لإزالة المسافات المزدوجة -->
+      <iframe class="main-iframe" id="main-content" name="content-frame" src="${currentPath}"></iframe>
       
     </div>
   `;
@@ -671,7 +670,6 @@ async function initGlobalSearch() {
           saveToHistory(currentQuery || input.value);
           hideDropdown();
           
-          // ✅ تصحيح: استخدام iframe.src بدلاً من window.location.href
           const iframe = document.getElementById('main-content');
           if (iframe) iframe.src = url;
           
