@@ -314,7 +314,7 @@ h6 { font-size: 0.8125rem; font-weight: 600; color: #404040; }
    Sidebar
    ============================================ */
 .sidebar {
-  width: 170px; /* ✅ تم تصغير العرض هنا (كان 185px) */
+  width: 170px; 
   min-width: 0;
   background: #fff;
   border-inline-start: 1px solid #e5e5e5;
@@ -689,7 +689,6 @@ h6 { font-size: 0.8125rem; font-weight: 600; color: #404040; }
   .logo { font-size: 1rem; }
   .search input { padding-block: 6px; padding-inline: 10px 32px; font-size: 12px; }
 
-  /* ✅ تم تصغير العرض هنا أيضاً ليكون متناسقاً */
   .sidebar { width: 160px; min-width: 160px; max-width: 160px; }
   .nav { padding: 6px 8px; gap: 2px; }
   .nav-item { padding: 6px 10px; font-size: 12px; gap: 8px; }
@@ -714,4 +713,42 @@ h6 { font-size: 0.8125rem; font-weight: 600; color: #404040; }
   padding: 0 !important;
   height: 100% !important;
   padding-bottom: 0 !important;
+}
+
+/* ============================================
+   ✅ وضع القائمة المصغرة (أيقونات فقط) للشاشات الكبيرة
+   ============================================ */
+@media (min-width: 769px) {
+  .body.sidebar-mini .sidebar {
+    width: 65px; 
+  }
+  
+  .body.sidebar-mini .nav-item {
+    justify-content: center;
+    padding: 12px 4px;
+    gap: 0;
+    font-size: 0; 
+  }
+  
+  .body.sidebar-mini .nav-item span { 
+    display: none; 
+  }
+  
+  .body.sidebar-mini .nav-item i { 
+    font-size: 18px; 
+    width: auto; 
+  }
+  
+  .body.sidebar-mini .sidebar-footer { 
+    padding: 8px 4px; 
+  }
+  
+  .body.sidebar-mini .sidebar-footer .nav-item { 
+    justify-content: center; 
+    padding: 12px 4px; 
+  }
+  
+  .body.sidebar-mini .sidebar-footer .nav-item i { 
+    font-size: 18px; 
+  }
 }

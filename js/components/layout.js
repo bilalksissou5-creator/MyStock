@@ -151,9 +151,47 @@ function renderLayout(activePage) {
   const bodyEl = document.getElementById('app-body');
   const isMobile = () => window.matchMedia('(max-width: 768px)').matches;
 
-  if (toggleBtn) toggleBtn.addEventListener('click', (e) => { e.stopPropagation(); if(isMobile()) bodyEl.classList.toggle('sidebar-hidden-mobile'); else bodyEl.classList.toggle('sidebar-closed'); });
-  if (!isMobile()) { if (localStorage.getItem('sidebar_closed') === 'true') bodyEl.classList.add('sidebar-closed'); }
-  else bodyEl.classList.add('sidebar-hidden-mobile');
+  // ✅ دالة لتطبيق الحالة المحفوظة
+  const applySidebarState = () => {
+    if (isMobile()) {
+      bodyEl.classList.remove('sidebar-mini');
+      bodyEl.classList.add('sidebar-hidden-mobile');
+    } else {
+      bodyEl.classList.remove('sidebar-hidden-mobile', 'sidebar-closed');
+      const isMini = localStorage.getItem('sidebar_mini') === 'true';
+      if (isMini) {
+        bodyEl.classList.add('sidebar-mini');
+      } else {
+        bodyEl.classList.remove('sidebar-mini');
+      }
+    }
+  };
+
+  // تطبيق الحالة عند تحميل الصفحة
+  applySidebarState();
+
+  // ✅ زر فتح / إغلاق القائمة
+  if (toggleBtn) {
+    toggleBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (isMobile()) {
+        bodyEl.classList.toggle('sidebar-hidden-mobile');
+      } else {
+        bodyEl.classList.toggle('sidebar-mini');
+        localStorage.setItem('sidebar_mini', bodyEl.classList.contains('sidebar-mini'));
+      }
+    });
+  }
+
+  // ✅ تصغير القائمة تلقائياً عند الضغط على أي رابط
+  document.querySelectorAll('.nav-item, .sidebar-footer .nav-item').forEach(link => {
+    link.addEventListener('click', () => {
+      if (!isMobile() && link.tagName === 'A') {
+        bodyEl.classList.add('sidebar-mini');
+        localStorage.setItem('sidebar_mini', 'true');
+      }
+    });
+  });
 
   if (typeof startNotifPolling === 'function') startNotifPolling();
 
@@ -697,12 +735,10 @@ function unlockAudio() {
   }
 }
 
-// فك قفل الصوت عند أي تفاعل من المستخدم
 ['click', 'touchstart', 'keydown'].forEach(evt => {
   document.addEventListener(evt, unlockAudio, { passive: true });
 });
 
-// الدالة الرئيسية لتشغيل التنبيه (تقرأ النغمة المختارة)
 window.playNotificationAlerts = async function() {
   console.log('🎵 playNotificationAlerts called');
   
@@ -718,7 +754,6 @@ window.playNotificationAlerts = async function() {
     return;
   }
 
-  // --- تشغيل الصوت ---
   if (soundOn && selectedTone !== 'none') {
     try {
       if (!window.__audioCtx) {
@@ -774,7 +809,6 @@ window.playNotificationAlerts = async function() {
     }
   }
 
-  // --- الاهتزاز ---
   if (vibrateOn && navigator.vibrate) {
     navigator.vibrate([200, 100, 200]);
     console.log('📳 Vibration triggered');
@@ -785,7 +819,6 @@ window.playNotificationAlerts = async function() {
 // ✅ دعم التنقل الذكي في التطبيق المثبت (PWA)
 // ============================================
 
-// 1. استقبال أمر التنقل من الإشعارات (إذا كان التطبيق مفتوحاً)
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.addEventListener('message', event => {
     if (event.data && event.data.type === 'NAVIGATE') {
@@ -794,23 +827,18 @@ if ('serviceWorker' in navigator) {
   });
 }
 
-// 2. إصلاح زر الرجوع (Hardware Back) لمنع إغلاق التطبيق فجأة
 if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone) {
-  // إضافة حالة وهمية للسجل لكي لا يغلق التطبيق عند أول ضغطة رجوع
   if (!window.history.state || !window.history.state.isAppRoot) {
     window.history.pushState({ isAppRoot: true }, '', window.location.href);
   }
 
   window.addEventListener('popstate', (e) => {
-    // إذا عاد المستخدم للجذر ولم يتبقَّ صفحات في السجل
     if (!e.state || !e.state.isAppRoot) {
       const currentPath = window.location.pathname;
       
-      // إذا كان في صفحة عميقة (مثل إيصال، منتج، الخ)، نعيده لصفحة الإشعارات
       if (!currentPath.includes('notifications.html') && !currentPath.includes('dashboard.html') && currentPath !== '/' && !currentPath.includes('index.html')) {
         window.location.href = '/notifications.html';
       }
-      // إذا كان في لوحة التحكم أو الإشعارات، نتركه يغلق التطبيق بشكل طبيعي
     }
   });
 }
