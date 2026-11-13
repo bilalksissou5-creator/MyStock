@@ -389,8 +389,8 @@ h6 { font-size: 0.8125rem; font-weight: 600; color: #404040; }
   flex: 1 1 auto;
   overflow-y: auto;
   overflow-x: hidden;
-  padding: 15px;
-  padding-bottom: 1px; 
+  padding: 24px;
+  padding-bottom: 24px; 
   min-height: 0;
   min-width: 0;
   height: 100%;
@@ -721,9 +721,11 @@ h6 { font-size: 0.8125rem; font-weight: 600; color: #404040; }
     font-size: 18px; 
   }
 
-  /* ✅ تأثير التمرير (Hover) على القائمة المصغرة - تعود لوضعها الطبيعي (بدون طفو) */
+  /* ✅ تأثير التمرير (Hover) على القائمة المصغرة */
   .body.sidebar-mini .sidebar:hover {
-    width: 240px; 
+    width: 240px; /* تتوسع عند تمرير الماوس */
+    box-shadow: 2px 0 10px rgba(0,0,0,0.1); /* ظل خفيف ليبدو كقائمة عائمة */
+    z-index: 100;
   }
   
   .body.sidebar-mini .sidebar:hover .nav-item {
@@ -734,7 +736,7 @@ h6 { font-size: 0.8125rem; font-weight: 600; color: #404040; }
   }
   
   .body.sidebar-mini .sidebar:hover .nav-item span { 
-    display: inline; 
+    display: inline; /* إظهار النص */
   }
   
   .body.sidebar-mini .sidebar:hover .nav-item i { 
