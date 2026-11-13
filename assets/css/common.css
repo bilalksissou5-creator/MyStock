@@ -42,7 +42,7 @@ button { font-family: inherit; }
 .app {
   display: flex;
   flex-direction: column;
-  height: 100%; /* ✅ تعديل: لتعتمد على الـ body */
+  height: 100%;
   overflow: hidden;
 }
 
@@ -312,7 +312,7 @@ h6 { font-size: 0.8125rem; font-weight: 600; color: #404040; }
    Sidebar
    ============================================ */
 .sidebar {
-  width: 240px; 
+  width: 180px; /* ✅ تم التعديل إلى 180px */
   min-width: 0;
   background: #fff;
   border-inline-start: 1px solid #e5e5e5;
@@ -645,7 +645,7 @@ h6 { font-size: 0.8125rem; font-weight: 600; color: #404040; }
   .logo { font-size: 1rem; }
   .search input { padding-block: 6px; padding-inline: 10px 32px; font-size: 12px; }
 
-  .sidebar { width: 200px; min-width: 200px; max-width: 200px; }
+  .sidebar { width: 160px; min-width: 160px; max-width: 160px; } /* ✅ تم تعديلها لتناسب العرض الجديد */
   .nav { padding: 6px 8px; gap: 2px; }
   .nav-item { padding: 6px 10px; font-size: 12px; gap: 8px; }
   .nav-item i { font-size: 14px; width: 18px; }
@@ -660,7 +660,7 @@ h6 { font-size: 0.8125rem; font-weight: 600; color: #404040; }
 }
 
 /* ============================================
-   ✅ تنسيق الإطار الجديد (بدون أي مسافات خارجية)
+   ✅ تنسيق الإطار (بدون أي مسافات خارجية)
    ============================================ */
 .main-iframe {
   flex: 1 1 auto;
@@ -669,7 +669,7 @@ h6 { font-size: 0.8125rem; font-weight: 600; color: #404040; }
   border: none;
   background: #f5f5f5;
   min-width: 0;
-  min-height: 0; /* ✅ ضروري لمنع تمدد الإطار */
+  min-height: 0;
   display: block;
 }
 
@@ -682,7 +682,6 @@ html.in-iframe, html.in-iframe body {
   margin: 0 !important;
 }
 
-/* ✅ إجبار التطبيق داخل الإطار على أخذ المساحة المتاحة بالكامل */
 html.in-iframe .app {
   height: 100% !important;
   display: flex !important;
@@ -690,11 +689,10 @@ html.in-iframe .app {
   overflow: hidden !important;
 }
 
-/* ✅ الحاوية الرئيسية داخل الإطار (تتمرر ولا تقطع المحتوى) */
 html.in-iframe .main {
-  flex: 1 1 auto !important; /* ✅ تتمدد ديناميكياً */
-  height: auto !important; /* ✅ إزالة 100% */
-  min-height: 0 !important; /* ✅ السطر السحري للتمرير */
+  flex: 1 1 auto !important;
+  height: auto !important;
+  min-height: 0 !important;
   overflow-y: auto !important; 
   overflow-x: hidden !important;
   padding: 15px !important;
@@ -756,8 +754,9 @@ html.in-iframe .main {
     font-size: 18px; 
   }
 
+  /* ✅ تم تعديل عرض التمرير إلى 180px */
   .body.sidebar-mini .sidebar:hover {
-    width: 240px; 
+    width: 180px; 
     box-shadow: 2px 0 10px rgba(0,0,0,0.1); 
     z-index: 100;
   }
