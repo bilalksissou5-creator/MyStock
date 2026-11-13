@@ -5,6 +5,7 @@
    ✅ إصلاح شكل خانة البحث لتعود دائرية وبعرض كامل
    ✅ إصلاح قطع النصوص داخل بطاقات المنتجات
    ✅ إجبار عرض بطاقتين في شاشة الهاتف
+   ✅ جعل حشوة البطاقة 5px في جميع الشاشات
    ============================================ */
 
 /* تنسيق شبكة المنتجات الأساسي */
@@ -18,7 +19,7 @@
 .product-card {
   background: white;
   border-radius: 10px;
-  padding: 12px;
+  padding: 5px; /* ✅ تم التعديل إلى 5px */
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
   display: flex;
   flex-direction: column;
@@ -63,6 +64,7 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  padding-inline: 5px; /* إضافة مسافة صغيرة للنص ليتناسق مع الحشوة الجديدة */
 }
 
 .product-card .sku {
@@ -72,6 +74,7 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  padding-inline: 5px;
 }
 
 /* تنسيق الإحصائيات الثلاثة داخل البطاقة */
@@ -83,11 +86,11 @@
   margin-top: auto;
 }
 
-/* ✅ تم تعديل الحشوة إلى 2px كما طلبت */
+/* ✅ حشوة المربعات 2px كما طلبت سابقاً */
 .stat {
   background: #fafafa;
   border-radius: 6px;
-  padding: 2px; /* ✅ 2px لجميع الجهات */
+  padding: 2px; 
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -104,7 +107,7 @@
 }
 
 .stat-value {
-  font-size: 12px; /* تصغير الخط قليلاً ليتناسب مع الحشوة 2px */
+  font-size: 12px; 
   font-weight: 700;
   white-space: nowrap;
   overflow: hidden;
@@ -125,11 +128,11 @@
   }
   
   .product-card { 
-    padding: 8px; /* تقليل الحشوة الداخلية للبطاقة لتتسع */
+    padding: 5px !important; /* ✅ إجبار الحشوة على 5px في الهاتف أيضاً */
   }
   
   .product-card-image { 
-    height: 100px; /* تصغير الصورة قليلاً */
+    height: 100px; 
   }
   
   .product-card h3 { 
@@ -241,17 +244,15 @@ html.in-iframe .search-bar {
   z-index: 99 !important;
 }
 
-/* ✅ إزالة قاعدة minmax(260px) التي كانت تجبر البطاقة على التمدد في الهاتف */
 html.in-iframe .products {
   display: grid !important;
-  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)) !important; /* تم إرجاعها للوضع الطبيعي */
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)) !important;
   gap: 16px !important;
   padding: 0 !important;
   margin: 0 !important;
   align-content: start !important;
 }
 
-/* ✅ تطبيق قاعدة الهاتف (عمودين) داخل الإطار أيضاً */
 @media (max-width: 768px) {
   html.in-iframe .products {
     grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
