@@ -1,7 +1,7 @@
 // ============================================
 // الهيكل المشترك (Header + Sidebar)
+// ✅ تحديث: استخدام iframe لمنع إعادة تحميل الصفحة
 // ✅ فحص تلقائي + تحذيرات + ترجمة كاملة (تحديث ديناميكي)
-// ✅ دعم iframe (وضع Embed)
 // ✅ محرك التنبيهات (نغمات متعددة + اهتزاز)
 // ✅ البحث الذكي الشامل (دقيق + سجل + تسامح مع الأخطاء)
 // ============================================
@@ -88,7 +88,6 @@ function renderLayout(activePage) {
 
   const tr = (key) => (window.t ? window.t(key) : key);
   
-  // ✅ إضافة labelKey لاستخدامها في data-i18n
   const navItems = [
     { href: '/dashboard.html', labelKey: 'nav_dashboard', icon: 'fa-house' },
     { href: '/products/add-workspace.html', labelKey: 'nav_add_product', icon: 'fa-circle-plus' },
@@ -101,21 +100,22 @@ function renderLayout(activePage) {
     { href: '/settings.html', labelKey: 'nav_settings', icon: 'fa-gear' },
   ];
 
-  // ✅ استخدام data-i18n بجانب tr() لضمان التحديث لاحقاً
+  // ✅ إضافة target="content-frame" لكل الروابط
   const navHTML = navItems.map(item => `
-    <a href="${item.href}" class="nav-item ${activePage === item.href ? 'active' : ''}">
+    <a href="${item.href}" target="content-frame" class="nav-item ${activePage === item.href ? 'active' : ''}">
       <i class="fas ${item.icon}"></i>
       <span data-i18n="${item.labelKey}">${tr(item.labelKey)}</span>
     </a>
   `).join('');
 
+  const currentPath = window.location.pathname + window.location.search;
+
   const layout = `
     <header class="header">
       <button type="button" class="sidebar-toggle" id="sidebar-toggle"><i class="fas fa-bars"></i></button>
-      <a href="/notifications.html" class="notif" id="notif-btn"><i class="fas fa-bell"></i><span class="notif-count" id="notif-count">0</span></a>
+      <a href="/notifications.html" target="content-frame" class="notif" id="notif-btn"><i class="fas fa-bell"></i><span class="notif-count" id="notif-count">0</span></a>
       <div class="search">
         <i class="fas fa-search"></i>
-        <!-- ✅ استخدام data-i18n-placeholder -->
         <input type="text" id="global-search-input" data-i18n-placeholder="nav_search" placeholder="${tr('nav_search')}" autocomplete="off">
         <div class="global-search-dropdown" id="global-search-dropdown"></div>
       </div>
@@ -125,18 +125,20 @@ function renderLayout(activePage) {
       <aside class="sidebar" id="app-sidebar">
         <nav class="nav">${navHTML}</nav>
         <div class="sidebar-footer">
-          <a href="/profile.html" class="nav-item ${activePage === '/profile.html' ? 'active' : ''}"><i class="fas fa-user"></i><span data-i18n="nav_profile">${tr('nav_profile')}</span></a>
+          <a href="/profile.html" target="content-frame" class="nav-item ${activePage === '/profile.html' ? 'active' : ''}"><i class="fas fa-user"></i><span data-i18n="nav_profile">${tr('nav_profile')}</span></a>
           <button class="nav-item logout" id="logout-btn"><i class="fas fa-right-from-bracket"></i><span data-i18n="nav_logout">${tr('nav_logout')}</span></button>
         </div>
       </aside>
-      <main class="main" id="main-content"></main>
+      
+      <!-- ✅ استبدال Main بـ iframe -->
+      <iframe class="main" id="main-content" name="content-frame" src="${currentPath}" style="border:none; width:100%; height:100%; background: #f5f5f5;"></iframe>
+      
     </div>
   `;
 
   const app = document.querySelector('.app');
   if (app) app.innerHTML = layout;
 
-  // ✅ إعادة تطبيق الترجمة فوراً بعد رسم القائمة
   if (window.applyLanguage) window.applyLanguage();
 
   document.querySelectorAll('.logout').forEach(b => {
@@ -151,7 +153,6 @@ function renderLayout(activePage) {
   const bodyEl = document.getElementById('app-body');
   const isMobile = () => window.matchMedia('(max-width: 768px)').matches;
 
-  // ✅ دالة لتطبيق الحالة المحفوظة
   const applySidebarState = () => {
     if (isMobile()) {
       bodyEl.classList.remove('sidebar-mini');
@@ -159,18 +160,13 @@ function renderLayout(activePage) {
     } else {
       bodyEl.classList.remove('sidebar-hidden-mobile', 'sidebar-closed');
       const isMini = localStorage.getItem('sidebar_mini') === 'true';
-      if (isMini) {
-        bodyEl.classList.add('sidebar-mini');
-      } else {
-        bodyEl.classList.remove('sidebar-mini');
-      }
+      if (isMini) bodyEl.classList.add('sidebar-mini');
+      else bodyEl.classList.remove('sidebar-mini');
     }
   };
 
-  // تطبيق الحالة عند تحميل الصفحة
   applySidebarState();
 
-  // ✅ زر فتح / إغلاق القائمة
   if (toggleBtn) {
     toggleBtn.addEventListener('click', (e) => {
       e.stopPropagation();
@@ -183,17 +179,16 @@ function renderLayout(activePage) {
     });
   }
 
-  // ✅ إغلاق أو تصغير القائمة عند الضغط على أي رابط
-  document.querySelectorAll('.nav-item, .sidebar-footer .nav-item').forEach(link => {
+  document.querySelectorAll('.nav-item').forEach(link => {
     link.addEventListener('click', () => {
-      // استثناء زر تسجيل الخروج لأنه يقوم بعملية أخرى
       if (link.id === 'logout-btn') return;
 
+      document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+      link.classList.add('active');
+
       if (isMobile()) {
-        // في الهاتف: تغلق القائمة تماماً
         bodyEl.classList.add('sidebar-hidden-mobile');
       } else {
-        // في الشاشات الكبيرة: تصغر القائمة لتعرض الأيقونات فقط
         bodyEl.classList.add('sidebar-mini');
         localStorage.setItem('sidebar_mini', 'true');
       }
@@ -201,8 +196,6 @@ function renderLayout(activePage) {
   });
 
   if (typeof startNotifPolling === 'function') startNotifPolling();
-
-  // ✅ تفعيل البحث الذكي
   initGlobalSearch();
 }
 
@@ -228,20 +221,17 @@ async function initGlobalSearch() {
   let activeIndex = -1;
   let currentQuery = '';
 
-  // ============================================
-  // ✅ تطبيع الحروف العربية
-  // ============================================
   function normArabic(s) {
     return String(s || '')
       .toLowerCase()
-      .replace(/[\u064B-\u065F\u0670]/g, '')   // التشكيل
-      .replace(/[أإآٱ]/g, 'ا')                  // الألف
-      .replace(/ة/g, 'ه')                        // التاء المربوطة
-      .replace(/ى/g, 'ي')                        // الألف المقصورة
-      .replace(/ؤ/g, 'و')                        // الواو
-      .replace(/ئ/g, 'ي')                        // الياء
-      .replace(/ـ/g, '')                         // التطويل
-      .replace(/[^\w\u0600-\u06FF\s]/g, ' ')    // إبقاء العربي والإنجليزي فقط
+      .replace(/[\u064B-\u065F\u0670]/g, '')   
+      .replace(/[أإآٱ]/g, 'ا')                  
+      .replace(/ة/g, 'ه')                        
+      .replace(/ى/g, 'ي')                        
+      .replace(/ؤ/g, 'و')                        
+      .replace(/ئ/g, 'ي')                        
+      .replace(/ـ/g, '')                         
+      .replace(/[^\w\u0600-\u06FF\s]/g, ' ')    
       .replace(/\s+/g, ' ')
       .trim();
   }
@@ -257,24 +247,20 @@ async function initGlobalSearch() {
     activeIndex = -1;
   };
 
-  // ============================================
-  // ✅ حساب درجة الصلة (0-100)
-  // ============================================
   function scoreMatch(normQuery, text) {
     if (!text) return 0;
     const normText = normArabic(text);
     if (!normText || !normQuery) return 0;
 
-    if (normText === normQuery) return 100;              // تطابق تام
-    if (normText.startsWith(normQuery)) return 85;       // يبدأ بـ
+    if (normText === normQuery) return 100;              
+    if (normText.startsWith(normQuery)) return 85;       
 
     const words = normText.split(' ');
-    if (words.some(w => w === normQuery)) return 80;     // كلمة كاملة
-    if (words.some(w => w.startsWith(normQuery))) return 70; // بداية كلمة
+    if (words.some(w => w === normQuery)) return 80;     
+    if (words.some(w => w.startsWith(normQuery))) return 70; 
 
-    if (normText.includes(normQuery)) return 50;         // يحتوي
+    if (normText.includes(normQuery)) return 50;         
 
-    // تسامح مع الأخطاء الإملائية (للإنجليزي فقط، طول 3+)
     if (/^[a-z0-9]+$/.test(normQuery) && normQuery.length >= 3) {
       if (Math.abs(normText.length - normQuery.length) <= 3) {
         let i = 0;
@@ -288,9 +274,6 @@ async function initGlobalSearch() {
     return 0;
   }
 
-  // ============================================
-  // ✅ سجل البحث الأخير
-  // ============================================
   const HISTORY_KEY = 'global_search_history_v1';
   const MAX_HISTORY = 5;
 
@@ -338,9 +321,6 @@ async function initGlobalSearch() {
     });
   }
 
-  // ============================================
-  // ✅ تمييز النص المطابق
-  // ============================================
   function highlight(text, query) {
     if (!text) return '';
     const esc = escapeHtml(text);
@@ -361,9 +341,6 @@ async function initGlobalSearch() {
     }
   }
 
-  // ============================================
-  // ✅ عرض النتائج
-  // ============================================
   function renderResults(groups) {
     const total = groups.reduce((s, g) => s + g.items.length, 0);
     if (total === 0) {
@@ -380,13 +357,14 @@ async function initGlobalSearch() {
       if (!g.items.length) return;
       html += `<div class="search-result-group"><div class="search-result-group-title">${g.title}</div>`;
       g.items.forEach(item => {
-        html += `<div class="search-result-item" data-url="${escapeHtml(item.url)}">
+        // ✅ إضافة target="content-frame" لنتائج البحث
+        html += `<a href="${escapeHtml(item.url)}" target="content-frame" class="search-result-item" style="text-decoration:none; color:inherit;">
           <div class="search-result-icon ${item.type}"><i class="fas ${item.icon}"></i></div>
           <div class="search-result-info">
             <div class="search-result-title">${item.highlighted}</div>
             <div class="search-result-subtitle">${escapeHtml(item.subtitle || '')}</div>
           </div>
-        </div>`;
+        </a>`;
       });
       html += `</div>`;
     });
@@ -395,21 +373,24 @@ async function initGlobalSearch() {
     dropdown.classList.add('show');
     activeIndex = -1;
 
+    // تحديث active state للقائمة الجانبية عند النقر على نتيجة بحث
     dropdown.querySelectorAll('.search-result-item').forEach(el => {
-      el.addEventListener('mousedown', (e) => {
-        e.preventDefault();
-        const url = el.dataset.url;
-        if (url) {
-          saveToHistory(currentQuery);
-          window.location.href = url;
+      el.addEventListener('mousedown', () => {
+        saveToHistory(currentQuery);
+        hideDropdown();
+        // تحديث الـ active في السايدبار
+        document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
+        
+        // تصغير السايدبار إذا لم تكن في الهاتف
+        const bodyEl = document.getElementById('app-body');
+        if (bodyEl && !window.matchMedia('(max-width: 768px)').matches) {
+          bodyEl.classList.add('sidebar-mini');
+          localStorage.setItem('sidebar_mini', 'true');
         }
       });
     });
   }
 
-  // ============================================
-  // ✅ البحث الرئيسي
-  // ============================================
   async function performSearch(query) {
     const q = query.trim();
     const normQ = normArabic(q);
@@ -433,7 +414,6 @@ async function initGlobalSearch() {
       const orgId = profile.organization_id;
       const canSeeWorkers = profile.role === 'admin' || profile.role === 'deputy';
 
-      // تنظيف الاستعلام من الرموز الخاصة
       const safeQ = q.replace(/[%_,()]/g, '').trim();
       if (!safeQ) { hideDropdown(); return; }
 
@@ -477,9 +457,6 @@ async function initGlobalSearch() {
           : Promise.resolve({ data: [] })
       ]);
 
-      // ============================================
-      // جمع المنتجات + ربط الباركودات
-      // ============================================
       const productMap = new Map();
       (productsRes.data || []).forEach(p => {
         productMap.set(p.id, { ...p, _scores: [] });
@@ -498,9 +475,6 @@ async function initGlobalSearch() {
         });
       }
 
-      // ============================================
-      // تسجيل درجات الصلة لكل منتج
-      // ============================================
       const scoredProducts = [];
       for (const p of productMap.values()) {
         const scores = [
@@ -522,9 +496,6 @@ async function initGlobalSearch() {
       scoredProducts.sort((a, b) => b.score - a.score);
       const topProducts = scoredProducts.slice(0, 5);
 
-      // ============================================
-      // تسجيل درجات الموردين
-      // ============================================
       const scoredSuppliers = (suppliersRes.data || [])
         .map(s => ({
           ...s,
@@ -538,16 +509,10 @@ async function initGlobalSearch() {
         .sort((a, b) => b.score - a.score)
         .slice(0, 3);
 
-      // ============================================
-      // الفواتير والإيصالات والعمال
-      // ============================================
       const topInvoices = (invoicesRes.data || []).slice(0, 3);
       const topReceipts = (receiptsRes.data || []).slice(0, 3);
       const topWorkers = (workersRes.data || []).slice(0, 3);
 
-      // ============================================
-      // بناء المجموعات
-      // ============================================
       const groups = [];
 
       if (topProducts.length) {
@@ -615,9 +580,6 @@ async function initGlobalSearch() {
         });
       }
 
-      // ============================================
-      // Fallback: إذا لم توجد نتائج، حاول بأحرف أقل
-      // ============================================
       if (groups.length === 0 && safeQ.length > 3) {
         const shortQ = safeQ.slice(0, Math.max(3, Math.floor(safeQ.length * 0.6)));
         return performShortSearch(shortQ, q, orgId, canSeeWorkers, groups);
@@ -630,9 +592,6 @@ async function initGlobalSearch() {
     }
   }
 
-  // ============================================
-  // ✅ بحث احتياطي
-  // ============================================
   async function performShortSearch(shortQ, originalQuery, orgId, canSeeWorkers, existingGroups) {
     try {
       const term = `%${shortQ}%`;
@@ -660,9 +619,6 @@ async function initGlobalSearch() {
     }
   }
 
-  // ============================================
-  // ✅ الأحداث
-  // ============================================
   input.addEventListener('input', (e) => {
     clearTimeout(debounceTimer);
     const q = e.target.value;
@@ -711,7 +667,8 @@ async function initGlobalSearch() {
         const url = target.dataset.url;
         if (url) {
           saveToHistory(currentQuery || input.value);
-          window.location.href = url;
+          window.open(url, 'content-frame'); // فتح في الإطار
+          hideDropdown();
         } else if (target.dataset.query) {
           input.value = target.dataset.query;
           performSearch(target.dataset.query);
