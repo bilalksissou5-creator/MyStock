@@ -447,6 +447,11 @@
   .stat-mini span { font-size: 9px; }
   .stat-mini b { font-size: 11px; }
 
+  /* ✅ توسيط أزرار الحفظ والإلغاء في الشاشات الكبيرة */
+  .form-actions {
+    justify-content: center;
+  }
+
   .form-left-col .page-header {
     position: sticky;
     top: 0;
