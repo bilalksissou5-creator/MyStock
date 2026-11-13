@@ -1,8 +1,7 @@
 // ============================================
 // الهيكل المشترك (Header + Sidebar)
-// ✅ تحديث: استخدام iframe لمنع إعادة تحميل الصفحة
-// ✅ إصلاح المسافات المزدوجة (تغيير كلاس الإطار)
-// ✅ جعل الوضع الافتراضي للقائمة (مصغرة - أيقونات فقط)
+// ✅ تحديث الرابط (URL) لمنع العودة للصفحة القديمة عند التحديث
+// ✅ دعم أزرار الرجوع والتقدم في المتصفح
 // ============================================
 
 const ALLOWED_PAGES = [
@@ -98,7 +97,7 @@ function renderLayout(activePage) {
   ];
 
   const navHTML = navItems.map(item => `
-    <a href="${item.href}" target="content-frame" class="nav-item ${activePage === item.href ? 'active' : ''}">
+    <a href="${item.href}" class="nav-item ${activePage === item.href ? 'active' : ''}">
       <i class="fas ${item.icon}"></i>
       <span data-i18n="${item.labelKey}">${tr(item.labelKey)}</span>
     </a>
@@ -109,7 +108,7 @@ function renderLayout(activePage) {
   const layout = `
     <header class="header">
       <button type="button" class="sidebar-toggle" id="sidebar-toggle"><i class="fas fa-bars"></i></button>
-      <a href="/notifications.html" target="content-frame" class="notif" id="notif-btn"><i class="fas fa-bell"></i><span class="notif-count" id="notif-count">0</span></a>
+      <a href="/notifications.html" class="notif" id="notif-btn"><i class="fas fa-bell"></i><span class="notif-count" id="notif-count">0</span></a>
       <div class="search">
         <i class="fas fa-search"></i>
         <input type="text" id="global-search-input" data-i18n-placeholder="nav_search" placeholder="${tr('nav_search')}" autocomplete="off">
@@ -121,12 +120,11 @@ function renderLayout(activePage) {
       <aside class="sidebar" id="app-sidebar">
         <nav class="nav">${navHTML}</nav>
         <div class="sidebar-footer">
-          <a href="/profile.html" target="content-frame" class="nav-item ${activePage === '/profile.html' ? 'active' : ''}"><i class="fas fa-user"></i><span data-i18n="nav_profile">${tr('nav_profile')}</span></a>
+          <a href="/profile.html" class="nav-item ${activePage === '/profile.html' ? 'active' : ''}"><i class="fas fa-user"></i><span data-i18n="nav_profile">${tr('nav_profile')}</span></a>
           <button class="nav-item logout" id="logout-btn"><i class="fas fa-right-from-bracket"></i><span data-i18n="nav_logout">${tr('nav_logout')}</span></button>
         </div>
       </aside>
       
-      <!-- ✅ تم تغيير الكلاس إلى main-iframe لإزالة المسافات المزدوجة -->
       <iframe class="main-iframe" id="main-content" name="content-frame" src="${currentPath}"></iframe>
       
     </div>
@@ -155,15 +153,9 @@ function renderLayout(activePage) {
       bodyEl.classList.add('sidebar-hidden-mobile');
     } else {
       bodyEl.classList.remove('sidebar-hidden-mobile', 'sidebar-closed');
-      
-      // ✅ التعديل هنا: إذا لم تكن هناك قيمة محفوظة، أو كانت القيمة true، نطبق وضع الأيقونات
       const isMini = localStorage.getItem('sidebar_mini') !== 'false'; 
-      
-      if (isMini) {
-        bodyEl.classList.add('sidebar-mini');
-      } else {
-        bodyEl.classList.remove('sidebar-mini');
-      }
+      if (isMini) bodyEl.classList.add('sidebar-mini');
+      else bodyEl.classList.remove('sidebar-mini');
     }
   };
 
@@ -176,15 +168,26 @@ function renderLayout(activePage) {
         bodyEl.classList.toggle('sidebar-hidden-mobile');
       } else {
         bodyEl.classList.toggle('sidebar-mini');
-        // حفظ الحالة: إذا كانت مصغرة نحفظ true، وإذا كانت مفتوحة نحفظ false
         localStorage.setItem('sidebar_mini', bodyEl.classList.contains('sidebar-mini'));
       }
     });
   }
 
+  // ✅ تعديل الروابط لتحديث الرابط في المتصفح
   document.querySelectorAll('.nav-item').forEach(link => {
-    link.addEventListener('click', () => {
+    link.addEventListener('click', (e) => {
       if (link.id === 'logout-btn') return;
+
+      const targetUrl = link.getAttribute('href');
+      if (targetUrl && targetUrl !== '#') {
+        e.preventDefault(); // منع القفز الافتراضي
+        
+        const iframe = document.getElementById('main-content');
+        if (iframe) iframe.src = targetUrl;
+        
+        // تحديث رابط المتصفح الرئيسي
+        window.history.pushState({ path: targetUrl }, '', targetUrl);
+      }
 
       document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
       link.classList.add('active');
@@ -196,6 +199,19 @@ function renderLayout(activePage) {
         localStorage.setItem('sidebar_mini', 'true');
       }
     });
+  });
+
+  // ✅ دعم زر الرجوع في المتصفح
+  window.addEventListener('popstate', (e) => {
+    const iframe = document.getElementById('main-content');
+    if (!iframe) return;
+    
+    const path = e.state && e.state.path ? e.state.path : (window.location.pathname + window.location.search);
+    iframe.src = path;
+
+    document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+    const activeLink = document.querySelector(`.nav-item[href="${path}"]`);
+    if (activeLink) activeLink.classList.add('active');
   });
 
   if (typeof startNotifPolling === 'function') startNotifPolling();
@@ -360,7 +376,7 @@ async function initGlobalSearch() {
       if (!g.items.length) return;
       html += `<div class="search-result-group"><div class="search-result-group-title">${g.title}</div>`;
       g.items.forEach(item => {
-        html += `<a href="${escapeHtml(item.url)}" target="content-frame" class="search-result-item" style="text-decoration:none; color:inherit;">
+        html += `<a href="${escapeHtml(item.url)}" class="search-result-item" style="text-decoration:none; color:inherit;">
           <div class="search-result-icon ${item.type}"><i class="fas ${item.icon}"></i></div>
           <div class="search-result-info">
             <div class="search-result-title">${item.highlighted}</div>
@@ -375,7 +391,6 @@ async function initGlobalSearch() {
     dropdown.classList.add('show');
     activeIndex = -1;
 
-    // ✅ تصحيح: استخدام iframe.src بدلاً من window.location.href
     dropdown.querySelectorAll('.search-result-item').forEach(el => {
       el.addEventListener('mousedown', (e) => {
         e.preventDefault(); 
@@ -386,6 +401,9 @@ async function initGlobalSearch() {
           
           const iframe = document.getElementById('main-content');
           if (iframe) iframe.src = url;
+          
+          // ✅ تحديث الرابط في المتصفح عند البحث
+          window.history.pushState({ path: url }, '', url);
 
           document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
           const bodyEl = document.getElementById('app-body');
@@ -681,6 +699,9 @@ async function initGlobalSearch() {
           const iframe = document.getElementById('main-content');
           if (iframe) iframe.src = url;
           
+          // ✅ تحديث الرابط في المتصفح عند البحث بالإنتر
+          window.history.pushState({ path: url }, '', url);
+
           document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
           const bodyEl = document.getElementById('app-body');
           if (bodyEl && !window.matchMedia('(max-width: 768px)').matches) {
@@ -697,6 +718,21 @@ async function initGlobalSearch() {
 
   input.value = '';
 }
+
+// ✅ استقبال الرسائل من الإطار الداخلي (مثل النقر على منتج أو فاتورة)
+window.addEventListener('message', (event) => {
+  const data = event.data;
+  if (!data || typeof data !== 'object') return;
+
+  if (data.type === 'PRODUCT_SELECTED' && data.productId) {
+    const url = `/products/detail.html?id=${encodeURIComponent(data.productId)}`;
+    const iframe = document.getElementById('main-content');
+    if (iframe) iframe.src = url;
+    window.history.pushState({ path: url }, '', url);
+  }
+  
+  // يمكنك إضافة أنواع رسائل أخرى هنا مستقبلاً (مثل فتح إيصال أو فاتورة)
+});
 
 // ============================================
 // ✅ محرك التنبيهات (نغمات متعددة + اهتزاز)
