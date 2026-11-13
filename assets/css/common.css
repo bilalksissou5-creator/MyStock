@@ -49,7 +49,7 @@ button { font-family: inherit; }
 }
 
 /* ============================================
-   ✅ نظام العناوين الموحد (Typography System)
+   ✅ نظام العناوين الموحد
    ============================================ */
 h1, h2, h3, h4, h5, h6 {
   margin: 0;
@@ -75,7 +75,7 @@ h6 { font-size: 0.8125rem; font-weight: 600; color: #404040; }
 }
 
 /* ============================================
-   ✅ Header - خلفية بيضاء
+   ✅ Header
    ============================================ */
 .header {
   background: #fff;
@@ -133,7 +133,7 @@ h6 { font-size: 0.8125rem; font-weight: 600; color: #404040; }
 }
 
 /* ============================================
-   ✅ البحث الشامل (Global Search Dropdown)
+   ✅ البحث الشامل
    ============================================ */
 .global-search-dropdown {
   position: absolute;
@@ -311,10 +311,10 @@ h6 { font-size: 0.8125rem; font-weight: 600; color: #404040; }
 }
 
 /* ============================================
-   Sidebar
+   Sidebar (الوضع المفتوح الأساسي)
    ============================================ */
 .sidebar {
-  width: 170px; 
+  width: 240px; /* ✅ تم تكبير العرض الأساسي للشاشات الكبيرة */
   min-width: 0;
   background: #fff;
   border-inline-start: 1px solid #e5e5e5;
@@ -398,7 +398,7 @@ h6 { font-size: 0.8125rem; font-weight: 600; color: #404040; }
 }
 
 /* ============================================
-   ✅ صفحة الرأس (موحّدة لكل الصفحات)
+   ✅ صفحة الرأس
    ============================================ */
 .page-header {
   display: flex;
@@ -470,45 +470,6 @@ h6 { font-size: 0.8125rem; font-weight: 600; color: #404040; }
 }
 .btn-danger:hover { background: #b91c1c; }
 .btn-danger:active { opacity: 0.8; }
-
-/* ============================================
-   ✅ خانة البحث في صفحة المنتجات
-   ============================================ */
-.search-bar {
-  position: relative;
-  margin-bottom: 20px;
-  max-width: 100%; 
-  width: 100%;
-}
-
-.search-bar i {
-  position: absolute;
-  inset-inline-end: 12px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: #a3a3a3;
-  font-size: 14px;
-  z-index: 2;
-  pointer-events: none;
-}
-
-.search-bar input {
-  width: 100%;
-  padding-block: 10px;
-  padding-inline: 12px 36px;
-  border: 1px solid #d4d4d4;
-  border-radius: 50px;
-  background: white;
-  outline: none;
-  font-size: 14px;
-  box-sizing: border-box;
-  transition: border-color 0.2s, box-shadow 0.2s;
-}
-
-.search-bar input:focus {
-  border-color: #171717;
-  box-shadow: 0 0 0 3px rgba(23, 23, 23, 0.05);
-}
 
 /* ============================================
    النماذج
@@ -642,9 +603,6 @@ h6 { font-size: 0.8125rem; font-weight: 600; color: #404040; }
   .sidebar {
     width: 65px;
     min-width: 0;
-    transition: width 0.2s ease-in-out,
-                opacity 0.2s ease-in-out,
-                border-inline-start-width 0.2s ease-in-out;
   }
 
   .nav { padding: 8px 4px; }
@@ -689,7 +647,7 @@ h6 { font-size: 0.8125rem; font-weight: 600; color: #404040; }
   .logo { font-size: 1rem; }
   .search input { padding-block: 6px; padding-inline: 10px 32px; font-size: 12px; }
 
-  .sidebar { width: 160px; min-width: 160px; max-width: 160px; }
+  .sidebar { width: 200px; min-width: 200px; max-width: 200px; }
   .nav { padding: 6px 8px; gap: 2px; }
   .nav-item { padding: 6px 10px; font-size: 12px; gap: 8px; }
   .nav-item i { font-size: 14px; width: 18px; }
@@ -750,5 +708,14 @@ h6 { font-size: 0.8125rem; font-weight: 600; color: #404040; }
   
   .body.sidebar-mini .sidebar-footer .nav-item i { 
     font-size: 18px; 
+  }
+
+  /* ✅ تكبير الخط والحشوات للعناصر في الشاشات الكبيرة (الوضع المفتوح) */
+  .body:not(.sidebar-mini) .nav-item {
+    font-size: 15px; /* تكبير الخط قليلاً */
+    padding: 14px 16px; /* مساحات أوسع */
+  }
+  .body:not(.sidebar-mini) .nav-item i {
+    font-size: 18px; /* أيقونات أكبر */
   }
 }
