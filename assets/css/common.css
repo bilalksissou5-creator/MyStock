@@ -312,7 +312,7 @@ h6 { font-size: 0.8125rem; font-weight: 600; color: #404040; }
    Sidebar (الوضع الأساسي)
    ============================================ */
 .sidebar {
-  width: 210px; 
+  width: 200px; /* ✅ تم التعديل إلى 200px */
   min-width: 0;
   background: #fff;
   border-inline-start: 1px solid #e5e5e5;
@@ -650,7 +650,7 @@ h6 { font-size: 0.8125rem; font-weight: 600; color: #404040; }
   .logo { font-size: 1rem; }
   .search input { padding-block: 6px; padding-inline: 10px 32px; font-size: 12px; }
 
-  .sidebar { width: 210px; min-width: 210px; max-width: 210px; }
+  .sidebar { width: 200px; min-width: 200px; max-width: 200px; } /* ✅ تم التعديل إلى 200px */
   .nav { padding: 6px 8px; gap: 2px; }
   .nav-item { padding: 6px 10px; font-size: 12px; gap: 8px; }
   .nav-item i { font-size: 18px !important; width: 22px; }
@@ -724,14 +724,14 @@ html.in-iframe .main {
   }
   
   .body.sidebar-mini .nav-item {
-    justify-content: flex-start !important; /* ✅ إلغاء التوسيط لتثبيت النقطة */
-    padding: 12px 13.5px !important; /* ✅ حشوة دقيقة جداً (13.5px) لتبدو في المنتصف */
+    justify-content: flex-start !important; 
+    padding: 12px 13.5px !important; 
     gap: 12px !important;
     transition: background 0.15s !important;
   }
   
   .body.sidebar-mini .nav-item span { 
-    display: none !important; /* إخفاء النص تماماً */
+    display: none !important; 
   }
 
   .body.sidebar-mini .nav-item i,
@@ -745,7 +745,7 @@ html.in-iframe .main {
   .body:not(.sidebar-mini) .nav-item,
   .body.sidebar-mini .sidebar:hover .nav-item {
     justify-content: flex-start !important;
-    padding: 12px 13.5px !important; /* ✅ نفس الحشوة الدقيقة (13.5px) */
+    padding: 12px 13.5px !important; 
     gap: 12px !important;
   }
 
@@ -764,7 +764,7 @@ html.in-iframe .main {
 
   /* 3. توسيع القائمة */
   .body.sidebar-mini .sidebar:hover {
-    width: 210px !important; 
+    width: 200px !important; /* ✅ تم التعديل إلى 200px */
     box-shadow: 2px 0 10px rgba(0,0,0,0.1); 
     z-index: 100;
   }
