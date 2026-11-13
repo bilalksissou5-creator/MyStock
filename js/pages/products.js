@@ -68,7 +68,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       { event: '*', schema: 'public', table: 'products' },
       async (payload) => { 
         if (payload.eventType === 'UPDATE') {
-          // تحديث الكمية (إضافة أو إخراج)
           const index = cachedProducts.findIndex(p => p.id === payload.new.id);
           if (index !== -1) {
             cachedProducts[index].qty = payload.new.qty;
@@ -76,7 +75,6 @@ document.addEventListener('DOMContentLoaded', async () => {
           }
         } 
         else if (payload.eventType === 'INSERT') {
-          // منتج جديد كلياً: نجلبه مع بيانات المورد لعرضه فوراً
           const { data: newProduct } = await db.from('products').select('*, suppliers(name)').eq('id', payload.new.id).single();
           if (newProduct && !cachedProducts.some(p => p.id === newProduct.id)) {
             cachedProducts.unshift(newProduct);
@@ -84,7 +82,6 @@ document.addEventListener('DOMContentLoaded', async () => {
           }
         }
         else if (payload.eventType === 'DELETE') {
-          // حذف منتج: نزيله من الشاشة فوراً
           cachedProducts = cachedProducts.filter(p => p.id !== payload.old.id);
           renderProductsToDOM();
         }
@@ -166,13 +163,14 @@ function renderProductsToDOM() {
     }
   }
 
-  // ✅ التعديل هنا: اكتشاف عرض الشاشة الحقيقي حتى لو كنا داخل إطار
+  // ✅ اكتشاف عرض الشاشة الحقيقي حتى لو كنا داخل إطار
   const isDesktop = (window.self !== window.top ? window.parent.innerWidth : window.innerWidth) >= 1024;
 
   container.innerHTML = grouped.map(p => {
     const total = (Number(p.qty ?? 0) * Number(p.price ?? 0));
     const lowClass = (p.qty ?? 0) < 10 ? 'low' : '';
     
+    // تحديد الرابط بناءً على نوع الشاشة
     const targetUrl = isDesktop 
       ? `/products/detail-workspace.html?productId=${p.id}&userId=${p.created_by || ''}&supplierId=${p.supplier_id || ''}&invoiceId=${p.invoice_id || ''}` 
       : `detail.html?id=${p.id}`;
@@ -201,15 +199,6 @@ function renderProductsToDOM() {
       </a>
     `;
   }).join('');
-
-  if (window.self !== window.top) {
-    document.querySelectorAll('.product-card').forEach(card => {
-      card.addEventListener('click', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        const productId = card.dataset.productId;
-        window.parent.postMessage({ type: 'PRODUCT_SELECTED', productId: productId }, '*');
-      });
-    });
-  }
+  
+  // ✅ تم إزالة كود preventDefault الذي كان يمنع فتح الرابط
 }
