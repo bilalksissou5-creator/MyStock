@@ -389,7 +389,7 @@ h6 { font-size: 0.8125rem; font-weight: 600; color: #404040; }
   flex: 1 1 auto;
   overflow-y: auto;
   overflow-x: hidden;
-  padding: 15px; /* ✅ تم التعديل إلى 15px */
+  padding: 15px; /* ✅ مسافة 15px */
   padding-bottom: 15px; 
   min-height: 0;
   min-width: 0;
@@ -620,7 +620,7 @@ h6 { font-size: 0.8125rem; font-weight: 600; color: #404040; }
   .sidebar-footer .nav-item i { font-size: 18px; }
 
   .main { 
-    padding: 15px; /* ✅ تم التعديل إلى 15px */
+    padding: 15px; 
     padding-bottom: 15px; 
   }
 
@@ -656,7 +656,7 @@ h6 { font-size: 0.8125rem; font-weight: 600; color: #404040; }
   .sidebar-footer .nav-item i { font-size: 14px; }
   
   .main { 
-    padding: 15px; /* ✅ تم التعديل إلى 15px */
+    padding: 15px; 
     padding-bottom: 15px; 
   }
 }
@@ -675,7 +675,7 @@ html.in-iframe .main {
   flex-direction: column !important;
   overflow-y: auto !important; 
   overflow-x: hidden !important;
-  padding: 15px !important; /* ✅ تم التعديل إلى 15px */
+  padding: 15px !important; 
   height: 100% !important;
   padding-bottom: 15px !important;
   box-sizing: border-box !important;
@@ -683,7 +683,7 @@ html.in-iframe .main {
 
 @media (max-width: 768px) {
   html.in-iframe .main {
-    padding: 15px !important; /* ✅ تم التعديل إلى 15px */
+    padding: 15px !important; 
     padding-bottom: 15px !important;
   }
 }
@@ -693,7 +693,6 @@ html.in-iframe .main {
    ============================================ */
 @media (min-width: 769px) {
   
-  /* الوضع المصغر الأساسي (أيقونات فقط) */
   .body.sidebar-mini .sidebar {
     width: 65px; 
   }
@@ -727,7 +726,6 @@ html.in-iframe .main {
     font-size: 18px; 
   }
 
-  /* تكبير الخط للشاشات الكبيرة في الوضع المفتوح */
   .body:not(.sidebar-mini) .nav-item {
     font-size: 15px; 
     padding: 14px 16px; 
@@ -736,7 +734,6 @@ html.in-iframe .main {
     font-size: 18px; 
   }
 
-  /* ✅ تأثير التمرير (Hover) على القائمة المصغرة */
   .body.sidebar-mini .sidebar:hover {
     width: 240px; 
     box-shadow: 2px 0 10px rgba(0,0,0,0.1); 
@@ -771,22 +768,4 @@ html.in-iframe .main {
   .body.sidebar-mini .sidebar:hover .sidebar-footer .nav-item i { 
     font-size: 18px; 
   }
-}
-
-/* ============================================
-   ✅ إجبار جميع الصفحات (بما فيها Dashboard) على مسافة 15px
-   ============================================ */
-html.in-iframe .main,
-html.in-iframe #main-content,
-.main {
-  padding: 15px !important;
-  padding-bottom: 15px !important;
-}
-
-/* إزالة أي هوامش إضافية للحاويات الداخلية في Dashboard */
-#main-content > div,
-.dashboard-container,
-.page-wrapper {
-  margin: 0 !important;
-  padding: 0 !important;
 }
