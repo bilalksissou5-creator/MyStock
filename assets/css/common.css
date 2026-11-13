@@ -312,7 +312,7 @@ h6 { font-size: 0.8125rem; font-weight: 600; color: #404040; }
    Sidebar
    ============================================ */
 .sidebar {
-  width: 180px; /* ✅ تم التعديل إلى 180px */
+  width: 180px; /* ✅ العرض المفتوح في الشاشات الكبيرة */
   min-width: 0;
   background: #fff;
   border-inline-start: 1px solid #e5e5e5;
@@ -337,7 +337,7 @@ h6 { font-size: 0.8125rem; font-weight: 600; color: #404040; }
   flex: 1 1 0;
   overflow-y: auto;
   overflow-x: hidden;
-  padding: 16px 12px;
+  padding: 16px 12px; /* ✅ مسافة 12px من اليمين واليسار (في الوضع العادي) */
   display: flex;
   flex-direction: column;
   gap: 4px;
@@ -599,22 +599,27 @@ h6 { font-size: 0.8125rem; font-weight: 600; color: #404040; }
   .logo { font-size: 1.2rem; }
 
   .sidebar {
-    width: 65px;
+    width: 70px; /* ✅ زيادة العرض قليلاً ليتحمل الحشوات الجديدة */
     min-width: 0;
   }
 
-  .nav { padding: 8px 4px; }
+  /* ✅ تطبيق نفس الحشوات الموجودة في الوضع المفتوح للشاشات الكبيرة */
+  .nav { 
+    padding: 16px 12px; /* ✅ 12px من اليمين واليسار */
+  }
+  
   .nav-item {
-    padding: 12px 4px;
+    padding: 14px 16px; /* ✅ 16px من الداخل */
     justify-content: center;
     gap: 0;
     font-size: 0;
   }
+  
   .nav-item span { display: none; }
   .nav-item i { font-size: 18px; width: auto; }
 
-  .sidebar-footer { padding: 8px 4px; }
-  .sidebar-footer .nav-item { padding: 12px 4px; justify-content: center; }
+  .sidebar-footer { padding: 12px; /* ✅ نفس الحشوة */ }
+  .sidebar-footer .nav-item { padding: 14px 16px; justify-content: center; }
   .sidebar-footer .nav-item i { font-size: 18px; }
 
   .main { 
@@ -645,7 +650,6 @@ h6 { font-size: 0.8125rem; font-weight: 600; color: #404040; }
   .logo { font-size: 1rem; }
   .search input { padding-block: 6px; padding-inline: 10px 32px; font-size: 12px; }
 
-  /* ✅ تم التعديل إلى 180px */
   .sidebar { width: 180px; min-width: 180px; max-width: 180px; }
   .nav { padding: 6px 8px; gap: 2px; }
   .nav-item { padding: 6px 10px; font-size: 12px; gap: 8px; }
@@ -747,6 +751,7 @@ html.in-iframe .main {
     font-size: 18px; 
   }
 
+  /* ✅ تطبيق نفس الحشوات عند الفتح في الشاشات الكبيرة */
   .body:not(.sidebar-mini) .nav-item {
     font-size: 15px; 
     padding: 14px 16px; 
@@ -755,7 +760,6 @@ html.in-iframe .main {
     font-size: 18px; 
   }
 
-  /* ✅ تم تعديل عرض التمرير إلى 180px */
   .body.sidebar-mini .sidebar:hover {
     width: 180px; 
     box-shadow: 2px 0 10px rgba(0,0,0,0.1); 
