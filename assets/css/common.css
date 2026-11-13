@@ -709,75 +709,75 @@ html.in-iframe .main {
 }
 
 /* ============================================
-   ✅ تثبيت عناصر القائمة (منع حركتها نهائياً وتقليل المسافات)
+   ✅ الوضع المصغر (أيقونات فقط)
    ============================================ */
 @media (min-width: 769px) {
   
-  /* 1. الوضع المصغر (القائمة مغلقة) */
   .body.sidebar-mini .sidebar {
     width: 65px; 
   }
   
   .body.sidebar-mini .nav-item,
   .body.sidebar-mini .sidebar-footer .nav-item {
-    justify-content: flex-start !important;
-    padding: 12px 10px !important; /* ✅ تقليل الحشوة من 16px إلى 10px */
-    gap: 8px !important; /* ✅ تقليل المسافة بين الأيقونة والنص */
-    font-size: 15px !important;
-    transition: background 0.15s !important;
-  }
-
-  /* إخفاء النص بطريقة لا تحرك الأيقونة */
-  .body.sidebar-mini .nav-item span { 
-    display: inline-block !important;
-    width: 0 !important;
-    opacity: 0 !important;
-    overflow: hidden !important;
-    white-space: nowrap !important;
-    margin-inline-start: 0 !important; /* ✅ إزالة المارجن */
-    pointer-events: none !important;
+    justify-content: center !important;
+    padding: 12px 0 !important;
+    gap: 0 !important;
   }
   
-  /* تثبيت عرض الأيقونة */
+  .body.sidebar-mini .nav-item span { 
+    display: none !important; 
+  }
+  
   .body.sidebar-mini .nav-item i { 
     font-size: 18px !important; 
-    width: 24px !important; 
-    flex-shrink: 0 !important;
+    width: auto !important; 
   }
   
-  /* 2. الوضع المفتوح بالكامل */
-  .body:not(.sidebar-mini) .nav-item,
-  .body:not(.sidebar-mini) .sidebar-footer .nav-item {
-    justify-content: flex-start !important;
-    padding: 12px 10px !important; /* ✅ تقليل الحشوة */
-    gap: 8px !important; /* ✅ تقليل المسافة */
-    font-size: 15px !important;
+  .body.sidebar-mini .sidebar-footer { 
+    padding: 8px 4px; 
+  }
+  
+  .body.sidebar-mini .sidebar-footer .nav-item { 
+    justify-content: center; 
+    padding: 12px 4px; 
+  }
+  
+  .body.sidebar-mini .sidebar-footer .nav-item i { 
+    font-size: 18px; 
   }
 
-  /* إظهار النص بدون التأثير على الأيقونة */
-  .body:not(.sidebar-mini) .nav-item span {
-    display: inline-block !important;
-    width: auto !important;
-    opacity: 1 !important;
-    margin-inline-start: 0 !important; /* ✅ إزالة المارجن الزائد */
-  }
-
-  .body:not(.sidebar-mini) .nav-item i {
-    font-size: 18px !important; 
-    width: 24px !important; 
-    flex-shrink: 0 !important;
-  }
-
-  /* 3. تأثير التمرير (Hover) */
+  /* ✅ عند تمرير الماوس (Hover) */
   .body.sidebar-mini .sidebar:hover {
     width: 180px; 
     box-shadow: 2px 0 10px rgba(0,0,0,0.1); 
     z-index: 100;
   }
   
+  .body.sidebar-mini .sidebar:hover .nav-item {
+    justify-content: flex-start;
+    padding: 12px 10px;
+    gap: 8px;
+    font-size: 15px; 
+  }
+  
   .body.sidebar-mini .sidebar:hover .nav-item span { 
-    width: auto !important;
-    opacity: 1 !important;
-    margin-inline-start: 0 !important;
+    display: inline-block;
+    width: auto;
+    opacity: 1;
+    margin-inline-start: 0;
+  }
+  
+  .body.sidebar-mini .sidebar:hover .nav-item i { 
+    font-size: 18px; 
+    width: 24px; 
+  }
+  
+  .body.sidebar-mini .sidebar:hover .sidebar-footer { 
+    padding: 12px; 
+  }
+  
+  .body.sidebar-mini .sidebar:hover .sidebar-footer .nav-item { 
+    justify-content: flex-start; 
+    padding: 12px 10px; 
   }
 }
