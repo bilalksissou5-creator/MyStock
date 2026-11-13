@@ -3,6 +3,7 @@
    ✅ إصلاح تداخل البطاقات والنصوص داخل الإطار
    ✅ تقليل الحشوات العمودية لشريط البحث والزر
    ✅ إصلاح شكل خانة البحث لتعود دائرية وبعرض كامل
+   ✅ إصلاح قطع النصوص داخل بطاقات المنتجات
    ============================================ */
 
 /* تنسيق شبكة المنتجات الأساسي */
@@ -76,7 +77,7 @@
 .product-stats {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 6px;
+  gap: 4px; /* ✅ تقليل الفراغ بين المربعات */
   text-align: center;
   margin-top: auto;
 }
@@ -84,7 +85,7 @@
 .stat {
   background: #fafafa;
   border-radius: 6px;
-  padding: 8px 4px;
+  padding: 6px 2px; /* ✅ تقليل الحشوة الداخلية */
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -92,16 +93,16 @@
 }
 
 .stat-label {
-  font-size: 11px;
+  font-size: 10px; /* ✅ تصغير الخط */
   color: #737373;
-  margin-bottom: 4px;
+  margin-bottom: 2px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
 .stat-value {
-  font-size: 14px;
+  font-size: 13px; /* ✅ تصغير الخط ليتسع للسعر */
   font-weight: 700;
   white-space: nowrap;
   overflow: hidden;
@@ -131,14 +132,14 @@
    ✅ تقليل الحشوات العمودية وإصلاح شكل خانة البحث
    ============================================ */
 .search-bar {
-  position: relative !important; /* ✅ لضمان بقاء الأيقونة داخل الحقل */
+  position: relative !important;
   width: 100% !important; 
 }
 
 .search-bar input {
-  width: 100% !important; /* ✅ إجبار الحقل على أخذ العرض الكامل */
+  width: 100% !important; 
   height: 34px !important; 
-  border-radius: 50px !important; /* ✅ إعادة الحواف الدائرية */
+  border-radius: 50px !important; 
   border: 1px solid #d4d4d4 !important;
   background: white !important;
   box-sizing: border-box !important;
@@ -215,9 +216,10 @@ html.in-iframe .search-bar {
   z-index: 99 !important;
 }
 
+/* ✅ تكبير عرض البطاقة داخل الإطار لمنع قطع النصوص */
 html.in-iframe .products {
   display: grid !important;
-  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)) !important;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)) !important; /* ✅ تم التعديل من 190px إلى 260px */
   gap: 16px !important;
   padding: 0 !important;
   margin: 0 !important;
