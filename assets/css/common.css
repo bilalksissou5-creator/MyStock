@@ -312,7 +312,7 @@ h6 { font-size: 0.8125rem; font-weight: 600; color: #404040; }
    Sidebar (الوضع الأساسي)
    ============================================ */
 .sidebar {
-  width: 200px; /* ✅ تم التعديل إلى 200px */
+  width: 200px; 
   min-width: 0;
   background: #fff;
   border-inline-start: 1px solid #e5e5e5;
@@ -650,7 +650,7 @@ h6 { font-size: 0.8125rem; font-weight: 600; color: #404040; }
   .logo { font-size: 1rem; }
   .search input { padding-block: 6px; padding-inline: 10px 32px; font-size: 12px; }
 
-  .sidebar { width: 200px; min-width: 200px; max-width: 200px; } /* ✅ تم التعديل إلى 200px */
+  .sidebar { width: 200px; min-width: 200px; max-width: 200px; }
   .nav { padding: 6px 8px; gap: 2px; }
   .nav-item { padding: 6px 10px; font-size: 12px; gap: 8px; }
   .nav-item i { font-size: 18px !important; width: 22px; }
@@ -714,7 +714,7 @@ html.in-iframe .main {
 }
 
 /* ============================================
-   ✅ وضع القائمة المصغرة (ثبات مطلق 0px بدون أي حركة)
+   ✅ وضع القائمة المصغرة (الحل الجذري لتساوي الحشوة)
    ============================================ */
 @media (min-width: 769px) {
   
@@ -723,29 +723,39 @@ html.in-iframe .main {
     width: 65px; 
   }
   
+  /* ✅ تحويل الزر إلى مربع متناسق ومتوسط في القائمة */
   .body.sidebar-mini .nav-item {
-    justify-content: flex-start !important; 
-    padding: 12px 13.5px !important; 
-    gap: 12px !important;
+    width: 42px !important;
+    height: 42px !important;
+    margin: 4px auto !important; /* توسيط المربع في القائمة */
+    padding: 0 !important; /* إزالة الحشوات الداخلية */
+    justify-content: center !important; /* توسيط الأيقونة داخل المربع */
+    gap: 0 !important;
     transition: background 0.15s !important;
+    border-radius: 10px !important;
   }
   
+  /* إخفاء النص تماماً */
   .body.sidebar-mini .nav-item span { 
     display: none !important; 
   }
 
+  /* تثبيت حجم الأيقونة */
   .body.sidebar-mini .nav-item i,
   .body.sidebar-mini .sidebar-footer .nav-item i { 
     font-size: 18px !important; 
-    width: 26px !important; 
+    width: auto !important; 
     flex-shrink: 0 !important;
   }
   
   /* 2. الوضع المفتوح (عند الفتح أو التمرير) */
   .body:not(.sidebar-mini) .nav-item,
   .body.sidebar-mini .sidebar:hover .nav-item {
+    width: 100% !important; /* يعود الزر للعرض الكامل */
+    height: auto !important;
+    margin: 0 !important;
+    padding: 12px 14px !important;
     justify-content: flex-start !important;
-    padding: 12px 13.5px !important; 
     gap: 12px !important;
   }
 
@@ -764,7 +774,7 @@ html.in-iframe .main {
 
   /* 3. توسيع القائمة */
   .body.sidebar-mini .sidebar:hover {
-    width: 200px !important; /* ✅ تم التعديل إلى 200px */
+    width: 200px !important; 
     box-shadow: 2px 0 10px rgba(0,0,0,0.1); 
     z-index: 100;
   }
