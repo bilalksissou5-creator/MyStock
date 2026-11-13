@@ -714,7 +714,7 @@ html.in-iframe .main {
 }
 
 /* ============================================
-   ✅ وضع القائمة المصغرة (الحل الجذري لتساوي الحشوة)
+   ✅ وضع القائمة المصغرة (تساوي الحشوة وتقليل المسافات العمودية)
    ============================================ */
 @media (min-width: 769px) {
   
@@ -723,13 +723,14 @@ html.in-iframe .main {
     width: 65px; 
   }
   
-  /* ✅ تحويل الزر إلى مربع متناسق ومتوسط في القائمة */
-  .body.sidebar-mini .nav-item {
+  /* ✅ تحويل الزر إلى مربع مع إزالة الهوامش العلوية والسفلية */
+  .body.sidebar-mini .nav-item,
+  .body.sidebar-mini .sidebar-footer .nav-item {
     width: 42px !important;
     height: 42px !important;
-    margin: 4px auto !important; /* توسيط المربع في القائمة */
-    padding: 0 !important; /* إزالة الحشوات الداخلية */
-    justify-content: center !important; /* توسيط الأيقونة داخل المربع */
+    margin: 0 auto !important; /* ✅ تم التعديل إلى 0 auto لتقليل المسافة العمودية */
+    padding: 0 !important; 
+    justify-content: center !important; 
     gap: 0 !important;
     transition: background 0.15s !important;
     border-radius: 10px !important;
@@ -751,7 +752,7 @@ html.in-iframe .main {
   /* 2. الوضع المفتوح (عند الفتح أو التمرير) */
   .body:not(.sidebar-mini) .nav-item,
   .body.sidebar-mini .sidebar:hover .nav-item {
-    width: 100% !important; /* يعود الزر للعرض الكامل */
+    width: 100% !important; 
     height: auto !important;
     margin: 0 !important;
     padding: 12px 14px !important;
