@@ -183,10 +183,17 @@ function renderLayout(activePage) {
     });
   }
 
-  // ✅ تصغير القائمة تلقائياً عند الضغط على أي رابط
+  // ✅ إغلاق أو تصغير القائمة عند الضغط على أي رابط
   document.querySelectorAll('.nav-item, .sidebar-footer .nav-item').forEach(link => {
     link.addEventListener('click', () => {
-      if (!isMobile() && link.tagName === 'A') {
+      // استثناء زر تسجيل الخروج لأنه يقوم بعملية أخرى
+      if (link.id === 'logout-btn') return;
+
+      if (isMobile()) {
+        // في الهاتف: تغلق القائمة تماماً
+        bodyEl.classList.add('sidebar-hidden-mobile');
+      } else {
+        // في الشاشات الكبيرة: تصغر القائمة لتعرض الأيقونات فقط
         bodyEl.classList.add('sidebar-mini');
         localStorage.setItem('sidebar_mini', 'true');
       }
