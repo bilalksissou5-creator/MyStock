@@ -2,6 +2,7 @@
    صفحة المنتجات (تصميم متجاوب داخل الإطار)
    ✅ إصلاح تداخل البطاقات والنصوص داخل الإطار
    ✅ تقليل الحشوات العمودية لشريط البحث والزر
+   ✅ إصلاح شكل خانة البحث لتعود دائرية وبعرض كامل
    ============================================ */
 
 /* تنسيق شبكة المنتجات الأساسي */
@@ -22,7 +23,7 @@
   text-decoration: none;
   color: inherit;
   transition: box-shadow 0.15s;
-  min-width: 0; /* ✅ يمنع البطاقة من التمدد خارج الشبكة */
+  min-width: 0;
 }
 
 .product-card:hover {
@@ -74,7 +75,7 @@
 /* تنسيق الإحصائيات الثلاثة داخل البطاقة */
 .product-stats {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr)); /* ✅ يمنع النصوص من كسر التصميم */
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 6px;
   text-align: center;
   margin-top: auto;
@@ -87,7 +88,7 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  min-width: 0; /* ✅ حماية إضافية */
+  min-width: 0;
 }
 
 .stat-label {
@@ -127,16 +128,42 @@
 }
 
 /* ============================================
-   ✅ تقليل الحشوات العمودية وتوحيد الارتفاع (34px)
+   ✅ تقليل الحشوات العمودية وإصلاح شكل خانة البحث
    ============================================ */
+.search-bar {
+  position: relative !important; /* ✅ لضمان بقاء الأيقونة داخل الحقل */
+  width: 100% !important; 
+}
+
 .search-bar input {
+  width: 100% !important; /* ✅ إجبار الحقل على أخذ العرض الكامل */
   height: 34px !important; 
+  border-radius: 50px !important; /* ✅ إعادة الحواف الدائرية */
+  border: 1px solid #d4d4d4 !important;
+  background: white !important;
   box-sizing: border-box !important;
   padding-top: 0 !important;
   padding-bottom: 0 !important;
   padding-inline: 14px 36px !important;
   font-size: 13px !important; 
   line-height: 34px !important;
+  outline: none !important;
+}
+
+.search-bar input:focus {
+  border-color: #171717 !important;
+  box-shadow: 0 0 0 3px rgba(23, 23, 23, 0.05) !important;
+}
+
+.search-bar i {
+  position: absolute !important;
+  inset-inline-end: 12px !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  color: #a3a3a3 !important;
+  font-size: 14px !important;
+  z-index: 2 !important;
+  pointer-events: none !important;
 }
 
 .page-header a[href="add.html"] {
@@ -152,11 +179,6 @@
   justify-content: center !important;
 }
 
-.search-bar i {
-  top: 50% !important;
-  transform: translateY(-50%) !important;
-}
-
 /* ============================================
    ✅ إصلاح التصميم داخل Workspace (iframe)
    ============================================ */
@@ -166,14 +188,13 @@ html.in-iframe, html.in-iframe body {
   margin: 0 !important;
 }
 
-/* جعل الحاوية الرئيسية مرنة وتسمح بالتمرير */
 html.in-iframe .main {
   display: flex !important;
   flex-direction: column !important;
   height: 100% !important;
   padding: 16px !important; 
   box-sizing: border-box !important;
-  overflow-y: auto !important; /* ✅ السماح بالتمرير لأسفل لرؤية جميع المنتجات */
+  overflow-y: auto !important;
 }
 
 html.in-iframe .page-header {
@@ -194,10 +215,9 @@ html.in-iframe .search-bar {
   z-index: 99 !important;
 }
 
-/* شبكة المنتجات داخل الإطار - تصغير الحد الأدنى للبطاقة لتتناسب مع المساحة */
 html.in-iframe .products {
   display: grid !important;
-  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)) !important; /* ✅ تعديل الحجم ليتناسب مع الإطار */
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)) !important;
   gap: 16px !important;
   padding: 0 !important;
   margin: 0 !important;
