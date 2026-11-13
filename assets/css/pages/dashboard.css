@@ -4,6 +4,12 @@
    ✅ بطاقة الأرباح (أعمدة خضراء موحدة)
    ============================================ */
 
+/* ✅ إزالة الحشوة الخارجية للحاوية الرئيسية في هذه الصفحة */
+.main {
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
 /* ============================================
    ✅ بطاقة قيمة المخزون
    ============================================ */
@@ -13,10 +19,11 @@
   border-radius: 14px;
   padding: 14px 12px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
-  margin-bottom: 20px;
+  /* ✅ تم إزالة margin-bottom هنا */
   display: flex;
   flex-direction: column;
   gap: 12px;
+  width: 100%;
 }
 
 /* ============================================
@@ -28,10 +35,11 @@
   border-radius: 14px;
   padding: 14px 12px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
-  margin-bottom: 20px;
+  /* ✅ تم إزالة margin-bottom هنا */
   display: flex;
   flex-direction: column;
   gap: 12px;
+  width: 100%;
 }
 
 /* ============================================
