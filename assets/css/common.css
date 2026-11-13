@@ -312,7 +312,7 @@ h6 { font-size: 0.8125rem; font-weight: 600; color: #404040; }
    Sidebar (الوضع الأساسي)
    ============================================ */
 .sidebar {
-  width: 210px; /* العرض المفتوح الافتراضي */
+  width: 210px; 
   min-width: 0;
   background: #fff;
   border-inline-start: 1px solid #e5e5e5;
@@ -337,7 +337,7 @@ h6 { font-size: 0.8125rem; font-weight: 600; color: #404040; }
   flex: 1 1 0;
   overflow-y: auto;
   overflow-x: hidden;
-  padding: 16px 6px; /* تقليل الحشوة لتوفير مساحة من الحافة */
+  padding: 16px 6px;
   display: flex;
   flex-direction: column;
   gap: 4px;
@@ -368,7 +368,7 @@ h6 { font-size: 0.8125rem; font-weight: 600; color: #404040; }
 
 .nav-item i { 
   width: 26px; 
-  font-size: 20px;
+  font-size: 18px; /* ✅ تم التعديل إلى 18px */
   text-align: center; 
   flex-shrink: 0; 
 }
@@ -616,11 +616,11 @@ h6 { font-size: 0.8125rem; font-weight: 600; color: #404040; }
     font-size: 0;
   }
   .nav-item span { display: none; }
-  .nav-item i { font-size: 22px; width: auto; } /* تكبير الأيقونة في الهاتف */
+  .nav-item i { font-size: 18px !important; width: auto; }
 
   .sidebar-footer { padding: 8px 4px; }
   .sidebar-footer .nav-item { padding: 12px 4px; justify-content: center; }
-  .sidebar-footer .nav-item i { font-size: 22px; }
+  .sidebar-footer .nav-item i { font-size: 18px !important; }
 
   .main { 
     padding: 15px; 
@@ -653,10 +653,10 @@ h6 { font-size: 0.8125rem; font-weight: 600; color: #404040; }
   .sidebar { width: 210px; min-width: 210px; max-width: 210px; }
   .nav { padding: 6px 8px; gap: 2px; }
   .nav-item { padding: 6px 10px; font-size: 12px; gap: 8px; }
-  .nav-item i { font-size: 16px; width: 20px; }
+  .nav-item i { font-size: 18px !important; width: 22px; }
   .sidebar-footer { padding: 6px 8px; gap: 2px; }
   .sidebar-footer .nav-item { padding: 6px 10px; font-size: 12px; }
-  .sidebar-footer .nav-item i { font-size: 16px; }
+  .sidebar-footer .nav-item i { font-size: 18px !important; }
   
   .main { 
     padding: 15px; 
@@ -714,34 +714,32 @@ html.in-iframe .main {
 }
 
 /* ============================================
-   ✅ وضع القائمة المصغرة (ثبات تام، أيقونات كبيرة، وبدون قطع نصوص)
+   ✅ وضع القائمة المصغرة (ثبات تام وبدون قطع نصوص)
    ============================================ */
 @media (min-width: 769px) {
   
-  /* 1. الوضع المغلق (الأيقونات فقط) */
   .body.sidebar-mini .sidebar {
     width: 65px; 
   }
   
   .body.sidebar-mini .nav-item {
     justify-content: center !important;
-    padding: 12px 0 !important; /* توسيط دقيق */
+    padding: 12px 0 !important; 
     gap: 0 !important;
     transition: background 0.15s !important;
   }
   
   .body.sidebar-mini .nav-item span { 
-    display: none !important; /* إخفاء النص */
+    display: none !important; 
   }
 
   .body.sidebar-mini .nav-item i,
   .body.sidebar-mini .sidebar-footer .nav-item i { 
-    font-size: 22px !important; /* تكبير الأيقونة */
+    font-size: 18px !important; /* ✅ تم التعديل إلى 18px */
     width: 26px !important; 
     flex-shrink: 0 !important;
   }
   
-  /* 2. الوضع المفتوح (عند الفتح أو التمرير) */
   .body:not(.sidebar-mini) .nav-item,
   .body.sidebar-mini .sidebar:hover .nav-item {
     justify-content: flex-start !important;
@@ -758,14 +756,21 @@ html.in-iframe .main {
 
   .body:not(.sidebar-mini) .nav-item i,
   .body.sidebar-mini .sidebar:hover .nav-item i {
-    font-size: 22px !important; 
+    font-size: 18px !important; /* ✅ تم التعديل إلى 18px */
     width: 26px !important; 
   }
 
-  /* 3. عرض القائمة المفتوحة (يتم توسيعها لـ 210px لمنع قطع النص) */
   .body.sidebar-mini .sidebar:hover {
     width: 210px !important; 
     box-shadow: 2px 0 10px rgba(0,0,0,0.1); 
     z-index: 100;
   }
+}
+
+/* ============================================
+   ✅ توحيد حجم أيقونات القائمة الجانبية (18px)
+   ============================================ */
+.nav-item i,
+.sidebar-footer .nav-item i {
+  font-size: 18px !important;
 }
