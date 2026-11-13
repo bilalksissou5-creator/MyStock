@@ -390,7 +390,7 @@ h6 { font-size: 0.8125rem; font-weight: 600; color: #404040; }
   overflow-y: auto;
   overflow-x: hidden;
   padding: 15px; /* ✅ تم التعديل إلى 15px */
-  padding-bottom: 15px; /* ✅ تم التعديل إلى 15px */
+  padding-bottom: 15px; 
   min-height: 0;
   min-width: 0;
   height: 100%;
@@ -771,4 +771,22 @@ html.in-iframe .main {
   .body.sidebar-mini .sidebar:hover .sidebar-footer .nav-item i { 
     font-size: 18px; 
   }
+}
+
+/* ============================================
+   ✅ إجبار جميع الصفحات (بما فيها Dashboard) على مسافة 15px
+   ============================================ */
+html.in-iframe .main,
+html.in-iframe #main-content,
+.main {
+  padding: 15px !important;
+  padding-bottom: 15px !important;
+}
+
+/* إزالة أي هوامش إضافية للحاويات الداخلية في Dashboard */
+#main-content > div,
+.dashboard-container,
+.page-wrapper {
+  margin: 0 !important;
+  padding: 0 !important;
 }
