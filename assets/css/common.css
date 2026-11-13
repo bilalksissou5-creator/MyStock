@@ -27,7 +27,6 @@ a, button, .nav-item, .times-item, .switch, .btn-primary, .btn-secondary, .btn-d
 
 html, body {
   height: 100%;
-  height: 100dvh;
   overflow: hidden;
 }
 
@@ -43,8 +42,7 @@ button { font-family: inherit; }
 .app {
   display: flex;
   flex-direction: column;
-  height: 100vh;
-  height: 100dvh;
+  height: 100%; /* ✅ تعديل: لتعتمد على الـ body */
   overflow: hidden;
 }
 
@@ -389,7 +387,7 @@ h6 { font-size: 0.8125rem; font-weight: 600; color: #404040; }
   flex: 1 1 auto;
   overflow-y: auto;
   overflow-x: hidden;
-  padding: 15px; /* ✅ مسافة 15px */
+  padding: 15px;
   padding-bottom: 15px; 
   min-height: 0;
   min-width: 0;
@@ -662,7 +660,21 @@ h6 { font-size: 0.8125rem; font-weight: 600; color: #404040; }
 }
 
 /* ============================================
-   ✅ إصلاح جذري لصفحات الـ Workspace (iframe) - محدث
+   ✅ تنسيق الإطار الجديد (بدون أي مسافات خارجية)
+   ============================================ */
+.main-iframe {
+  flex: 1 1 auto;
+  width: 100%;
+  height: 100%;
+  border: none;
+  background: #f5f5f5;
+  min-width: 0;
+  min-height: 0; /* ✅ ضروري لمنع تمدد الإطار */
+  display: block;
+}
+
+/* ============================================
+   ✅ إصلاح جذري لصفحات الـ Workspace (iframe)
    ============================================ */
 html.in-iframe, html.in-iframe body {
   height: 100% !important;
@@ -670,15 +682,25 @@ html.in-iframe, html.in-iframe body {
   margin: 0 !important;
 }
 
-html.in-iframe .main {
+/* ✅ إجبار التطبيق داخل الإطار على أخذ المساحة المتاحة بالكامل */
+html.in-iframe .app {
+  height: 100% !important;
   display: flex !important;
   flex-direction: column !important;
+  overflow: hidden !important;
+}
+
+/* ✅ الحاوية الرئيسية داخل الإطار (تتمرر ولا تقطع المحتوى) */
+html.in-iframe .main {
+  flex: 1 1 auto !important; /* ✅ تتمدد ديناميكياً */
+  height: auto !important; /* ✅ إزالة 100% */
+  min-height: 0 !important; /* ✅ السطر السحري للتمرير */
   overflow-y: auto !important; 
   overflow-x: hidden !important;
-  padding: 15px !important; /* ✅ المسافة 15px للمحتوى الداخلي */
-  height: 100% !important;
-  padding-bottom: 15px !important;
+  padding: 15px !important;
   box-sizing: border-box !important;
+  display: flex !important;
+  flex-direction: column !important;
 }
 
 @media (max-width: 768px) {
@@ -768,17 +790,4 @@ html.in-iframe .main {
   .body.sidebar-mini .sidebar:hover .sidebar-footer .nav-item i { 
     font-size: 18px; 
   }
-}
-
-/* ============================================
-   ✅ تنسيق الإطار الجديد (بدون أي مسافات خارجية)
-   ============================================ */
-.main-iframe {
-  flex: 1 1 auto;
-  width: 100%;
-  height: 100%;
-  border: none;
-  background: #f5f5f5;
-  min-width: 0;
-  display: block; /* يمنع ظهور مسافات افتراضية تحت الإطار */
 }

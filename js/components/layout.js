@@ -1,7 +1,6 @@
 // ============================================
 // الهيكل المشترك (Header + Sidebar)
 // ✅ تحديث: استخدام iframe لمنع إعادة تحميل الصفحة
-// ✅ إصلاح المسافات المزدوجة (تغيير كلاس الإطار)
 // ============================================
 
 const ALLOWED_PAGES = [
@@ -125,7 +124,6 @@ function renderLayout(activePage) {
         </div>
       </aside>
       
-      <!-- ✅ تم تغيير الكلاس إلى main-iframe لإزالة المسافات المزدوجة -->
       <iframe class="main-iframe" id="main-content" name="content-frame" src="${currentPath}"></iframe>
       
     </div>
@@ -367,7 +365,6 @@ async function initGlobalSearch() {
     dropdown.classList.add('show');
     activeIndex = -1;
 
-    // ✅ تصحيح: استخدام iframe.src بدلاً من window.location.href
     dropdown.querySelectorAll('.search-result-item').forEach(el => {
       el.addEventListener('mousedown', (e) => {
         e.preventDefault(); 
