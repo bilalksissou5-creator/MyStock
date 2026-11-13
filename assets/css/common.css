@@ -311,7 +311,7 @@ h6 { font-size: 0.8125rem; font-weight: 600; color: #404040; }
 }
 
 /* ============================================
-   Sidebar (الوضع المفتوح الأساسي)
+   Sidebar
    ============================================ */
 .sidebar {
   width: 240px; 
@@ -389,8 +389,8 @@ h6 { font-size: 0.8125rem; font-weight: 600; color: #404040; }
   flex: 1 1 auto;
   overflow-y: auto;
   overflow-x: hidden;
-  padding: 24px;
-  padding-bottom: 24px; 
+  padding: 15px; /* ✅ تم التعديل إلى 15px */
+  padding-bottom: 15px; /* ✅ تم التعديل إلى 15px */
   min-height: 0;
   min-width: 0;
   height: 100%;
@@ -620,8 +620,8 @@ h6 { font-size: 0.8125rem; font-weight: 600; color: #404040; }
   .sidebar-footer .nav-item i { font-size: 18px; }
 
   .main { 
-    padding: 12px; 
-    padding-bottom: 16px; 
+    padding: 15px; /* ✅ تم التعديل إلى 15px */
+    padding-bottom: 15px; 
   }
 
   .body.sidebar-hidden-mobile .sidebar {
@@ -656,8 +656,8 @@ h6 { font-size: 0.8125rem; font-weight: 600; color: #404040; }
   .sidebar-footer .nav-item i { font-size: 14px; }
   
   .main { 
-    padding: 12px; 
-    padding-bottom: 16px; 
+    padding: 15px; /* ✅ تم التعديل إلى 15px */
+    padding-bottom: 15px; 
   }
 }
 
@@ -673,18 +673,18 @@ html.in-iframe, html.in-iframe body {
 html.in-iframe .main {
   display: flex !important;
   flex-direction: column !important;
-  overflow-y: auto !important; /* ✅ السماح بالتمرير لأسفل */
+  overflow-y: auto !important; 
   overflow-x: hidden !important;
-  padding: 24px !important; /* ✅ إرجاع المسافات الجانبية */
+  padding: 15px !important; /* ✅ تم التعديل إلى 15px */
   height: 100% !important;
-  padding-bottom: 24px !important;
+  padding-bottom: 15px !important;
   box-sizing: border-box !important;
 }
 
 @media (max-width: 768px) {
   html.in-iframe .main {
-    padding: 12px !important; /* مسافة أقل للهاتف */
-    padding-bottom: 16px !important;
+    padding: 15px !important; /* ✅ تم التعديل إلى 15px */
+    padding-bottom: 15px !important;
   }
 }
 
@@ -738,8 +738,8 @@ html.in-iframe .main {
 
   /* ✅ تأثير التمرير (Hover) على القائمة المصغرة */
   .body.sidebar-mini .sidebar:hover {
-    width: 240px; /* تتوسع عند تمرير الماوس */
-    box-shadow: 2px 0 10px rgba(0,0,0,0.1); /* ظل خفيف ليبدو كقائمة عائمة */
+    width: 240px; 
+    box-shadow: 2px 0 10px rgba(0,0,0,0.1); 
     z-index: 100;
   }
   
@@ -751,7 +751,7 @@ html.in-iframe .main {
   }
   
   .body.sidebar-mini .sidebar:hover .nav-item span { 
-    display: inline; /* إظهار النص */
+    display: inline; 
   }
   
   .body.sidebar-mini .sidebar:hover .nav-item i { 
