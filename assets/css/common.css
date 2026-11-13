@@ -721,11 +721,21 @@ h6 { font-size: 0.8125rem; font-weight: 600; color: #404040; }
     font-size: 18px; 
   }
 
-  /* ✅ تأثير التمرير (Hover) على القائمة المصغرة */
+  /* ✅ تأثير التمرير (Hover) على القائمة المصغرة - يطفو فوق المحتوى ولا يدفعه */
+  .body.sidebar-mini .sidebar {
+    position: relative;
+    z-index: 50;
+  }
+
   .body.sidebar-mini .sidebar:hover {
-    width: 240px; /* تتوسع عند تمرير الماوس */
-    box-shadow: 2px 0 10px rgba(0,0,0,0.1); /* ظل خفيف ليبدو كقائمة عائمة */
-    z-index: 100;
+    position: absolute; /* يسحب القائمة من التصميم لتعوم فوق المحتوى */
+    top: 0;
+    bottom: 0;
+    inset-inline-start: 0;
+    width: 240px; 
+    box-shadow: 4px 0 15px rgba(0,0,0,0.15); /* ظل أقوى لتبدو عائمة */
+    z-index: 1000;
+    background: #fff; 
   }
   
   .body.sidebar-mini .sidebar:hover .nav-item {
@@ -736,7 +746,7 @@ h6 { font-size: 0.8125rem; font-weight: 600; color: #404040; }
   }
   
   .body.sidebar-mini .sidebar:hover .nav-item span { 
-    display: inline; /* إظهار النص */
+    display: inline; 
   }
   
   .body.sidebar-mini .sidebar:hover .nav-item i { 
