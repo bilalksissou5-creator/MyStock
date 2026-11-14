@@ -6,6 +6,7 @@
    ✅ إصلاح قطع النصوص داخل بطاقات المنتجات
    ✅ إجبار عرض بطاقتين في شاشة الهاتف
    ✅ جعل حشوة البطاقة 5px في جميع الشاشات
+   ✅ إجبار عرض 3 بطاقات في الوضع المقلوب (Landscape)
    ============================================ */
 
 /* تنسيق شبكة المنتجات الأساسي */
@@ -19,7 +20,7 @@
 .product-card {
   background: white;
   border-radius: 10px;
-  padding: 5px; /* ✅ تم التعديل إلى 5px */
+  padding: 5px; 
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
   display: flex;
   flex-direction: column;
@@ -64,7 +65,7 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  padding-inline: 5px; /* إضافة مسافة صغيرة للنص ليتناسق مع الحشوة الجديدة */
+  padding-inline: 5px;
 }
 
 .product-card .sku {
@@ -86,7 +87,6 @@
   margin-top: auto;
 }
 
-/* ✅ حشوة المربعات 2px كما طلبت سابقاً */
 .stat {
   background: #fafafa;
   border-radius: 6px;
@@ -119,16 +119,15 @@
   color: #dc2626;
 }
 
-/* ══════ شاشات الهاتف ══════ */
-@media (max-width: 768px) {
-  /* ✅ إجبار الشبكة على عرض بطاقتين بالضبط (عمودين) */
+/* ══════ شاشات الهاتف (الوضع العمودي) ══════ */
+@media (max-width: 768px) and (orientation: portrait) {
   .products {
     grid-template-columns: repeat(2, minmax(0, 1fr)) !important; 
-    gap: 8px !important; /* تقليل الفراغ بين البطاقتين */
+    gap: 8px !important; 
   }
   
   .product-card { 
-    padding: 5px !important; /* ✅ إجبار الحشوة على 5px في الهاتف أيضاً */
+    padding: 5px !important; 
   }
   
   .product-card-image { 
@@ -153,6 +152,43 @@
   }
   .stat-value { 
     font-size: 11px; 
+  }
+}
+
+/* ✅ إضافة جديدة: إجبار 3 بطاقات في الوضع المقلوب (Landscape) */
+@media (orientation: landscape) and (max-height: 500px) {
+  .products {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: 6px !important;
+  }
+  
+  .product-card { 
+    padding: 4px !important; 
+  }
+  
+  .product-card-image { 
+    height: 80px; 
+    margin-bottom: 6px;
+  }
+  
+  .product-card h3 { 
+    font-size: 12px; 
+    margin-bottom: 2px;
+  }
+
+  .product-card .sku {
+    font-size: 10px;
+    margin-bottom: 6px;
+  }
+  
+  .stat { 
+    padding: 2px !important; 
+  }
+  .stat-label { 
+    font-size: 8px; 
+  }
+  .stat-value { 
+    font-size: 10px; 
   }
 }
 
@@ -253,10 +289,19 @@ html.in-iframe .products {
   align-content: start !important;
 }
 
-@media (max-width: 768px) {
+/* تعديل شبكة الإطار في الهاتف العمودي */
+@media (max-width: 768px) and (orientation: portrait) {
   html.in-iframe .products {
     grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
     gap: 8px !important;
+  }
+}
+
+/* تعديل شبكة الإطار في الوضع المقلوب */
+@media (orientation: landscape) and (max-height: 500px) {
+  html.in-iframe .products {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: 6px !important;
   }
 }
 
