@@ -1,7 +1,42 @@
 /* ============================================
-   صفحة قائمة الفواتير
+   صفحة قائمة الفواتير (متوافق مع invoices.js)
    ============================================ */
 
+/* 1. إصلاح شريط البحث (Search Bar) */
+.search-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #ffffff;
+  padding: 10px 16px;
+  border-radius: 10px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  margin-bottom: 16px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.search-bar i {
+  color: #737373;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+.search-bar input {
+  flex: 1;
+  min-width: 0; /* لمنع تمدد الحقل خارج الشاشة */
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 14px;
+  color: #171717;
+}
+
+.search-bar input::placeholder {
+  color: #a3a3a3;
+}
+
+/* 2. قائمة الفواتير */
 .invoices-list {
   display: flex;
   flex-direction: column;
@@ -119,13 +154,18 @@
   color: white;
 }
 
+/* 3. تنسيقات الهاتف (Mobile) */
 @media (max-width: 768px) {
+  .invoices-list {
+    padding: 0 12px; /* هوامش جانبية */
+  }
+
   .invoice-card {
     display: grid;
     grid-template-columns: 40px 1fr;
     grid-template-rows: auto auto;
-    gap: 8px;
-    padding: 12px;
+    gap: 10px;
+    padding: 14px;
   }
 
   .invoice-icon {
@@ -139,17 +179,25 @@
     grid-column: 2;
   }
 
+  /* السماح لرقم الفاتورة الطويل بالنزول لسطر جديد */
   .invoice-info strong {
     font-size: 13px;
+    white-space: normal !important;
+    word-break: break-all !important;
+    line-height: 1.3;
+    margin-bottom: 2px;
   }
 
   .invoice-stats {
     grid-column: 1 / -1;
     width: 100%;
     justify-content: space-between;
+    margin-top: 4px;
   }
 
   .invoice-stats .stat-mini {
     flex: 1;
+    padding: 8px 4px;
+    justify-content: center;
   }
 }
