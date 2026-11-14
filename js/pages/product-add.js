@@ -3,6 +3,7 @@
 // ✅ الترتيب الصحيح للهاتف (السلة قبل الملخص والأزرار)
 // ✅ إضافة تلقائية للسلة عند المسح
 // ✅ إصلاح تكرار المسح (زيادة الكمية وتفريغ الحقول)
+// ✅ إصلاح تفريغ حقل الفئة (Category) بعد الإضافة
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   if (window.__productAddLoaded) return;
@@ -333,11 +334,12 @@ document.addEventListener('DOMContentLoaded', async () => {
       addedProducts[existingCartIndex].qty = Number(addedProducts[existingCartIndex].qty || 0) + 1;
       renderAddedProducts();
       
-      // تفريغ الحقول حتى لا يبقى الباركود في الحقل
+      // تفريغ الحقول حتى لا يبقى الباركود أو الفئة في الحقل
       nameInput.value = '';
       qtyInput.value = '1';
       priceInput.value = '0';
       skuInput.value = '';
+      categoryInput.value = ''; // ✅ تفريغ حقل الفئة
       scannedImageUrl = null;
       
       return;
@@ -496,6 +498,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       qtyInput.value = '1';
       priceInput.value = '0';
       skuInput.value = '';
+      categoryInput.value = ''; // ✅ تفريغ حقل الفئة
       scannedImageUrl = null;
       renderAddedProducts();
     } finally {
