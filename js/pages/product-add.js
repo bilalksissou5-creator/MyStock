@@ -340,6 +340,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       qtyInput.value = '1';
       skuInput.value = value;
       scannedImageUrl = localProduct.image_url || null;
+      if (nameInput.value.trim() && Number(qtyInput.value) > 0) addToCart(); // ✅ إضافة تلقائية للسلة بعد المسح
       return;
     }
 
@@ -358,6 +359,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (p.image_url) scannedImageUrl = p.image_url;
         skuInput.value = value;
         qtyInput.value = '1';
+        if (nameInput.value.trim() && Number(qtyInput.value) > 0) addToCart(); // ✅ إضافة تلقائية للسلة بعد المسح
         return;
       }
     } catch (err) { console.warn('Open Food Facts error:', err); }
