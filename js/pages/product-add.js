@@ -1,6 +1,8 @@
 // ============================================
 // صفحة إضافة منتجات
 // ✅ الترتيب الصحيح للهاتف (السلة قبل الملخص والأزرار)
+// ✅ إضافة تلقائية للسلة عند المسح
+// ✅ إصلاح تكرار المسح (زيادة الكمية وتفريغ الحقول)
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   if (window.__productAddLoaded) return;
@@ -321,6 +323,27 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (!value) return;
     hideAlerts();
 
+    // ✅ 1. فحص التكرار أولاً: إذا كان المنتج موجوداً في السلة مسبقاً
+    const existingCartIndex = addedProducts.findIndex(p => {
+      const pSkus = (p.skus && p.skus.length) ? p.skus : (p.sku ? [p.sku] : []);
+      return pSkus.includes(value);
+    });
+    
+    if (existingCartIndex !== -1) {
+      addedProducts[existingCartIndex].qty = Number(addedProducts[existingCartIndex].qty || 0) + 1;
+      renderAddedProducts();
+      
+      // تفريغ الحقول حتى لا يبقى الباركود في الحقل
+      nameInput.value = '';
+      qtyInput.value = '1';
+      priceInput.value = '0';
+      skuInput.value = '';
+      scannedImageUrl = null;
+      
+      return;
+    }
+
+    // ✅ 2. إذا لم يكن في السلة، نبحث في الداتابيز
     let { data: localProduct } = await db.from('products').select('*')
       .eq('organization_id', organizationId).eq('sku', value).limit(1).maybeSingle();
 
@@ -340,10 +363,12 @@ document.addEventListener('DOMContentLoaded', async () => {
       qtyInput.value = '1';
       skuInput.value = value;
       scannedImageUrl = localProduct.image_url || null;
-      if (nameInput.value.trim() && Number(qtyInput.value) > 0) addToCart(); // ✅ إضافة تلقائية للسلة بعد المسح
+      // ✅ إضافة تلقائية للسلة
+      if (nameInput.value.trim() && Number(qtyInput.value) > 0) addToCart();
       return;
     }
 
+    // ✅ 3. البحث في Open Food Facts
     scannerHint.textContent = tr('prod_add_searching');
     try {
       const res = await fetch(`https://world.openfoodfacts.org/api/v2/product/${encodeURIComponent(value)}.json`);
@@ -359,11 +384,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (p.image_url) scannedImageUrl = p.image_url;
         skuInput.value = value;
         qtyInput.value = '1';
-        if (nameInput.value.trim() && Number(qtyInput.value) > 0) addToCart(); // ✅ إضافة تلقائية للسلة بعد المسح
+        // ✅ إضافة تلقائية للسلة
+        if (nameInput.value.trim() && Number(qtyInput.value) > 0) addToCart();
         return;
       }
     } catch (err) { console.warn('Open Food Facts error:', err); }
 
+    // ✅ 4. إذا كان الباركود مجهولاً تماماً
     skuInput.value = value;
     scannedImageUrl = null;
   }
