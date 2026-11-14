@@ -1,19 +1,27 @@
 /* ============================================
-   صفحة الفواتير - بنفس تنسيق صفحة الموردين
+   صفحة الفواتير - توحيد العرض مع شريط البحث
    ============================================ */
 
-/* 1. حقل البحث (شكل دائري وأنيق) */
+/* 1. توحيد عرض شريط البحث وقائمة الفواتير */
+.search-bar,
+.invoices-list {
+  width: 100%;
+  max-width: 700px;
+  margin-left: auto;
+  margin-right: auto;
+  box-sizing: border-box;
+}
+
+/* 2. حقل البحث (شكل دائري وأنيق) */
 .search-bar {
   display: flex;
   align-items: center;
   gap: 12px;
   background: #ffffff;
   padding: 12px 18px;
-  border-radius: 50px; /* شكل دائري كصفحة الموردين */
+  border-radius: 50px;
   border: 1px solid #e5e5e5;
   margin-bottom: 20px;
-  width: 100%;
-  box-sizing: border-box;
 }
 
 .search-bar i {
@@ -36,35 +44,35 @@
   color: #a3a3a3;
 }
 
-/* 2. قائمة الفواتير */
+/* 3. قائمة الفواتير */
 .invoices-list {
   display: flex;
   flex-direction: column;
   gap: 12px;
-  max-width: 700px;
-  margin: 0 auto;
 }
 
-/* 3. كارت الفاتورة (تصميم مشابه لكارت المورد) */
+/* 4. كارت الفاتورة */
 .invoice-card {
   display: flex;
   align-items: center;
   gap: 16px;
   background: #ffffff;
   padding: 16px;
-  border-radius: 16px; /* حواف دائرية مثل كارت المورد */
+  border-radius: 16px;
   border: 1px solid #f0f0f0;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
   text-decoration: none;
   color: inherit;
   transition: box-shadow 0.2s, transform 0.2s;
+  width: 100%; /* لضمان أخذ العرض الكامل للحاوية */
+  box-sizing: border-box;
 }
 
 .invoice-card:hover {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
 }
 
-/* 4. أيقونة الفاتورة (دائرة رمادية مثل أيقونة الشاحنة) */
+/* 5. أيقونة الفاتورة */
 .invoice-icon {
   width: 48px;
   height: 48px;
@@ -78,7 +86,7 @@
   font-size: 20px;
 }
 
-/* 5. معلومات الفاتورة */
+/* 6. معلومات الفاتورة */
 .invoice-info {
   flex: 1;
   min-width: 0;
@@ -115,7 +123,7 @@
   width: 14px;
 }
 
-/* 6. إحصائيات الفاتورة (الكمية والسعر) */
+/* 7. إحصائيات الفاتورة */
 .invoice-stats {
   display: flex;
   gap: 8px;
@@ -134,7 +142,7 @@
 }
 
 .invoice-stats .stat-mini.highlight {
-  background: #171717; /* الزر الأسود مثل زر Add Supplier */
+  background: #171717;
   color: white;
 }
 
@@ -158,12 +166,8 @@
   color: #ffffff;
 }
 
-/* 7. تنسيقات الهاتف (Mobile) */
+/* 8. تنسيقات الهاتف (Mobile) */
 @media (max-width: 768px) {
-  .invoices-list {
-    padding: 0;
-  }
-
   .invoice-card {
     display: grid;
     grid-template-columns: 48px 1fr;
@@ -180,7 +184,6 @@
     grid-column: 2;
   }
 
-  /* السماح لرقم الفاتورة الطويل بالنزول لسطر جديد */
   .invoice-info strong {
     font-size: 14px;
     white-space: normal !important;
@@ -188,14 +191,13 @@
     line-height: 1.3;
   }
 
-  /* ترتيب الإحصائيات في الأسفل بعرض كامل */
   .invoice-stats {
     grid-column: 1 / -1;
     width: 100%;
     justify-content: space-between;
     margin-top: 8px;
     padding-top: 12px;
-    border-top: 1px dashed #e5e5e5; /* خط فاصل خفيف جداً */
+    border-top: 1px dashed #e5e5e5;
   }
 
   .invoice-stats .stat-mini {
