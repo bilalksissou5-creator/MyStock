@@ -641,28 +641,6 @@ h6 { font-size: 0.8125rem; font-weight: 600; color: #404040; }
 }
 
 /* ============================================
-   ✅ الوضع الأفقي (Landscape)
-   ============================================ */
-@media (orientation: landscape) and (max-height: 500px) {
-  .header { height: 45px; padding: 0 12px; gap: 10px; }
-  .logo { font-size: 1rem; }
-  .search input { padding-block: 6px; padding-inline: 10px 32px; font-size: 12px; }
-
-  .sidebar { width: 200px; min-width: 200px; max-width: 200px; }
-  .nav { padding: 6px 8px; gap: 2px; }
-  .nav-item { padding: 6px 14px; font-size: 12px; gap: 8px; }
-  .nav-item i { font-size: 18px !important; width: 18px; }
-  .sidebar-footer { padding: 6px 8px; gap: 2px; }
-  .sidebar-footer .nav-item { padding: 6px 14px; font-size: 12px; }
-  .sidebar-footer .nav-item i { font-size: 18px !important; }
-  
-  .main { 
-    padding: 15px; 
-    padding-bottom: 15px; 
-  }
-}
-
-/* ============================================
    ✅ تنسيق الإطار (بدون أي مسافات خارجية)
    ============================================ */
 .main-iframe {
@@ -721,7 +699,6 @@ html.in-iframe .main {
     width: 65px; 
   }
   
-  /* إجبار جميع الحالات (مغلق، مفتوح بالزر، مفتوح بالتمرير) على نفس الخصائص */
   .body.sidebar-mini .nav-item,
   .body:not(.sidebar-mini) .nav-item,
   .body.sidebar-mini .sidebar:hover .nav-item,
@@ -730,14 +707,13 @@ html.in-iframe .main {
     width: 100% !important;
     height: 44px !important;
     margin: 0 !important;
-    padding: 0 !important; /* إزالة الحشوات دائماً */
-    position: relative !important; /* الحفاظ على النسبية دائماً */
+    padding: 0 !important; 
+    position: relative !important; 
     background: transparent !important; 
     border-radius: 0 !important;
     gap: 0 !important;
   }
 
-  /* ✅ إنشاء الخلفية الرمادية */
   .body.sidebar-mini .nav-item::before,
   .body.sidebar-mini .sidebar-footer .nav-item::before,
   .body:not(.sidebar-mini) .nav-item::before,
@@ -755,7 +731,6 @@ html.in-iframe .main {
     z-index: 0;
   }
 
-  /* إظهار الخلفية */
   .body.sidebar-mini .nav-item:hover::before,
   .body.sidebar-mini .nav-item.active::before,
   .body:not(.sidebar-mini) .nav-item:hover::before,
@@ -765,12 +740,10 @@ html.in-iframe .main {
     background: #e5e5e5 !important;
   }
   
-  /* إخفاء النص في الوضع المغلق */
   .body.sidebar-mini .nav-item span { 
     display: none !important; 
   }
 
-  /* ✅ تثبيت الأيقونة في جميع الحالات لمنع الحركة */
   .body.sidebar-mini .nav-item i,
   .body:not(.sidebar-mini) .nav-item i,
   .body.sidebar-mini .sidebar:hover .nav-item i,
@@ -786,7 +759,6 @@ html.in-iframe .main {
     z-index: 1;
   }
   
-  /* توسيع الخلفية في الوضع المفتوح (بالزر أو التمرير) */
   .body:not(.sidebar-mini) .nav-item::before,
   .body.sidebar-mini .sidebar:hover .nav-item::before,
   .body:not(.sidebar-mini) .sidebar-footer .nav-item::before,
@@ -796,7 +768,6 @@ html.in-iframe .main {
     border-radius: 8px !important;
   }
 
-  /* ✅ إظهار النص وإعطائه مسافة ثابتة من الحافة اليسرى */
   .body:not(.sidebar-mini) .nav-item span,
   .body.sidebar-mini .sidebar:hover .nav-item span,
   .body:not(.sidebar-mini) .sidebar-footer .nav-item span,
@@ -804,12 +775,11 @@ html.in-iframe .main {
     display: inline-block !important;
     opacity: 1 !important;
     width: auto !important;
-    margin-left: 48px !important; /* المسافة الثابتة الموحدة */
+    margin-left: 48px !important; 
     white-space: nowrap !important;
     z-index: 1;
   }
 
-  /* توسيع القائمة */
   .body.sidebar-mini .sidebar:hover {
     width: 200px !important; 
     box-shadow: 2px 0 10px rgba(0,0,0,0.1); 
