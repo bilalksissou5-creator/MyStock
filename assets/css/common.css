@@ -712,30 +712,36 @@ html.in-iframe .main {
 }
 
 /* ============================================
-   ✅ الحل النهائي (0px حركة للأيقونات، وحركة مرنة للخلفية)
+   ✅ الحل النهائي (توحيد الفتح بالزر والتمرير معاً)
    ============================================ */
 @media (min-width: 769px) {
   
-  /* 1. الوضع المغلق (القائمة بعرض 65px) */
+  /* 1. الوضع المغلق */
   .body.sidebar-mini .sidebar {
     width: 65px; 
   }
   
-  /* تثبيت الزر ليكون ثابتاً تماماً */
+  /* إجبار جميع الحالات (مغلق، مفتوح بالزر، مفتوح بالتمرير) على نفس الخصائص */
   .body.sidebar-mini .nav-item,
-  .body.sidebar-mini .sidebar-footer .nav-item {
+  .body:not(.sidebar-mini) .nav-item,
+  .body.sidebar-mini .sidebar:hover .nav-item,
+  .body.sidebar-mini .sidebar-footer .nav-item,
+  .body:not(.sidebar-mini) .sidebar-footer .nav-item {
     width: 100% !important;
     height: 44px !important;
     margin: 0 !important;
-    padding: 0 !important;
-    position: relative !important;
+    padding: 0 !important; /* إزالة الحشوات دائماً */
+    position: relative !important; /* الحفاظ على النسبية دائماً */
     background: transparent !important; 
     border-radius: 0 !important;
+    gap: 0 !important;
   }
 
-  /* ✅ إنشاء الخلفية الرمادية كـ "طبقة" خلفية تتوسع بمرونة */
+  /* ✅ إنشاء الخلفية الرمادية */
   .body.sidebar-mini .nav-item::before,
-  .body.sidebar-mini .sidebar-footer .nav-item::before {
+  .body.sidebar-mini .sidebar-footer .nav-item::before,
+  .body:not(.sidebar-mini) .nav-item::before,
+  .body:not(.sidebar-mini) .sidebar-footer .nav-item::before {
     content: '';
     position: absolute;
     top: 50%;
@@ -749,21 +755,27 @@ html.in-iframe .main {
     z-index: 0;
   }
 
-  /* إظهار الخلفية عند التمرير أو التحديد */
+  /* إظهار الخلفية */
   .body.sidebar-mini .nav-item:hover::before,
   .body.sidebar-mini .nav-item.active::before,
-  .body.sidebar-mini .sidebar-footer .nav-item:hover::before {
+  .body:not(.sidebar-mini) .nav-item:hover::before,
+  .body:not(.sidebar-mini) .nav-item.active::before,
+  .body.sidebar-mini .sidebar-footer .nav-item:hover::before,
+  .body:not(.sidebar-mini) .sidebar-footer .nav-item:hover::before {
     background: #e5e5e5 !important;
   }
   
-  /* إخفاء النص تماماً */
+  /* إخفاء النص في الوضع المغلق */
   .body.sidebar-mini .nav-item span { 
     display: none !important; 
   }
 
-  /* ✅ تثبيت الأيقونة بإحداثيات مطلقة لمنع أي حركة */
+  /* ✅ تثبيت الأيقونة في جميع الحالات لمنع الحركة */
   .body.sidebar-mini .nav-item i,
-  .body.sidebar-mini .sidebar-footer .nav-item i { 
+  .body:not(.sidebar-mini) .nav-item i,
+  .body.sidebar-mini .sidebar:hover .nav-item i,
+  .body.sidebar-mini .sidebar-footer .nav-item i,
+  .body:not(.sidebar-mini) .sidebar-footer .nav-item i { 
     position: absolute !important;
     left: 26.5px !important; 
     top: 50% !important;
@@ -774,13 +786,7 @@ html.in-iframe .main {
     z-index: 1;
   }
   
-  /* 2. الوضع المفتوح (عند الفتح أو التمرير) */
-  .body:not(.sidebar-mini) .nav-item,
-  .body.sidebar-mini .sidebar:hover .nav-item {
-    height: 44px !important;
-  }
-
-  /* توسيع الخلفية فقط، دون تحريك الزر */
+  /* توسيع الخلفية في الوضع المفتوح (بالزر أو التمرير) */
   .body:not(.sidebar-mini) .nav-item::before,
   .body.sidebar-mini .sidebar:hover .nav-item::before,
   .body:not(.sidebar-mini) .sidebar-footer .nav-item::before,
@@ -790,19 +796,20 @@ html.in-iframe .main {
     border-radius: 8px !important;
   }
 
-  /* ✅ إظهار النص وتقليل المسافة بينه وبين الأيقونة */
+  /* ✅ إظهار النص وإعطائه مسافة ثابتة من الحافة اليسرى */
   .body:not(.sidebar-mini) .nav-item span,
-  .body.sidebar-mini .sidebar:hover .nav-item span { 
+  .body.sidebar-mini .sidebar:hover .nav-item span,
+  .body:not(.sidebar-mini) .sidebar-footer .nav-item span,
+  .body.sidebar-mini .sidebar:hover .sidebar-footer .nav-item span { 
     display: inline-block !important;
     opacity: 1 !important;
     width: auto !important;
-    /* ✅ تم تعديل المسافة من 48px إلى 38px لكي يقترب النص من الأيقونة */
-    margin-left: 38px !important; 
+    margin-left: 48px !important; /* المسافة الثابتة الموحدة */
     white-space: nowrap !important;
     z-index: 1;
   }
 
-  /* 3. توسيع القائمة */
+  /* توسيع القائمة */
   .body.sidebar-mini .sidebar:hover {
     width: 200px !important; 
     box-shadow: 2px 0 10px rgba(0,0,0,0.1); 
