@@ -322,7 +322,7 @@ h6 { font-size: 0.8125rem; font-weight: 600; color: #404040; }
   overflow: hidden;
   height: 100%;
   
-  /* ✅ إعادة تفعيل الحركة المرنة للقائمة */
+  /* ✅ حركة مرنة للقائمة فقط */
   transition: width 0.3s ease-in-out !important; 
 }
 
@@ -713,7 +713,7 @@ html.in-iframe .main {
 }
 
 /* ============================================
-   ✅ الحل المطلق (توسيط مثالي + حركة مرنة)
+   ✅ الحل النهائي (0px حركة للأيقونات، وحركة مرنة للخلفية)
    ============================================ */
 @media (min-width: 769px) {
   
@@ -722,17 +722,39 @@ html.in-iframe .main {
     width: 65px; 
   }
   
-  /* نثبت الزر في المنتصف كبطاقة (مربع 44x44) */
+  /* تثبيت الزر ليكون ثابتاً تماماً */
   .body.sidebar-mini .nav-item,
   .body.sidebar-mini .sidebar-footer .nav-item {
-    width: 44px !important;
+    width: 100% !important;
     height: 44px !important;
-    margin: 0 auto !important;
-    padding: 0 !important; 
-    position: relative !important; 
-    /* ✅ تفعيل الحركة المرنة لتوسع الزر */
-    transition: background 0.2s, width 0.3s ease-in-out, margin 0.3s ease-in-out !important;
-    border-radius: 8px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    position: relative !important;
+    background: transparent !important; /* إزالة الخلفية من الزر نفسه */
+    border-radius: 0 !important;
+  }
+
+  /* ✅ إنشاء الخلفية الرمادية كـ "طبقة" خلفية تتوسع بمرونة */
+  .body.sidebar-mini .nav-item::before,
+  .body.sidebar-mini .sidebar-footer .nav-item::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 26.5px !important; /* منتصف القائمة 65px */
+    transform: translate(-50%, -50%);
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    background: transparent;
+    transition: all 0.3s ease !important; /* حركة مرنة لتوسع الخلفية */
+    z-index: 0;
+  }
+
+  /* إظهار الخلفية عند التمرير أو التحديد */
+  .body.sidebar-mini .nav-item:hover::before,
+  .body.sidebar-mini .nav-item.active::before,
+  .body.sidebar-mini .sidebar-footer .nav-item:hover::before {
+    background: #e5e5e5 !important;
   }
   
   /* إخفاء النص تماماً */
@@ -740,47 +762,51 @@ html.in-iframe .main {
     display: none !important; 
   }
 
-  /* ✅ الأيقونة تثبت في المنتصف ولن تتحرك */
+  /* ✅ تثبيت الأيقونة بإحداثيات مطلقة لمنع أي حركة */
   .body.sidebar-mini .nav-item i,
   .body.sidebar-mini .sidebar-footer .nav-item i { 
     position: absolute !important;
-    left: 23px !important; 
+    left: 26.5px !important; /* نفس منتصف القائمة */
     top: 50% !important;
     transform: translate(-50%, -50%) !important; 
     font-size: 18px !important; 
     width: 18px !important; 
     text-align: center !important;
+    z-index: 1;
   }
   
   /* 2. الوضع المفتوح (عند الفتح أو التمرير) */
   .body:not(.sidebar-mini) .nav-item,
   .body.sidebar-mini .sidebar:hover .nav-item {
-    width: 100% !important; 
-    height: auto !important;
-    margin: 0 !important;
-    padding: 12px 14px !important;
-    position: relative !important;
+    height: 44px !important;
   }
 
-  /* إظهار النص بمرونة */
+  /* توسيع الخلفية فقط، دون تحريك الزر */
+  .body:not(.sidebar-mini) .nav-item::before,
+  .body.sidebar-mini .sidebar:hover .nav-item::before,
+  .body:not(.sidebar-mini) .sidebar-footer .nav-item::before,
+  .body.sidebar-mini .sidebar:hover .sidebar-footer .nav-item::before {
+    width: calc(100% - 12px) !important; /* تمتد لتشمل العرض بالكامل */
+    left: 50% !important;
+    border-radius: 8px !important;
+  }
+
+  /* إظهار النص بجانب الأيقونة */
   .body:not(.sidebar-mini) .nav-item span,
   .body.sidebar-mini .sidebar:hover .nav-item span { 
     display: inline-block !important;
     opacity: 1 !important;
     width: auto !important;
-    margin-left: 38px !important; 
+    margin-left: 48px !important; /* مسافة آمنة بعد الأيقونة المثبتة */
     white-space: nowrap !important;
-    /* ✅ تأثير ظهور النص بسلاسة */
-    transition: opacity 0.3s ease-in-out, margin-left 0.3s ease-in-out !important;
+    z-index: 1;
   }
 
-  /* 3. توسيع القائمة بمرونة */
+  /* 3. توسيع القائمة */
   .body.sidebar-mini .sidebar:hover {
     width: 200px !important; 
     box-shadow: 2px 0 10px rgba(0,0,0,0.1); 
     z-index: 100;
-    /* ✅ تفعيل الحركة المرنة للقائمة */
-    transition: width 0.3s ease-in-out !important; 
   }
 }
 
