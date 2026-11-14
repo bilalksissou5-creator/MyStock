@@ -322,7 +322,8 @@ h6 { font-size: 0.8125rem; font-weight: 600; color: #404040; }
   overflow: hidden;
   height: 100%;
   
-  transition: none !important; /* ✅ منع اهتزاز القائمة */
+  /* ✅ إعادة تفعيل الحركة المرنة للقائمة */
+  transition: width 0.3s ease-in-out !important; 
 }
 
 .body.sidebar-closed .sidebar {
@@ -361,7 +362,7 @@ h6 { font-size: 0.8125rem; font-weight: 600; color: #404040; }
   text-align: start;
   flex-shrink: 0;
   white-space: nowrap;
-  transition: background 0.15s;
+  transition: background 0.2s;
 }
 
 .nav-item i { 
@@ -712,7 +713,7 @@ html.in-iframe .main {
 }
 
 /* ============================================
-   ✅ الحل المطلق (توسيط مثالي + صفر حركة للعناصر)
+   ✅ الحل المطلق (توسيط مثالي + حركة مرنة)
    ============================================ */
 @media (min-width: 769px) {
   
@@ -727,9 +728,10 @@ html.in-iframe .main {
     width: 44px !important;
     height: 44px !important;
     margin: 0 auto !important;
-    padding: 0 !important; /* إزالة الحشوات */
-    position: relative !important; /* ضروري لتثبيت الأيقونة بداخله */
-    transition: background 0.15s !important;
+    padding: 0 !important; 
+    position: relative !important; 
+    /* ✅ تفعيل الحركة المرنة لتوسع الزر */
+    transition: background 0.2s, width 0.3s ease-in-out, margin 0.3s ease-in-out !important;
     border-radius: 8px !important;
   }
   
@@ -738,13 +740,13 @@ html.in-iframe .main {
     display: none !important; 
   }
 
-  /* ✅ السحر كله هنا: تثبيت الأيقونة في مسافة 23.5px (وهي منتصف الـ 65px تماماً) */
+  /* ✅ الأيقونة تثبت في المنتصف ولن تتحرك */
   .body.sidebar-mini .nav-item i,
   .body.sidebar-mini .sidebar-footer .nav-item i { 
     position: absolute !important;
-    left: 23.5px !important; /* المسافة الثابتة التي لا تتغير أبداً */
+    left: 23px !important; 
     top: 50% !important;
-    transform: translate(-50%, -50%) !important; /* توسيط الأيقونة لنفسها */
+    transform: translate(-50%, -50%) !important; 
     font-size: 18px !important; 
     width: 18px !important; 
     text-align: center !important;
@@ -753,29 +755,32 @@ html.in-iframe .main {
   /* 2. الوضع المفتوح (عند الفتح أو التمرير) */
   .body:not(.sidebar-mini) .nav-item,
   .body.sidebar-mini .sidebar:hover .nav-item {
-    width: 100% !important; /* الزر يأخذ العرض بالكامل */
+    width: 100% !important; 
     height: auto !important;
     margin: 0 !important;
     padding: 12px 14px !important;
     position: relative !important;
   }
 
-  /* إظهار النص وإعطائه مسافة لكي لا يتداخل مع الأيقونة */
+  /* إظهار النص بمرونة */
   .body:not(.sidebar-mini) .nav-item span,
   .body.sidebar-mini .sidebar:hover .nav-item span { 
     display: inline-block !important;
     opacity: 1 !important;
     width: auto !important;
-    margin-left: 38px !important; /* مسافة النص بعد الأيقونة المثبتة */
+    margin-left: 38px !important; 
     white-space: nowrap !important;
+    /* ✅ تأثير ظهور النص بسلاسة */
+    transition: opacity 0.3s ease-in-out, margin-left 0.3s ease-in-out !important;
   }
 
-  /* 3. توسيع القائمة */
+  /* 3. توسيع القائمة بمرونة */
   .body.sidebar-mini .sidebar:hover {
     width: 200px !important; 
     box-shadow: 2px 0 10px rgba(0,0,0,0.1); 
     z-index: 100;
-    transition: none !important; /* منع أي حركة للقائمة */
+    /* ✅ تفعيل الحركة المرنة للقائمة */
+    transition: width 0.3s ease-in-out !important; 
   }
 }
 
