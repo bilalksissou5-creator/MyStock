@@ -322,7 +322,6 @@ h6 { font-size: 0.8125rem; font-weight: 600; color: #404040; }
   overflow: hidden;
   height: 100%;
   
-  /* ✅ حركة مرنة للقائمة فقط */
   transition: width 0.3s ease-in-out !important; 
 }
 
@@ -730,7 +729,7 @@ html.in-iframe .main {
     margin: 0 !important;
     padding: 0 !important;
     position: relative !important;
-    background: transparent !important; /* إزالة الخلفية من الزر نفسه */
+    background: transparent !important; 
     border-radius: 0 !important;
   }
 
@@ -740,13 +739,13 @@ html.in-iframe .main {
     content: '';
     position: absolute;
     top: 50%;
-    left: 26.5px !important; /* منتصف القائمة 65px */
+    left: 26.5px !important; 
     transform: translate(-50%, -50%);
     width: 40px;
     height: 40px;
     border-radius: 8px;
     background: transparent;
-    transition: all 0.3s ease !important; /* حركة مرنة لتوسع الخلفية */
+    transition: all 0.3s ease !important; 
     z-index: 0;
   }
 
@@ -766,7 +765,7 @@ html.in-iframe .main {
   .body.sidebar-mini .nav-item i,
   .body.sidebar-mini .sidebar-footer .nav-item i { 
     position: absolute !important;
-    left: 26.5px !important; /* نفس منتصف القائمة */
+    left: 26.5px !important; 
     top: 50% !important;
     transform: translate(-50%, -50%) !important; 
     font-size: 18px !important; 
@@ -786,18 +785,19 @@ html.in-iframe .main {
   .body.sidebar-mini .sidebar:hover .nav-item::before,
   .body:not(.sidebar-mini) .sidebar-footer .nav-item::before,
   .body.sidebar-mini .sidebar:hover .sidebar-footer .nav-item::before {
-    width: calc(100% - 12px) !important; /* تمتد لتشمل العرض بالكامل */
+    width: calc(100% - 12px) !important; 
     left: 50% !important;
     border-radius: 8px !important;
   }
 
-  /* إظهار النص بجانب الأيقونة */
+  /* ✅ إظهار النص وتقليل المسافة بينه وبين الأيقونة */
   .body:not(.sidebar-mini) .nav-item span,
   .body.sidebar-mini .sidebar:hover .nav-item span { 
     display: inline-block !important;
     opacity: 1 !important;
     width: auto !important;
-    margin-left: 48px !important; /* مسافة آمنة بعد الأيقونة المثبتة */
+    /* ✅ تم تعديل المسافة من 48px إلى 38px لكي يقترب النص من الأيقونة */
+    margin-left: 38px !important; 
     white-space: nowrap !important;
     z-index: 1;
   }
