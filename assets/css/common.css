@@ -684,8 +684,8 @@ html.in-iframe .main {
 
 @media (max-width: 768px) {
   html.in-iframe .main {
-    padding: 15px !important; 
-    padding-bottom: 15px !important;
+    /* ✅ تصفير المسافة العلوية في الهاتف ليلتصق المحتوى بالهيدر */
+    padding: 0 15px 15px 15px !important; 
   }
 }
 

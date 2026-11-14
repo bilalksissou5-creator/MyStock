@@ -254,7 +254,7 @@
   border-radius: 16px; 
   padding: 16px; 
   width: 100%; 
-  max-width: 380px; /* ✅ تصغير النافذة */
+  max-width: 380px; 
   display: flex; 
   flex-direction: column; 
   gap: 12px; 
@@ -266,7 +266,6 @@
 .scanner-close { background: rgba(255, 255, 255, 0.1); border: none; color: #ffffff; width: 36px; height: 36px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 16px; transition: background 0.15s; }
 .scanner-close:hover { background: rgba(255, 255, 255, 0.2); }
 
-/* ✅ تصغير الحاوية بمقدار 30 بكسل (من 300 إلى 270) وإبقائها مربعة */
 .scanner-reader { 
   width: 100% !important; 
   max-width: min(100%, 270px, 45vh) !important; 
@@ -278,7 +277,6 @@
   position: relative !important;
 }
 
-/* ✅ إزالة position:absolute لكي لا تختفي علامة التركيز البيضاء */
 .scanner-reader video,
 #scanner-reader video {
   width: 100% !important; 
@@ -287,7 +285,6 @@
   border-radius: 12px !important;
 }
 
-/* ✅ تنسيقات زر قلب الكاميرا الجديد */
 .scanner-actions {
   display: flex;
   justify-content: center;
@@ -349,7 +346,7 @@
 }
 
 /* ============================================
-   ✅ التصميم الشبكي للشاشات الكبيرة (إصلاح المسافة 16px)
+   ✅ التصميم الشبكي للشاشات الكبيرة (سكرول داخل البطاقة)
    ============================================ */
 @media (min-width: 700px) {
   .main {
