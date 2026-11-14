@@ -379,7 +379,7 @@
 }
 
 /* ============================================
-   ✅ إصلاح التمرير داخل Workspace (الحل الصحيح للهاتف)
+   ✅ إصلاح التمرير داخل Workspace 
    ============================================ */
 html.in-iframe, html.in-iframe body {
   height: 100% !important;
@@ -406,19 +406,18 @@ html.in-iframe, html.in-iframe body {
   }
 }
 
-/* ✅ في الهاتف: نلغي السكرول الداخلي ونعيد المسافات */
+/* ✅ في الهاتف: إعادة المسافات مع مسافة علوية مناسبة */
 @media (max-width: 699px) {
   html.in-iframe .main {
     display: block !important; 
     height: 100% !important;
-    padding: 0 16px 16px 16px !important; /* 0 من الأعلى ليمر تحت الهيدر */
+    padding: 16px 16px 16px 16px !important; /* 16px من الأعلى لعدم التصاق زر Scan */
     box-sizing: border-box !important;
     overflow-y: auto !important; 
   }
 
   html.in-iframe .add-form {
-    /* ✅ إعادة الفليكس لكي تعمل المسافات (gap) بين البطاقات */
-    display: flex !important; 
+    display: flex !important; /* إعادة الفليكس لتعمل المسافات بين البطاقات */
     flex-direction: column !important;
     gap: 16px !important;
     overflow: visible !important; 

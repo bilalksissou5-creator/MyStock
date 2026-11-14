@@ -676,17 +676,10 @@ html.in-iframe .main {
   min-height: 0 !important;
   overflow-y: auto !important; 
   overflow-x: hidden !important;
-  padding: 15px !important;
+  padding: 15px !important; /* ✅ مسافة 15px لجميع الصفحات */
   box-sizing: border-box !important;
   display: flex !important;
   flex-direction: column !important;
-}
-
-@media (max-width: 768px) {
-  html.in-iframe .main {
-    /* ✅ تصفير المسافة العلوية في الهاتف ليلتصق المحتوى بالهيدر */
-    padding: 0 15px 15px 15px !important; 
-  }
 }
 
 /* ============================================
