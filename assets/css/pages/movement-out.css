@@ -224,52 +224,14 @@
 /* ============================================
    ✅ تعديلات الماسح الضوئي (كاميرا مربعة)
    ============================================ */
-.scanner-modal { 
-  position: fixed; 
-  inset: 0; 
-  background: rgba(0, 0, 0, 0.85); 
-  z-index: 10000; 
-  display: none; 
-  align-items: center; 
-  justify-content: center; 
-  padding: 16px; 
-}
-.scanner-box { 
-  background: #171717; 
-  border-radius: 16px; 
-  padding: 16px; 
-  width: 100%; 
-  max-width: 380px; 
-  display: flex; 
-  flex-direction: column; 
-  gap: 12px; 
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5); 
-  max-height: 90vh; 
-}
+.scanner-modal { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.85); z-index: 10000; display: none; align-items: center; justify-content: center; padding: 16px; }
+.scanner-box { background: #171717; border-radius: 16px; padding: 16px; width: 100%; max-width: 380px; display: flex; flex-direction: column; gap: 12px; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5); max-height: 90vh; }
 .scanner-header { display: flex; align-items: center; justify-content: space-between; color: #ffffff; flex-shrink: 0; }
 .scanner-header h3 { font-size: 16px; font-weight: 700; margin: 0; }
 .scanner-close { background: rgba(255, 255, 255, 0.1); border: none; color: #ffffff; width: 36px; height: 36px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 16px; transition: background 0.15s; }
 .scanner-close:hover { background: rgba(255, 255, 255, 0.2); }
-
-.scanner-reader { 
-  width: 100% !important; 
-  max-width: min(100%, 270px, 45vh) !important; 
-  aspect-ratio: 1 / 1 !important; 
-  margin: 0 auto !important; 
-  border-radius: 12px; 
-  overflow: hidden !important; 
-  background: #000000; 
-  position: relative !important;
-}
-
-.scanner-reader video,
-#scanner-reader video {
-  width: 100% !important; 
-  height: 100% !important; 
-  object-fit: cover !important; 
-  border-radius: 12px !important;
-}
-
+.scanner-reader { width: 100% !important; max-width: min(100%, 270px, 45vh) !important; aspect-ratio: 1 / 1 !important; margin: 0 auto !important; border-radius: 12px; overflow: hidden !important; background: #000000; position: relative !important; }
+.scanner-reader video, #scanner-reader video { width: 100% !important; height: 100% !important; object-fit: cover !important; border-radius: 12px !important; }
 .scanner-hint { color: #a3a3a3; font-size: 13px; text-align: center; margin: 0; flex-shrink: 0; }
 
 /* ============================================
@@ -320,7 +282,6 @@
     max-width: none !important; 
     width: 100% !important;
     margin: 0 !important;
-    
     display: flex; 
     flex-direction: row; 
     gap: 0; 
@@ -418,7 +379,7 @@
 }
 
 /* ============================================
-   ✅ إصلاح التمرير داخل Workspace (سكرول طبيعي للهاتف)
+   ✅ إصلاح التمرير داخل Workspace (الحل الصحيح للهاتف)
    ============================================ */
 html.in-iframe, html.in-iframe body {
   height: 100% !important;
@@ -445,10 +406,10 @@ html.in-iframe, html.in-iframe body {
   }
 }
 
-/* ✅ في الهاتف: نلغي الحبس ونجعل السكرول طبيعياً */
+/* ✅ في الهاتف: نلغي السكرول الداخلي ونعيد المسافات */
 @media (max-width: 699px) {
   html.in-iframe .main {
-    display: block !important; /* التمرير الطبيعي */
+    display: block !important; 
     height: 100% !important;
     padding: 0 16px 16px 16px !important; /* 0 من الأعلى ليمر تحت الهيدر */
     box-sizing: border-box !important;
@@ -456,8 +417,11 @@ html.in-iframe, html.in-iframe body {
   }
 
   html.in-iframe .add-form {
-    display: block !important; 
-    overflow: visible !important; /* إزالة السكرول الداخلي */
+    /* ✅ إعادة الفليكس لكي تعمل المسافات (gap) بين البطاقات */
+    display: flex !important; 
+    flex-direction: column !important;
+    gap: 16px !important;
+    overflow: visible !important; 
     height: auto !important;
   }
 }
