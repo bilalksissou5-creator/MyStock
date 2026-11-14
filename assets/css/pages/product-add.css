@@ -316,7 +316,7 @@
 .scanner-hint { color: #a3a3a3; font-size: 13px; text-align: center; margin: 0; flex-shrink: 0; }
 
 /* ============================================
-   ✅ تصميم الهواتف 
+   ✅ تصميم الهواتف (سكرول طبيعي ويمر تحت الهيدر)
    ============================================ */
 @media (max-width: 699px) {
   .main {
@@ -346,7 +346,7 @@
 }
 
 /* ============================================
-   ✅ التصميم الشبكي للشاشات الكبيرة (سكرول داخل البطاقة)
+   ✅ التصميم الشبكي للشاشات الكبيرة
    ============================================ */
 @media (min-width: 700px) {
   .main {
@@ -462,7 +462,7 @@
 }
 
 /* ============================================
-   ✅ إصلاح التمرير داخل Workspace 
+   ✅ إصلاح التمرير داخل Workspace (سكرول طبيعي للهاتف)
    ============================================ */
 html.in-iframe, html.in-iframe body {
   height: 100% !important;
@@ -470,26 +470,38 @@ html.in-iframe, html.in-iframe body {
   margin: 0 !important;
 }
 
-html.in-iframe .main {
-  display: flex !important;
-  flex-direction: column !important;
-  height: 100% !important;
-  padding: 16px !important; 
-  box-sizing: border-box !important;
-  overflow: hidden !important;
-}
+@media (min-width: 700px) {
+  html.in-iframe .main {
+    display: flex !important;
+    flex-direction: column !important;
+    height: 100% !important;
+    padding: 16px !important; 
+    box-sizing: border-box !important;
+    overflow: hidden !important;
+  }
 
-html.in-iframe .add-form {
-  flex: 1 1 auto !important;
-  overflow: hidden !important;
-  padding: 0 !important;
-  box-sizing: border-box !important;
-  min-height: 0 !important; 
-}
-
-@media (max-width: 699px) {
   html.in-iframe .add-form {
-    overflow-y: auto !important;
-    padding-inline-end: 8px !important;
+    flex: 1 1 auto !important;
+    overflow: hidden !important;
+    padding: 0 !important;
+    box-sizing: border-box !important;
+    min-height: 0 !important; 
+  }
+}
+
+/* ✅ في الهاتف: نلغي الحبس ونجعل السكرول طبيعياً */
+@media (max-width: 699px) {
+  html.in-iframe .main {
+    display: block !important; /* التمرير الطبيعي */
+    height: 100% !important;
+    padding: 0 16px 16px 16px !important; /* 0 من الأعلى ليمر تحت الهيدر */
+    box-sizing: border-box !important;
+    overflow-y: auto !important; 
+  }
+
+  html.in-iframe .add-form {
+    display: block !important; 
+    overflow: visible !important; /* إزالة السكرول الداخلي */
+    height: auto !important;
   }
 }
