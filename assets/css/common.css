@@ -808,3 +808,47 @@ html.in-iframe .main {
     transform: translate(-50%, -50%) scaleX(-1) !important;
   }
 }
+
+/* ============================================
+   ✅ تصحيح اتجاه الأيقونة والنص في القائمة الجانبية (RTL)
+   ============================================ */
+@media (min-width: 769px) {
+  /* 1. جعل الأيقونة على اليمين (أولاً) */
+  [dir="rtl"] .body.sidebar-mini .nav-item i,
+  [dir="rtl"] .body:not(.sidebar-mini) .nav-item i,
+  [dir="rtl"] .body.sidebar-mini .sidebar:hover .nav-item i,
+  [dir="rtl"] .body.sidebar-mini .sidebar-footer .nav-item i,
+  [dir="rtl"] .body:not(.sidebar-mini) .sidebar-footer .nav-item i { 
+    left: auto !important;
+    right: 26.5px !important;
+    transform: translate(50%, -50%) scaleX(-1) !important; 
+  }
+  
+  /* 2. نقل الخلفية الرمادية للأيقونة لليمين */
+  [dir="rtl"] .body.sidebar-mini .nav-item::before,
+  [dir="rtl"] .body.sidebar-mini .sidebar-footer .nav-item::before,
+  [dir="rtl"] .body:not(.sidebar-mini) .nav-item::before,
+  [dir="rtl"] .body:not(.sidebar-mini) .sidebar-footer .nav-item::before {
+    left: auto !important;
+    right: 26.5px !important;
+    transform: translate(50%, -50%) !important;
+  }
+  
+  /* 3. توسيط الخلفية عند فتح القائمة */
+  [dir="rtl"] .body:not(.sidebar-mini) .nav-item::before,
+  [dir="rtl"] .body.sidebar-mini .sidebar:hover .nav-item::before,
+  [dir="rtl"] .body:not(.sidebar-mini) .sidebar-footer .nav-item::before,
+  [dir="rtl"] .body.sidebar-mini .sidebar:hover .sidebar-footer .nav-item::before {
+    right: 50% !important;
+    transform: translate(50%, -50%) !important;
+  }
+
+  /* 4. جعل النص على اليسار (ثانياً) */
+  [dir="rtl"] .body:not(.sidebar-mini) .nav-item span,
+  [dir="rtl"] .body.sidebar-mini .sidebar:hover .nav-item span,
+  [dir="rtl"] .body:not(.sidebar-mini) .sidebar-footer .nav-item span,
+  [dir="rtl"] .body.sidebar-mini .sidebar:hover .sidebar-footer .nav-item span { 
+    margin-left: 0 !important;
+    margin-right: 48px !important; 
+  }
+}
