@@ -1,13 +1,16 @@
 /* ============================================
-   صفحة الإعدادات
+   صفحة الإعدادات - عرض كامل للشاشة
    ============================================ */
 
 .settings-wrapper {
   display: flex;
   flex-direction: column;
   gap: 16px;
-  max-width: 600px;
-  margin: 0 auto;
+  /* ✅ التعديل: أخذ العرض الكامل مع حد أقصى يتناسب مع الشاشات الكبيرة */
+  width: 100% !important; 
+  max-width: 700px !important; 
+  margin: 0 auto !important;
+  box-sizing: border-box !important;
 }
 
 /* ══════ البطاقة ══════ */
@@ -16,6 +19,9 @@
   border-radius: 20px;
   overflow: hidden;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  /* ✅ التعديل: إجبار البطاقة على أخذ عرض الحاوية بالكامل */
+  width: 100% !important;
+  box-sizing: border-box !important;
 }
 
 /* ══════ العنصر الواحد ══════ */
