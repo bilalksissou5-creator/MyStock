@@ -787,3 +787,24 @@ html.in-iframe .main {
 .sidebar-footer .nav-item i {
   font-size: 18px !important;
 }
+
+/* ============================================
+   ✅ عكس اتجاه جميع أيقونات القائمة الجانبية (RTL)
+   ============================================ */
+
+/* 1. للهواتف والشاشات الصغيرة */
+@media (max-width: 768px) {
+  [dir="rtl"] .nav-item i,
+  [dir="rtl"] .sidebar-footer .nav-item i {
+    transform: scaleX(-1) !important;
+  }
+}
+
+/* 2. للكمبيوتر (مع الحفاظ على توسيط الأيقونة) */
+@media (min-width: 769px) {
+  [dir="rtl"] .nav-item i,
+  [dir="rtl"] .sidebar-footer .nav-item i {
+    /* نضيف scaleX(-1) بجانب translate حتى لا تختل الأيقونة */
+    transform: translate(-50%, -50%) scaleX(-1) !important;
+  }
+}
