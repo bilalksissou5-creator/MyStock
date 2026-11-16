@@ -364,7 +364,7 @@
 .org-save-bar {
   position: fixed;
   bottom: 20px;
-  left: 70px; 
+  left: 50%; 
   right: 0;
   z-index: 1000;
   display: flex;
