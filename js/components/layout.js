@@ -2,6 +2,7 @@
 // الهيكل المشترك (Header + Sidebar)
 // ✅ إصلاح زر الرجوع للعمل بشكل طبيعي مع الإطار
 // ✅ إضافة زر سلة المحذوفات
+// ✅ إخفاء العناصر المحذوفة (deleted_at) من البحث الشامل
 // ============================================
 
 const ALLOWED_PAGES = [
@@ -444,11 +445,13 @@ async function initGlobalSearch() {
         db.from('products')
           .select('id, name, sku, qty, category, price')
           .eq('organization_id', orgId)
+          .is('deleted_at', null) // ✅ إخفاء المنتجات المحذوفة من البحث
           .or(`name.ilike.${term},sku.ilike.${term},category.ilike.${term}`)
           .limit(15),
         db.from('suppliers')
           .select('id, name, specialty, phone')
           .eq('organization_id', orgId)
+          .is('deleted_at', null) // ✅ إخفاء الموردين المحذوفين من البحث
           .or(`name.ilike.${term},specialty.ilike.${term},phone.ilike.${term}`)
           .limit(10),
         db.from('invoices')
@@ -489,6 +492,7 @@ async function initGlobalSearch() {
       if (missingIds.length > 0) {
         const { data: extraProducts } = await db.from('products')
           .select('id, name, sku, qty, category, price')
+          .is('deleted_at', null) // ✅ إخفاء المنتجات المحذوفة (البحث بالباركود)
           .in('id', missingIds);
         (extraProducts || []).forEach(p => {
           productMap.set(p.id, { ...p, _scores: [], _viaBarcode: true });
@@ -618,6 +622,7 @@ async function initGlobalSearch() {
       const { data: products } = await db.from('products')
         .select('id, name, sku, qty')
         .eq('organization_id', orgId)
+        .is('deleted_at', null) // ✅ إخفاء المنتجات المحذوفة (البحث التقريبي)
         .or(`name.ilike.${term},sku.ilike.${term}`)
         .limit(5);
 
