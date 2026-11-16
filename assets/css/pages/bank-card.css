@@ -1,15 +1,19 @@
 /* ============================================
    صفحة البطاقة البنكية
    ✅ تصميم ثلاثي الأبعاد + معلومات الاشتراك
+   ✅ إصلاح العرض الكامل على الهاتف (مطابق لباقي الصفحات)
    ============================================ */
 
 .bank-card-wrapper {
-  max-width: 520px;
-  margin: 0 auto;
-  padding: 0 4px 20px;
+  /* ✅ التعديل: إجبار الحاوية على أخذ عرض الشاشة */
+  width: 100% !important;
+  max-width: 800px !important; 
+  margin: 0 auto !important;
+  padding: 0 0 20px !important; /* إزالة الحشوة الجانبية للاعتماد على .main */
   display: flex;
   flex-direction: column;
   gap: 24px;
+  box-sizing: border-box !important;
 }
 
 /* ══════════════════════════════════════════
@@ -20,12 +24,13 @@
   display: flex;
   justify-content: center;
   margin-bottom: 8px;
+  width: 100%;
 }
 
 .bank-card-visual {
   position: relative;
   width: 100%;
-  max-width: 340px;
+  max-width: 340px; /* ✅ نُبقي على هذا الحد لكي لا تتشوه البطاقة */
   height: 200px;
   transform-style: preserve-3d;
   transition: transform 0.7s cubic-bezier(0.4, 0.0, 0.2, 1);
@@ -261,6 +266,9 @@
   display: flex;
   flex-direction: column;
   gap: 10px;
+  /* ✅ التعديل: إجبار صندوق الاشتراك على العرض الكامل */
+  width: 100% !important;
+  box-sizing: border-box !important;
 }
 
 .bc-info-row {
@@ -298,6 +306,8 @@
   padding: 40px 20px;
   text-align: center;
   color: #737373;
+  width: 100% !important;
+  box-sizing: border-box !important;
 }
 
 .bank-card-empty i {
@@ -327,6 +337,7 @@
   flex-direction: column;
   gap: 8px;
   margin-top: 8px;
+  width: 100% !important; /* ✅ العرض الكامل للأزرار */
 }
 
 /* ══════════════════════════════════════════
@@ -335,6 +346,12 @@
 #deactivate-btn {
   background: #dc2626;
   color: white;
+  /* ✅ التعديل: العرض الكامل وتوسيط النص */
+  width: 100% !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  box-sizing: border-box !important;
 }
 
 #deactivate-btn:hover {
