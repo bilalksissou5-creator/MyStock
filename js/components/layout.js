@@ -1,6 +1,7 @@
 // ============================================
 // الهيكل المشترك (Header + Sidebar)
 // ✅ إصلاح زر الرجوع للعمل بشكل طبيعي مع الإطار
+// ✅ إضافة زر سلة المحذوفات
 // ============================================
 
 const ALLOWED_PAGES = [
@@ -93,6 +94,8 @@ function renderLayout(activePage) {
     { href: '/suppliers/list.html', labelKey: 'nav_suppliers', icon: 'fa-truck' },
     { href: '/invoices/list.html', labelKey: 'nav_invoices', icon: 'fa-file-invoice' },
     { href: '/settings.html', labelKey: 'nav_settings', icon: 'fa-gear' },
+    // ✅ إضافة زر سلة المحذوفات تحت الإعدادات
+    { href: '/trash.html', labelKey: 'nav_trash', icon: 'fa-trash-can' },
   ];
 
   const navHTML = navItems.map(item => `
