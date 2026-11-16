@@ -2,6 +2,7 @@
 // صفحة المنتجات (مع التحديث الفوري والعملة)
 // ✅ دعم كامل للترجمة
 // ✅ إصلاح اتجاه العملة (LTR) لمنع انزياحها
+// ✅ إخفاء المنتجات المحذوفة (deleted_at)
 // ============================================
 let productsChannel = null; 
 let cachedProducts = []; 
@@ -61,27 +62,49 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   });
 
-  // ✅ الاستماع لكل التغييرات (إضافة كمية، منتج جديد، أو حذف) وتحديث الشاشة فوراً
+  // ✅ الاستماع لكل التغييرات وتحديث الشاشة فوراً مع مراعاة الحذف المنطقي
   productsChannel = db.channel('custom-products-channel')
     .on(
       'postgres_changes',
       { event: '*', schema: 'public', table: 'products' },
       async (payload) => { 
         if (payload.eventType === 'UPDATE') {
+          // إذا تم تعديل الكمية
           const index = cachedProducts.findIndex(p => p.id === payload.new.id);
-          if (index !== -1) {
-            cachedProducts[index].qty = payload.new.qty;
-            renderProductsToDOM(); 
+          
+          // إذا كان المنتج محذوفاً الآن (deleted_at له قيمة)، نحذفه من الواجهة
+          if (payload.new.deleted_at) {
+            if (index !== -1) {
+              cachedProducts.splice(index, 1);
+              renderProductsToDOM(); 
+            }
+          } 
+          // إذا تم استعادته (deleted_at أصبح null) أو تعديله
+          else {
+            if (index !== -1) {
+              // تحديث البيانات المخزنة
+              cachedProducts[index] = { ...cachedProducts[index], ...payload.new };
+              renderProductsToDOM(); 
+            } else {
+              // إذا تم استعادته من سلة المحذوفات حديثاً، نجلبه ونضيفه
+              const { data: restoredProduct } = await db.from('products').select('*, suppliers(name)').eq('id', payload.new.id).is('deleted_at', null).single();
+              if (restoredProduct) {
+                cachedProducts.unshift(restoredProduct);
+                renderProductsToDOM();
+              }
+            }
           }
         } 
         else if (payload.eventType === 'INSERT') {
-          const { data: newProduct } = await db.from('products').select('*, suppliers(name)').eq('id', payload.new.id).single();
+          // ✅ التأكد من أن المنتج الجديد ليس محذوفاً
+          const { data: newProduct } = await db.from('products').select('*, suppliers(name)').eq('id', payload.new.id).is('deleted_at', null).single();
           if (newProduct && !cachedProducts.some(p => p.id === newProduct.id)) {
             cachedProducts.unshift(newProduct);
             renderProductsToDOM();
           }
         }
         else if (payload.eventType === 'DELETE') {
+          // الحذف النهائي من قاعدة البيانات
           cachedProducts = cachedProducts.filter(p => p.id !== payload.old.id);
           renderProductsToDOM();
         }
@@ -109,9 +132,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 async function loadProductsFromDB() {
+  // ✅ إضافة .is('deleted_at', null) لجلب المنتجات النشطة فقط
   const { data, error } = await db
     .from('products')
     .select('*, suppliers(name)')
+    .is('deleted_at', null) 
     .order('created_at', { ascending: false });
 
   const container = document.getElementById('products');
@@ -199,6 +224,4 @@ function renderProductsToDOM() {
       </a>
     `;
   }).join('');
-  
-  // ✅ تم إزالة كود preventDefault الذي كان يمنع فتح الرابط
 }

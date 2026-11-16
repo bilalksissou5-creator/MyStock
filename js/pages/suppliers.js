@@ -2,6 +2,7 @@
 // صفحة الموردين (مع التحديث الفوري بسرعة البرق)
 // ✅ دعم كامل للترجمة
 // ✅ إعادة زر إضافة المورد
+// ✅ إخفاء الموردين المحذوفين (deleted_at)
 // ============================================
 let suppliersChannel = null;
 let cachedSuppliers = []; // مخزن مؤقت
@@ -72,6 +73,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       { event: '*', schema: 'public', table: 'suppliers' },
       (payload) => {
         console.log('تحديث فوري للموردين من جهاز آخر:', payload);
+        // سيتم إعادة جلب القائمة النشطة فقط، مما يعني اختفاء المحذوف فوراً
         loadSuppliers(); 
       }
     )
@@ -79,9 +81,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 async function loadSuppliers() {
+  // ✅ التعديل هنا: جلب الموردين النشطين فقط
   const { data, error } = await db
     .from('suppliers')
     .select('*')
+    .is('deleted_at', null) // <--- السطر الجديد
     .order('created_at', { ascending: false });
 
   if (error) {

@@ -2,6 +2,7 @@
 // صفحة تفاصيل المورد (مع التحديث الفوري)
 // ✅ دعم كامل للترجمة
 // ✅ الحذف المنطقي (نقل المورد لسلة المحذوفات)
+// ✅ منع عرض الموردين المحذوفين
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   const user = await requireAuth();
@@ -25,10 +26,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // دالة لجلب بيانات المورد وعرضها
   async function fetchAndRenderSupplier() {
+    // ✅ التعديل هنا: إضافة .is('deleted_at', null) لمنع فتح مورد محذوف
     const { data: supplier, error } = await db
       .from('suppliers')
       .select('*')
       .eq('id', supplierId)
+      .is('deleted_at', null) // <--- السطر الجديد
       .single();
 
     if (error || !supplier) {
@@ -59,7 +62,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     main.innerHTML = `
       <div class="page-header">
         <h2>${tr('sup_det_title')}</h2>
-        <!-- ✅ تم إزالة زر العودة من هنا -->
       </div>
 
       <div class="supplier-detail">
@@ -185,7 +187,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('delete-btn').addEventListener('click', async () => {
       if (!confirm(tr('sup_det_confirm_del'))) return;
 
-      // ✅ التعديل هنا: الحذف المنطقي بدلاً من الحذف النهائي
+      // ✅ الحذف المنطقي
       const { error } = await db.from('suppliers').update({ 
         deleted_at: new Date().toISOString(),
         deleted_by: user.id 
@@ -225,7 +227,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         event: '*', 
         schema: 'public', 
         table: 'suppliers',
-        filter: `id=eq.${supplierId}` // نراقب هذا المورد فقط
+        filter: `id=eq.${supplierId}` 
       },
       (payload) => {
         console.log('تحديث فوري لبيانات المورد:', payload);
@@ -233,16 +235,30 @@ document.addEventListener('DOMContentLoaded', async () => {
         // إذا تم تعديل بيانات المورد
         if (payload.eventType === 'UPDATE') {
           const updated = payload.new;
+          
+          // ✅ التعديل هنا: إذا تم حذف المورد (تم وضع تاريخ في deleted_at)، نعرض رسالة الخطأ فوراً
+          if (updated.deleted_at) {
+            main.innerHTML = `
+              <div class="alert alert-error" style="margin-top: 16px;">
+                ${tr('sup_det_not_found')}
+              </div>
+              <a href="list.html" class="btn-secondary" style="margin-top: 12px;">
+                ${tr('prod_detail_back')}
+              </a>
+            `;
+            return; // نوقف التنفيذ هنا لأن المورد لم يعد موجوداً
+          }
+
           // تحديث الحقول مباشرة دون إعادة بناء الصفحة بالكامل
           const fieldsToUpdate = ['name', 'specialty', 'phone', 'email', 'address', 'notes'];
           fieldsToUpdate.forEach(field => {
             const el = document.getElementById(`f-${field}`);
             if (el && el.dataset.value !== updated[field]) {
               el.dataset.value = updated[field] || '';
-              el.textContent = updated[field] || ''; // سيتم استبدالها بـ inlineEdit
+              el.textContent = updated[field] || ''; 
             }
           });
-          // تحديث العناوين الثابتة (مثل الاسم في الرأس والتخصص)
+          // تحديث العناوين الثابتة
           const headerTitle = document.querySelector('.detail-title .edit-field');
           if (headerTitle && updated.name) {
             headerTitle.dataset.value = updated.name;
@@ -254,7 +270,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           }
         }
 
-        // إذا تم حذف المورد
+        // إذا تم حذف المورد نهائياً (Hard Delete)
         if (payload.eventType === 'DELETE') {
           main.innerHTML = `
             <div class="alert alert-error" style="margin-top: 16px;">

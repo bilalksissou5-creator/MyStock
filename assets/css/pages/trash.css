@@ -1,0 +1,200 @@
+/* ============================================
+   صفحة سلة المحذوفات (Trash)
+   ============================================ */
+
+.trash-wrapper {
+  width: 100% !important;
+  max-width: 800px !important;
+  margin: 0 auto !important;
+  padding: 0 0 20px !important; /* الحشوة تأتي من .main */
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  box-sizing: border-box !important;
+}
+
+/* التبويبات (Tabs) */
+.trash-tabs {
+  display: flex;
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 6px;
+  border: 1px solid #e5e5e5;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+.trash-tab {
+  flex: 1;
+  padding: 10px;
+  text-align: center;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #737373;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: none;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.trash-tab:hover {
+  background: #f5f5f5;
+}
+
+.trash-tab.active {
+  background: #171717;
+  color: white;
+}
+
+/* قائمة العناصر المحذوفة */
+.trash-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100% !important;
+}
+
+/* بطاقة العنصر المحذوف */
+.trash-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #ffffff;
+  padding: 16px;
+  border-radius: 12px;
+  border: 1px solid #e5e5e5;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+  gap: 12px;
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+.trash-card-info {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex: 1;
+  min-width: 0;
+}
+
+.trash-card-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  background: #fef2f2;
+  color: #dc2626;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.trash-card-text {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.trash-card-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: #171717;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.trash-card-subtitle {
+  font-size: 12px;
+  color: #737373;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* أزرار التحكم */
+.trash-actions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.btn-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 14px;
+}
+
+.btn-restore {
+  background: #dcfce7;
+  color: #16a34a;
+}
+
+.btn-restore:hover {
+  background: #bbf7d0;
+}
+
+.btn-delete-forever {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.btn-delete-forever:hover {
+  background: #fecaca;
+}
+
+/* حالة فارغة */
+.trash-empty {
+  background: #ffffff;
+  padding: 40px 20px;
+  border-radius: 12px;
+  text-align: center;
+  border: 1px dashed #d4d4d4;
+  color: #737373;
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+.trash-empty i {
+  font-size: 40px;
+  color: #d4d4d4;
+  margin-bottom: 12px;
+  display: block;
+}
+
+/* الهواتف */
+@media (max-width: 480px) {
+  .trash-card {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 14px;
+  }
+  
+  .trash-actions {
+    width: 100%;
+    justify-content: flex-end;
+    border-top: 1px solid #f5f5f5;
+    padding-top: 10px;
+    margin-top: 4px;
+  }
+
+  .trash-tab {
+    font-size: 13px;
+    padding: 8px;
+  }
+}
