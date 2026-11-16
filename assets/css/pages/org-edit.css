@@ -4,14 +4,13 @@
    ✅ زر حفظ عائم في المنتصف يتحرك حسب القائمة الجانبية
    ✅ زر اختيار الصورة في المنتصف
    ✅ عرض كامل ومطابق لباقي الصفحات (بدون حشوة إضافية)
+   ✅ توسيط النص والأيقونة داخل زر الحفظ
    ============================================ */
 
 .org-edit-wrapper {
-  /* ✅ إجبار العرض الكامل */
   width: 100% !important;
   max-width: 800px !important;
   margin: 0 auto !important;
-  /* ✅ الحشوة الجانبية 0 لأن الحاوية الرئيسية .main توفر الحشوة بالفعل */
   padding: 0 0 100px !important; 
   display: flex;
   flex-direction: column;
@@ -155,7 +154,7 @@
   min-width: 200px; 
   margin: 10px auto 0; 
   display: flex !important;
-  justify-content: center;
+  justify-content: center !important; /* ✅ توسيط المحتوى */
   align-items: center;
   border-radius: 50px; 
   padding: 10px 24px;
@@ -397,6 +396,12 @@
   font-size: 15px;
   font-weight: 700;
   letter-spacing: 0.5px;
+  
+  /* ✅ التصحيح: توسيط النص والأيقونة داخل الزر */
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  gap: 8px !important;
 }
 
 /* في الشاشات الكبيرة (التابلت/الحاسوب) القائمة أوسع */
@@ -414,7 +419,6 @@
 
 /* ══════ Responsive ══════ */
 @media (max-width: 480px) {
-  /* ✅ إزالة الحشوة الجانبية لتعتمد على .main فقط */
   .org-edit-wrapper { padding: 0 0 90px !important; }
   .org-section { padding: 16px 14px; }
   .org-logo-preview { width: 100px; height: 100px; margin-bottom: 14px; }
@@ -433,5 +437,14 @@
   .currency-preview { padding: 12px 14px; flex-direction: column; align-items: flex-start; gap: 6px; }
   .preview-value { font-size: 15px; }
   .org-save-bar { bottom: 15px; }
-  .org-save-bar .btn-primary { min-width: 200px; padding: 12px 24px; font-size: 14px; align-items: center;}
+  
+  .org-save-bar .btn-primary { 
+    min-width: 200px; 
+    padding: 12px 24px; 
+    font-size: 14px; 
+    /* ✅ التصحيح: توسيط المحتوى في الهاتف أيضاً */
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+  }
 }
