@@ -2,6 +2,7 @@
    صفحة البطاقة البنكية
    ✅ تصميم ثلاثي الأبعاد + معلومات الاشتراك
    ✅ إصلاح العرض الكامل على الهاتف (مطابق لباقي الصفحات)
+   ✅ توسيط جميع الأزرار وتصغيرها حسب المحتوى
    ============================================ */
 
 .bank-card-wrapper {
@@ -30,7 +31,7 @@
 .bank-card-visual {
   position: relative;
   width: 100%;
-  max-width: 340px; /* ✅ نُبقي على هذا الحد لكي لا تتشوه البطاقة */
+  max-width: 340px;
   height: 200px;
   transform-style: preserve-3d;
   transition: transform 0.7s cubic-bezier(0.4, 0.0, 0.2, 1);
@@ -266,7 +267,6 @@
   display: flex;
   flex-direction: column;
   gap: 10px;
-  /* ✅ التعديل: إجبار صندوق الاشتراك على العرض الكامل */
   width: 100% !important;
   box-sizing: border-box !important;
 }
@@ -330,28 +330,34 @@
 }
 
 /* ══════════════════════════════════════════
-   الأزرار
+   ✅ الأزرار (تم التعديل لتشمل جميع الأزرار)
    ══════════════════════════════════════════ */
 .bank-card-actions {
   display: flex;
   flex-direction: column;
   gap: 8px;
   margin-top: 8px;
-  width: 100% !important; /* ✅ العرض الكامل للأزرار */
+  width: 100% !important;
 }
 
-/* ══════════════════════════════════════════
-   زر إلغاء التفعيل (أحمر) — legacy
-   ══════════════════════════════════════════ */
+/* ✅ التعديل هنا: استهداف كل الأزرار داخل حاوية الأزرار لتكون في المنتصف وبحجم المحتوى */
+.bank-card-actions button,
+.bank-card-actions a,
 #deactivate-btn {
-  background: #dc2626;
-  color: white;
-  /* ✅ التعديل: العرض الكامل وتوسيط النص */
-  width: 100% !important;
+  width: fit-content !important; /* العرض حسب المحتوى */
+  margin: 0 auto !important; /* التوسيط الدائم */
   display: flex !important;
   justify-content: center !important;
   align-items: center !important;
+  gap: 8px !important;
+  padding: 10px 24px !important; /* شكل زر مريح */
   box-sizing: border-box !important;
+}
+
+/* الحفاظ على ألوان الزر الأحمر */
+#deactivate-btn {
+  background: #dc2626;
+  color: white;
 }
 
 #deactivate-btn:hover {
