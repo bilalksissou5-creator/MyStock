@@ -1,6 +1,7 @@
 // ============================================
 // صفحة تفاصيل المورد (مع التحديث الفوري)
 // ✅ دعم كامل للترجمة
+// ✅ الحذف المنطقي (نقل المورد لسلة المحذوفات)
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   const user = await requireAuth();
@@ -184,7 +185,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('delete-btn').addEventListener('click', async () => {
       if (!confirm(tr('sup_det_confirm_del'))) return;
 
-      const { error } = await db.from('suppliers').delete().eq('id', supplierId);
+      // ✅ التعديل هنا: الحذف المنطقي بدلاً من الحذف النهائي
+      const { error } = await db.from('suppliers').update({ 
+        deleted_at: new Date().toISOString(),
+        deleted_by: user.id 
+      }).eq('id', supplierId);
 
       if (error) {
         alert(tr('prod_detail_err') + ' ' + error.message);
