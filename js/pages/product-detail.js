@@ -5,6 +5,7 @@
 // ✅ إصلاح ظهور الباركود (الربط بين SKU وجدول الباركودات)
 // ✅ استبدال الرموز التعبيرية بأيقونات Font Awesome
 // ✅ ترجمة ديناميكية لأنواع الوحدة (قطعة، كغ، إلخ)
+// ✅ الحذف المنطقي (نقل العنصر لسلة المحذوفات)
 // ============================================
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -435,7 +436,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     deleteBtn.addEventListener('click', async () => {
       if (!confirm(tr('prod_detail_confirm_delete'))) return;
 
-      const { error } = await db.from('products').delete().eq('id', productId);
+      // ✅ التعديل هنا: الحذف المنطقي بدلاً من الحذف النهائي
+      const { error } = await db.from('products').update({ 
+        deleted_at: new Date().toISOString(),
+        deleted_by: user.id 
+      }).eq('id', productId);
 
       if (error) {
         alert(tr('prod_detail_err') + ' ' + error.message);
