@@ -425,5 +425,5 @@
   .currency-preview { padding: 12px 14px; flex-direction: column; align-items: flex-start; gap: 6px; }
   .preview-value { font-size: 15px; }
   .org-save-bar { bottom: 15px; }
-  .org-save-bar .btn-primary { min-width: 200px; padding: 12px 24px; font-size: 14px; }
+  .org-save-bar .btn-primary { min-width: 200px; padding: 12px 0px; font-size: 14px; }
 }
