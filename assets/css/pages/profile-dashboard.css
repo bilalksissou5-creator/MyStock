@@ -1,14 +1,18 @@
 /* ============================================
-   لوحة معلومات المستخدم
+   لوحة معلومات المستخدم (Dashboard)
+   ✅ عرض كامل لجميع الشاشات (مطابق لباقي الصفحات)
    ============================================ */
 
 .pd-wrapper {
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 0 4px 20px;
+  /* ✅ التعديل: إجبار العرض الكامل مع مسافات جانبية مريحة */
+  width: 100% !important;
+  max-width: 800px !important;
+  margin: 0 auto !important;
+  padding: 0 16px 20px !important; 
   display: flex;
   flex-direction: column;
   gap: 20px;
+  box-sizing: border-box !important;
 }
 
 /* ══════ بطاقة المستخدم المصغّرة ══════ */
@@ -21,6 +25,9 @@
   border: 1px solid #e5e5e5;
   border-radius: 14px;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+  /* ✅ التعديل: العرض الكامل */
+  width: 100% !important;
+  box-sizing: border-box !important;
 }
 
 .pd-user-avatar {
@@ -80,6 +87,9 @@
   display: flex;
   flex-direction: column;
   gap: 10px;
+  /* ✅ التعديل: العرض الكامل */
+  width: 100% !important;
+  box-sizing: border-box !important;
 }
 
 /* ══════ البطاقة الواحدة ══════ */
@@ -97,6 +107,9 @@
   transition: all 0.15s ease;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
   cursor: pointer;
+  /* ✅ التعديل: العرض الكامل */
+  width: 100% !important;
+  box-sizing: border-box !important;
 }
 
 .pd-card:hover {
@@ -203,6 +216,11 @@
 
 /* ══════ Responsive ══════ */
 @media (max-width: 480px) {
+  /* ✅ التعديل: تصفير الحشوة الإضافية لأننا أضفناها في .pd-wrapper */
+  .pd-wrapper {
+    padding: 0 0 20px !important;
+  }
+
   .pd-user-card {
     padding: 14px;
     gap: 12px;
