@@ -230,29 +230,55 @@
   display: block;
 }
 
-/* الهواتف */
+/* ============================================
+   ✅ إصلاح تصميم الهواتف (تصميم قائمة مريح)
+   ============================================ */
 @media (max-width: 600px) {
   .trash-log-card {
-    flex-wrap: wrap;
+    display: flex;
+    align-items: flex-start;
     padding: 14px;
+    padding-inline-end: 40px; /* مساحة لزر الثلاث نقاط */
+    position: relative;
+    gap: 0;
+  }
+
+  /* إخفاء التسمية لتوفير مساحة */
+  .trash-source-badge {
+    display: none; 
+  }
+
+  .trash-log-content {
+    width: 100%;
+    align-items: flex-start;
     gap: 12px;
   }
 
-  .trash-source-badge {
-    order: -1; /* نقل التسمية للأعلى */
+  .trash-image-box {
+    width: 50px;
+    height: 50px;
+  }
+
+  .trash-item-details {
+    gap: 6px;
+  }
+
+  .trash-item-name {
+    font-size: 14px;
+  }
+
+  /* ترتيب المعلومات تحت بعضها */
+  .trash-item-meta {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+    font-size: 11px;
   }
 
   .trash-menu-container {
     position: absolute;
     top: 12px;
-    inset-inline-end: 12px;
-  }
-
-  .trash-log-content {
-    width: 100%;
-  }
-  
-  .trash-log-card {
-    position: relative;
+    inset-inline-end: 8px;
+    margin: 0;
   }
 }
