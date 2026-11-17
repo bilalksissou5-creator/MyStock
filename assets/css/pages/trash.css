@@ -169,13 +169,14 @@
 /* القائمة المنسدلة */
 .trash-dropdown {
   position: absolute;
-  top: calc(100% + 4px);
+  top: calc(100% + 6px);
   inset-inline-end: 0;
   background: white;
   border: 1px solid #e5e5e5;
   border-radius: 10px;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
-  min-width: 160px;
+  width: max-content;
+  min-width: 140px;
   z-index: 100;
   display: none;
   flex-direction: column;
@@ -193,6 +194,7 @@
 .trash-dropdown button {
   display: flex;
   align-items: center;
+  justify-content: flex-start;
   gap: 10px;
   width: 100%;
   padding: 10px 12px;
@@ -238,7 +240,7 @@
     display: flex;
     align-items: flex-start;
     padding: 14px;
-    padding-inline-end: 40px; /* مساحة لزر الثلاث نقاط */
+    padding-inline-end: 40px;
     position: relative;
     gap: 0;
   }
@@ -280,5 +282,31 @@
     top: 12px;
     inset-inline-end: 8px;
     margin: 0;
+  }
+
+  /* ✅ ضبط القائمة المنسدلة لتصبح أيقونات فقط */
+  .trash-dropdown {
+    width: 44px !important;
+    min-width: 44px !important;
+    padding: 4px !important;
+    top: calc(100% + 2px) !important;
+    inset-inline-end: 0 !important;
+  }
+
+  /* إخفاء النص في الهاتف */
+  .trash-dropdown .dropdown-text {
+    display: none !important;
+  }
+
+  /* توسيط الأيقونة داخل الزر */
+  .trash-dropdown button {
+    justify-content: center !important;
+    padding: 10px 0 !important;
+    width: 100% !important;
+  }
+
+  .trash-dropdown button i {
+    font-size: 16px !important;
+    margin: 0 !important;
   }
 }

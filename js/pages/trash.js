@@ -130,10 +130,12 @@ document.addEventListener('DOMContentLoaded', async () => {
           
           <div class="trash-dropdown" id="dropdown-${item._table}-${item.id}">
             <button class="btn-restore-text" onclick="restoreItem('${item.id}', '${item._table}')">
-              <i class="fas fa-rotate-left"></i> ${tr('trash_restore', 'Restore')}
+              <i class="fas fa-rotate-left"></i> 
+              <span class="dropdown-text">${tr('trash_restore', 'Restore')}</span>
             </button>
             <button class="btn-delete-text" onclick="permanentDelete('${item.id}', '${item._table}', '${safeName}')">
-              <i class="fas fa-trash"></i> ${tr('trash_delete_forever', 'Delete Permanently')}
+              <i class="fas fa-trash"></i> 
+              <span class="dropdown-text">${tr('trash_delete_forever', 'Delete Permanently')}</span>
             </button>
           </div>
         </div>
