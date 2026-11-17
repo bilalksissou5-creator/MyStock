@@ -1,6 +1,6 @@
 // ============================================
 // صفحة سلة المحذوفات (Trash)
-// ✅ سجل حذف أفقي مقسم حسب النوع (منتجات / موردين)
+// ✅ سجل حذف احترافي (أسماء، تواريخ، تفاصيل)
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   const user = await requireAuth();
@@ -39,15 +39,33 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   const listContainer = document.getElementById('trash-list');
 
-  // إغلاق القوائم المنسدلة عند الضغط في أي مكان
   document.addEventListener('click', (e) => {
     if (!e.target.closest('.trash-menu-container')) {
       document.querySelectorAll('.trash-dropdown').forEach(el => el.classList.remove('show'));
     }
   });
 
+  // دالة مساعدة لتنسيق الوقت (منذ متى تم الحذف)
+  function timeAgo(dateString) {
+    const date = new Date(dateString);
+    const now = new Date();
+    const seconds = Math.floor((now - date) / 1000);
+    
+    let interval = seconds / 31536000;
+    if (interval > 1) return Math.floor(interval) + " " + tr('years_ago', 'years ago');
+    interval = seconds / 2592000;
+    if (interval > 1) return Math.floor(interval) + " " + tr('months_ago', 'months ago');
+    interval = seconds / 86400;
+    if (interval > 1) return Math.floor(interval) + " " + tr('days_ago', 'days ago');
+    interval = seconds / 3600;
+    if (interval > 1) return Math.floor(interval) + " " + tr('hours_ago', 'hours ago');
+    interval = seconds / 60;
+    if (interval > 1) return Math.floor(interval) + " " + tr('minutes_ago', 'mins ago');
+    return tr('just_now', 'Just now');
+  }
+
   // دالة رسم بطاقة واحدة
-  function renderTrashCard(item) {
+  function renderTrashCard(item, userMap) {
     const isProduct = item._table === 'products';
     
     // التسمية
@@ -55,10 +73,26 @@ document.addEventListener('DOMContentLoaded', async () => {
       ? tr('search_group_products', 'Products') 
       : tr('search_group_suppliers', 'Suppliers');
     
-    // الحجم
-    const itemSize = isProduct 
-      ? `${item.qty || 0} ${tr('products_qty', 'Qty')}` 
-      : tr('sup_supplier', 'Supplier');
+    // من قام بالحذف
+    const deletedByName = item.deleted_by && userMap.has(item.deleted_by) 
+      ? userMap.get(item.deleted_by) 
+      : tr('unknown_user', 'Unknown');
+      
+    // وقت الحذف
+    const deletedAtTime = timeAgo(item.deleted_at);
+
+    // التفاصيل (الكمية والباركود للمنتجات، والهاتف للموردين)
+    let metaHtml = '';
+    if (isProduct) {
+      metaHtml = `
+        <span><i class="fas fa-barcode"></i> ${item.sku || '—'}</span>
+        <span><i class="fas fa-cubes"></i> ${tr('products_qty', 'Qty')}: ${item.qty || 0}</span>
+      `;
+    } else {
+      metaHtml = `
+        <span><i class="fas fa-phone"></i> ${item.phone || '—'}</span>
+      `;
+    }
 
     // الصورة
     const imageHtml = (isProduct && item.image_url) 
@@ -69,14 +103,26 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     return `
       <div class="trash-log-card">
-        <div class="trash-source-title">${sourceTitle}</div>
+        <!-- 1. تسمية المصدر -->
+        <div class="trash-source-badge">${sourceTitle}</div>
         
+        <!-- 2. الصورة والتفاصيل -->
         <div class="trash-log-content">
           <div class="trash-image-box">${imageHtml}</div>
-          <div class="trash-item-name">${item.name || '—'}</div>
-          <div class="trash-item-size">${itemSize}</div>
+          
+          <div class="trash-item-details">
+            <div class="trash-item-name">${item.name || '—'}</div>
+            <div class="trash-item-meta">
+              ${metaHtml}
+            </div>
+            <div class="trash-item-meta" style="margin-top: 2px;">
+              <span style="color: #dc2626;"><i class="fas fa-user-xmark"></i> ${deletedByName}</span>
+              <span><i class="fas fa-clock"></i> ${deletedAtTime}</span>
+            </div>
+          </div>
         </div>
 
+        <!-- 3. زر الإجراءات -->
         <div class="trash-menu-container">
           <button class="trash-menu-btn" onclick="toggleDropdown(event, '${item._table}-${item.id}')">
             <i class="fas fa-ellipsis-vertical"></i>
@@ -99,19 +145,25 @@ document.addEventListener('DOMContentLoaded', async () => {
     listContainer.innerHTML = `<div class="trash-empty"><i class="fas fa-spinner fa-spin"></i><p>${tr('loading', 'Loading...')}</p></div>`;
 
     try {
-      // جلب المنتجات والموردين المحذوفين
-      const [productsRes, suppliersRes] = await Promise.all([
+      // 1. جلب المنتجات، الموردين، وأسماء المستخدمين في وقت واحد
+      const [productsRes, suppliersRes, profilesRes] = await Promise.all([
         db.from('products').select('*').eq('organization_id', orgId).not('deleted_at', 'is', null),
-        db.from('suppliers').select('*').eq('organization_id', orgId).not('deleted_at', 'is', null)
+        db.from('suppliers').select('*').eq('organization_id', orgId).not('deleted_at', 'is', null),
+        db.from('profiles').select('id, full_name').eq('organization_id', orgId)
       ]);
 
       if (productsRes.error) throw productsRes.error;
       if (suppliersRes.error) throw suppliersRes.error;
+      if (profilesRes.error) throw profilesRes.error;
+
+      // 2. إنشاء خريطة (Map) لربط معرف المستخدم باسمه بسرعة
+      const userMap = new Map();
+      (profilesRes.data || []).forEach(p => userMap.set(p.id, p.full_name));
 
       let products = (productsRes.data || []).map(i => ({ ...i, _table: 'products' }));
       let suppliers = (suppliersRes.data || []).map(i => ({ ...i, _table: 'suppliers' }));
 
-      // ترتيب كل قسم حسب تاريخ الحذف (الأحدث أولاً)
+      // ترتيب حسب تاريخ الحذف
       products.sort((a, b) => new Date(b.deleted_at) - new Date(a.deleted_at));
       suppliers.sort((a, b) => new Date(b.deleted_at) - new Date(a.deleted_at));
 
@@ -130,13 +182,13 @@ document.addEventListener('DOMContentLoaded', async () => {
       // قسم المنتجات
       if (products.length > 0) {
         html += `<div class="trash-section-title"><i class="fas fa-box"></i> ${tr('search_group_products', 'Products')}</div>`;
-        html += products.map(renderTrashCard).join('');
+        html += products.map(p => renderTrashCard(p, userMap)).join('');
       }
 
       // قسم الموردين
       if (suppliers.length > 0) {
         html += `<div class="trash-section-title"><i class="fas fa-truck"></i> ${tr('search_group_suppliers', 'Suppliers')}</div>`;
-        html += suppliers.map(renderTrashCard).join('');
+        html += suppliers.map(s => renderTrashCard(s, userMap)).join('');
       }
 
       listContainer.innerHTML = html;
@@ -151,7 +203,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     event.stopPropagation(); 
     const dropdown = document.getElementById(`dropdown-${uniqueId}`);
     
-    // إغلاق الباقي
     document.querySelectorAll('.trash-dropdown').forEach(el => {
       if (el.id !== `dropdown-${uniqueId}`) el.classList.remove('show');
     });

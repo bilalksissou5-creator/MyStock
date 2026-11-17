@@ -1,5 +1,5 @@
 /* ============================================
-   صفحة سلة المحذوفات (Trash) - سجل أفقي مقسم
+   صفحة سلة المحذوفات (Trash) - تصميم احترافي
    ============================================ */
 
 .trash-wrapper {
@@ -49,42 +49,42 @@
 .trash-log-card {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   background: #ffffff;
-  padding: 12px 16px;
+  padding: 14px 16px;
   border-radius: 12px;
   border: 1px solid #e5e5e5;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
-  gap: 12px;
+  gap: 16px;
   width: 100% !important;
   box-sizing: border-box !important;
 }
 
 /* التسمية (الصفحة التي تم الحذف منها) */
-.trash-source-title {
-  font-size: 12px;
+.trash-source-badge {
+  font-size: 11px;
   font-weight: 700;
   color: #737373;
-  min-width: 80px;
+  min-width: 70px;
   text-align: center;
   background: #f5f5f5;
-  padding: 4px 8px;
-  border-radius: 6px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  flex-shrink: 0;
 }
 
-/* محتوى البطاقة (صورة، اسم، حجم) */
+/* محتوى البطاقة (صورة، اسم، تفاصيل) */
 .trash-log-content {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
   flex: 1;
   min-width: 0;
 }
 
 .trash-image-box {
-  width: 40px;
-  height: 40px;
-  border-radius: 8px;
+  width: 46px;
+  height: 46px;
+  border-radius: 10px;
   background: #f5f5f5;
   display: flex;
   align-items: center;
@@ -101,32 +101,52 @@
 
 .trash-image-box i {
   color: #a3a3a3;
-  font-size: 18px;
+  font-size: 20px;
+}
+
+/* تفاصيل العنصر */
+.trash-item-details {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+  flex: 1;
 }
 
 .trash-item-name {
   font-size: 15px;
-  font-weight: 600;
+  font-weight: 700;
   color: #171717;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-.trash-item-size {
+.trash-item-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   font-size: 12px;
   color: #737373;
-  background: #f5f5f5;
-  padding: 2px 8px;
-  border-radius: 6px;
-  white-space: nowrap;
-  margin-inline-start: auto;
+  flex-wrap: wrap;
+}
+
+.trash-item-meta span {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.trash-item-meta i {
+  font-size: 10px;
+  color: #a3a3a3;
 }
 
 /* زر الثلاث نقاط والقائمة المنسدلة */
 .trash-menu-container {
   position: relative;
   flex-shrink: 0;
+  margin-inline-start: auto;
 }
 
 .trash-menu-btn {
@@ -213,25 +233,26 @@
 /* الهواتف */
 @media (max-width: 600px) {
   .trash-log-card {
-    flex-direction: column;
-    align-items: flex-start;
-    padding: 12px;
-    gap: 8px;
-    position: relative;
+    flex-wrap: wrap;
+    padding: 14px;
+    gap: 12px;
   }
 
-  .trash-source-title {
-    width: auto;
-    margin-bottom: 4px;
-  }
-
-  .trash-log-content {
-    width: 100%;
+  .trash-source-badge {
+    order: -1; /* نقل التسمية للأعلى */
   }
 
   .trash-menu-container {
     position: absolute;
     top: 12px;
     inset-inline-end: 12px;
+  }
+
+  .trash-log-content {
+    width: 100%;
+  }
+  
+  .trash-log-card {
+    position: relative;
   }
 }
