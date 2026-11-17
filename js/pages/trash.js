@@ -1,5 +1,6 @@
 // ============================================
 // صفحة سلة المحذوفات (Trash)
+// ✅ سجل حذف أفقي مقسم حسب النوع (منتجات / موردين)
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   const user = await requireAuth();
@@ -20,27 +21,14 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   const orgId = profile.organization_id;
-  let currentTab = 'products'; // 'products' or 'suppliers'
 
-  // بناء هيكل الصفحة
   main.innerHTML = `
     <div class="page-header">
       <h2><i class="fas fa-trash-can" style="color: #dc2626; margin-inline-end: 8px;"></i> ${tr('nav_trash', 'Trash')}</h2>
     </div>
     
     <div class="trash-wrapper">
-      <!-- التبويبات -->
-      <div class="trash-tabs">
-        <button class="trash-tab active" id="tab-products">
-          <i class="fas fa-box"></i> ${tr('search_group_products', 'Products')}
-        </button>
-        <button class="trash-tab" id="tab-suppliers">
-          <i class="fas fa-truck"></i> ${tr('search_group_suppliers', 'Suppliers')}
-        </button>
-      </div>
-
-      <!-- قائمة العناصر -->
-      <div class="trash-list" id="trash-list">
+      <div class="trash-log-list" id="trash-list">
         <div class="trash-empty">
           <i class="fas fa-spinner fa-spin"></i>
           <p>${tr('loading', 'Loading...')}</p>
@@ -50,21 +38,84 @@ document.addEventListener('DOMContentLoaded', async () => {
   `;
 
   const listContainer = document.getElementById('trash-list');
-  const tabProducts = document.getElementById('tab-products');
-  const tabSuppliers = document.getElementById('tab-suppliers');
 
-  // دالة جلب وعرض البيانات
+  // إغلاق القوائم المنسدلة عند الضغط في أي مكان
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('.trash-menu-container')) {
+      document.querySelectorAll('.trash-dropdown').forEach(el => el.classList.remove('show'));
+    }
+  });
+
+  // دالة رسم بطاقة واحدة
+  function renderTrashCard(item) {
+    const isProduct = item._table === 'products';
+    
+    // التسمية
+    const sourceTitle = isProduct 
+      ? tr('search_group_products', 'Products') 
+      : tr('search_group_suppliers', 'Suppliers');
+    
+    // الحجم
+    const itemSize = isProduct 
+      ? `${item.qty || 0} ${tr('products_qty', 'Qty')}` 
+      : tr('sup_supplier', 'Supplier');
+
+    // الصورة
+    const imageHtml = (isProduct && item.image_url) 
+      ? `<img src="${item.image_url}" alt="${item.name}">` 
+      : `<i class="fas ${isProduct ? 'fa-box' : 'fa-truck'}"></i>`;
+
+    const safeName = (item.name || '').replace(/'/g, "\\'");
+
+    return `
+      <div class="trash-log-card">
+        <div class="trash-source-title">${sourceTitle}</div>
+        
+        <div class="trash-log-content">
+          <div class="trash-image-box">${imageHtml}</div>
+          <div class="trash-item-name">${item.name || '—'}</div>
+          <div class="trash-item-size">${itemSize}</div>
+        </div>
+
+        <div class="trash-menu-container">
+          <button class="trash-menu-btn" onclick="toggleDropdown(event, '${item._table}-${item.id}')">
+            <i class="fas fa-ellipsis-vertical"></i>
+          </button>
+          
+          <div class="trash-dropdown" id="dropdown-${item._table}-${item.id}">
+            <button class="btn-restore-text" onclick="restoreItem('${item.id}', '${item._table}')">
+              <i class="fas fa-rotate-left"></i> ${tr('trash_restore', 'Restore')}
+            </button>
+            <button class="btn-delete-text" onclick="permanentDelete('${item.id}', '${item._table}', '${safeName}')">
+              <i class="fas fa-trash"></i> ${tr('trash_delete_forever', 'Delete Permanently')}
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
   async function loadTrash() {
     listContainer.innerHTML = `<div class="trash-empty"><i class="fas fa-spinner fa-spin"></i><p>${tr('loading', 'Loading...')}</p></div>`;
 
     try {
-      let query = db.from(currentTab).select('*').eq('organization_id', orgId).not('deleted_at', 'is', null).order('deleted_at', { ascending: false });
-      
-      const { data, error } = await query;
+      // جلب المنتجات والموردين المحذوفين
+      const [productsRes, suppliersRes] = await Promise.all([
+        db.from('products').select('*').eq('organization_id', orgId).not('deleted_at', 'is', null),
+        db.from('suppliers').select('*').eq('organization_id', orgId).not('deleted_at', 'is', null)
+      ]);
 
-      if (error) throw error;
+      if (productsRes.error) throw productsRes.error;
+      if (suppliersRes.error) throw suppliersRes.error;
 
-      if (!data || data.length === 0) {
+      let products = (productsRes.data || []).map(i => ({ ...i, _table: 'products' }));
+      let suppliers = (suppliersRes.data || []).map(i => ({ ...i, _table: 'suppliers' }));
+
+      // ترتيب كل قسم حسب تاريخ الحذف (الأحدث أولاً)
+      products.sort((a, b) => new Date(b.deleted_at) - new Date(a.deleted_at));
+      suppliers.sort((a, b) => new Date(b.deleted_at) - new Date(a.deleted_at));
+
+      if (products.length === 0 && suppliers.length === 0) {
         listContainer.innerHTML = `
           <div class="trash-empty">
             <i class="fas fa-check-circle" style="color: #16a34a;"></i>
@@ -74,41 +125,21 @@ document.addEventListener('DOMContentLoaded', async () => {
         return;
       }
 
-      listContainer.innerHTML = data.map(item => {
-        const isProduct = currentTab === 'products';
-        const title = item.name;
-        const subtitle = isProduct 
-          ? `SKU: ${item.sku || '—'} | Qty: ${item.qty || 0}` 
-          : `Phone: ${item.phone || '—'}`;
-        
-        const dateDeleted = new Date(item.deleted_at).toLocaleDateString();
-        
-        return `
-          <div class="trash-card">
-            <div class="trash-card-info">
-              <div class="trash-card-icon">
-                <i class="fas ${isProduct ? 'fa-box' : 'fa-truck'}"></i>
-              </div>
-              <div class="trash-card-text">
-                <div class="trash-card-title">${title}</div>
-                <div class="trash-card-subtitle">${subtitle}</div>
-                <div class="trash-card-subtitle" style="font-size: 10px; color: #a3a3a3; margin-top: 4px;">
-                  ${tr('trash_deleted_on', 'Deleted on')}: ${dateDeleted}
-                </div>
-              </div>
-            </div>
-            
-            <div class="trash-actions">
-              <button class="btn-icon btn-restore" onclick="restoreItem('${item.id}', '${currentTab}')" title="${tr('trash_restore', 'Restore')}">
-                <i class="fas fa-rotate-left"></i>
-              </button>
-              <button class="btn-icon btn-delete-forever" onclick="permanentDelete('${item.id}', '${currentTab}', '${title.replace(/'/g, "\\'")}')" title="${tr('trash_delete_forever', 'Delete Permanently')}">
-                <i class="fas fa-trash"></i>
-              </button>
-            </div>
-          </div>
-        `;
-      }).join('');
+      let html = '';
+
+      // قسم المنتجات
+      if (products.length > 0) {
+        html += `<div class="trash-section-title"><i class="fas fa-box"></i> ${tr('search_group_products', 'Products')}</div>`;
+        html += products.map(renderTrashCard).join('');
+      }
+
+      // قسم الموردين
+      if (suppliers.length > 0) {
+        html += `<div class="trash-section-title"><i class="fas fa-truck"></i> ${tr('search_group_suppliers', 'Suppliers')}</div>`;
+        html += suppliers.map(renderTrashCard).join('');
+      }
+
+      listContainer.innerHTML = html;
 
     } catch (err) {
       console.error(err);
@@ -116,16 +147,25 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
 
-  // دالة الاستعادة
+  window.toggleDropdown = (event, uniqueId) => {
+    event.stopPropagation(); 
+    const dropdown = document.getElementById(`dropdown-${uniqueId}`);
+    
+    // إغلاق الباقي
+    document.querySelectorAll('.trash-dropdown').forEach(el => {
+      if (el.id !== `dropdown-${uniqueId}`) el.classList.remove('show');
+    });
+
+    dropdown.classList.toggle('show');
+  };
+
   window.restoreItem = async (id, table) => {
     if (!confirm(tr('trash_confirm_restore', 'Are you sure you want to restore this item?'))) return;
 
     try {
-      // إعادة العنصر للحياة (مسح تاريخ الحذف)
       const { error } = await db.from(table).update({ deleted_at: null, deleted_by: null }).eq('id', id);
       if (error) throw error;
       
-      // إشعار
       if (typeof notifyOrganization === 'function') {
         await notifyOrganization({
           orgId: orgId,
@@ -137,22 +177,19 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
       }
 
-      loadTrash(); // إعادة تحميل القائمة
+      loadTrash();
     } catch (err) {
       alert(tr('error', 'Error') + ': ' + err.message);
     }
   };
 
-  // دالة الحذف النهائي
   window.permanentDelete = async (id, table, name) => {
     if (!confirm(`${tr('trash_confirm_delete', 'Are you sure you want to PERMANENTLY delete')} "${name}"?\n\n${tr('trash_warning', 'This action cannot be undone!')}`)) return;
 
     try {
-      // الحذف النهائي من قاعدة البيانات
       const { error } = await db.from(table).delete().eq('id', id);
       if (error) throw error;
       
-      // إشعار
       if (typeof notifyOrganization === 'function') {
         await notifyOrganization({
           orgId: orgId,
@@ -164,27 +201,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
       }
 
-      loadTrash(); // إعادة تحميل القائمة
+      loadTrash();
     } catch (err) {
       alert(tr('error', 'Error') + ': ' + err.message);
     }
   };
 
-  // أحداث التبويبات
-  tabProducts.addEventListener('click', () => {
-    currentTab = 'products';
-    tabProducts.classList.add('active');
-    tabSuppliers.classList.remove('active');
-    loadTrash();
-  });
-
-  tabSuppliers.addEventListener('click', () => {
-    currentTab = 'suppliers';
-    tabSuppliers.classList.add('active');
-    tabProducts.classList.remove('active');
-    loadTrash();
-  });
-
-  // التحميل الأولي
   loadTrash();
 });

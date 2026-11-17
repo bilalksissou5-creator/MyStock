@@ -1,72 +1,57 @@
 /* ============================================
-   صفحة سلة المحذوفات (Trash)
+   صفحة سلة المحذوفات (Trash) - سجل أفقي مقسم
    ============================================ */
 
 .trash-wrapper {
   width: 100% !important;
-  max-width: 800px !important;
+  max-width: 850px !important;
   margin: 0 auto !important;
-  padding: 0 0 20px !important; /* الحشوة تأتي من .main */
+  padding: 0 0 20px !important;
   display: flex;
   flex-direction: column;
   gap: 16px;
   box-sizing: border-box !important;
 }
 
-/* التبويبات (Tabs) */
-.trash-tabs {
-  display: flex;
-  background: #ffffff;
-  border-radius: 12px;
-  padding: 6px;
-  border: 1px solid #e5e5e5;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
-  width: 100% !important;
-  box-sizing: border-box !important;
-}
-
-.trash-tab {
-  flex: 1;
-  padding: 10px;
-  text-align: center;
-  border-radius: 8px;
-  font-size: 14px;
-  font-weight: 600;
-  color: #737373;
-  cursor: pointer;
-  transition: all 0.2s;
-  border: none;
-  background: transparent;
+/* عنوان الفاصل بين الأقسام */
+.trash-section-title {
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 8px;
+  gap: 12px;
+  font-size: 15px;
+  font-weight: 700;
+  color: #404040;
+  margin-top: 10px;
+  margin-bottom: 4px;
 }
 
-.trash-tab:hover {
-  background: #f5f5f5;
+.trash-section-title::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: #e5e5e5;
 }
 
-.trash-tab.active {
-  background: #171717;
-  color: white;
+.trash-section-title i {
+  color: #a3a3a3;
+  font-size: 18px;
 }
 
-/* قائمة العناصر المحذوفة */
-.trash-list {
+/* سجل الحذف */
+.trash-log-list {
   display: flex;
   flex-direction: column;
   gap: 10px;
   width: 100% !important;
 }
 
-/* بطاقة العنصر المحذوف */
-.trash-card {
+/* بطاقة السجل الأفقي */
+.trash-log-card {
   display: flex;
   align-items: center;
   justify-content: space-between;
   background: #ffffff;
-  padding: 16px;
+  padding: 12px 16px;
   border-radius: 12px;
   border: 1px solid #e5e5e5;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
@@ -75,88 +60,136 @@
   box-sizing: border-box !important;
 }
 
-.trash-card-info {
+/* التسمية (الصفحة التي تم الحذف منها) */
+.trash-source-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: #737373;
+  min-width: 80px;
+  text-align: center;
+  background: #f5f5f5;
+  padding: 4px 8px;
+  border-radius: 6px;
+}
+
+/* محتوى البطاقة (صورة، اسم، حجم) */
+.trash-log-content {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 12px;
   flex: 1;
   min-width: 0;
 }
 
-.trash-card-icon {
-  width: 44px;
-  height: 44px;
-  border-radius: 10px;
-  background: #fef2f2;
-  color: #dc2626;
+.trash-image-box {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  background: #f5f5f5;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 18px;
+  overflow: hidden;
   flex-shrink: 0;
 }
 
-.trash-card-text {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  min-width: 0;
+.trash-image-box img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
-.trash-card-title {
+.trash-image-box i {
+  color: #a3a3a3;
+  font-size: 18px;
+}
+
+.trash-item-name {
   font-size: 15px;
-  font-weight: 700;
+  font-weight: 600;
   color: #171717;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-.trash-card-subtitle {
+.trash-item-size {
   font-size: 12px;
   color: #737373;
+  background: #f5f5f5;
+  padding: 2px 8px;
+  border-radius: 6px;
   white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  margin-inline-start: auto;
 }
 
-/* أزرار التحكم */
-.trash-actions {
-  display: flex;
-  gap: 8px;
+/* زر الثلاث نقاط والقائمة المنسدلة */
+.trash-menu-container {
+  position: relative;
   flex-shrink: 0;
 }
 
-.btn-icon {
+.trash-menu-btn {
   width: 36px;
   height: 36px;
   border-radius: 8px;
   border: none;
+  background: transparent;
+  color: #737373;
+  cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
+  font-size: 18px;
+  transition: background 0.2s;
+}
+
+.trash-menu-btn:hover { background: #f5f5f5; }
+
+/* القائمة المنسدلة */
+.trash-dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  inset-inline-end: 0;
+  background: white;
+  border: 1px solid #e5e5e5;
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  min-width: 160px;
+  z-index: 100;
+  display: none;
+  flex-direction: column;
+  padding: 6px;
+  animation: fadeInMenu 0.15s ease-out;
+}
+
+.trash-dropdown.show { display: flex; }
+
+@keyframes fadeInMenu {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.trash-dropdown button {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 10px 12px;
+  border: none;
+  background: transparent;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s;
-  font-size: 14px;
+  text-align: start;
+  transition: background 0.15s;
 }
 
-.btn-restore {
-  background: #dcfce7;
-  color: #16a34a;
-}
+.trash-dropdown button:hover { background: #f5f5f5; }
 
-.btn-restore:hover {
-  background: #bbf7d0;
-}
-
-.btn-delete-forever {
-  background: #fee2e2;
-  color: #dc2626;
-}
-
-.btn-delete-forever:hover {
-  background: #fecaca;
-}
+.btn-restore-text { color: #16a34a; }
+.btn-delete-text { color: #dc2626; }
 
 /* حالة فارغة */
 .trash-empty {
@@ -178,23 +211,27 @@
 }
 
 /* الهواتف */
-@media (max-width: 480px) {
-  .trash-card {
+@media (max-width: 600px) {
+  .trash-log-card {
     flex-direction: column;
     align-items: flex-start;
-    padding: 14px;
-  }
-  
-  .trash-actions {
-    width: 100%;
-    justify-content: flex-end;
-    border-top: 1px solid #f5f5f5;
-    padding-top: 10px;
-    margin-top: 4px;
+    padding: 12px;
+    gap: 8px;
+    position: relative;
   }
 
-  .trash-tab {
-    font-size: 13px;
-    padding: 8px;
+  .trash-source-title {
+    width: auto;
+    margin-bottom: 4px;
+  }
+
+  .trash-log-content {
+    width: 100%;
+  }
+
+  .trash-menu-container {
+    position: absolute;
+    top: 12px;
+    inset-inline-end: 12px;
   }
 }
