@@ -6,6 +6,7 @@
 // ✅ استبدال الرموز التعبيرية بأيقونات Font Awesome
 // ✅ ترجمة ديناميكية لأنواع الوحدة (قطعة، كغ، إلخ)
 // ✅ الحذف المنطقي (نقل العنصر لسلة المحذوفات)
+// ✅ إضافة زر "سجل المنتج" بجانب العنوان في الأعلى
 // ============================================
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -94,9 +95,14 @@ document.addEventListener('DOMContentLoaded', async () => {
   const lowStockThreshold = Number(product.low_stock_threshold ?? 10);
   const isLowStock = Number(product.qty ?? 0) <= lowStockThreshold;
 
+  // ✅ التعديل هنا: إضافة زر "سجل المنتج" في الهيدر
   main.innerHTML = `
-    <div class="page-header">
-      <h2>${tr('prod_detail_title')}</h2>
+    <div class="page-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+      <h2 style="margin: 0;">${tr('prod_detail_title')}</h2>
+      <button class="btn-secondary" id="history-btn" style="display: flex; align-items: center; gap: 8px; padding: 8px 16px; font-size: 13px; font-weight: 700; border-radius: 8px;">
+        <i class="fas fa-history"></i>
+        <span>${tr('prod_history_btn', 'سجل المنتج')}</span>
+      </button>
     </div>
 
     <!-- ✅ الحاوية الرئيسية للتصميم الشبكي -->
@@ -231,6 +237,14 @@ document.addEventListener('DOMContentLoaded', async () => {
   // ============================================
   // الوظائف التفاعلية
   // ============================================
+
+  // ✅ التعديل هنا: إضافة حدث لزر سجل المنتج
+  const historyBtn = document.getElementById('history-btn');
+  if (historyBtn) {
+    historyBtn.addEventListener('click', () => {
+      window.location.href = `/product-history.html?id=${productId}`;
+    });
+  }
 
   function updateQtyStyle() {
     const qtyEl = document.getElementById('qty-stat-value');
