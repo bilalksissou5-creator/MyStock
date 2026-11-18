@@ -108,7 +108,7 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  flex: 1; 
+  flex: 1; /* يسمح للنص بأخذ المساحة المتاحة وتقصيره إذا طال */
 }
 
 /* اسم المستخدم */
@@ -116,7 +116,7 @@
   font-size: 12px;
   font-weight: 600;
   white-space: nowrap;
-  flex-shrink: 0; 
+  flex-shrink: 0; /* يمنع تقليص حجم اسم المستخدم */
 }
 
 /* الكمية والباركود */
@@ -246,7 +246,7 @@
 
 .trash-empty i {
   font-size: 60px;
-  color: #a3a3a3;
+  color: #a3a3a3; /* ✅ تم توحيد اللون مع النص */
   margin-bottom: 16px;
   display: block;
 }
@@ -254,17 +254,17 @@
 .trash-empty p {
   font-size: 16px;
   font-weight: 600;
-  color: #a3a3a3;
+  color: #a3a3a3; /* لون النص */
   margin: 0;
 }
 
 /* ============================================
-   ✅ تعديلات الهواتف (الحشوة المحيطة 8px فقط)
+   ✅ تعديلات بسيطة للهواتف
    ============================================ */
 @media (max-width: 600px) {
   .trash-log-card {
-    padding: 8px !important; /* ✅ الحشوة المحيطة بالعناصر */
-    /* gap: 12px; تم الاحتفاظ بالمسافة الافتراضية بين العناصر */
+    padding: 8px; /* ✅ التعديل الوحيد هنا: الحشوة الداخلية 8px */
+    gap: 12px;
   }
   
   .trash-item-name {
