@@ -1,6 +1,6 @@
 // ============================================
 // صفحة سلة المحذوفات (Trash)
-// ✅ سجل حذف احترافي (توزيع أفقي دقيق)
+// ✅ سجل حذف احترافي (توزيع دقيق)
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   const user = await requireAuth();
@@ -90,27 +90,30 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const safeName = (item.name || '').replace(/'/g, "\\'");
 
-    // ✅ تم إعادة هيكلة العناصر لتطابق توزيع الشبكة المطلوب
+    // ✅ التصميم الجديد: صف علوي (الاسم + المستخدم) وصف سفلي (الكمية + الوقت)
     return `
       <div class="trash-log-card">
         
-        <!-- 1. الصورة -->
         <div class="trash-image-box">${imageHtml}</div>
         
-        <!-- 2. الاسم والكمية (الجهة اليمنى) -->
-        <div class="trash-col-name">
-          <div class="trash-item-name">${item.name || '—'}</div>
-          <div class="trash-item-meta">
-            ${metaHtml}
+        <div class="trash-content-area">
+          <div class="trash-top-line">
+            <div class="trash-item-name">${item.name || '—'}</div>
+            <div class="trash-col-user">
+              <span style="color: #dc2626;"><i class="fas fa-user-xmark"></i> ${deletedByName}</span>
+            </div>
+          </div>
+          
+          <div class="trash-bottom-line">
+            <div class="trash-item-meta">
+              ${metaHtml}
+            </div>
+            <div class="trash-item-time">
+              <i class="fas fa-clock"></i> ${deletedAtTime}
+            </div>
           </div>
         </div>
 
-        <!-- 3. اسم المستخدم الذي حذف (في الوسط مقابل الاسم) -->
-        <div class="trash-col-user">
-          <span style="color: #dc2626;"><i class="fas fa-user-xmark"></i> ${deletedByName}</span>
-        </div>
-
-        <!-- 4. زر الثلاث نقاط والوقت (الجهة اليسرى) -->
         <div class="trash-col-actions">
           <div class="trash-menu-container">
             <button class="trash-menu-btn" onclick="toggleDropdown(event, '${item._table}-${item.id}')">
@@ -126,10 +129,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                 <span class="dropdown-text">${tr('trash_delete_forever', 'Delete Permanently')}</span>
               </button>
             </div>
-          </div>
-          
-          <div class="trash-item-time">
-            <i class="fas fa-clock"></i> ${deletedAtTime}
           </div>
         </div>
 

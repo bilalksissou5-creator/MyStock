@@ -45,10 +45,9 @@
   width: 100% !important;
 }
 
-/* ✅ بطاقة السجل (توزيع الشبكة للكمبيوتر) */
+/* ✅ بطاقة السجل */
 .trash-log-card {
-  display: grid;
-  grid-template-columns: 46px 1fr auto auto;
+  display: flex;
   align-items: center;
   background: #ffffff;
   padding: 14px 16px;
@@ -83,14 +82,25 @@
   font-size: 20px;
 }
 
-/* العمود الثاني: الاسم والكمية */
-.trash-col-name {
+/* ✅ الحاوية المركزية (الصفوف) */
+.trash-content-area {
+  flex: 1;
   display: flex;
   flex-direction: column;
   gap: 4px;
-  min-width: 0; /* مهم لمنع تمدد النص الطويل */
+  min-width: 0;
 }
 
+.trash-top-line,
+.trash-bottom-line {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+
+/* اسم المنتج */
 .trash-item-name {
   font-size: 15px;
   font-weight: 700;
@@ -98,8 +108,18 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  flex: 1; /* يسمح للنص بأخذ المساحة المتاحة وتقصيره إذا طال */
 }
 
+/* اسم المستخدم */
+.trash-col-user {
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+  flex-shrink: 0; /* يمنع تقليص حجم اسم المستخدم */
+}
+
+/* الكمية والباركود */
 .trash-item-meta {
   display: flex;
   align-items: center;
@@ -120,26 +140,7 @@
   color: #a3a3a3;
 }
 
-/* ✅ العمود الثالث: اسم المستخدم (في الوسط) */
-.trash-col-user {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 12px;
-  font-weight: 600;
-  white-space: nowrap;
-  padding: 0 10px;
-}
-
-/* ✅ العمود الرابع: زر الثلاث نقاط والوقت */
-.trash-col-actions {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-  flex-shrink: 0;
-}
-
+/* الوقت */
 .trash-item-time {
   font-size: 10px;
   color: #737373;
@@ -147,6 +148,14 @@
   align-items: center;
   gap: 4px;
   white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* زر الثلاث نقاط */
+.trash-col-actions {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
 }
 
 .trash-menu-container {
@@ -237,52 +246,16 @@
 }
 
 /* ============================================
-   ✅ إصلاح تصميم الهواتف (اسم المستخدم في نفس السطر)
+   ✅ تعديلات بسيطة للهواتف
    ============================================ */
 @media (max-width: 600px) {
   .trash-log-card {
-    /* 4 أعمدة: الصورة | الاسم | المستخدم | الأزرار */
-    grid-template-columns: 46px minmax(0, 1fr) auto auto; 
-    
-    /* ✅ التعديل هنا: وضع "user" في الصف الأول مع "name"، و "meta" في الصف الثاني تحتهما */
-    grid-template-areas: 
-      "img name user actions"
-      "img meta meta actions"; 
-      
-    gap: 4px 6px; /* تقليل المسافة بين الصفوف قليلاً */
     padding: 12px;
-    align-items: center;
+    gap: 12px;
   }
-
-  .trash-image-box {
-    grid-area: img;
-    align-self: center; 
-  }
-
-  .trash-col-name {
-    grid-area: name;
-    align-self: center;
-  }
-
-  .trash-item-meta {
-    grid-area: meta;
-    margin-top: 2px;
-    align-self: start;
-  }
-
-  /* اسم المستخدم: في المنتصف ومحاذى مع اسم المنتج */
-  .trash-col-user {
-    grid-area: user;
-    justify-content: flex-end; /* يجعله قريباً من زر الثلاث نقاط */
-    padding-inline-end: 6px;
-    margin: 0;
-    align-self: center; /* يضمن بقاءه في منتصف السطر الأول */
-    font-size: 11px; /* تصغير الخط قليلاً ليتسع للاسم */
-  }
-
-  .trash-col-actions {
-    grid-area: actions;
-    align-self: center;
+  
+  .trash-item-name {
+    font-size: 14px;
   }
 
   /* تعديلات القائمة المنسدلة في الهاتف */
