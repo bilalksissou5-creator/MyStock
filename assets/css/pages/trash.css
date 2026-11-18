@@ -237,16 +237,19 @@
 }
 
 /* ============================================
-   ✅ إصلاح تصميم الهواتف (العناصر على سطر واحد)
+   ✅ إصلاح تصميم الهواتف (اسم المستخدم في نفس السطر)
    ============================================ */
 @media (max-width: 600px) {
   .trash-log-card {
     /* 4 أعمدة: الصورة | الاسم | المستخدم | الأزرار */
     grid-template-columns: 46px minmax(0, 1fr) auto auto; 
+    
+    /* ✅ التعديل هنا: وضع "user" في الصف الأول مع "name"، و "meta" في الصف الثاني تحتهما */
     grid-template-areas: 
       "img name user actions"
-      "img meta user actions"; /* الكمية تحت الاسم، واسم المستخدم في المنتصف */
-    gap: 2px 8px;
+      "img meta meta actions"; 
+      
+    gap: 4px 6px; /* تقليل المسافة بين الصفوف قليلاً */
     padding: 12px;
     align-items: center;
   }
@@ -258,20 +261,23 @@
 
   .trash-col-name {
     grid-area: name;
+    align-self: center;
   }
 
   .trash-item-meta {
     grid-area: meta;
     margin-top: 2px;
+    align-self: start;
   }
 
-  /* اسم المستخدم: في المنتصف مقابل اسم المنتج */
+  /* اسم المستخدم: في المنتصف ومحاذى مع اسم المنتج */
   .trash-col-user {
     grid-area: user;
-    justify-content: flex-end; /* يدفعه باتجاه اليسار (أو اليمين في العربية) */
-    padding-inline-end: 8px;
+    justify-content: flex-end; /* يجعله قريباً من زر الثلاث نقاط */
+    padding-inline-end: 6px;
     margin: 0;
-    align-self: center;
+    align-self: center; /* يضمن بقاءه في منتصف السطر الأول */
+    font-size: 11px; /* تصغير الخط قليلاً ليتسع للاسم */
   }
 
   .trash-col-actions {
