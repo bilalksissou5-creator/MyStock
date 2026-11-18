@@ -987,6 +987,11 @@ const translations = {
     years_ago: 'منذ سنوات',
     sup_supplier: 'مورد',
     products_qty: 'الكمية',
+
+    prod_history_btn: 'سجل المنتج',
+    prod_history_title: 'سجل إضافة المنتج',
+    prod_history_empty: 'لا يوجد سجل إضافات لهذا المنتج.',
+    prod_history_confirm_del: 'هل أنت متأكد من حذف هذه الكمية؟ سيتم خصمها من إجمالي المخزون.',
   },
 
   fr: {
@@ -1963,6 +1968,11 @@ const translations = {
     years_ago: 'il y a quelques années',
     sup_supplier: 'Fournisseur',
     products_qty: 'Quantité',
+
+    prod_history_btn: 'Historique',
+    prod_history_title: 'Historique du produit',
+    prod_history_empty: 'Aucun historique d\'ajout trouvé pour ce produit.',
+    prod_history_confirm_del: 'Êtes-vous sûr de vouloir supprimer cette quantité ? Elle sera déduite du stock total.',
   },
 
   en: {
@@ -2941,6 +2951,11 @@ const translations = {
     years_ago: 'years ago',
     sup_supplier: 'Supplier',
     products_qty: 'Qty',
+
+    prod_history_btn: 'History',
+    prod_history_title: 'Product History',
+    prod_history_empty: 'No addition history found for this product.',
+    prod_history_confirm_del: 'Are you sure you want to delete this quantity? It will be deducted from the total stock.',
   },
 
   

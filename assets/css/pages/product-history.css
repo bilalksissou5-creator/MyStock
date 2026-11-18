@@ -1,0 +1,197 @@
+/* ============================================
+   صفحة سجل المنتج (Product History)
+   ✅ تصميم بطاقات أفقي مشابه لسلة المحذوفات
+   ============================================ */
+
+.history-wrapper {
+  width: 100% !important;
+  max-width: 850px !important;
+  margin: 0 auto !important;
+  padding: 0 0 20px !important;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  box-sizing: border-box !important;
+}
+
+/* قائمة السجل */
+.history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100% !important;
+}
+
+/* ✅ البطاقة */
+.history-card {
+  display: flex;
+  align-items: center;
+  background: #ffffff;
+  padding: 14px 16px;
+  border-radius: 12px;
+  border: 1px solid #e5e5e5;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+  gap: 16px;
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+/* صندوق الصورة */
+.history-image {
+  width: 50px;
+  height: 50px;
+  border-radius: 10px;
+  background: #f5f5f5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.history-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.history-image i {
+  color: #a3a3a3;
+  font-size: 20px;
+}
+
+/* معلومات المنتج */
+.history-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.history-name {
+  font-size: 15px;
+  font-weight: 700;
+  color: #171717;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.history-meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 12px;
+  color: #737373;
+}
+
+.history-meta span {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.history-meta i {
+  font-size: 10px;
+  color: #a3a3a3;
+}
+
+/* الكمية المضافة */
+.history-qty {
+  font-size: 14px;
+  font-weight: 700;
+  color: #16a34a;
+  background: #dcfce7;
+  padding: 4px 12px;
+  border-radius: 8px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* زر الحذف */
+.history-delete-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  border: none;
+  background: #fee2e2;
+  color: #dc2626;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.15s;
+  flex-shrink: 0;
+  font-size: 16px;
+}
+
+.history-delete-btn:hover {
+  background: #fecaca;
+  transform: scale(1.05);
+}
+
+/* حالة فارغة */
+.history-empty {
+  background: transparent;
+  padding: 60px 20px;
+  text-align: center;
+  color: #737373;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+.history-empty i {
+  font-size: 60px;
+  color: #e5e5e5;
+  margin-bottom: 16px;
+  display: block;
+}
+
+.history-empty p {
+  font-size: 16px;
+  font-weight: 600;
+  color: #a3a3a3;
+  margin: 0;
+}
+
+/* ============================================
+   ✅ تصميم الهواتف
+   ============================================ */
+@media (max-width: 600px) {
+  .history-card {
+    padding: 8px !important;
+    gap: 10px;
+  }
+
+  .history-image {
+    width: 44px;
+    height: 44px;
+  }
+
+  .history-name {
+    font-size: 14px;
+  }
+
+  .history-meta {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+    font-size: 11px;
+  }
+
+  .history-qty {
+    font-size: 13px;
+    padding: 2px 8px;
+  }
+
+  .history-delete-btn {
+    width: 34px;
+    height: 34px;
+    font-size: 14px;
+  }
+}
