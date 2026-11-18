@@ -1,6 +1,7 @@
 // ============================================
 // صفحة سلة المحذوفات (Trash)
 // ✅ سجل حذف احترافي (توزيع دقيق)
+// ✅ أيقونة سلة رمادية في حالة عدم وجود محذوفات
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   const user = await requireAuth();
@@ -90,7 +91,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const safeName = (item.name || '').replace(/'/g, "\\'");
 
-    // ✅ التصميم الجديد: صف علوي (الاسم + المستخدم) وصف سفلي (الكمية + الوقت)
+    // التصميم: صف علوي (الاسم + المستخدم) وصف سفلي (الكمية + الوقت)
     return `
       <div class="trash-log-card">
         
@@ -160,9 +161,10 @@ document.addEventListener('DOMContentLoaded', async () => {
       suppliers.sort((a, b) => new Date(b.deleted_at) - new Date(a.deleted_at));
 
       if (products.length === 0 && suppliers.length === 0) {
+        // ✅ تعديل: تغيير الأيقونة إلى سلة محذوفات (وإزالة اللون الأخضر)
         listContainer.innerHTML = `
           <div class="trash-empty">
-            <i class="fas fa-check-circle" style="color: #16a34a;"></i>
+            <i class="fas fa-trash-can"></i>
             <p>${tr('trash_empty', 'Trash is empty')}</p>
           </div>
         `;

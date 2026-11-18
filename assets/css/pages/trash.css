@@ -246,7 +246,7 @@
 
 .trash-empty i {
   font-size: 60px;
-  color: #e5e5e5;
+  color: #a3a3a3; /* ✅ تم توحيد اللون مع النص */
   margin-bottom: 16px;
   display: block;
 }
@@ -254,7 +254,7 @@
 .trash-empty p {
   font-size: 16px;
   font-weight: 600;
-  color: #a3a3a3;
+  color: #a3a3a3; /* لون النص */
   margin: 0;
 }
 
