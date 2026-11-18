@@ -45,9 +45,10 @@
   width: 100% !important;
 }
 
-/* بطاقة السجل الأفقي */
+/* ✅ بطاقة السجل (توزيع الشبكة) */
 .trash-log-card {
-  display: flex;
+  display: grid;
+  grid-template-columns: 46px 1fr auto auto;
   align-items: center;
   background: #ffffff;
   padding: 14px 16px;
@@ -57,28 +58,6 @@
   gap: 16px;
   width: 100% !important;
   box-sizing: border-box !important;
-}
-
-/* التسمية (الصفحة التي تم الحذف منها) */
-.trash-source-badge {
-  font-size: 11px;
-  font-weight: 700;
-  color: #737373;
-  min-width: 70px;
-  text-align: center;
-  background: #f5f5f5;
-  padding: 6px 10px;
-  border-radius: 8px;
-  flex-shrink: 0;
-}
-
-/* محتوى البطاقة (صورة، اسم، تفاصيل) */
-.trash-log-content {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  flex: 1;
-  min-width: 0;
 }
 
 .trash-image-box {
@@ -104,13 +83,12 @@
   font-size: 20px;
 }
 
-/* تفاصيل العنصر */
-.trash-item-details {
+/* العمود الثاني: الاسم والكمية */
+.trash-col-name {
   display: flex;
   flex-direction: column;
   gap: 4px;
   min-width: 0;
-  flex: 1;
 }
 
 .trash-item-name {
@@ -142,11 +120,37 @@
   color: #a3a3a3;
 }
 
-/* زر الثلاث نقاط والقائمة المنسدلة */
+/* ✅ العمود الثالث: اسم المستخدم (في الوسط) */
+.trash-col-user {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+  padding: 0 10px;
+}
+
+/* ✅ العمود الرابع: زر الثلاث نقاط والوقت */
+.trash-col-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.trash-item-time {
+  font-size: 10px;
+  color: #737373;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+}
+
 .trash-menu-container {
   position: relative;
-  flex-shrink: 0;
-  margin-inline-start: auto;
 }
 
 .trash-menu-btn {
@@ -169,7 +173,7 @@
 /* القائمة المنسدلة */
 .trash-dropdown {
   position: absolute;
-  top: calc(100% + 6px);
+  top: calc(100% + 4px);
   inset-inline-end: 0;
   background: white;
   border: 1px solid #e5e5e5;
@@ -233,58 +237,46 @@
 }
 
 /* ============================================
-   ✅ إصلاح تصميم الهواتف (تصميم قائمة مريح)
+   ✅ إصلاح تصميم الهواتف 
    ============================================ */
 @media (max-width: 600px) {
   .trash-log-card {
-    display: flex;
-    align-items: flex-start;
-    padding: 14px;
-    padding-inline-end: 40px;
-    position: relative;
-    gap: 0;
-  }
-
-  /* إخفاء التسمية لتوفير مساحة */
-  .trash-source-badge {
-    display: none; 
-  }
-
-  .trash-log-content {
-    width: 100%;
-    align-items: flex-start;
-    gap: 12px;
+    grid-template-columns: 46px 1fr auto;
+    grid-template-areas: 
+      "img name actions"
+      "img user actions"
+      "img meta actions";
+    gap: 6px 12px;
+    padding: 12px;
   }
 
   .trash-image-box {
-    width: 50px;
-    height: 50px;
+    grid-area: img;
+    align-self: flex-start; /* الصورة في الأعلى */
   }
 
-  .trash-item-details {
-    gap: 6px;
+  .trash-col-name {
+    grid-area: name;
   }
 
-  .trash-item-name {
-    font-size: 14px;
+  .trash-col-user {
+    grid-area: user;
+    justify-content: flex-start; /* محاذاة لبداية السطر */
+    padding: 0;
+    margin-top: 2px;
   }
 
-  /* ترتيب المعلومات تحت بعضها */
   .trash-item-meta {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 4px;
-    font-size: 11px;
+    grid-area: meta;
+    margin-top: 2px;
   }
 
-  .trash-menu-container {
-    position: absolute;
-    top: 12px;
-    inset-inline-end: 8px;
-    margin: 0;
+  .trash-col-actions {
+    grid-area: actions;
+    align-self: center;
   }
 
-  /* ✅ ضبط القائمة المنسدلة لتصبح أيقونات فقط */
+  /* تعديلات القائمة المنسدلة في الهاتف */
   .trash-dropdown {
     width: 44px !important;
     min-width: 44px !important;
@@ -293,12 +285,10 @@
     inset-inline-end: 0 !important;
   }
 
-  /* إخفاء النص في الهاتف */
   .trash-dropdown .dropdown-text {
     display: none !important;
   }
 
-  /* توسيط الأيقونة داخل الزر */
   .trash-dropdown button {
     justify-content: center !important;
     padding: 10px 0 !important;

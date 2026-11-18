@@ -1,6 +1,6 @@
 // ============================================
 // صفحة سلة المحذوفات (Trash)
-// ✅ سجل حذف احترافي (أسماء، تواريخ، تفاصيل)
+// ✅ سجل حذف احترافي (توزيع أفقي دقيق)
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   const user = await requireAuth();
@@ -45,7 +45,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   });
 
-  // دالة مساعدة لتنسيق الوقت (منذ متى تم الحذف)
   function timeAgo(dateString) {
     const date = new Date(dateString);
     const now = new Date();
@@ -64,24 +63,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     return tr('just_now', 'Just now');
   }
 
-  // دالة رسم بطاقة واحدة
   function renderTrashCard(item, userMap) {
     const isProduct = item._table === 'products';
     
-    // التسمية
-    const sourceTitle = isProduct 
-      ? tr('search_group_products', 'Products') 
-      : tr('search_group_suppliers', 'Suppliers');
-    
-    // من قام بالحذف
     const deletedByName = item.deleted_by && userMap.has(item.deleted_by) 
       ? userMap.get(item.deleted_by) 
       : tr('unknown_user', 'Unknown');
       
-    // وقت الحذف
     const deletedAtTime = timeAgo(item.deleted_at);
 
-    // التفاصيل (الكمية والباركود للمنتجات، والهاتف للموردين)
     let metaHtml = '';
     if (isProduct) {
       metaHtml = `
@@ -94,51 +84,55 @@ document.addEventListener('DOMContentLoaded', async () => {
       `;
     }
 
-    // الصورة
     const imageHtml = (isProduct && item.image_url) 
       ? `<img src="${item.image_url}" alt="${item.name}">` 
       : `<i class="fas ${isProduct ? 'fa-box' : 'fa-truck'}"></i>`;
 
     const safeName = (item.name || '').replace(/'/g, "\\'");
 
+    // ✅ تم إعادة هيكلة العناصر لتطابق توزيع الشبكة المطلوب
     return `
       <div class="trash-log-card">
-        <!-- 1. تسمية المصدر -->
-        <div class="trash-source-badge">${sourceTitle}</div>
         
-        <!-- 2. الصورة والتفاصيل -->
-        <div class="trash-log-content">
-          <div class="trash-image-box">${imageHtml}</div>
-          
-          <div class="trash-item-details">
-            <div class="trash-item-name">${item.name || '—'}</div>
-            <div class="trash-item-meta">
-              ${metaHtml}
-            </div>
-            <div class="trash-item-meta" style="margin-top: 2px;">
-              <span style="color: #dc2626;"><i class="fas fa-user-xmark"></i> ${deletedByName}</span>
-              <span><i class="fas fa-clock"></i> ${deletedAtTime}</span>
-            </div>
+        <!-- 1. الصورة -->
+        <div class="trash-image-box">${imageHtml}</div>
+        
+        <!-- 2. الاسم والكمية (الجهة اليمنى) -->
+        <div class="trash-col-name">
+          <div class="trash-item-name">${item.name || '—'}</div>
+          <div class="trash-item-meta">
+            ${metaHtml}
           </div>
         </div>
 
-        <!-- 3. زر الإجراءات -->
-        <div class="trash-menu-container">
-          <button class="trash-menu-btn" onclick="toggleDropdown(event, '${item._table}-${item.id}')">
-            <i class="fas fa-ellipsis-vertical"></i>
-          </button>
+        <!-- 3. اسم المستخدم الذي حذف (في الوسط مقابل الاسم) -->
+        <div class="trash-col-user">
+          <span style="color: #dc2626;"><i class="fas fa-user-xmark"></i> ${deletedByName}</span>
+        </div>
+
+        <!-- 4. زر الثلاث نقاط والوقت (الجهة اليسرى) -->
+        <div class="trash-col-actions">
+          <div class="trash-menu-container">
+            <button class="trash-menu-btn" onclick="toggleDropdown(event, '${item._table}-${item.id}')">
+              <i class="fas fa-ellipsis-vertical"></i>
+            </button>
+            <div class="trash-dropdown" id="dropdown-${item._table}-${item.id}">
+              <button class="btn-restore-text" onclick="restoreItem('${item.id}', '${item._table}')">
+                <i class="fas fa-rotate-left"></i> 
+                <span class="dropdown-text">${tr('trash_restore', 'Restore')}</span>
+              </button>
+              <button class="btn-delete-text" onclick="permanentDelete('${item.id}', '${item._table}', '${safeName}')">
+                <i class="fas fa-trash"></i> 
+                <span class="dropdown-text">${tr('trash_delete_forever', 'Delete Permanently')}</span>
+              </button>
+            </div>
+          </div>
           
-          <div class="trash-dropdown" id="dropdown-${item._table}-${item.id}">
-            <button class="btn-restore-text" onclick="restoreItem('${item.id}', '${item._table}')">
-              <i class="fas fa-rotate-left"></i> 
-              <span class="dropdown-text">${tr('trash_restore', 'Restore')}</span>
-            </button>
-            <button class="btn-delete-text" onclick="permanentDelete('${item.id}', '${item._table}', '${safeName}')">
-              <i class="fas fa-trash"></i> 
-              <span class="dropdown-text">${tr('trash_delete_forever', 'Delete Permanently')}</span>
-            </button>
+          <div class="trash-item-time">
+            <i class="fas fa-clock"></i> ${deletedAtTime}
           </div>
         </div>
+
       </div>
     `;
   }
@@ -147,7 +141,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     listContainer.innerHTML = `<div class="trash-empty"><i class="fas fa-spinner fa-spin"></i><p>${tr('loading', 'Loading...')}</p></div>`;
 
     try {
-      // 1. جلب المنتجات، الموردين، وأسماء المستخدمين في وقت واحد
       const [productsRes, suppliersRes, profilesRes] = await Promise.all([
         db.from('products').select('*').eq('organization_id', orgId).not('deleted_at', 'is', null),
         db.from('suppliers').select('*').eq('organization_id', orgId).not('deleted_at', 'is', null),
@@ -158,14 +151,12 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (suppliersRes.error) throw suppliersRes.error;
       if (profilesRes.error) throw profilesRes.error;
 
-      // 2. إنشاء خريطة (Map) لربط معرف المستخدم باسمه بسرعة
       const userMap = new Map();
       (profilesRes.data || []).forEach(p => userMap.set(p.id, p.full_name));
 
       let products = (productsRes.data || []).map(i => ({ ...i, _table: 'products' }));
       let suppliers = (suppliersRes.data || []).map(i => ({ ...i, _table: 'suppliers' }));
 
-      // ترتيب حسب تاريخ الحذف
       products.sort((a, b) => new Date(b.deleted_at) - new Date(a.deleted_at));
       suppliers.sort((a, b) => new Date(b.deleted_at) - new Date(a.deleted_at));
 
@@ -181,13 +172,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       let html = '';
 
-      // قسم المنتجات
       if (products.length > 0) {
         html += `<div class="trash-section-title"><i class="fas fa-box"></i> ${tr('search_group_products', 'Products')}</div>`;
         html += products.map(p => renderTrashCard(p, userMap)).join('');
       }
 
-      // قسم الموردين
       if (suppliers.length > 0) {
         html += `<div class="trash-section-title"><i class="fas fa-truck"></i> ${tr('search_group_suppliers', 'Suppliers')}</div>`;
         html += suppliers.map(s => renderTrashCard(s, userMap)).join('');
