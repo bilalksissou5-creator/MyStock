@@ -113,7 +113,7 @@
 
 /* اسم المستخدم */
 .trash-col-user {
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 600;
   white-space: nowrap;
   flex-shrink: 0; /* يمنع تقليص حجم اسم المستخدم */
@@ -226,23 +226,36 @@
 .btn-restore-text { color: #16a34a; }
 .btn-delete-text { color: #dc2626; }
 
-/* حالة فارغة */
+/* ============================================
+   ✅ حالة فارغة (بدون صندوق - مثل صفحة العمال)
+   ============================================ */
 .trash-empty {
-  background: #ffffff;
-  padding: 40px 20px;
-  border-radius: 12px;
+  background: transparent;
+  border: none;
+  padding: 60px 20px;
   text-align: center;
-  border: 1px dashed #d4d4d4;
   color: #737373;
   width: 100% !important;
   box-sizing: border-box !important;
+  
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
 .trash-empty i {
-  font-size: 40px;
-  color: #d4d4d4;
-  margin-bottom: 12px;
+  font-size: 60px;
+  color: #e5e5e5;
+  margin-bottom: 16px;
   display: block;
+}
+
+.trash-empty p {
+  font-size: 16px;
+  font-weight: 600;
+  color: #a3a3a3;
+  margin: 0;
 }
 
 /* ============================================
