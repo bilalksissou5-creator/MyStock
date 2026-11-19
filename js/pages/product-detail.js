@@ -446,20 +446,22 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   const deleteBtn = document.getElementById('delete-btn');
-  if (deleteBtn) {
-    deleteBtn.addEventListener('click', async () => {
-      if (!confirm(tr('prod_detail_confirm_delete'))) return;
+if (deleteBtn) {
+  deleteBtn.addEventListener('click', async () => {
+    if (!confirm(tr('prod_detail_confirm_delete'))) return;
 
-      // ✅ التعديل هنا: الحذف المنطقي بدلاً من الحذف النهائي
-      const { error } = await db.from('products').update({ 
-        deleted_at: new Date().toISOString(),
-        deleted_by: user.id 
-      }).eq('id', productId);
+    console.log("زر الحذف يعمل! جاري التحديث..."); // ✅ أضف هذا السطر
 
-      if (error) {
-        alert(tr('prod_detail_err') + ' ' + error.message);
-        return;
-      }
+    const { error } = await db.from('products').update({ 
+      deleted_at: new Date().toISOString(),
+      deleted_by: user.id 
+    }).eq('id', productId);
+
+    if (error) {
+      console.error("خطأ أثناء التحديث:", error); // ✅ أضف هذا السطر
+      alert(tr('prod_detail_err') + ' ' + error.message);
+      return;
+    }
 
       if (typeof notifyOrganization === 'function' && profile?.organization_id) {
         await notifyOrganization({
