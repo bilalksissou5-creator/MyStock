@@ -1,6 +1,6 @@
 // ============================================
 // صفحة سجل المنتج (Product History)
-// ✅ عرض سجل الإضافات وحذف الكميات الخاطئة
+// ✅ حذف الحركة والكمية والفاتورة (نقل للمحذوفات)
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   const user = await requireAuth();
@@ -19,13 +19,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     return;
   }
 
-  // 1. جلب بيانات المنتج الأساسية
-  const { data: product, error: productError } = await db
-    .from('products')
-    .select('*')
-    .eq('id', productId)
-    .single();
-
+  const { data: product, error: productError } = await db.from('products').select('*').eq('id', productId).single();
   if (productError || !product) {
     main.innerHTML = `<div class="alert alert-error">${tr('prod_detail_not_found', 'Product not found')}</div>`;
     return;
@@ -33,7 +27,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   document.title = `${tr('prod_history_title', 'Product History')} - ${product.name}`;
 
-  // 2. بناء هيكل الصفحة
   main.innerHTML = `
     <div class="page-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
       <h2 style="margin: 0; display: flex; align-items: center; gap: 8px;">
@@ -41,62 +34,47 @@ document.addEventListener('DOMContentLoaded', async () => {
         ${tr('prod_history_title', 'Product History')}
       </h2>
       <a href="/products/detail.html?id=${productId}" class="btn-secondary" style="display: flex; align-items: center; gap: 8px; padding: 8px 16px; font-size: 13px; font-weight: 700; border-radius: 8px; text-decoration: none;">
-        <i class="fas fa-arrow-left"></i>
-        <span>${tr('prod_detail_back', 'Back to Product')}</span>
+        <i class="fas fa-arrow-left"></i> <span>${tr('prod_detail_back', 'Back')}</span>
       </a>
     </div>
     
     <div class="history-wrapper">
       <div class="history-list" id="history-list">
-        <div class="history-empty">
-          <i class="fas fa-spinner fa-spin"></i>
-          <p>${tr('loading', 'Loading...')}</p>
-        </div>
+        <div class="history-empty"><i class="fas fa-spinner fa-spin"></i><p>${tr('loading', 'Loading...')}</p></div>
       </div>
     </div>
   `;
 
   const listContainer = document.getElementById('history-list');
 
-  // 3. دالة جلب وعرض السجل
   async function loadHistory() {
     listContainer.innerHTML = `<div class="history-empty"><i class="fas fa-spinner fa-spin"></i><p>${tr('loading', 'Loading...')}</p></div>`;
 
     try {
-      // جلب الحركات من جدول stock_movements (فقط حركات الإدخال in)
-      const { data: movements, error } = await db
-        .from('stock_movements')
+      // جلب الحركات غير المحذوفة فقط
+      const { data: movements, error } = await db.from('stock_movements')
         .select('*')
         .eq('product_id', productId)
         .eq('type', 'in')
+        .is('deleted_at', null) // ✅ فقط السجلات النشطة (غير المحذوفة)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
 
       if (!movements || movements.length === 0) {
-        listContainer.innerHTML = `
-          <div class="history-empty">
-            <i class="fas fa-box-open"></i>
-            <p>${tr('prod_history_empty', 'No addition history found for this product.')}</p>
-          </div>
-        `;
+        listContainer.innerHTML = `<div class="history-empty"><i class="fas fa-box-open"></i><p>${tr('prod_history_empty', 'No addition history found.')}</p></div>`;
         return;
       }
 
-      // عرض البطاقات
       listContainer.innerHTML = movements.map(mov => {
         const date = new Date(mov.created_at);
         const dateStr = date.toLocaleDateString();
         const timeStr = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
-        const imageHtml = product.image_url 
-          ? `<img src="${product.image_url}" alt="${product.name}">` 
-          : `<i class="fas fa-box"></i>`;
+        const imageHtml = product.image_url ? `<img src="${product.image_url}" alt="${product.name}">` : `<i class="fas fa-box"></i>`;
 
         return `
           <div class="history-card">
             <div class="history-image">${imageHtml}</div>
-            
             <div class="history-info">
               <div class="history-name">${product.name || '—'}</div>
               <div class="history-meta">
@@ -104,12 +82,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                 <span><i class="fas fa-calendar"></i> ${dateStr} • ${timeStr}</span>
               </div>
             </div>
-
-            <!-- الكمية التي أضيفت -->
             <div class="history-qty">+${mov.quantity}</div>
-
-            <!-- زر الحذف -->
-            <button class="history-delete-btn" onclick="deleteMovement('${mov.id}', ${mov.quantity})" title="${tr('delete', 'Delete')}">
+            <button class="history-delete-btn" onclick="deleteMovement('${mov.id}', ${mov.quantity}, '${mov.invoice_id || ''}')" title="${tr('delete', 'Delete')}">
               <i class="fas fa-trash"></i>
             </button>
           </div>
@@ -122,36 +96,51 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
 
-  // 4. دالة حذف الكمية (تصحيح الخطأ)
-  window.deleteMovement = async (movementId, qtyToRemove) => {
-    const confirmMsg = tr('prod_history_confirm_del', 'Are you sure you want to delete this quantity? It will be deducted from the total stock.');
-    if (!confirm(confirmMsg)) return;
+  // دالة الحذف والتراجع الشامل
+  window.deleteMovement = async (movementId, qtyToRemove, invoiceId) => {
+    if (!confirm(tr('prod_history_confirm_del', 'Are you sure you want to delete this quantity? It will be deducted from stock and invoice.'))) return;
 
     try {
-      // حساب الكمية الجديدة (مع التأكد من عدم النزول تحت الصفر)
+      // 1. نقل الحركة إلى سلة المحذوفات (Soft Delete)
+      const { error: moveErr } = await db.from('stock_movements').update({ deleted_at: new Date().toISOString() }).eq('id', movementId);
+      if (moveErr) throw moveErr;
+
+      // 2. خصم الكمية من بطاقة المنتج
       const currentQty = Number(product.qty || 0);
       const newQty = Math.max(0, currentQty - Number(qtyToRemove));
-      
-      // أ. تحديث كمية المنتج في جدول products
-      const { error: updateError } = await db
-        .from('products')
-        .update({ qty: newQty })
-        .eq('id', productId);
-        
-      if (updateError) throw updateError;
+      await db.from('products').update({ qty: newQty }).eq('id', productId);
 
-      // ب. حذف سجل الحركة من جدول stock_movements
-      const { error: deleteError } = await db
-        .from('stock_movements')
-        .delete()
-        .eq('id', movementId);
+      // 3. تعديل الفاتورة
+      if (invoiceId) {
+        const { data: invoice } = await db.from('invoices').select('*').eq('invoice_number', invoiceId).single();
         
-      if (deleteError) throw deleteError;
+        if (invoice) {
+          const newInvQty = Math.max(0, Number(invoice.total_qty || 0) - Number(qtyToRemove));
+          const newInvValue = Math.max(0, Number(invoice.total_value || 0) - (Number(qtyToRemove) * Number(product.price || 0)));
 
-      // ج. تحديث الكمية في الذاكرة (حتى لا يحدث خطأ إذا تم الحذف أكثر من مرة بدون تحديث)
+          if (newInvQty <= 0) {
+            // إذا أصبحت الفاتورة فارغة، ننقلها لسلة المحذوفات
+            await db.from('invoices').update({ deleted_at: new Date().toISOString(), total_qty: 0, total_value: 0 }).eq('id', invoice.id);
+            await db.from('invoice_items').update({ deleted_at: new Date().toISOString(), qty: 0, total: 0 }).eq('invoice_id', invoice.id);
+          } else {
+            // إذا تبقى شيء في الفاتورة، نحدث الإجماليات
+            await db.from('invoices').update({ total_qty: newInvQty, total_value: newInvValue }).eq('id', invoice.id);
+            
+            // تحديث عنصر الفاتورة المرتبط بالمنتج
+            const { data: item } = await db.from('invoice_items').select('*').eq('invoice_id', invoice.id).eq('product_id', productId).single();
+            if (item) {
+              const itemNewQty = Math.max(0, Number(item.qty) - Number(qtyToRemove));
+              if (itemNewQty <= 0) {
+                await db.from('invoice_items').update({ deleted_at: new Date().toISOString(), qty: 0, total: 0 }).eq('id', item.id);
+              } else {
+                await db.from('invoice_items').update({ qty: itemNewQty, total: itemNewQty * Number(item.price) }).eq('id', item.id);
+              }
+            }
+          }
+        }
+      }
+
       product.qty = newQty; 
-
-      // د. إعادة تحميل القائمة لتعكس الحذف
       loadHistory();
 
     } catch (err) {
@@ -159,6 +148,5 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   };
 
-  // تشغيل جلب البيانات عند فتح الصفحة
   loadHistory();
 });

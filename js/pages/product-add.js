@@ -3,6 +3,7 @@
 // ✅ الترتيب الصحيح للهاتف (السلة قبل الملخص والأزرار)
 // ✅ إعادة السلوك القديم: المسح يملأ الحقول فقط (الإضافة عبر زر "تم")
 // ✅ إصلاح تفريغ حقل الفئة (Category) بعد الإضافة
+// ✅ ربط حركة المخزون بالفاتورة (invoice_id)
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   if (window.__productAddLoaded) return;
@@ -597,9 +598,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             .upsert(aliasRows, { onConflict: 'organization_id,barcode', ignoreDuplicates: true });
         }
 
+        // ✅ التعديل هنا: إضافة invoice_id لربط الحركة بالفاتورة
         await db.from('stock_movements').insert({
           organization_id: profile.organization_id,
           product_id: productId,
+          invoice_id: invoiceNumber, 
           type: 'in',
           method: 'manual',
           quantity: Number(p.qty),
