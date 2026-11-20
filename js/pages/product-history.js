@@ -1,9 +1,10 @@
 
 // ============================================
 // صفحة سجل المنتج (Product History)
-// ✅ حذف الحركة ونقلها إلى سلة المحذوفات
-// ✅ تسجيل المستخدم الذي قام بالحذف
-// ✅ التحقق من نجاح التحديث في Supabase
+// ✅ حذف صف الفاتورة فعلياً
+// ✅ حفظ نسخة صف الفاتورة لاستعادته
+// ✅ نقل الحركة إلى سلة المحذوفات
+// ✅ خصم الكمية من بطاقة المنتج
 // ============================================
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -173,11 +174,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             <button
               class="history-delete-btn"
-              onclick="deleteMovement(
-                '${mov.id}',
-                ${Number(mov.quantity)},
-                '${mov.invoice_id || ''}'
-              )"
+              onclick="deleteMovement('${mov.id}')"
               title="${tr('delete', 'Delete')}"
             >
               <i class="fas fa-trash"></i>
@@ -198,33 +195,29 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   // ============================================
-  // حذف الحركة ونقلها إلى سلة المحذوفات
+  // حذف الحركة وحذف صف الفاتورة فعلياً
   // ============================================
 
-  window.deleteMovement = async (
-    movementId,
-    qtyToRemove,
-    invoiceId
-  ) => {
+  window.deleteMovement = async (movementId) => {
 
     if (!confirm(
       tr(
         'prod_history_confirm_del',
-        'Are you sure you want to delete this quantity? It will be deducted from stock and invoice.'
+        'Are you sure you want to delete this quantity?'
       )
     )) return;
 
     try {
 
-      // 1. التحقق من الحركة قبل الحذف
-      const { data: movement, error: fetchError } = await db
+      // 1. جلب الحركة
+      const { data: movement, error: movementError } = await db
         .from('stock_movements')
-        .select('id, organization_id, quantity, deleted_at')
+        .select('*')
         .eq('id', movementId)
         .eq('product_id', productId)
         .single();
 
-      if (fetchError) throw fetchError;
+      if (movementError) throw movementError;
 
       if (!movement) {
         throw new Error('لم يتم العثور على سجل الحركة.');
@@ -234,10 +227,133 @@ document.addEventListener('DOMContentLoaded', async () => {
         throw new Error('هذا السجل موجود بالفعل في سلة المحذوفات.');
       }
 
-      // 2. نقل الحركة إلى سلة المحذوفات
+      const qty = Number(movement.quantity);
+
+      if (!Number.isFinite(qty) || qty <= 0) {
+        throw new Error('كمية الحركة غير صحيحة.');
+      }
+
+      // 2. جلب بيانات المنتج
+      const { data: prod, error: prodError } = await db
+        .from('products')
+        .select('qty, price')
+        .eq('id', productId)
+        .single();
+
+      if (prodError) throw prodError;
+
+      if (!prod) {
+        throw new Error('لم يتم العثور على المنتج.');
+      }
+
+      // 3. البحث عن الفاتورة وصف المنتج
+      let invoice = null;
+      let invoiceItem = null;
+
+      if (movement.invoice_id) {
+
+        const { data, error } = await db
+          .from('invoices')
+          .select('*')
+          .eq('invoice_number', movement.invoice_id)
+          .maybeSingle();
+
+        if (error) throw error;
+
+        invoice = data;
+
+        if (invoice) {
+
+          const { data: item, error: itemError } = await db
+            .from('invoice_items')
+            .select('*')
+            .eq('invoice_id', invoice.id)
+            .eq('product_id', productId)
+            .limit(1)
+            .maybeSingle();
+
+          if (itemError) throw itemError;
+
+          invoiceItem = item;
+        }
+      }
+
       const deletedTime = new Date().toISOString();
 
-      const { data: updatedMovement, error: moveErr } = await db
+      // 4. حفظ نسخة صف الفاتورة قبل حذفه
+      if (invoiceItem) {
+
+        const { error: snapshotError } = await db
+          .from('stock_movements')
+          .update({
+            invoice_item_snapshot: invoiceItem
+          })
+          .eq('id', movementId)
+          .eq('organization_id', movement.organization_id)
+          .is('deleted_at', null);
+
+        if (snapshotError) throw snapshotError;
+
+      }
+
+      // 5. حذف صف المنتج فعلياً من الفاتورة
+      if (invoiceItem) {
+
+        const { data: deletedItem, error: deleteItemError } = await db
+          .from('invoice_items')
+          .delete()
+          .eq('id', invoiceItem.id)
+          .select('id');
+
+        if (deleteItemError) throw deleteItemError;
+
+        if (!deletedItem || deletedItem.length === 0) {
+          throw new Error('تعذر حذف صف المنتج من الفاتورة.');
+        }
+
+        // تحديث إجماليات الفاتورة
+        const newInvQty = Math.max(
+          0,
+          Number(invoice.total_qty || 0) -
+          Number(invoiceItem.qty || 0)
+        );
+
+        const newInvValue = Math.max(
+          0,
+          Number(invoice.total_value || 0) -
+          Number(invoiceItem.total || 0)
+        );
+
+        const { error: invoiceUpdateError } = await db
+          .from('invoices')
+          .update({
+            total_qty: newInvQty,
+            total_value: newInvValue
+          })
+          .eq('id', invoice.id);
+
+        if (invoiceUpdateError) throw invoiceUpdateError;
+      }
+
+      // 6. خصم الكمية من بطاقة المنتج
+      const currentQty = Number(prod.qty || 0);
+
+      const newQty = Math.max(
+        0,
+        currentQty - qty
+      );
+
+      const { error: updateProductError } = await db
+        .from('products')
+        .update({
+          qty: newQty
+        })
+        .eq('id', productId);
+
+      if (updateProductError) throw updateProductError;
+
+      // 7. نقل الحركة إلى سلة المحذوفات
+      const { data: updatedMovement, error: moveError } = await db
         .from('stock_movements')
         .update({
           deleted_at: deletedTime,
@@ -246,159 +362,21 @@ document.addEventListener('DOMContentLoaded', async () => {
         .eq('id', movementId)
         .eq('organization_id', movement.organization_id)
         .is('deleted_at', null)
-        .select('id, deleted_at, deleted_by');
+        .select('id');
 
-      console.log('Movement update:', {
-        updatedMovement,
-        moveErr
-      });
+      if (moveError) throw moveError;
 
-      if (moveErr) throw moveErr;
-
-      // التأكد من أن Supabase حدّث الحركة فعلاً
       if (!updatedMovement || updatedMovement.length === 0) {
-        throw new Error(
-          'لم يتم نقل الحركة إلى سلة المحذوفات. تحقق من صلاحيات RLS.'
-        );
+        throw new Error('تعذر نقل الحركة إلى سلة المحذوفات.');
       }
 
-      // اعتماد الكمية المسجلة في قاعدة البيانات
-      const qty = Number(movement.quantity);
-
-      // 3. خصم الكمية من بطاقة المنتج
-      const currentQty = Number(product.qty || 0);
-      const newQty = Math.max(0, currentQty - qty);
-
-      const { error: productError } = await db
-        .from('products')
-        .update({ qty: newQty })
-        .eq('id', productId);
-
-      if (productError) {
-        throw new Error(
-          'تم نقل الحركة إلى المحذوفات، لكن تعذر تحديث كمية المنتج: ' +
-          productError.message
-        );
-      }
-
-      // 4. تعديل الفاتورة المرتبطة
-      if (invoiceId) {
-
-        const { data: invoice, error: invoiceError } = await db
-          .from('invoices')
-          .select('*')
-          .eq('invoice_number', invoiceId)
-          .maybeSingle();
-
-        if (invoiceError) throw invoiceError;
-
-        if (invoice) {
-
-          const newInvQty = Math.max(
-            0,
-            Number(invoice.total_qty || 0) - qty
-          );
-
-          const newInvValue = Math.max(
-            0,
-            Number(invoice.total_value || 0) -
-            (qty * Number(product.price || 0))
-          );
-
-          if (newInvQty <= 0) {
-
-            // الفاتورة أصبحت فارغة
-            const { error: invUpdateError } = await db
-              .from('invoices')
-              .update({
-                deleted_at: deletedTime,
-                total_qty: 0,
-                total_value: 0
-              })
-              .eq('id', invoice.id);
-
-            if (invUpdateError) throw invUpdateError;
-
-            const { error: itemsError } = await db
-              .from('invoice_items')
-              .update({
-                deleted_at: deletedTime,
-                qty: 0,
-                total: 0
-              })
-              .eq('invoice_id', invoice.id);
-
-            if (itemsError) throw itemsError;
-
-          } else {
-
-            // تحديث إجماليات الفاتورة
-            const { error: invUpdateError } = await db
-              .from('invoices')
-              .update({
-                total_qty: newInvQty,
-                total_value: newInvValue
-              })
-              .eq('id', invoice.id);
-
-            if (invUpdateError) throw invUpdateError;
-
-            // تحديث عنصر الفاتورة المرتبط بالمنتج
-            const { data: item, error: itemError } = await db
-              .from('invoice_items')
-              .select('*')
-              .eq('invoice_id', invoice.id)
-              .eq('product_id', productId)
-              .maybeSingle();
-
-            if (itemError) throw itemError;
-
-            if (item) {
-
-              const itemNewQty = Math.max(
-                0,
-                Number(item.qty) - qty
-              );
-
-              if (itemNewQty <= 0) {
-
-                const { error: deleteItemError } = await db
-                  .from('invoice_items')
-                  .update({
-                    deleted_at: deletedTime,
-                    qty: 0,
-                    total: 0
-                  })
-                  .eq('id', item.id);
-
-                if (deleteItemError) throw deleteItemError;
-
-              } else {
-
-                const { error: updateItemError } = await db
-                  .from('invoice_items')
-                  .update({
-                    qty: itemNewQty,
-                    total: itemNewQty * Number(item.price)
-                  })
-                  .eq('id', item.id);
-
-                if (updateItemError) throw updateItemError;
-              }
-            }
-          }
-        }
-      }
-
-      // 5. تحديث كمية المنتج محلياً
+      // 8. تحديث الكمية المحلية
       product.qty = newQty;
 
-      // 6. إعادة تحميل السجل
+      // 9. إعادة تحميل السجل
       await loadHistory();
 
-      alert(
-        'تم نقل السجل إلى سلة المحذوفات بنجاح.'
-      );
+      alert('تم حذف صف المنتج ونقل السجل إلى سلة المحذوفات بنجاح.');
 
     } catch (err) {
 
