@@ -1,70 +1,154 @@
+
 /* ============================================
-   صفحة استقبال تسجيل الدخول (Auth Callback)
+   MyStock - شاشة استقبال تسجيل الدخول
    ============================================ */
 
+* {
+  box-sizing: border-box;
+}
+
 body.auth-callback-page {
+  position: relative;
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
-  font-family: system-ui, -apple-system, sans-serif;
-  background: #f5f5f5;
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100svh;
   margin: 0;
   padding: 20px;
-  box-sizing: border-box;
+  overflow: hidden;
+  font-family: system-ui, -apple-system, sans-serif;
+
+  /* النصف العلوي أبيض والنصف السفلي أسود */
+  background: linear-gradient(
+    to bottom,
+    #ffffff 0%,
+    #ffffff 50%,
+    #000000 50%,
+    #000000 100%
+  );
 }
+
+/* ============================================
+   اسم التطبيق في النصف السفلي
+   ============================================ */
+
+body.auth-callback-page::after {
+  content: "MyStock";
+  position: absolute;
+  top: 75%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+
+  color: #ffffff;
+  font-size: clamp(32px, 9vw, 48px);
+  font-weight: 800;
+  letter-spacing: 1.5px;
+
+  text-align: center;
+  white-space: nowrap;
+  user-select: none;
+}
+
+/* ============================================
+   صندوق التحقق من تسجيل الدخول
+   ============================================ */
 
 .auth-callback-box {
+  position: absolute;
+  top: 25%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+
+  width: min(380px, calc(100% - 40px));
+  padding: 24px 16px;
+
   text-align: center;
-  background: white;
-  padding: 32px 24px;
-  border-radius: 16px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
-  max-width: 100%;
-  width: 380px;
-  box-sizing: border-box;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
 }
+
+/* رسالة التحقق */
 
 .auth-callback-box h2 {
-  margin: 0 0 10px 0;
+  margin: 0 0 10px;
   color: #171717;
-  font-size: 1.2rem;
+  font-size: 1.15rem;
   font-weight: 700;
+  line-height: 1.8;
 }
 
-.auth-callback-box p {
-  color: #6b7280;
-  font-size: 14px;
-  margin: 0;
-  line-height: 1.5;
+/* النص الثانوي */
+
+.auth-callback-box h2 span {
+  line-height: 1.8;
 }
 
-.auth-callback-error {
-  color: #dc2626;
-  margin-top: 20px;
-  font-size: 13px;
-  text-align: start;
-  display: none;
-  word-wrap: break-word;
-  background: #fef2f2;
-  padding: 12px;
-  border-radius: 8px;
-  border: 1px solid #fecaca;
-  font-family: monospace; /* لقراءة الأكواد والأخطاء بوضوح */
-}
+/* ============================================
+   مؤشر التحميل
+   ============================================ */
 
-/* مؤشر تحميل بسيط (Spinner) */
 .auth-spinner {
   display: inline-block;
-  width: 24px;
-  height: 24px;
+  width: 34px;
+  height: 34px;
+
   border: 3px solid #e5e5e5;
   border-top-color: #171717;
   border-radius: 50%;
-  animation: spin 1s linear infinite;
-  margin-bottom: 16px;
+
+  animation: mystock-spin 0.8s linear infinite;
+  margin-bottom: 18px;
 }
 
-@keyframes spin {
-  to { transform: rotate(360deg); }
+@keyframes mystock-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ============================================
+   رسائل الأخطاء
+   ============================================ */
+
+.auth-callback-error {
+  display: none;
+  margin-top: 20px;
+  padding: 12px;
+
+  color: #dc2626;
+  background: #fef2f2;
+
+  font-size: 13px;
+  text-align: start;
+  word-wrap: break-word;
+  overflow-wrap: anywhere;
+
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  font-family: monospace;
+}
+
+/* ============================================
+   الشاشات الصغيرة
+   ============================================ */
+
+@media (max-height: 500px) {
+  .auth-callback-box {
+    top: 25%;
+    padding: 10px;
+  }
+
+  body.auth-callback-page::after {
+    font-size: 30px;
+  }
+
+  .auth-spinner {
+    width: 24px;
+    height: 24px;
+    margin-bottom: 8px;
+  }
 }

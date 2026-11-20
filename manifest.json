@@ -1,3 +1,4 @@
+
 {
   "id": "/",
   "name": "MyStock",
@@ -6,9 +7,13 @@
   "start_url": "/auth-callback.html",
   "display": "standalone",
   "orientation": "any",
-  "background_color": "#ffffff",
-  "theme_color": "#171717",
-  "categories": ["business", "productivity", "utilities"],
+  "background_color": "#000000",
+  "theme_color": "#000000",
+  "categories": [
+    "business",
+    "productivity",
+    "utilities"
+  ],
   "icons": [
     {
       "src": "/assets/img/icon-192.png",
