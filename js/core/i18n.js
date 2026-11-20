@@ -1973,6 +1973,8 @@ const translations = {
     prod_history_title: 'Historique du produit',
     prod_history_empty: 'Aucun historique d\'ajout trouvé pour ce produit.',
     prod_history_confirm_del: 'Êtes-vous sûr de vouloir supprimer cette quantité ? Elle sera déduite du stock total.',
+
+    prod_history_delete_success: 'La ligne du produit a été supprimée et l’enregistrement a été déplacé vers la corbeille avec succès.',
   },
 
   en: {
@@ -2956,6 +2958,8 @@ const translations = {
     prod_history_title: 'Product History',
     prod_history_empty: 'No addition history found for this product.',
     prod_history_confirm_del: 'Are you sure you want to delete this quantity? It will be deducted from the total stock.',
+
+    prod_history_delete_success: 'The product row was deleted and the record was successfully moved to the trash.',
   },
 
   

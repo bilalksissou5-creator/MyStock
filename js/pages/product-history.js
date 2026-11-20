@@ -5,6 +5,7 @@
 // ✅ حفظ نسخة صف الفاتورة لاستعادته
 // ✅ نقل الحركة إلى سلة المحذوفات
 // ✅ خصم الكمية من بطاقة المنتج
+// ✅ تنسيق التاريخ حسب لغة التطبيق
 // ============================================
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -98,6 +99,62 @@ document.addEventListener('DOMContentLoaded', async () => {
   const listContainer = document.getElementById('history-list');
 
   // ============================================
+  // تحديد لغة التاريخ والوقت
+  // ============================================
+
+  function getDateLocale() {
+    const currentLang = (
+      document.documentElement.lang ||
+      localStorage.getItem('language') ||
+      localStorage.getItem('lang') ||
+      'en'
+    ).toLowerCase();
+
+    if (currentLang.startsWith('ar')) {
+      return 'ar-MA';
+    }
+
+    if (currentLang.startsWith('fr')) {
+      return 'fr-FR';
+    }
+
+    return 'en-GB';
+  }
+
+  // ============================================
+  // تنسيق التاريخ والوقت
+  // ============================================
+
+  function formatMovementDate(dateString) {
+    const date = new Date(dateString);
+
+    if (isNaN(date.getTime())) {
+      return '—';
+    }
+
+    const locale = getDateLocale();
+
+    const dateStr = new Intl.DateTimeFormat(locale, {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric'
+    }).format(date);
+
+    const timeStr = new Intl.DateTimeFormat(locale, {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false
+    }).format(date);
+
+    return `
+      <span dir="ltr"
+            style="unicode-bidi:isolate; display:inline-block;">
+        ${dateStr} • ${timeStr}
+      </span>
+    `;
+  }
+
+  // ============================================
   // تحميل سجل المنتج
   // ============================================
 
@@ -133,12 +190,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
 
       listContainer.innerHTML = movements.map(mov => {
-        const date = new Date(mov.created_at);
-        const dateStr = date.toLocaleDateString();
-        const timeStr = date.toLocaleTimeString([], {
-          hour: '2-digit',
-          minute: '2-digit'
-        });
+        const formattedDate = formatMovementDate(mov.created_at);
 
         const imageHtml = product.image_url
           ? `<img src="${product.image_url}" alt="${product.name}">`
@@ -163,7 +215,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
                 <span>
                   <i class="fas fa-calendar"></i>
-                  ${dateStr} • ${timeStr}
+                  ${formattedDate}
                 </span>
               </div>
             </div>
@@ -376,7 +428,12 @@ document.addEventListener('DOMContentLoaded', async () => {
       // 9. إعادة تحميل السجل
       await loadHistory();
 
-      alert('تم حذف صف المنتج ونقل السجل إلى سلة المحذوفات بنجاح.');
+      alert(
+        tr(
+          'prod_history_delete_success',
+          'The product row was deleted and the record was successfully moved to the trash.'
+        )
+      );
 
     } catch (err) {
 
