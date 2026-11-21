@@ -5,6 +5,7 @@
  // ✅ إصلاح اتجاه العملة (LTR) لمنع انزياحها
  // ✅ إخفاء المنتجات المحذوفة (deleted_at)
  // ✅ Skeleton مطابق لأبعاد بطاقات المنتجات الأصلية
+ // ✅ عدد Skeleton مطابق لعدد البطاقات الحقيقية
  // ✅ ظهور المنتجات الحقيقية بالتدريج من الأعلى للأسفل
  // ============================================
 
@@ -36,12 +37,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     style.id = 'products-skeleton-style';
 
     style.textContent = `
-      /* البطاقة الوهمية تحتفظ بتصميم البطاقة الأصلية */
       .product-skeleton {
         pointer-events: none;
       }
 
-      /* العناصر الرمادية فقط */
       .product-skeleton .skeleton-shape {
         position: relative;
         overflow: hidden;
@@ -49,7 +48,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         border-radius: 4px;
       }
 
-      /* حركة التحميل */
       .product-skeleton .skeleton-shape::after {
         content: "";
         position: absolute;
@@ -70,44 +68,36 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
       }
 
-      /* الصورة الوهمية */
       .product-skeleton .product-card-image {
         position: relative;
         background: #e5e5e5;
       }
 
-      /* مكان اسم المنتج */
       .product-skeleton .skeleton-title {
         width: 65%;
         height: 15px;
         margin: 0 5px 6px;
       }
 
-      /* مكان SKU */
       .product-skeleton .skeleton-sku {
         width: 40%;
         height: 12px;
         margin: 0 5px 12px;
       }
 
-      /* مكان عناوين الإحصائيات */
       .product-skeleton .skeleton-stat-label {
         width: 65%;
         height: 9px;
         margin: 3px auto 4px;
       }
 
-      /* مكان قيم الإحصائيات */
       .product-skeleton .skeleton-stat-value {
         width: 50%;
         height: 12px;
         margin: 4px auto;
       }
 
-      /* ========================================
-         ✅ ظهور البطاقات الحقيقية بالتدريج
-         ======================================== */
-
+      /* ظهور البطاقات الحقيقية بالتدريج */
       .product-card.product-enter {
         opacity: 0;
         animation: productCardReveal 0.4s ease-out forwards;
@@ -300,16 +290,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             p => p.id === payload.new.id
           );
 
-          // إذا تم حذف المنتج
           if (payload.new.deleted_at) {
             if (index !== -1) {
               cachedProducts.splice(index, 1);
               renderProductsToDOM();
             }
-          }
-
-          // إذا تم تعديله أو استعادته
-          else {
+          } else {
             if (index !== -1) {
               cachedProducts[index] = {
                 ...cachedProducts[index],
@@ -393,6 +379,31 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 // ============================================
+// ✅ حساب المنتجات المجمعة
+// ============================================
+function getGroupedProducts() {
+  const groupedMap = new Map();
+  const grouped = [];
+
+  for (const p of cachedProducts) {
+    const key = `${(p.name ?? '').trim()}|${p.supplier_id ?? ''}|${p.price ?? 0}`;
+
+    if (groupedMap.has(key)) {
+      const existing = groupedMap.get(key);
+      existing.qty = (existing.qty ?? 0) + (p.qty ?? 0);
+    } else {
+      const copy = { ...p };
+      copy.qty = p.qty ?? 0;
+
+      groupedMap.set(key, copy);
+      grouped.push(copy);
+    }
+  }
+
+  return grouped;
+}
+
+// ============================================
 // ✅ جلب المنتجات من Supabase
 // ============================================
 async function loadProductsFromDB() {
@@ -421,6 +432,48 @@ async function loadProductsFromDB() {
 
   cachedProducts = data || [];
 
+  // ============================================
+  // ✅ إنشاء Skeleton مطابق لعدد البطاقات الحقيقية
+  // ============================================
+  const grouped = getGroupedProducts();
+  const realCardsCount = grouped.length;
+
+  if (realCardsCount > 0) {
+    container.innerHTML = Array.from(
+      { length: realCardsCount },
+      () => `
+        <div class="product-card product-skeleton" aria-hidden="true">
+
+          <div class="product-card-image skeleton-shape"></div>
+
+          <div class="skeleton-shape skeleton-title"></div>
+
+          <div class="skeleton-shape skeleton-sku"></div>
+
+          <div class="product-stats">
+
+            <div class="stat">
+              <div class="skeleton-shape skeleton-stat-label"></div>
+              <div class="skeleton-shape skeleton-stat-value"></div>
+            </div>
+
+            <div class="stat">
+              <div class="skeleton-shape skeleton-stat-label"></div>
+              <div class="skeleton-shape skeleton-stat-value"></div>
+            </div>
+
+            <div class="stat">
+              <div class="skeleton-shape skeleton-stat-label"></div>
+              <div class="skeleton-shape skeleton-stat-value"></div>
+            </div>
+
+          </div>
+        </div>
+      `
+    ).join('');
+  }
+
+  // استبدال البطاقات الوهمية بالحقيقية
   renderProductsToDOM();
 }
 
@@ -448,7 +501,9 @@ function renderProductsToDOM() {
 
   container.setAttribute('aria-busy', 'false');
 
-  if (cachedProducts.length === 0) {
+  const grouped = getGroupedProducts();
+
+  if (grouped.length === 0) {
     container.innerHTML = `
       <div class="empty-state">
         <i class="fas fa-box-open"></i>
@@ -459,24 +514,6 @@ function renderProductsToDOM() {
     return;
   }
 
-  const groupedMap = new Map();
-  const grouped = [];
-
-  for (const p of cachedProducts) {
-    const key = `${(p.name ?? '').trim()}|${p.supplier_id ?? ''}|${p.price ?? 0}`;
-
-    if (groupedMap.has(key)) {
-      const existing = groupedMap.get(key);
-      existing.qty = (existing.qty ?? 0) + (p.qty ?? 0);
-    } else {
-      const copy = { ...p };
-      copy.qty = p.qty ?? 0;
-
-      groupedMap.set(key, copy);
-      grouped.push(copy);
-    }
-  }
-
   // اكتشاف عرض الشاشة الحقيقي حتى لو كنا داخل إطار
   const isDesktop = (
     window.self !== window.top
@@ -484,20 +521,16 @@ function renderProductsToDOM() {
       : window.innerWidth
   ) >= 1024;
 
-  // ============================================
-  // ✅ رسم البطاقات بترتيبها الأصلي
-  // ✅ تأخير ظهور كل بطاقة عن البطاقة السابقة
-  // ============================================
+  // رسم البطاقات بترتيبها الأصلي
   container.innerHTML = grouped.map((p, index) => {
     const total = Number(p.qty ?? 0) * Number(p.price ?? 0);
     const lowClass = (p.qty ?? 0) < 10 ? 'low' : '';
 
-    // تحديد الرابط بناءً على نوع الشاشة
     const targetUrl = isDesktop
       ? `/products/detail-workspace.html?productId=${p.id}&userId=${p.created_by || ''}&supplierId=${p.supplier_id || ''}&invoiceId=${p.invoice_id || ''}`
       : `detail.html?id=${p.id}`;
 
-    // كل بطاقة تتأخر 70ms عن السابقة
+    // تأخير ظهور كل بطاقة عن السابقة
     const animationDelay = index * 70;
 
     return `
