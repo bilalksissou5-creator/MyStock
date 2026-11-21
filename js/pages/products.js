@@ -1,11 +1,11 @@
 
-// ============================================
-// صفحة المنتجات (مع التحديث الفوري والعملة)
-// ✅ دعم كامل للترجمة
-// ✅ إصلاح اتجاه العملة (LTR) لمنع انزياحها
-// ✅ إخفاء المنتجات المحذوفة (deleted_at)
-// ✅ Skeleton Loading للعناصر فقط باللون الرمادي
-// ============================================
+ // ============================================
+ // صفحة المنتجات (مع التحديث الفوري والعملة)
+ // ✅ دعم كامل للترجمة
+ // ✅ إصلاح اتجاه العملة (LTR) لمنع انزياحها
+ // ✅ إخفاء المنتجات المحذوفة (deleted_at)
+ // ✅ Skeleton مطابق لأبعاد بطاقات المنتجات الأصلية
+ // ============================================
 
 let productsChannel = null;
 let cachedProducts = [];
@@ -28,25 +28,28 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (!main) return;
 
   // ============================================
-  // ✅ CSS الخاص بعناصر التحميل الرمادية فقط
+  // ✅ CSS الخاص بعناصر Skeleton فقط
   // ============================================
   if (!document.getElementById('products-skeleton-style')) {
     const style = document.createElement('style');
     style.id = 'products-skeleton-style';
 
     style.textContent = `
+      /* البطاقة الوهمية تحتفظ بتصميم البطاقة الأصلية */
       .product-skeleton {
         pointer-events: none;
       }
 
-      .skeleton-shape {
+      /* العناصر الرمادية فقط */
+      .product-skeleton .skeleton-shape {
         position: relative;
         overflow: hidden;
         background: #e5e5e5;
-        border-radius: 5px;
+        border-radius: 4px;
       }
 
-      .skeleton-shape::after {
+      /* حركة التحميل */
+      .product-skeleton .skeleton-shape::after {
         content: "";
         position: absolute;
         inset: 0;
@@ -66,38 +69,84 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
       }
 
-      .skeleton-image {
-        width: 100%;
-        height: 130px;
-        margin-bottom: 14px;
+      /* الصورة الوهمية: تحتفظ بارتفاع الصورة الأصلي */
+      .product-skeleton .product-card-image {
+        position: relative;
+        background: #e5e5e5;
       }
 
-      .skeleton-title {
+      /* مكان اسم المنتج */
+      .product-skeleton .skeleton-title {
         width: 65%;
-        height: 17px;
-        margin-bottom: 12px;
+        height: 15px;
+        margin: 0 5px 6px;
       }
 
-      .skeleton-line {
+      /* مكان SKU */
+      .product-skeleton .skeleton-sku {
         width: 40%;
         height: 12px;
-        margin-bottom: 18px;
+        margin: 0 5px 12px;
       }
 
-      .skeleton-stat {
+      /* مكان عناوين الإحصائيات */
+      .product-skeleton .skeleton-stat-label {
         width: 65%;
-        height: 11px;
-        margin: 8px auto;
+        height: 9px;
+        margin: 3px auto 4px;
       }
 
-      .skeleton-stat-value {
-        width: 45%;
-        height: 16px;
-        margin: 8px auto;
+      /* مكان قيم الإحصائيات */
+      .product-skeleton .skeleton-stat-value {
+        width: 50%;
+        height: 12px;
+        margin: 4px auto;
+      }
+
+      /* الهاتف العمودي */
+      @media (max-width: 768px) and (orientation: portrait) {
+        .product-skeleton .skeleton-title {
+          height: 13px;
+          margin-bottom: 4px;
+        }
+
+        .product-skeleton .skeleton-sku {
+          height: 11px;
+          margin-bottom: 8px;
+        }
+
+        .product-skeleton .skeleton-stat-label {
+          height: 8px;
+        }
+
+        .product-skeleton .skeleton-stat-value {
+          height: 11px;
+        }
+      }
+
+      /* الهاتف الأفقي */
+      @media (orientation: landscape) and (max-height: 500px) {
+        .product-skeleton .skeleton-title {
+          height: 12px;
+          margin-bottom: 2px;
+        }
+
+        .product-skeleton .skeleton-sku {
+          height: 10px;
+          margin-bottom: 6px;
+        }
+
+        .product-skeleton .skeleton-stat-label {
+          height: 7px;
+        }
+
+        .product-skeleton .skeleton-stat-value {
+          height: 10px;
+        }
       }
 
       @media (prefers-reduced-motion: reduce) {
-        .skeleton-shape::after {
+        .product-skeleton .skeleton-shape::after {
           animation: none;
         }
       }
@@ -107,7 +156,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   // ============================================
-  // ✅ عرض هيكل الصفحة
+  // ✅ عرض هيكل الصفحة فوراً
   // ============================================
   main.innerHTML = `
     <div class="page-header">
@@ -130,27 +179,30 @@ document.addEventListener('DOMContentLoaded', async () => {
     <div id="products" class="products" aria-busy="true">
       ${Array.from({ length: 6 }).map(() => `
         <div class="product-card product-skeleton" aria-hidden="true">
-          <div class="skeleton-shape skeleton-image"></div>
+
+          <div class="product-card-image skeleton-shape"></div>
 
           <div class="skeleton-shape skeleton-title"></div>
 
-          <div class="skeleton-shape skeleton-line"></div>
+          <div class="skeleton-shape skeleton-sku"></div>
 
           <div class="product-stats">
+
             <div class="stat">
-              <div class="skeleton-shape skeleton-stat"></div>
+              <div class="skeleton-shape skeleton-stat-label"></div>
               <div class="skeleton-shape skeleton-stat-value"></div>
             </div>
 
             <div class="stat">
-              <div class="skeleton-shape skeleton-stat"></div>
+              <div class="skeleton-shape skeleton-stat-label"></div>
               <div class="skeleton-shape skeleton-stat-value"></div>
             </div>
 
             <div class="stat">
-              <div class="skeleton-shape skeleton-stat"></div>
+              <div class="skeleton-shape skeleton-stat-label"></div>
               <div class="skeleton-shape skeleton-stat-value"></div>
             </div>
+
           </div>
         </div>
       `).join('')}
@@ -188,13 +240,18 @@ document.addEventListener('DOMContentLoaded', async () => {
   // ============================================
   await loadProductsFromDB();
 
+  // ============================================
+  // ✅ البحث في المنتجات
+  // ============================================
   const searchInput = document.getElementById('search-products');
 
   if (searchInput) {
     searchInput.addEventListener('input', (e) => {
       const q = e.target.value.trim().toLowerCase();
 
-      document.querySelectorAll('.product-card:not(.product-skeleton)').forEach(card => {
+      document.querySelectorAll(
+        '.product-card:not(.product-skeleton)'
+      ).forEach(card => {
         const text = card.textContent.toLowerCase();
         card.style.display = text.includes(q) ? '' : 'none';
       });
@@ -202,13 +259,14 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   // ============================================
-  // ✅ الاستماع لكل التغييرات وتحديث الشاشة فوراً
+  // ✅ الاستماع لكل التغييرات في المنتجات
   // ============================================
   productsChannel = db.channel('custom-products-channel')
     .on(
       'postgres_changes',
       { event: '*', schema: 'public', table: 'products' },
       async (payload) => {
+
         if (payload.eventType === 'UPDATE') {
           const index = cachedProducts.findIndex(
             p => p.id === payload.new.id
@@ -222,7 +280,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
           }
 
-          // إذا تم استعادة المنتج أو تعديله
+          // إذا تم تعديله أو استعادته
           else {
             if (index !== -1) {
               cachedProducts[index] = {
@@ -247,6 +305,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           }
         }
 
+        // إضافة منتج جديد
         else if (payload.eventType === 'INSERT') {
           const { data: newProduct } = await db
             .from('products')
@@ -264,6 +323,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           }
         }
 
+        // الحذف النهائي
         else if (payload.eventType === 'DELETE') {
           cachedProducts = cachedProducts.filter(
             p => p.id !== payload.old.id
@@ -276,7 +336,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     .subscribe();
 
   // ============================================
-  // ✅ استقبال التحديثات الفورية من الصفحات الأخرى
+  // ✅ استقبال التحديثات من الصفحات الأخرى
   // ============================================
   window.addEventListener('message', (event) => {
     const data = event.data;
@@ -424,6 +484,7 @@ function renderProductsToDOM() {
         <p class="sku">${p.sku ?? '—'}</p>
 
         <div class="product-stats">
+
           <div class="stat">
             <div class="stat-label">${tr('products_qty')}</div>
             <div class="stat-value ${lowClass}">
@@ -444,6 +505,7 @@ function renderProductsToDOM() {
               ${formatPrice(total)}
             </div>
           </div>
+
         </div>
       </a>
     `;
