@@ -4,12 +4,13 @@
 ✅ إصلاح تداخل البطاقات والنصوص داخل الإطار
 ✅ إصلاح شكل خانة البحث
 ✅ إصلاح قطع النصوص داخل بطاقات المنتجات
-✅ بطاقتان في شاشة الهاتف
-✅ ثلاث بطاقات في الوضع المقلوب
+✅ بطاقتان في شاشة الهاتف العمودي
+✅ ثلاث بطاقات في الوضع الأفقي القصير
 ✅ دعم Skeleton بألوان رمادية مختلفة
-✅ تمرير طبيعي لجميع المنتجات
+✅ تمرير طبيعي موحد لجميع الشاشات والاتجاهات
 ✅ الحفاظ على ارتفاع البطاقات الأصلي
 ============================================ */
+
 
 /* ============================================
 تنسيق شبكة المنتجات الأساسي
@@ -88,6 +89,7 @@
   padding-inline: 5px;
 }
 
+
 /* ============================================
 الإحصائيات الثلاثة داخل البطاقة
 ============================================ */
@@ -132,6 +134,7 @@
   color: #dc2626;
 }
 
+
 /* ============================================
 بطاقات Skeleton Loading
 ============================================ */
@@ -145,14 +148,12 @@
   opacity: 1;
 }
 
-/* مكان صورة المنتج */
 .product-skeleton .product-card-image {
   background: #d4d4d4 !important;
   border-radius: 8px;
   overflow: hidden;
 }
 
-/* مكان اسم المنتج */
 .product-skeleton h3 {
   background: #c8c8c8 !important;
   color: transparent !important;
@@ -164,7 +165,6 @@
   font-size: 0 !important;
 }
 
-/* مكان SKU */
 .product-skeleton .sku {
   background: #d0d0d0 !important;
   color: transparent !important;
@@ -176,13 +176,11 @@
   font-size: 0 !important;
 }
 
-/* خانات الإحصائيات */
 .product-skeleton .stat {
   background: #d1d1d1 !important;
   border-radius: 6px;
 }
 
-/* مكان عنوان الإحصائية */
 .product-skeleton .stat-label {
   background: #bdbdbd !important;
   color: transparent !important;
@@ -193,7 +191,6 @@
   font-size: 0 !important;
 }
 
-/* مكان قيمة الإحصائية */
 .product-skeleton .stat-value {
   background: #c2c2c2 !important;
   color: transparent !important;
@@ -204,11 +201,11 @@
   font-size: 0 !important;
 }
 
-/* إخفاء الصور والأيقونات داخل Skeleton */
 .product-skeleton img,
 .product-skeleton i {
   visibility: hidden !important;
 }
+
 
 /* ============================================
 ظهور البطاقات الحقيقية تدريجياً
@@ -222,6 +219,7 @@
 .product-card.product-enter.product-visible {
   opacity: 1;
 }
+
 
 /* ============================================
 شاشات الهاتف (الوضع العمودي)
@@ -264,6 +262,7 @@
   }
 }
 
+
 /* ============================================
 الوضع الأفقي: ثلاث بطاقات
 ============================================ */
@@ -305,6 +304,7 @@
     font-size: 10px;
   }
 }
+
 
 /* ============================================
 إصلاح خانة البحث
@@ -359,27 +359,30 @@
   justify-content: center !important;
 }
 
+
 /* ============================================
 إصلاح التصميم داخل Workspace (iframe)
-مع الحفاظ على التمرير الطبيعي
+تمرير طبيعي موحد
+لا يوجد تمرير داخلي مزدوج
 ============================================ */
 
 html.in-iframe,
 html.in-iframe body {
-  height: 100% !important;
-  overflow: hidden !important;
+  height: auto !important;
+  min-height: 100% !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
   margin: 0 !important;
 }
 
 html.in-iframe .main {
   display: flex !important;
   flex-direction: column !important;
-  height: 100% !important;
-  min-height: 0 !important;
+  height: auto !important;
+  min-height: 100% !important;
   padding: 16px !important;
   box-sizing: border-box !important;
-  overflow-y: auto !important;
-  overflow-x: hidden !important;
+  overflow: visible !important;
 }
 
 html.in-iframe .page-header {
@@ -409,9 +412,12 @@ html.in-iframe .products {
   align-content: start !important;
   overflow: visible !important;
   min-width: 0 !important;
+  height: auto !important;
 }
 
+
 /* شبكة الإطار في الهاتف العمودي */
+
 @media (max-width: 768px) and (orientation: portrait) {
   html.in-iframe .products {
     grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
@@ -419,7 +425,9 @@ html.in-iframe .products {
   }
 }
 
+
 /* شبكة الإطار في الوضع الأفقي */
+
 @media (orientation: landscape) and (max-height: 500px) {
   html.in-iframe .products {
     grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
@@ -427,9 +435,10 @@ html.in-iframe .products {
   }
 }
 
+
 /* ============================================
 الشاشات الكبيرة خارج الإطار
-مع الحفاظ على التمرير الطبيعي
+تمرير طبيعي مع المحتوى
 ============================================ */
 
 @media (min-width: 600px) {
@@ -443,10 +452,9 @@ html.in-iframe .products {
     align-items: start !important;
     align-content: start !important;
     padding: 24px !important;
-    height: 100% !important;
-    min-height: 0 !important;
-    overflow-y: auto !important;
-    overflow-x: hidden !important;
+    height: auto !important;
+    min-height: 100% !important;
+    overflow: visible !important;
     box-sizing: border-box !important;
   }
 
@@ -492,10 +500,49 @@ html.in-iframe .products {
     align-items: start !important;
     align-content: start !important;
     overflow: visible !important;
+    height: auto !important;
   }
 
   html:not(.in-iframe) .product-card {
     display: flex !important;
     flex-direction: column !important;
   }
+}
+
+
+/* ============================================
+توحيد التمرير في جميع الشاشات والاتجاهات
+============================================ */
+
+/* السماح للصفحة بالتمدد حسب عدد المنتجات */
+
+html,
+body {
+  min-height: 100% !important;
+  height: auto !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+}
+
+/* منع حاويات الصفحة من حبس المنتجات */
+
+html:not(.in-iframe) .main,
+html:not(.in-iframe) #main-content,
+html.in-iframe .main {
+  max-height: none !important;
+}
+
+/* قائمة المنتجات تتمدد مع جميع البطاقات */
+
+.products {
+  height: auto !important;
+  max-height: none !important;
+  overflow: visible !important;
+  flex: 0 0 auto !important;
+}
+
+/* منع قص البطاقات */
+
+.product-card {
+  min-height: 0;
 }
