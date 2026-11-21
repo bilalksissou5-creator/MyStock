@@ -5,6 +5,7 @@
  // ✅ إصلاح اتجاه العملة (LTR) لمنع انزياحها
  // ✅ إخفاء المنتجات المحذوفة (deleted_at)
  // ✅ Skeleton مطابق لأبعاد بطاقات المنتجات الأصلية
+ // ✅ ظهور المنتجات الحقيقية بالتدريج من الأعلى للأسفل
  // ============================================
 
 let productsChannel = null;
@@ -28,7 +29,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (!main) return;
 
   // ============================================
-  // ✅ CSS الخاص بعناصر Skeleton فقط
+  // ✅ CSS الخاص بعناصر Skeleton والظهور التدريجي
   // ============================================
   if (!document.getElementById('products-skeleton-style')) {
     const style = document.createElement('style');
@@ -69,7 +70,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
       }
 
-      /* الصورة الوهمية: تحتفظ بارتفاع الصورة الأصلي */
+      /* الصورة الوهمية */
       .product-skeleton .product-card-image {
         position: relative;
         background: #e5e5e5;
@@ -101,6 +102,27 @@ document.addEventListener('DOMContentLoaded', async () => {
         width: 50%;
         height: 12px;
         margin: 4px auto;
+      }
+
+      /* ========================================
+         ✅ ظهور البطاقات الحقيقية بالتدريج
+         ======================================== */
+
+      .product-card.product-enter {
+        opacity: 0;
+        animation: productCardReveal 0.4s ease-out forwards;
+      }
+
+      @keyframes productCardReveal {
+        from {
+          opacity: 0;
+          transform: translateY(9px);
+        }
+
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
       }
 
       /* الهاتف العمودي */
@@ -148,6 +170,12 @@ document.addEventListener('DOMContentLoaded', async () => {
       @media (prefers-reduced-motion: reduce) {
         .product-skeleton .skeleton-shape::after {
           animation: none;
+        }
+
+        .product-card.product-enter {
+          animation: none;
+          opacity: 1;
+          transform: none;
         }
       }
     `;
@@ -456,7 +484,11 @@ function renderProductsToDOM() {
       : window.innerWidth
   ) >= 1024;
 
-  container.innerHTML = grouped.map(p => {
+  // ============================================
+  // ✅ رسم البطاقات بترتيبها الأصلي
+  // ✅ تأخير ظهور كل بطاقة عن البطاقة السابقة
+  // ============================================
+  container.innerHTML = grouped.map((p, index) => {
     const total = Number(p.qty ?? 0) * Number(p.price ?? 0);
     const lowClass = (p.qty ?? 0) < 10 ? 'low' : '';
 
@@ -465,10 +497,14 @@ function renderProductsToDOM() {
       ? `/products/detail-workspace.html?productId=${p.id}&userId=${p.created_by || ''}&supplierId=${p.supplier_id || ''}&invoiceId=${p.invoice_id || ''}`
       : `detail.html?id=${p.id}`;
 
+    // كل بطاقة تتأخر 70ms عن السابقة
+    const animationDelay = index * 70;
+
     return `
       <a
         href="${targetUrl}"
-        class="product-card"
+        class="product-card product-enter"
+        style="animation-delay: ${animationDelay}ms"
         data-product-id="${p.id}"
       >
         <div class="product-card-image">
