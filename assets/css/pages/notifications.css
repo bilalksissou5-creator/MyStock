@@ -6,19 +6,22 @@
    ============================================ */
 
 .notifications-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  display: flex !important;
+  justify-content: flex-start !important;
+  align-items: center !important;
+  width: 100% !important;
   max-width: 700px;
-  margin: 0 auto 20px;
+  margin: 0 auto 20px !important;
+  direction: inherit !important;
   text-align: start !important;
-  direction: inherit;
 }
 
 .notifications-header h2 {
-  margin: 0;
+  display: block !important;
+  width: auto !important;
+  margin: 0 !important;
   text-align: start !important;
-  direction: inherit;
+  direction: inherit !important;
 }
 
 /* ✅ ترويسة وضع التحديد (شريط عائم) */
