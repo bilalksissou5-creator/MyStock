@@ -1,50 +1,60 @@
+
 /* ============================================
    صفحة الإدارة العامة (One UI Style)
-   ✅ بطاقة اللغة + بطاقة التاريخ والوقت
+   ✅ عرض متجاوب لجميع الشاشات
+   ✅ تقريب النصوص من حواف البطاقات
    ============================================ */
 
 .times-wrapper {
-  max-width: 600px;
-  margin: 0 auto;
+  width: 100% !important;
+  max-width: none !important;
+  margin: 0 !important;
   display: flex;
   flex-direction: column;
   gap: 16px;
   padding-bottom: 20px;
+  box-sizing: border-box;
 }
 
 /* ══════════════════════════════════════════
-   البطاقة (One UI)
+   البطاقة
    ══════════════════════════════════════════ */
+
 .times-card {
   background: #ffffff;
   border-radius: 28px;
   overflow: hidden;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  width: 100%;
+  box-sizing: border-box;
 }
 
 /* ══════════════════════════════════════════
    العنصر الواحد
    ══════════════════════════════════════════ */
+
 .times-item {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  padding: 20px 24px;
+  padding: 16px 14px;
   text-decoration: none;
   color: inherit;
   cursor: pointer;
   transition: background 0.15s;
   -webkit-tap-highlight-color: transparent;
   position: relative;
+  box-sizing: border-box;
+  width: 100%;
 }
 
 .times-item:not(:last-child)::after {
   content: '';
   position: absolute;
   bottom: 0;
-  inset-inline-start: 24px;
-  inset-inline-end: 24px;
+  inset-inline-start: 14px;
+  inset-inline-end: 14px;
   height: 1px;
   background: #f0f0f0;
 }
@@ -57,6 +67,7 @@
 /* ══════════════════════════════════════════
    الحاوية اليسرى (نص)
    ══════════════════════════════════════════ */
+
 .times-item-left {
   flex: 1;
   min-width: 0;
@@ -91,6 +102,7 @@
 /* ══════════════════════════════════════════
    السهم
    ══════════════════════════════════════════ */
+
 .times-arrow {
   color: #c0c0c0;
   font-size: 18px;
@@ -102,7 +114,6 @@
   color: #171717;
 }
 
-/* ✅ السهم يتبع اللغة */
 [dir="rtl"] .times-arrow {
   transform: none;
 }
@@ -112,8 +123,9 @@
 }
 
 /* ══════════════════════════════════════════
-   معلومات التاريخ والوقت (العرض الحي)
+   معلومات التاريخ والوقت
    ══════════════════════════════════════════ */
+
 .times-live {
   display: flex;
   flex-direction: column;
@@ -147,19 +159,25 @@
 /* ══════════════════════════════════════════
    Responsive
    ══════════════════════════════════════════ */
+
 @media (max-width: 480px) {
+  .times-wrapper {
+    width: 100% !important;
+    max-width: none !important;
+  }
+
   .times-card {
     border-radius: 24px;
   }
 
   .times-item {
-    padding: 18px 20px;
+    padding: 14px 12px;
     gap: 10px;
   }
 
   .times-item:not(:last-child)::after {
-    inset-inline-start: 20px;
-    inset-inline-end: 20px;
+    inset-inline-start: 12px;
+    inset-inline-end: 12px;
   }
 
   .times-title {
