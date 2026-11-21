@@ -1,11 +1,14 @@
+
 /* ============================================
    صفحة الملف الشخصي — تصميم Facebook
    ✅ دعم كامل للاتجاه RTL/LTR
+   ✅ عرض كامل الصفحة
    ============================================ */
 
 .profile-fb-wrapper {
-  max-width: 800px;
-  margin: 0 auto;
+  width: 100% !important;
+  max-width: none !important;
+  margin: 0 !important;
   padding: 0 0 20px;
   box-sizing: border-box;
 }
@@ -77,7 +80,9 @@
   color: #a3a3a3;
 }
 
-/* ✅ النقطة على حافة الدائرة */
+/* ============================================
+   نقطة الحالة
+   ============================================ */
 .profile-status-dot {
   position: absolute;
   bottom: 14.64%;
@@ -232,7 +237,6 @@
   margin-inline-start: 4px;
 }
 
-/* ✅ RTL: السهم يشير لليسار (chevron-right يعرض يمين في LTR) */
 [dir="rtl"] .team-accordion-arrow {
   transform: scaleX(-1);
 }
@@ -241,7 +245,6 @@
   transform: none;
 }
 
-/* ✅ عند الفتح: يدور 90 درجة */
 [dir="rtl"] .team-accordion.open .team-accordion-arrow {
   transform: scaleX(-1) rotate(-90deg);
   color: #171717;
@@ -269,7 +272,7 @@
 }
 
 /* ============================================
-   المعلومات الشخصية (Info List)
+   المعلومات الشخصية
    ============================================ */
 .info-list {
   display: flex;
@@ -313,7 +316,7 @@
   gap: 12px;
 }
 
-/* ══════ نقطة الاتصال ══════ */
+/* نقطة الاتصال */
 .member-avatar-wrap {
   position: relative;
   display: inline-block;
@@ -346,7 +349,7 @@
   background: #d4d4d4;
 }
 
-/* ══════ بطاقة العضو ══════ */
+/* بطاقة العضو */
 .member-card {
   background: #fafafa;
   border: 1px solid #f0f0f0;
@@ -691,7 +694,10 @@
    ============================================ */
 @media (max-width: 768px) {
   .profile-fb-wrapper {
-    padding: 0 8px 20px;
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 0 20px;
   }
 
   .profile-cover {
