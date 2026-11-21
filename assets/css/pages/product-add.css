@@ -3,7 +3,7 @@
    صفحة إضافة منتجات
    ✅ تمرير مستقل للقسم الأول والثاني في الشاشات الكبيرة
    ✅ تمرير طبيعي للصفحة في الهواتف
-   ✅ إصلاح المسافة الزائدة أسفل الشاشة
+   ✅ إلغاء المسافة السفلية في الهاتف الأفقي فقط
    ✅ دعم الشاشات العمودية والأفقية
    ✅ دعم Workspace / iframe
    ============================================ */
@@ -869,5 +869,24 @@ html.in-iframe .add-form {
     gap: 16px !important;
     overflow: visible !important;
     height: auto !important;
+  }
+}
+
+/* ============================================
+   إلغاء المسافة السفلية في الهاتف الأفقي فقط
+   يعمل داخل Workspace وخارجه
+   ============================================ */
+
+@media (max-width: 900px) and (orientation: landscape) {
+  .main,
+  html.in-iframe .main {
+    padding-bottom: 0 !important;
+    margin-bottom: 0 !important;
+  }
+
+  .add-form,
+  html.in-iframe .add-form {
+    padding-bottom: 0 !important;
+    margin-bottom: 0 !important;
   }
 }
