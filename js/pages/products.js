@@ -1,13 +1,14 @@
 
- // ============================================
- // صفحة المنتجات (مع التحديث الفوري والعملة)
- // ✅ دعم كامل للترجمة
- // ✅ إصلاح اتجاه العملة (LTR) لمنع انزياحها
- // ✅ إخفاء المنتجات المحذوفة (deleted_at)
- // ✅ Skeleton مطابق لأبعاد بطاقات المنتجات الأصلية
- // ✅ عدد Skeleton مطابق لعدد البطاقات الحقيقية
- // ✅ ظهور المنتجات الحقيقية بالتدريج من الأعلى للأسفل
- // ============================================
+// ============================================
+// صفحة المنتجات (مع التحديث الفوري والعملة)
+// ✅ دعم كامل للترجمة
+// ✅ إصلاح اتجاه العملة (LTR) لمنع انزياحها
+// ✅ إخفاء المنتجات المحذوفة (deleted_at)
+// ✅ Skeleton مطابق لأبعاد بطاقات المنتجات الأصلية
+// ✅ عدد Skeleton مطابق لعدد البطاقات الحقيقية
+// ✅ ظهور المنتجات الحقيقية بالتدريج من الأعلى للأسفل
+// ✅ ظهور بطاقة واحدة تلو الأخرى دون حركة مكانية
+// ============================================
 
 let productsChannel = null;
 let cachedProducts = [];
@@ -30,7 +31,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (!main) return;
 
   // ============================================
-  // ✅ CSS الخاص بعناصر Skeleton والظهور التدريجي
+  // CSS الخاص بعناصر Skeleton والظهور التدريجي
   // ============================================
   if (!document.getElementById('products-skeleton-style')) {
     const style = document.createElement('style');
@@ -97,21 +98,20 @@ document.addEventListener('DOMContentLoaded', async () => {
         margin: 4px auto;
       }
 
-      /* ظهور البطاقات الحقيقية بالتدريج */
+      /* ظهور البطاقات الحقيقية واحدة تلو الأخرى */
       .product-card.product-enter {
         opacity: 0;
         animation: productCardReveal 0.4s ease-out forwards;
       }
 
+      /* تغيير الشفافية فقط دون تحريك البطاقة */
       @keyframes productCardReveal {
         from {
           opacity: 0;
-          transform: translateY(9px);
         }
 
         to {
           opacity: 1;
-          transform: translateY(0);
         }
       }
 
@@ -165,7 +165,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         .product-card.product-enter {
           animation: none;
           opacity: 1;
-          transform: none;
         }
       }
     `;
@@ -174,7 +173,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   // ============================================
-  // ✅ عرض هيكل الصفحة فوراً
+  // عرض هيكل الصفحة فوراً
   // ============================================
   main.innerHTML = `
     <div class="page-header">
@@ -228,7 +227,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   `;
 
   // ============================================
-  // ✅ 1. جلب العملة من إعدادات المنظمة
+  // 1. جلب العملة من إعدادات المنظمة
   // ============================================
   try {
     const { data: profile } = await db
@@ -254,12 +253,12 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   // ============================================
-  // ✅ جلب المنتجات
+  // جلب المنتجات
   // ============================================
   await loadProductsFromDB();
 
   // ============================================
-  // ✅ البحث في المنتجات
+  // البحث في المنتجات
   // ============================================
   const searchInput = document.getElementById('search-products');
 
@@ -277,7 +276,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   // ============================================
-  // ✅ الاستماع لكل التغييرات في المنتجات
+  // الاستماع لكل التغييرات في المنتجات
   // ============================================
   productsChannel = db.channel('custom-products-channel')
     .on(
@@ -350,7 +349,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     .subscribe();
 
   // ============================================
-  // ✅ استقبال التحديثات من الصفحات الأخرى
+  // استقبال التحديثات من الصفحات الأخرى
   // ============================================
   window.addEventListener('message', (event) => {
     const data = event.data;
@@ -379,7 +378,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 // ============================================
-// ✅ حساب المنتجات المجمعة
+// حساب المنتجات المجمعة
 // ============================================
 function getGroupedProducts() {
   const groupedMap = new Map();
@@ -404,7 +403,7 @@ function getGroupedProducts() {
 }
 
 // ============================================
-// ✅ جلب المنتجات من Supabase
+// جلب المنتجات من Supabase
 // ============================================
 async function loadProductsFromDB() {
   const container = document.getElementById('products');
@@ -433,7 +432,7 @@ async function loadProductsFromDB() {
   cachedProducts = data || [];
 
   // ============================================
-  // ✅ إنشاء Skeleton مطابق لعدد البطاقات الحقيقية
+  // إنشاء Skeleton مطابق لعدد البطاقات الحقيقية
   // ============================================
   const grouped = getGroupedProducts();
   const realCardsCount = grouped.length;
@@ -478,7 +477,7 @@ async function loadProductsFromDB() {
 }
 
 // ============================================
-// ✅ تنسيق السعر مع العملة
+// تنسيق السعر مع العملة
 // ============================================
 function formatPrice(price) {
   const val = Number(price || 0).toFixed(2);
@@ -491,7 +490,7 @@ function formatPrice(price) {
 }
 
 // ============================================
-// ✅ رسم بطاقات المنتجات
+// رسم بطاقات المنتجات
 // ============================================
 function renderProductsToDOM() {
   const tr = (key) => (window.t ? window.t(key) : key);
