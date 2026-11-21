@@ -1,20 +1,29 @@
 
 /* ============================================
 صفحة المنتجات (تصميم متجاوب داخل الإطار)
-✅ الحفاظ على التصميم الأصلي
-✅ دعم بطاقات Skeleton
-✅ البطاقة الوهمية رمادية بالكامل بدرجات مختلفة
-✅ البطاقة الحقيقية تبقى بيضاء
-✅ انتقال تدريجي من الأعلى إلى الأسفل
-✅ تأثير شفافية فقط دون تحريك
+✅ إصلاح تداخل البطاقات والنصوص داخل الإطار
+✅ إصلاح شكل خانة البحث
+✅ إصلاح قطع النصوص داخل بطاقات المنتجات
+✅ بطاقتان في شاشة الهاتف
+✅ ثلاث بطاقات في الوضع المقلوب
+✅ دعم Skeleton بألوان رمادية مختلفة
+✅ منع ظهور السكرول داخل صفحة المنتجات
+✅ الحفاظ على ارتفاع البطاقات الأصلي
 ============================================ */
 
-/* تنسيق شبكة المنتجات الأساسي */
+/* ============================================
+تنسيق شبكة المنتجات الأساسي
+============================================ */
+
 .products {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
   gap: 16px;
   align-content: start;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  overflow: visible !important;
 }
 
 .product-card {
@@ -28,6 +37,8 @@
   color: inherit;
   transition: box-shadow 0.15s;
   min-width: 0;
+  box-sizing: border-box;
+  height: auto;
 }
 
 .product-card:hover {
@@ -44,6 +55,7 @@
   justify-content: center;
   overflow: hidden;
   margin-bottom: 12px;
+  flex-shrink: 0;
 }
 
 .product-card-image img {
@@ -78,7 +90,10 @@
   padding-inline: 5px;
 }
 
-/* تنسيق الإحصائيات الثلاثة داخل البطاقة */
+/* ============================================
+الإحصائيات الثلاثة داخل البطاقة
+============================================ */
+
 .product-stats {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -120,7 +135,7 @@
 }
 
 /* ============================================
-✅ بطاقات Skeleton Loading
+بطاقات Skeleton Loading
 ============================================ */
 
 .product-card.product-skeleton {
@@ -130,6 +145,7 @@
   pointer-events: none;
   cursor: default;
   opacity: 1;
+  height: auto !important;
 }
 
 /* مكان صورة المنتج */
@@ -191,14 +207,14 @@
   font-size: 0 !important;
 }
 
-/* إخفاء أيقونات وصور Skeleton */
+/* إخفاء الصور والأيقونات داخل Skeleton */
 .product-skeleton img,
 .product-skeleton i {
   visibility: hidden !important;
 }
 
 /* ============================================
-✅ ظهور البطاقات الحقيقية تدريجياً
+ظهور البطاقات الحقيقية تدريجياً
 ============================================ */
 
 .product-card.product-enter {
@@ -252,7 +268,7 @@
 }
 
 /* ============================================
-إجبار 3 بطاقات في الوضع المقلوب
+الوضع الأفقي: ثلاث بطاقات
 ============================================ */
 
 @media (orientation: landscape) and (max-height: 500px) {
@@ -294,7 +310,7 @@
 }
 
 /* ============================================
-تقليل الحشوات وإصلاح خانة البحث
+إصلاح خانة البحث
 ============================================ */
 
 .search-bar {
@@ -363,7 +379,8 @@ html.in-iframe .main {
   height: 100% !important;
   padding: 16px !important;
   box-sizing: border-box !important;
-  overflow-y: auto !important;
+  overflow: hidden !important;
+  min-height: 0 !important;
 }
 
 html.in-iframe .page-header {
@@ -391,6 +408,9 @@ html.in-iframe .products {
   padding: 0 !important;
   margin: 0 !important;
   align-content: start !important;
+  overflow: visible !important;
+  min-height: 0 !important;
+  min-width: 0 !important;
 }
 
 /* شبكة الإطار في الهاتف العمودي */
@@ -401,7 +421,7 @@ html.in-iframe .products {
   }
 }
 
-/* شبكة الإطار في الوضع المقلوب */
+/* شبكة الإطار في الوضع الأفقي */
 @media (orientation: landscape) and (max-height: 500px) {
   html.in-iframe .products {
     grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
@@ -410,8 +430,7 @@ html.in-iframe .products {
 }
 
 /* ============================================
-الحل الجذري للشاشات الكبيرة
-في حال عدم استخدام الإطار
+الشاشات الكبيرة خارج الإطار
 ============================================ */
 
 @media (min-width: 600px) {
@@ -426,8 +445,9 @@ html.in-iframe .products {
     align-content: start !important;
     padding: 24px !important;
     height: 100% !important;
-    overflow-y: auto !important;
+    overflow: hidden !important;
     box-sizing: border-box !important;
+    min-height: 0 !important;
   }
 
   html:not(.in-iframe) .page-header {
@@ -471,10 +491,11 @@ html.in-iframe .products {
     gap: 16px !important;
     align-items: start !important;
     align-content: start !important;
+    overflow: visible !important;
   }
 
   html:not(.in-iframe) .product-card {
-    height: max-content !important;
+    height: auto !important;
     display: flex !important;
     flex-direction: column !important;
   }
