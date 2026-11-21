@@ -2,18 +2,21 @@
 // ============================================
 // صفحة المنتجات (مع التحديث الفوري والعملة)
 // ✅ دعم كامل للترجمة
-// ✅ إصلاح اتجاه العملة (LTR) لمنع انزياحها
+// ✅ إصلاح اتجاه العملة (LTR)
 // ✅ إخفاء المنتجات المحذوفة (deleted_at)
-// ✅ Skeleton مطابق لأبعاد بطاقات المنتجات الأصلية
-// ✅ عدد Skeleton مطابق لعدد البطاقات الحقيقية
-// ✅ ظهور المنتجات الحقيقية بالتدريج من الأعلى للأسفل
-// ✅ ظهور بطاقة واحدة تلو الأخرى دون حركة مكانية
+// ✅ بطاقات Skeleton بيضاء بنفس تصميم البطاقات الأصلية
+// ✅ عدد Skeleton مطابق تماماً لعدد البطاقات الحقيقية
+// ✅ تحويل بطاقات Skeleton إلى حقيقية واحدة تلو الأخرى
+// ✅ ظهور من الأعلى إلى الأسفل دون انزياح مكاني
 // ============================================
 
 let productsChannel = null;
 let cachedProducts = [];
 let orgCurrencySymbol = '';
 let orgShowCurrency = false;
+
+// منع عمليات العرض القديمة من التأثير على العرض الجديد
+let productsRenderToken = 0;
 
 document.addEventListener('DOMContentLoaded', async () => {
   const user = await requireAuth();
@@ -31,14 +34,15 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (!main) return;
 
   // ============================================
-  // CSS الخاص بعناصر Skeleton والظهور التدريجي
+  // CSS الخاص ببطاقات Skeleton والظهور التدريجي
   // ============================================
   if (!document.getElementById('products-skeleton-style')) {
     const style = document.createElement('style');
     style.id = 'products-skeleton-style';
 
     style.textContent = `
-      .product-skeleton {
+      /* بطاقة Skeleton تحتفظ بتصميم البطاقة الأصلية */
+      .product-card.product-skeleton {
         pointer-events: none;
       }
 
@@ -98,13 +102,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         margin: 4px auto;
       }
 
-      /* ظهور البطاقات الحقيقية واحدة تلو الأخرى */
+      /* ظهور البطاقة الحقيقية في مكانها دون انزياح */
       .product-card.product-enter {
         opacity: 0;
-        animation: productCardReveal 0.4s ease-out forwards;
+        animation: productCardReveal 0.35s ease-out forwards;
       }
 
-      /* تغيير الشفافية فقط دون تحريك البطاقة */
       @keyframes productCardReveal {
         from {
           opacity: 0;
@@ -173,7 +176,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   // ============================================
-  // عرض هيكل الصفحة فوراً
+  // عرض هيكل الصفحة
   // ============================================
   main.innerHTML = `
     <div class="page-header">
@@ -193,41 +196,11 @@ document.addEventListener('DOMContentLoaded', async () => {
       >
     </div>
 
-    <div id="products" class="products" aria-busy="true">
-      ${Array.from({ length: 6 }).map(() => `
-        <div class="product-card product-skeleton" aria-hidden="true">
-
-          <div class="product-card-image skeleton-shape"></div>
-
-          <div class="skeleton-shape skeleton-title"></div>
-
-          <div class="skeleton-shape skeleton-sku"></div>
-
-          <div class="product-stats">
-
-            <div class="stat">
-              <div class="skeleton-shape skeleton-stat-label"></div>
-              <div class="skeleton-shape skeleton-stat-value"></div>
-            </div>
-
-            <div class="stat">
-              <div class="skeleton-shape skeleton-stat-label"></div>
-              <div class="skeleton-shape skeleton-stat-value"></div>
-            </div>
-
-            <div class="stat">
-              <div class="skeleton-shape skeleton-stat-label"></div>
-              <div class="skeleton-shape skeleton-stat-value"></div>
-            </div>
-
-          </div>
-        </div>
-      `).join('')}
-    </div>
+    <div id="products" class="products" aria-busy="true"></div>
   `;
 
   // ============================================
-  // 1. جلب العملة من إعدادات المنظمة
+  // جلب العملة من إعدادات المنظمة
   // ============================================
   try {
     const { data: profile } = await db
@@ -403,6 +376,41 @@ function getGroupedProducts() {
 }
 
 // ============================================
+// إنشاء بطاقة Skeleton بنفس بنية البطاقة الأصلية
+// ============================================
+function createProductSkeleton() {
+  return `
+    <div class="product-card product-skeleton" aria-hidden="true">
+
+      <div class="product-card-image skeleton-shape"></div>
+
+      <div class="skeleton-shape skeleton-title"></div>
+
+      <div class="skeleton-shape skeleton-sku"></div>
+
+      <div class="product-stats">
+
+        <div class="stat">
+          <div class="skeleton-shape skeleton-stat-label"></div>
+          <div class="skeleton-shape skeleton-stat-value"></div>
+        </div>
+
+        <div class="stat">
+          <div class="skeleton-shape skeleton-stat-label"></div>
+          <div class="skeleton-shape skeleton-stat-value"></div>
+        </div>
+
+        <div class="stat">
+          <div class="skeleton-shape skeleton-stat-label"></div>
+          <div class="skeleton-shape skeleton-stat-value"></div>
+        </div>
+
+      </div>
+    </div>
+  `;
+}
+
+// ============================================
 // جلب المنتجات من Supabase
 // ============================================
 async function loadProductsFromDB() {
@@ -431,48 +439,7 @@ async function loadProductsFromDB() {
 
   cachedProducts = data || [];
 
-  // ============================================
-  // إنشاء Skeleton مطابق لعدد البطاقات الحقيقية
-  // ============================================
-  const grouped = getGroupedProducts();
-  const realCardsCount = grouped.length;
-
-  if (realCardsCount > 0) {
-    container.innerHTML = Array.from(
-      { length: realCardsCount },
-      () => `
-        <div class="product-card product-skeleton" aria-hidden="true">
-
-          <div class="product-card-image skeleton-shape"></div>
-
-          <div class="skeleton-shape skeleton-title"></div>
-
-          <div class="skeleton-shape skeleton-sku"></div>
-
-          <div class="product-stats">
-
-            <div class="stat">
-              <div class="skeleton-shape skeleton-stat-label"></div>
-              <div class="skeleton-shape skeleton-stat-value"></div>
-            </div>
-
-            <div class="stat">
-              <div class="skeleton-shape skeleton-stat-label"></div>
-              <div class="skeleton-shape skeleton-stat-value"></div>
-            </div>
-
-            <div class="stat">
-              <div class="skeleton-shape skeleton-stat-label"></div>
-              <div class="skeleton-shape skeleton-stat-value"></div>
-            </div>
-
-          </div>
-        </div>
-      `
-    ).join('');
-  }
-
-  // استبدال البطاقات الوهمية بالحقيقية
+  // عرض المنتجات بعد تجميعها
   renderProductsToDOM();
 }
 
@@ -490,7 +457,72 @@ function formatPrice(price) {
 }
 
 // ============================================
-// رسم بطاقات المنتجات
+// إنشاء بطاقة المنتج الحقيقية
+// ============================================
+function createProductCard(p) {
+  const tr = (key) => (window.t ? window.t(key) : key);
+
+  const total = Number(p.qty ?? 0) * Number(p.price ?? 0);
+  const lowClass = (p.qty ?? 0) < 10 ? 'low' : '';
+
+  const isDesktop = (
+    window.self !== window.top
+      ? window.parent.innerWidth
+      : window.innerWidth
+  ) >= 1024;
+
+  const targetUrl = isDesktop
+    ? `/products/detail-workspace.html?productId=${p.id}&userId=${p.created_by || ''}&supplierId=${p.supplier_id || ''}&invoiceId=${p.invoice_id || ''}`
+    : `detail.html?id=${p.id}`;
+
+  return `
+    <a
+      href="${targetUrl}"
+      class="product-card product-enter"
+      data-product-id="${p.id}"
+    >
+      <div class="product-card-image">
+        ${
+          p.image_url
+            ? `<img src="${p.image_url}" alt="${p.name}" loading="lazy">`
+            : `<i class="fas fa-box-open"></i>`
+        }
+      </div>
+
+      <h3>${p.name ?? tr('products_no_name')}</h3>
+
+      <p class="sku">${p.sku ?? '—'}</p>
+
+      <div class="product-stats">
+
+        <div class="stat">
+          <div class="stat-label">${tr('products_qty')}</div>
+          <div class="stat-value ${lowClass}">
+            ${p.qty ?? 0}
+          </div>
+        </div>
+
+        <div class="stat">
+          <div class="stat-label">${tr('products_price')}</div>
+          <div class="stat-value" dir="ltr">
+            ${formatPrice(p.price)}
+          </div>
+        </div>
+
+        <div class="stat">
+          <div class="stat-label">${tr('products_total')}</div>
+          <div class="stat-value" dir="ltr">
+            ${formatPrice(total)}
+          </div>
+        </div>
+
+      </div>
+    </a>
+  `;
+}
+
+// ============================================
+// رسم بطاقات المنتجات وتحويل Skeleton تدريجياً
 // ============================================
 function renderProductsToDOM() {
   const tr = (key) => (window.t ? window.t(key) : key);
@@ -498,7 +530,8 @@ function renderProductsToDOM() {
   const container = document.getElementById('products');
   if (!container) return;
 
-  container.setAttribute('aria-busy', 'false');
+  // إلغاء أي عملية عرض تدريجي سابقة
+  const currentToken = ++productsRenderToken;
 
   const grouped = getGroupedProducts();
 
@@ -510,72 +543,45 @@ function renderProductsToDOM() {
       </div>
     `;
 
+    container.setAttribute('aria-busy', 'false');
     return;
   }
 
-  // اكتشاف عرض الشاشة الحقيقي حتى لو كنا داخل إطار
-  const isDesktop = (
-    window.self !== window.top
-      ? window.parent.innerWidth
-      : window.innerWidth
-  ) >= 1024;
+  // ============================================
+  // إنشاء العدد المطابق تماماً للبطاقات الحقيقية
+  // ============================================
+  container.innerHTML = grouped
+    .map(() => createProductSkeleton())
+    .join('');
 
-  // رسم البطاقات بترتيبها الأصلي
-  container.innerHTML = grouped.map((p, index) => {
-    const total = Number(p.qty ?? 0) * Number(p.price ?? 0);
-    const lowClass = (p.qty ?? 0) < 10 ? 'low' : '';
+  container.setAttribute('aria-busy', 'true');
 
-    const targetUrl = isDesktop
-      ? `/products/detail-workspace.html?productId=${p.id}&userId=${p.created_by || ''}&supplierId=${p.supplier_id || ''}&invoiceId=${p.invoice_id || ''}`
-      : `detail.html?id=${p.id}`;
+  // حفظ بطاقات Skeleton بترتيبها
+  const skeletonCards = Array.from(
+    container.querySelectorAll('.product-skeleton')
+  );
 
-    // تأخير ظهور كل بطاقة عن السابقة
-    const animationDelay = index * 70;
+  // ============================================
+  // تحويل كل بطاقة وهمية إلى حقيقية واحدة تلو الأخرى
+  // ============================================
+  grouped.forEach((product, index) => {
+    setTimeout(() => {
 
-    return `
-      <a
-        href="${targetUrl}"
-        class="product-card product-enter"
-        style="animation-delay: ${animationDelay}ms"
-        data-product-id="${p.id}"
-      >
-        <div class="product-card-image">
-          ${
-            p.image_url
-              ? `<img src="${p.image_url}" alt="${p.name}" loading="lazy">`
-              : `<i class="fas fa-box-open"></i>`
-          }
-        </div>
+      // تجاهل أي عملية قديمة إذا حدث تحديث جديد
+      if (currentToken !== productsRenderToken) return;
 
-        <h3>${p.name ?? tr('products_no_name')}</h3>
+      const skeleton = skeletonCards[index];
 
-        <p class="sku">${p.sku ?? '—'}</p>
+      if (!skeleton || !skeleton.isConnected) return;
 
-        <div class="product-stats">
+      // استبدال البطاقة في نفس مكانها
+      skeleton.outerHTML = createProductCard(product);
 
-          <div class="stat">
-            <div class="stat-label">${tr('products_qty')}</div>
-            <div class="stat-value ${lowClass}">
-              ${p.qty ?? 0}
-            </div>
-          </div>
+      // إنهاء التحميل عند ظهور آخر بطاقة
+      if (index === grouped.length - 1) {
+        container.setAttribute('aria-busy', 'false');
+      }
 
-          <div class="stat">
-            <div class="stat-label">${tr('products_price')}</div>
-            <div class="stat-value" dir="ltr">
-              ${formatPrice(p.price)}
-            </div>
-          </div>
-
-          <div class="stat">
-            <div class="stat-label">${tr('products_total')}</div>
-            <div class="stat-value" dir="ltr">
-              ${formatPrice(total)}
-            </div>
-          </div>
-
-        </div>
-      </a>
-    `;
-  }).join('');
+    }, index * 100);
+  });
 }
