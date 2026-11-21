@@ -1,10 +1,10 @@
 
 /* ============================================
    صفحة إضافة منتجات
-   ✅ تمرير طبيعي للصفحة بجميع الشاشات والاتجاهات
-   ✅ التمرير الرئيسي داخل main فقط
-   ✅ الحفاظ على تصميم العمودين للشاشات الكبيرة
-   ✅ إلغاء التمرير الداخلي المتداخل
+   ✅ تمرير مستقل للقسم الأول والثاني في الشاشات الكبيرة
+   ✅ تمرير طبيعي للصفحة في الهواتف
+   ✅ دعم الشاشات العمودية والأفقية
+   ✅ دعم Workspace / iframe
    ============================================ */
 
 .add-form {
@@ -529,10 +529,9 @@
 }
 
 /* ============================================
-   التمرير الطبيعي لجميع الشاشات
+   إعداد التمرير الأساسي
    ============================================ */
 
-/* التمرير الرئيسي في main */
 .main {
   overflow-y: auto !important;
   overflow-x: hidden !important;
@@ -542,7 +541,6 @@
   box-sizing: border-box !important;
 }
 
-/* إلغاء التمرير الداخلي */
 .add-form,
 .form-left-col,
 .form-right-col,
@@ -551,7 +549,6 @@
   overflow: visible !important;
 }
 
-/* السماح للمحتوى بالتمدد */
 .add-form,
 .form-left-col,
 .form-right-col {
@@ -565,6 +562,21 @@
    ============================================ */
 
 @media (max-width: 699px) {
+  .main {
+    display: block !important;
+    height: auto !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    padding-bottom: 16px !important;
+  }
+
+  .add-form {
+    display: flex !important;
+    flex-direction: column !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
+
   .form-left-col,
   .form-right-col {
     display: contents;
@@ -633,56 +645,70 @@
 
 /* ============================================
    تصميم الشاشات الكبيرة
+   تمرير مستقل لكل عمود
    ============================================ */
 
 @media (min-width: 700px) {
   .main {
-    display: block !important;
-    overflow-y: auto !important;
-    overflow-x: hidden !important;
-    height: auto !important;
+    display: flex !important;
+    flex-direction: column !important;
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    height: 100% !important;
+    overflow: hidden !important;
     padding: 16px !important;
-    padding-bottom: 16px !important;
+    box-sizing: border-box !important;
   }
 
   .add-form {
     max-width: none !important;
     width: 100% !important;
     margin: 0 !important;
-    display: flex;
-    flex-direction: row;
-    align-items: flex-start;
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: stretch !important;
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    height: 100% !important;
     gap: 0;
-    overflow: visible !important;
+    overflow: hidden !important;
   }
 
+  /* القسم الأول: نموذج الإضافة */
   .form-left-col {
-    flex: 1;
-    height: auto !important;
-    min-height: 0;
-    overflow: visible !important;
-    padding-bottom: 0;
+    flex: 1 1 0 !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    padding-bottom: 16px;
     padding-inline-end: 5px;
     border-inline-end: 1px solid #e5e5e5;
     box-sizing: border-box;
     position: relative;
+    overscroll-behavior-y: contain;
+    scrollbar-gutter: stable;
   }
 
+  /* القسم الثاني: سلة المنتجات */
   .form-right-col {
-    flex: 1.5;
-    height: auto !important;
-    min-height: 0;
-    overflow: visible !important;
+    flex: 1.5 1 0 !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
     padding-inline-start: 8px;
     padding-inline-end: 0;
-    padding-bottom: 0;
+    padding-bottom: 16px;
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
+    overscroll-behavior-y: contain;
+    scrollbar-gutter: stable;
   }
 
   .card-added {
-    flex: none;
+    flex: none !important;
     display: flex;
     flex-direction: column;
     min-height: 0;
@@ -691,7 +717,7 @@
   }
 
   .added-products {
-    flex: none;
+    flex: none !important;
     min-height: 0;
     overflow: visible !important;
     margin-inline-end: 0;
@@ -778,27 +804,37 @@ html.in-iframe .add-form {
 /* الشاشات الكبيرة داخل iframe */
 @media (min-width: 700px) {
   html.in-iframe .main {
-    display: block !important;
-    height: auto !important;
-    overflow-y: auto !important;
-    overflow-x: hidden !important;
+    display: flex !important;
+    flex-direction: column !important;
+    flex: 1 1 auto !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
     padding: 16px !important;
-    padding-bottom: 16px !important;
+    box-sizing: border-box !important;
   }
 
   html.in-iframe .add-form {
     display: flex !important;
     flex-direction: row !important;
-    flex: none !important;
-    overflow: visible !important;
-    height: auto !important;
+    flex: 1 1 auto !important;
+    overflow: hidden !important;
+    height: 100% !important;
     min-height: 0 !important;
   }
 
-  html.in-iframe .form-left-col,
+  html.in-iframe .form-left-col {
+    height: 100% !important;
+    min-height: 0 !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+  }
+
   html.in-iframe .form-right-col {
-    height: auto !important;
-    overflow: visible !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
   }
 
   html.in-iframe .added-products {
