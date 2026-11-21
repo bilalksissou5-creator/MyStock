@@ -2,8 +2,10 @@
 // ============================================
 // صفحة سلة المحذوفات (Trash)
 // ✅ المنتجات والموردون وحركات المخزون
-// ✅ استعادة صف الفاتورة المحذوف فعلياً
-// ✅ استعادة البيانات الأصلية من JSONB
+// ✅ بطاقة قريبة من بطاقة سجل المنتج
+// ✅ عرض اسم المستخدم الذي قام بالحذف
+// ✅ عرض الصورة والاسم والباركود والتاريخ والكمية
+// ✅ استعادة صف الفاتورة من JSONB
 // ✅ إعادة حساب إجماليات الفاتورة
 // ✅ التحقق من نجاح عمليات Supabase
 // ============================================
@@ -67,6 +69,47 @@ document.addEventListener('DOMContentLoaded', async () => {
   const listContainer = document.getElementById('trash-list');
 
   // ============================================
+  // أدوات مساعدة
+  // ============================================
+
+  function escapeHTML(value) {
+    return String(value ?? '').replace(/[&<>"']/g, char => ({
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#039;'
+    })[char]);
+  }
+
+  function encodeValue(value) {
+    return encodeURIComponent(String(value ?? ''))
+      .replace(/'/g, '%27');
+  }
+
+  function formatDate(dateString) {
+    if (!dateString) return '—';
+
+    const date = new Date(dateString);
+
+    if (Number.isNaN(date.getTime())) return '—';
+
+    const datePart = date.toLocaleDateString('en-GB', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric'
+    });
+
+    const timePart = date.toLocaleTimeString([], {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false
+    });
+
+    return `${datePart} • ${timePart}`;
+  }
+
+  // ============================================
   // إغلاق القوائم المنسدلة
   // ============================================
 
@@ -78,49 +121,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
 
   // ============================================
-  // حساب الوقت
-  // ============================================
-
-  function timeAgo(dateString) {
-    const date = new Date(dateString);
-    const now = new Date();
-
-    const seconds = Math.floor((now - date) / 1000);
-
-    let interval = seconds / 31536000;
-
-    if (interval > 1)
-      return Math.floor(interval) + ' ' +
-        tr('years_ago', 'years ago');
-
-    interval = seconds / 2592000;
-
-    if (interval > 1)
-      return Math.floor(interval) + ' ' +
-        tr('months_ago', 'months ago');
-
-    interval = seconds / 86400;
-
-    if (interval > 1)
-      return Math.floor(interval) + ' ' +
-        tr('days_ago', 'days ago');
-
-    interval = seconds / 3600;
-
-    if (interval > 1)
-      return Math.floor(interval) + ' ' +
-        tr('hours_ago', 'hours ago');
-
-    interval = seconds / 60;
-
-    if (interval > 1)
-      return Math.floor(interval) + ' ' +
-        tr('minutes_ago', 'mins ago');
-
-    return tr('just_now', 'Just now');
-  }
-
-  // ============================================
   // عرض بطاقة المحذوفات
   // ============================================
 
@@ -129,150 +129,237 @@ document.addEventListener('DOMContentLoaded', async () => {
     const isSupplier = item._table === 'suppliers';
     const isMovement = item._table === 'stock_movements';
 
-    let sourceTitle = '';
     let itemName = '';
-    let itemMeta = '';
+    let barcode = '';
     let imageHtml = '';
+    let quantity = null;
+    let operationDate = item.created_at || item.deleted_at;
 
     if (isProduct) {
-      sourceTitle = tr('search_group_products', 'Products');
-      itemName = item.name;
-
-      itemMeta = `
-        <span>
-          <i class="fas fa-barcode"></i>
-          ${item.sku || '—'}
-        </span>
-        <span>
-          <i class="fas fa-cubes"></i>
-          ${tr('products_qty', 'Qty')}: ${item.qty || 0}
-        </span>
-      `;
+      itemName = item.name || '—';
+      barcode = item.sku || '—';
+      quantity = item.qty;
 
       imageHtml = item.image_url
-        ? `<img src="${item.image_url}" alt="${item.name}">`
+        ? `<img src="${escapeHTML(item.image_url)}"
+                alt="${escapeHTML(itemName)}"
+                style="width:100%;height:100%;object-fit:cover;">`
         : `<i class="fas fa-box"></i>`;
 
     } else if (isSupplier) {
-      sourceTitle = tr('search_group_suppliers', 'Suppliers');
-      itemName = item.name;
-
-      itemMeta = `
-        <span>
-          <i class="fas fa-phone"></i>
-          ${item.phone || '—'}
-        </span>
-      `;
+      itemName = item.name || '—';
+      barcode = item.phone || '—';
 
       imageHtml = `<i class="fas fa-truck"></i>`;
 
     } else if (isMovement) {
-      sourceTitle = tr('nav_movements', 'Stock Movements');
-
       itemName = item.products?.name || 'Unknown Product';
+      barcode = item.products?.sku || '—';
 
-      itemMeta = `
-        <span>
-          <i class="fas fa-plus-circle" style="color:#16a34a;"></i>
-          +${item.quantity}
-        </span>
-        <span>
-          <i class="fas fa-file-invoice"></i>
-          ${item.invoice_id || '—'}
-        </span>
-      `;
+      quantity = item.quantity;
+
+      operationDate =
+        item.created_at ||
+        item.movement_date ||
+        item.deleted_at;
 
       imageHtml = item.products?.image_url
-        ? `<img src="${item.products.image_url}">`
+        ? `<img src="${escapeHTML(item.products.image_url)}"
+                alt="${escapeHTML(itemName)}"
+                style="width:100%;height:100%;object-fit:cover;">`
         : `<i class="fas fa-box"></i>`;
     }
 
+    // اسم المستخدم الذي قام بالحذف
     const deletedByName =
       item.deleted_by && userMap.has(item.deleted_by)
         ? userMap.get(item.deleted_by)
-        : tr('unknown_user', 'Unknown');
+        : tr('unknown_user', 'Unknown user');
 
-    const deletedAtTime = timeAgo(item.deleted_at);
+    const safeDeletedByName = escapeHTML(deletedByName);
 
-    const safeName = (itemName || '')
-      .replace(/\\/g, '\\\\')
-      .replace(/'/g, "\\'")
-      .replace(/"/g, '&quot;');
+    const safeName = escapeHTML(itemName);
+    const safeBarcode = escapeHTML(barcode);
+    const displayDate = formatDate(operationDate);
 
-    const safeId = String(item.id).replace(/'/g, "\\'");
+    const safeId = encodeValue(item.id);
+    const safeProductId = encodeValue(item.product_id || '');
+    const safeInvoiceId = encodeValue(item.invoice_id || '');
+    const safeItemName = encodeValue(itemName);
 
-    const safeProductId = String(item.product_id || '')
-      .replace(/'/g, "\\'");
+    const uniqueId = `${item._table}-${item.id}`;
 
-    const safeInvoiceId = String(item.invoice_id || '')
-      .replace(/'/g, "\\'");
+    let quantityHtml = '';
+
+    if (quantity !== null && quantity !== undefined) {
+      let quantityText = quantity;
+
+      if (isMovement) {
+        const sign = item.movement_type === 'out' ? '-' : '+';
+        quantityText = `${sign}${Math.abs(Number(quantity) || 0)}`;
+      }
+
+      quantityHtml = `
+        <span class="trash-quantity-badge"
+          style="
+            display:inline-flex;
+            align-items:center;
+            justify-content:center;
+            min-width:58px;
+            padding:9px 12px;
+            border-radius:14px;
+            background:#dcfce7;
+            color:#16a34a;
+            font-weight:700;
+            white-space:nowrap;
+          ">
+          ${escapeHTML(quantityText)}
+        </span>
+      `;
+    }
 
     return `
-      <div class="trash-log-card">
+      <div class="trash-log-card"
+        style="
+          display:flex;
+          align-items:center;
+          gap:12px;
+          padding:14px;
+          margin-bottom:12px;
+          background:#fff;
+          border:1px solid #e5e7eb;
+          border-radius:20px;
+          box-shadow:0 2px 5px rgba(0,0,0,.03);
+          min-width:0;
+        ">
 
-        <div class="trash-image-box">
+        <div class="trash-image-box"
+          style="
+            width:78px;
+            height:78px;
+            min-width:78px;
+            border-radius:15px;
+            overflow:hidden;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            background:#f3f4f6;
+            color:#9ca3af;
+            font-size:25px;
+          ">
           ${imageHtml}
         </div>
 
-        <div class="trash-content-area">
+        <div class="trash-content-area"
+          style="
+            flex:1;
+            min-width:0;
+            display:flex;
+            flex-direction:column;
+            gap:8px;
+          ">
 
-          <div class="trash-top-line">
-
-            <div class="trash-item-name">
-              ${itemName || '—'}
-            </div>
-
-            <div class="trash-col-user">
-              <span style="color:#dc2626;">
-                <i class="fas fa-user-xmark"></i>
-                ${deletedByName}
-              </span>
-            </div>
-
+          <div class="trash-item-name"
+            style="
+              font-size:18px;
+              font-weight:700;
+              color:#171717;
+              overflow:hidden;
+              text-overflow:ellipsis;
+              white-space:nowrap;
+            ">
+            ${safeName}
           </div>
 
-          <div class="trash-bottom-line">
+          <div class="trash-item-meta"
+            style="
+              display:flex;
+              flex-direction:column;
+              gap:5px;
+              color:#888;
+              font-size:14px;
+              min-width:0;
+            ">
 
-            <div class="trash-item-meta">
-              ${itemMeta}
-            </div>
+            <span style="overflow:hidden;text-overflow:ellipsis;">
+              <i class="fas ${isSupplier ? 'fa-phone' : 'fa-barcode'}"></i>
+              ${safeBarcode}
+            </span>
 
-            <div class="trash-item-time">
-              <i class="fas fa-clock"></i>
-              ${deletedAtTime}
-            </div>
+            <span>
+              <i class="fas fa-calendar"></i>
+              ${escapeHTML(displayDate)}
+            </span>
+
+            <span style="
+              display:flex;
+              align-items:center;
+              gap:5px;
+              color:#dc2626;
+              font-weight:600;
+              overflow:hidden;
+              text-overflow:ellipsis;
+            ">
+              <i class="fas fa-user-xmark"></i>
+              <span>${safeDeletedByName}</span>
+            </span>
 
           </div>
 
         </div>
 
-        <div class="trash-col-actions">
+        <div class="trash-col-actions"
+          style="
+            display:flex;
+            align-items:center;
+            gap:8px;
+            flex-shrink:0;
+          ">
 
-          <div class="trash-menu-container">
+          ${quantityHtml}
+
+          <div class="trash-menu-container"
+            style="position:relative;">
 
             <button
               class="trash-menu-btn"
-              onclick="toggleDropdown(event, '${item._table}-${safeId}')"
-            >
+              type="button"
+              aria-label="Trash options"
+              onclick="toggleDropdown(event, '${escapeHTML(uniqueId)}')"
+              style="
+                width:44px;
+                height:48px;
+                border:0;
+                background:transparent;
+                color:#777;
+                font-size:21px;
+                cursor:pointer;
+              ">
               <i class="fas fa-ellipsis-vertical"></i>
             </button>
 
             <div
               class="trash-dropdown"
-              id="dropdown-${item._table}-${safeId}"
-            >
+              id="dropdown-${escapeHTML(uniqueId)}"
+              style="
+                min-width:190px;
+                right:0;
+                z-index:100;
+              ">
 
               <button
                 class="btn-restore-text"
+                type="button"
                 onclick="restoreItem(
-                  '${safeId}',
+                  decodeURIComponent('${safeId}'),
                   '${item._table}',
-                  '${safeProductId}',
+                  decodeURIComponent('${safeProductId}'),
                   ${Number(item.quantity || 0)},
-                  '${safeInvoiceId}'
-                )"
-              >
+                  decodeURIComponent('${safeInvoiceId}')
+                )">
+
                 <i class="fas fa-rotate-left"></i>
+
                 <span class="dropdown-text">
                   ${tr('trash_restore', 'Restore')}
                 </span>
@@ -280,13 +367,15 @@ document.addEventListener('DOMContentLoaded', async () => {
 
               <button
                 class="btn-delete-text"
+                type="button"
                 onclick="permanentDelete(
-                  '${safeId}',
+                  decodeURIComponent('${safeId}'),
                   '${item._table}',
-                  '${safeName}'
-                )"
-              >
+                  decodeURIComponent('${safeItemName}')
+                )">
+
                 <i class="fas fa-trash"></i>
+
                 <span class="dropdown-text">
                   ${tr('trash_delete_forever', 'Delete Permanently')}
                 </span>
@@ -307,7 +396,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   // ============================================
 
   async function loadTrash() {
-
     listContainer.innerHTML = `
       <div class="trash-empty">
         <i class="fas fa-spinner fa-spin"></i>
@@ -316,7 +404,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     `;
 
     try {
-
       const [
         productsRes,
         suppliersRes,
@@ -335,10 +422,11 @@ document.addEventListener('DOMContentLoaded', async () => {
           .not('deleted_at', 'is', null),
 
         db.from('stock_movements')
-          .select('*, products(name, image_url, price)')
+          .select('*, products(name, image_url, price, sku)')
           .eq('organization_id', orgId)
           .not('deleted_at', 'is', null),
 
+        // جلب أسماء مستخدمي المؤسسة
         db.from('profiles')
           .select('id, full_name')
           .eq('organization_id', orgId)
@@ -350,10 +438,14 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (movementsRes.error) throw movementsRes.error;
       if (profilesRes.error) throw profilesRes.error;
 
+      // إنشاء خريطة أسماء المستخدمين
       const userMap = new Map();
 
       (profilesRes.data || []).forEach(p => {
-        userMap.set(p.id, p.full_name);
+        userMap.set(
+          p.id,
+          p.full_name || tr('unknown_user', 'Unknown user')
+        );
       });
 
       const products = (productsRes.data || [])
@@ -382,7 +474,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         suppliers.length === 0 &&
         movements.length === 0
       ) {
-
         listContainer.innerHTML = `
           <div class="trash-empty">
             <i class="fas fa-trash-can"></i>
@@ -437,12 +528,11 @@ document.addEventListener('DOMContentLoaded', async () => {
       listContainer.innerHTML = html;
 
     } catch (err) {
-
       console.error('Load trash error:', err);
 
       listContainer.innerHTML = `
         <div class="alert alert-error">
-          ${err.message}
+          ${escapeHTML(err.message)}
         </div>
       `;
     }
@@ -453,7 +543,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   // ============================================
 
   window.toggleDropdown = (event, uniqueId) => {
-
     event.stopPropagation();
 
     const dropdown = document.getElementById(
@@ -483,7 +572,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     qty,
     invoiceId
   ) => {
-
     if (!confirm(
       tr(
         'trash_confirm_restore',
@@ -492,11 +580,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     )) return;
 
     try {
-
-      // ----------------------------------------
-      // استعادة حركة المخزون
-      // ----------------------------------------
-
       if (table === 'stock_movements') {
 
         // 1. جلب الحركة
@@ -534,10 +617,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           throw new Error('المنتج الأصلي غير موجود.');
         }
 
-        // ----------------------------------------
         // 3. إعادة صف الفاتورة
-        // ----------------------------------------
-
         if (snapshot) {
 
           if (
@@ -548,7 +628,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             throw new Error('نسخة صف الفاتورة غير مكتملة.');
           }
 
-          // التحقق من وجود الفاتورة
           const { data: invoice, error: invoiceError } = await db
             .from('invoices')
             .select('*')
@@ -562,7 +641,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             throw new Error('الفاتورة الأصلية غير موجودة.');
           }
 
-          // التحقق من عدم وجود صف مكرر
           const { data: existingItem, error: existingError } = await db
             .from('invoice_items')
             .select('id')
@@ -575,14 +653,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             throw new Error('صف المنتج موجود بالفعل في الفاتورة.');
           }
 
-          // إعادة إنشاء الصف الأصلي
           const { error: insertError } = await db
             .from('invoice_items')
             .insert(snapshot);
 
           if (insertError) throw insertError;
 
-          // تحديث إجماليات الفاتورة
           const { error: invoiceUpdateError } = await db
             .from('invoices')
             .update({
@@ -600,36 +676,25 @@ document.addEventListener('DOMContentLoaded', async () => {
           if (invoiceUpdateError) throw invoiceUpdateError;
 
         } else if (movement.invoice_id) {
-
-          // السجلات القديمة التي لا تحتوي نسخة محفوظة
           console.warn(
             'No invoice snapshot available for movement:',
             movement.id
           );
-
         }
 
-        // ----------------------------------------
         // 4. إعادة الكمية إلى المنتج
-        // ----------------------------------------
-
         const newQty =
           Number(prod.qty || 0) + movementQty;
 
         const { error: updateProductError } = await db
           .from('products')
-          .update({
-            qty: newQty
-          })
+          .update({ qty: newQty })
           .eq('id', movement.product_id)
           .eq('organization_id', orgId);
 
         if (updateProductError) throw updateProductError;
 
-        // ----------------------------------------
         // 5. استعادة الحركة
-        // ----------------------------------------
-
         const { data: restored, error: restoreError } = await db
           .from('stock_movements')
           .update({
@@ -649,20 +714,28 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       } else {
 
-        // ----------------------------------------
-        // استعادة منتج أو مورد عادي
-        // ----------------------------------------
+        const allowedTables = ['products', 'suppliers'];
 
-        const { error } = await db
+        if (!allowedTables.includes(table)) {
+          throw new Error('نوع السجل غير مسموح.');
+        }
+
+        const { data: restored, error } = await db
           .from(table)
           .update({
             deleted_at: null,
             deleted_by: null
           })
           .eq('id', id)
-          .eq('organization_id', orgId);
+          .eq('organization_id', orgId)
+          .not('deleted_at', 'is', null)
+          .select('id');
 
         if (error) throw error;
+
+        if (!restored || restored.length === 0) {
+          throw new Error('تعذرت استعادة السجل.');
+        }
       }
 
       alert('تمت استعادة البيانات بنجاح.');
@@ -670,7 +743,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       await loadTrash();
 
     } catch (err) {
-
       console.error('Restore error:', err);
 
       alert(
@@ -684,27 +756,40 @@ document.addEventListener('DOMContentLoaded', async () => {
   // ============================================
 
   window.permanentDelete = async (id, table, name) => {
+    const allowedTables = [
+      'products',
+      'suppliers',
+      'stock_movements'
+    ];
+
+    if (!allowedTables.includes(table)) {
+      alert('نوع السجل غير مسموح.');
+      return;
+    }
 
     if (!confirm(
       `${tr('trash_confirm_delete', 'Are you sure you want to PERMANENTLY delete')} "${name}"?\n\n${tr('trash_warning', 'This action cannot be undone!')}`
     )) return;
 
     try {
-
-      const { error } = await db
+      const { data: deleted, error } = await db
         .from(table)
         .delete()
         .eq('id', id)
-        .eq('organization_id', orgId);
+        .eq('organization_id', orgId)
+        .select('id');
 
       if (error) throw error;
+
+      if (!deleted || deleted.length === 0) {
+        throw new Error('لم يتم العثور على السجل للحذف.');
+      }
 
       alert('تم الحذف النهائي بنجاح.');
 
       await loadTrash();
 
     } catch (err) {
-
       console.error('Permanent delete error:', err);
 
       alert(
