@@ -1,6 +1,8 @@
+
 // ============================================
 // صفحة الإشعارات (مع تحديد متعدد وتأثير التمرير)
 // ============================================
+
 document.addEventListener('DOMContentLoaded', async () => {
   const user = await requireAuth();
   if (!user) return;
@@ -9,10 +11,18 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   renderLayout('notifications.html');
   if (window.applyLanguage) window.applyLanguage();
+
   const tr = (key) => (window.t ? window.t(key) : key);
   document.title = tr('ntf_title_full');
 
   const main = document.getElementById('main-content');
+
+  // تحديد اتجاه عنوان الصفحة حسب اللغة فقط
+  const currentLang = window.getCurrentLang
+    ? window.getCurrentLang()
+    : (localStorage.getItem('app_lang') || 'ar');
+
+  const isRTL = currentLang === 'ar';
 
   // بناء الواجهة
   main.innerHTML = `
@@ -21,16 +31,16 @@ document.addEventListener('DOMContentLoaded', async () => {
       <h2>${tr('ntf_title')}</h2>
     </div>
 
-    <!-- ✅ ترويسة وضع التحديد -->
+    <!-- ترويسة وضع التحديد -->
     <div class="notifications-selection-header" id="selection-header">
       <button type="button" id="cancel-selection-btn" class="selection-pill-btn">
         ${tr('ntf_cancel')}
       </button>
-      
+
       <div class="selection-center-text" id="selection-center-text">
         ${(tr('ntf_selected') || 'Selected: {n}').replace('{n}', 0)}
       </div>
-      
+
       <button type="button" id="select-all-btn" class="selection-pill-btn right-pill">
         <span class="pill-count" id="pill-count">0</span>
         <span class="selection-all-circle" id="select-all-circle">
@@ -49,16 +59,33 @@ document.addEventListener('DOMContentLoaded', async () => {
         <i class="fas fa-check-double"></i>
         <span>${tr('ntf_mark_read')}</span>
       </button>
+
       <button type="button" id="delete-selected-btn" class="action-bar-btn danger">
         <i class="fas fa-trash"></i>
         <span>${tr('ntf_delete')}</span>
       </button>
+
       <button type="button" id="cancel-selection-btn-bar" class="action-bar-btn">
         <i class="fas fa-xmark"></i>
         <span>${tr('ntf_cancel')}</span>
       </button>
     </div>
   `;
+
+  // محاذاة عنوان صفحة الإشعارات فقط
+  const notificationsHeader = main.querySelector('.notifications-header');
+
+  if (notificationsHeader) {
+    notificationsHeader.style.direction = isRTL ? 'rtl' : 'ltr';
+    notificationsHeader.style.textAlign = isRTL ? 'right' : 'left';
+
+    const headerTitle = notificationsHeader.querySelector('h2');
+
+    if (headerTitle) {
+      headerTitle.style.textAlign = isRTL ? 'right' : 'left';
+      headerTitle.style.direction = isRTL ? 'rtl' : 'ltr';
+    }
+  }
 
   let currentNotifications = [];
   let selectionMode = false;
@@ -74,7 +101,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const cancelBtnBar = document.getElementById('cancel-selection-btn-bar');
   const deleteBtn = document.getElementById('delete-selected-btn');
   const markReadBtn = document.getElementById('mark-read-btn');
-  
+
   // حاوية التمرير الرئيسية
   const scrollContainer = document.querySelector('.main');
 
@@ -82,8 +109,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   await loadNotifications();
 
   // ============================================
-  // ✅ تأثير التمرير (تحويل الأزرار إلى كبسولات)
+  // تأثير التمرير (تحويل الأزرار إلى كبسولات)
   // ============================================
+
   if (scrollContainer) {
     scrollContainer.addEventListener('scroll', () => {
       if (scrollContainer.scrollTop > 20) {
@@ -98,10 +126,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   function updateSelectionUI() {
     const count = selectedIds.size;
-    
+
     const template = tr('ntf_selected') || 'Selected: {n}';
     centerText.textContent = template.replace('{n}', count);
-    
+
     pillCount.textContent = count;
 
     if (count === currentNotifications.length && count > 0) {
@@ -114,9 +142,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   function enterSelectionMode(initialId = null) {
     selectionMode = true;
     document.body.classList.add('notif-selection-mode');
-    
+
     if (scrollContainer) {
-      scrollContainer.scrollTop = 0; 
+      scrollContainer.scrollTop = 0;
       selectionHeader.classList.remove('is-scrolled');
     }
 
@@ -161,15 +189,19 @@ document.addEventListener('DOMContentLoaded', async () => {
   selectAllBtn.addEventListener('click', () => {
     if (selectedIds.size === currentNotifications.length) {
       selectedIds.clear();
+
       document.querySelectorAll('.notification-item.selected').forEach(el => {
         el.classList.remove('selected');
       });
+
       updateSelectionUI();
     } else {
       currentNotifications.forEach(n => selectedIds.add(n.id));
+
       document.querySelectorAll('.notification-item').forEach(el => {
         el.classList.add('selected');
       });
+
       updateSelectionUI();
     }
   });
@@ -200,6 +232,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       currentNotifications = currentNotifications.filter(n => !selectedIds.has(n.id));
 
       const idsToRemove = Array.from(selectedIds);
+
       idsToRemove.forEach(id => {
         const el = document.querySelector(`.notification-item[data-id="${id}"]`);
         if (el) el.remove();
@@ -251,6 +284,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
 
   // ---- الضغط المطول ----
+
   function attachLongPress(item, id) {
     let timer = null;
     let startX = 0, startY = 0;
@@ -259,7 +293,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const start = (e) => {
       if (selectionMode) return;
+
       const point = e.touches ? e.touches[0] : e;
+
       startX = point.clientX;
       startY = point.clientY;
       moved = false;
@@ -274,12 +310,17 @@ document.addEventListener('DOMContentLoaded', async () => {
     };
 
     const cancel = () => {
-      if (timer) { clearTimeout(timer); timer = null; }
+      if (timer) {
+        clearTimeout(timer);
+        timer = null;
+      }
     };
 
     const move = (e) => {
       if (!timer) return;
+
       const point = e.touches ? e.touches[0] : e;
+
       if (Math.abs(point.clientX - startX) > 10 || Math.abs(point.clientY - startY) > 10) {
         moved = true;
         cancel();
@@ -294,7 +335,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     item.addEventListener('mousemove', move);
     item.addEventListener('mouseup', cancel);
     item.addEventListener('mouseleave', cancel);
-    
+
     item._longPressCheck = () => {
       const res = longPressTriggered;
       longPressTriggered = false;
@@ -303,9 +344,16 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   // ---- تحميل الإشعارات ----
+
   async function loadNotifications() {
     const lang = window.getCurrentLang ? window.getCurrentLang() : 'ar';
-    const localeMap = { ar: 'ar-MA', fr: 'fr-FR', en: 'en-US' };
+
+    const localeMap = {
+      ar: 'ar-MA',
+      fr: 'fr-FR',
+      en: 'en-US'
+    };
+
     const locale = localeMap[lang] || 'en-US';
 
     const { data: { user: authUser } } = await db.auth.getUser();
@@ -342,6 +390,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         warning: 'fa-triangle-exclamation',
         danger: 'fa-circle-exclamation',
       };
+
       const icon = icons[n.type] || icons.info;
       const time = formatTime(n.created_at, tr, locale);
       const seenClass = n.seen ? 'seen' : '';
@@ -352,18 +401,23 @@ document.addEventListener('DOMContentLoaded', async () => {
           <div class="notification-icon ${n.type || 'info'}">
             <i class="fas ${icon}"></i>
           </div>
+
           <div class="notification-content">
             <div class="notification-title">
               ${n.title}
               ${n.user_name ? `<span class="notification-user">• ${n.user_name}</span>` : ''}
             </div>
+
             ${n.message ? `<div class="notification-message">${n.message}</div>` : ''}
+
             <div class="notification-time">${time}</div>
           </div>
+
           <div class="notification-checks">
             <i class="fas fa-check"></i>
             <i class="fas fa-check"></i>
           </div>
+
           <div class="notif-select-circle">
             <i class="fas fa-check"></i>
           </div>
@@ -403,21 +457,38 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     if (data && !data.is_read) {
       await db.from('notifications').update({ is_read: true }).eq('id', id);
+
       const item = document.querySelector(`.notification-item[data-id="${id}"]`);
       if (item) item.classList.add('read');
     }
 
     if (data?.link) {
-      setTimeout(() => { window.location.href = data.link; }, 400);
+      setTimeout(() => {
+        window.location.href = data.link;
+      }, 400);
     }
   }
 });
 
+// ============================================
+// تحديث حالة مشاهدة الإشعارات
+// ============================================
+
 async function markAllAsSeen() {
   const { data: { user } } = await db.auth.getUser();
+
   if (!user) return;
-  await db.from('notifications').update({ seen: true }).eq('user_id', user.id).eq('seen', false);
+
+  await db
+    .from('notifications')
+    .update({ seen: true })
+    .eq('user_id', user.id)
+    .eq('seen', false);
 }
+
+// ============================================
+// تنسيق وقت الإشعار
+// ============================================
 
 function formatTime(iso, tr, locale) {
   const date = new Date(iso);
@@ -425,8 +496,18 @@ function formatTime(iso, tr, locale) {
   const diff = Math.floor((now - date) / 1000);
 
   if (diff < 60) return tr('ntf_now');
-  if (diff < 3600) return `${tr('ntf_min_ago')} ${Math.floor(diff / 60)} ${tr('ntf_min')}`;
-  if (diff < 86400) return `${tr('ntf_hour_ago')} ${Math.floor(diff / 3600)} ${tr('ntf_hour')}`;
-  if (diff < 604800) return `${tr('ntf_day_ago')} ${Math.floor(diff / 86400)} ${tr('ntf_day')}`;
+
+  if (diff < 3600) {
+    return `${tr('ntf_min_ago')} ${Math.floor(diff / 60)} ${tr('ntf_min')}`;
+  }
+
+  if (diff < 86400) {
+    return `${tr('ntf_hour_ago')} ${Math.floor(diff / 3600)} ${tr('ntf_hour')}`;
+  }
+
+  if (diff < 604800) {
+    return `${tr('ntf_day_ago')} ${Math.floor(diff / 86400)} ${tr('ntf_day')}`;
+  }
+
   return date.toLocaleDateString(locale);
 }
