@@ -2,7 +2,7 @@
 /* ============================================
    صفحة الإشعارات
    ✅ دعم RTL / LTR
-   ✅ محاذاة النص حسب لغة التطبيق
+   ✅ محاذاة عنوان الصفحة حسب لغة التطبيق
    ============================================ */
 
 .notifications-header {
@@ -11,10 +11,14 @@
   align-items: center;
   max-width: 700px;
   margin: 0 auto 20px;
+  text-align: start !important;
+  direction: inherit;
 }
 
 .notifications-header h2 {
   margin: 0;
+  text-align: start !important;
+  direction: inherit;
 }
 
 /* ✅ ترويسة وضع التحديد (شريط عائم) */
