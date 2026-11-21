@@ -1,3 +1,4 @@
+
 /* ============================================
    ✅ استدعاء خط Nunito (للاتينية) وخط Cairo (للعربية)
    ============================================ */
@@ -12,7 +13,7 @@
   padding: 0;
   box-sizing: border-box;
   font-family: 'Nunito', 'Cairo', system-ui, -apple-system, sans-serif;
-  -webkit-tap-highlight-color: transparent !important; 
+  -webkit-tap-highlight-color: transparent !important;
 }
 
 input, textarea, select, button {
@@ -125,8 +126,8 @@ h6 { font-size: 0.8125rem; font-weight: 600; color: #404040; }
   transition: border-color 0.2s, box-shadow 0.2s;
 }
 
-.search input:focus { 
-  border-color: #171717; 
+.search input:focus {
+  border-color: #171717;
   box-shadow: 0 0 0 3px rgba(23, 23, 23, 0.05);
 }
 
@@ -312,7 +313,7 @@ h6 { font-size: 0.8125rem; font-weight: 600; color: #404040; }
    Sidebar (الوضع الأساسي)
    ============================================ */
 .sidebar {
-  width: 200px; 
+  width: 200px;
   min-width: 0;
   background: #fff;
   border-inline-start: 1px solid #e5e5e5;
@@ -321,8 +322,8 @@ h6 { font-size: 0.8125rem; font-weight: 600; color: #404040; }
   flex-shrink: 0;
   overflow: hidden;
   height: 100%;
-  
-  transition: width 0.3s ease-in-out !important; 
+
+  transition: width 0.3s ease-in-out !important;
 }
 
 .body.sidebar-closed .sidebar {
@@ -364,11 +365,11 @@ h6 { font-size: 0.8125rem; font-weight: 600; color: #404040; }
   transition: background 0.2s;
 }
 
-.nav-item i { 
-  width: 18px; 
-  font-size: 18px; 
-  text-align: center; 
-  flex-shrink: 0; 
+.nav-item i {
+  width: 18px;
+  font-size: 18px;
+  text-align: center;
+  flex-shrink: 0;
 }
 .nav-item:hover { background: #f5f5f5; }
 .nav-item.active { background: #e5e5e5; font-weight: 800; }
@@ -391,7 +392,7 @@ h6 { font-size: 0.8125rem; font-weight: 600; color: #404040; }
   overflow-y: auto;
   overflow-x: hidden;
   padding: 15px;
-  padding-bottom: 15px; 
+  padding-bottom: 0 !important;
   min-height: 0;
   min-width: 0;
   height: 100%;
@@ -620,9 +621,9 @@ h6 { font-size: 0.8125rem; font-weight: 600; color: #404040; }
   .sidebar-footer .nav-item { padding: 12px 4px; justify-content: center; }
   .sidebar-footer .nav-item i { font-size: 18px !important; }
 
-  .main { 
-    padding: 15px; 
-    padding-bottom: 15px; 
+  .main {
+    padding: 15px;
+    padding-bottom: 0 !important;
   }
 
   .body.sidebar-hidden-mobile .sidebar {
@@ -674,9 +675,10 @@ html.in-iframe .main {
   flex: 1 1 auto !important;
   height: auto !important;
   min-height: 0 !important;
-  overflow-y: auto !important; 
+  overflow-y: auto !important;
   overflow-x: hidden !important;
-  padding: 15px !important; /* ✅ مسافة 15px لجميع الصفحات */
+  padding: 15px !important;
+  padding-bottom: 0 !important;
   box-sizing: border-box !important;
   display: flex !important;
   flex-direction: column !important;
@@ -686,12 +688,12 @@ html.in-iframe .main {
    ✅ الحل النهائي (توحيد الفتح بالزر والتمرير معاً)
    ============================================ */
 @media (min-width: 769px) {
-  
+
   /* 1. الوضع المغلق */
   .body.sidebar-mini .sidebar {
-    width: 65px; 
+    width: 65px;
   }
-  
+
   .body.sidebar-mini .nav-item,
   .body:not(.sidebar-mini) .nav-item,
   .body.sidebar-mini .sidebar:hover .nav-item,
@@ -700,9 +702,9 @@ html.in-iframe .main {
     width: 100% !important;
     height: 44px !important;
     margin: 0 !important;
-    padding: 0 !important; 
-    position: relative !important; 
-    background: transparent !important; 
+    padding: 0 !important;
+    position: relative !important;
+    background: transparent !important;
     border-radius: 0 !important;
     gap: 0 !important;
   }
@@ -714,13 +716,13 @@ html.in-iframe .main {
     content: '';
     position: absolute;
     top: 50%;
-    left: 26.5px !important; 
+    left: 26.5px !important;
     transform: translate(-50%, -50%);
     width: 40px;
     height: 40px;
     border-radius: 8px;
     background: transparent;
-    transition: all 0.3s ease !important; 
+    transition: all 0.3s ease !important;
     z-index: 0;
   }
 
@@ -732,31 +734,31 @@ html.in-iframe .main {
   .body:not(.sidebar-mini) .sidebar-footer .nav-item:hover::before {
     background: #e5e5e5 !important;
   }
-  
-  .body.sidebar-mini .nav-item span { 
-    display: none !important; 
+
+  .body.sidebar-mini .nav-item span {
+    display: none !important;
   }
 
   .body.sidebar-mini .nav-item i,
   .body:not(.sidebar-mini) .nav-item i,
   .body.sidebar-mini .sidebar:hover .nav-item i,
   .body.sidebar-mini .sidebar-footer .nav-item i,
-  .body:not(.sidebar-mini) .sidebar-footer .nav-item i { 
+  .body:not(.sidebar-mini) .sidebar-footer .nav-item i {
     position: absolute !important;
-    left: 26.5px !important; 
+    left: 26.5px !important;
     top: 50% !important;
-    transform: translate(-50%, -50%) !important; 
-    font-size: 18px !important; 
-    width: 18px !important; 
+    transform: translate(-50%, -50%) !important;
+    font-size: 18px !important;
+    width: 18px !important;
     text-align: center !important;
     z-index: 1;
   }
-  
+
   .body:not(.sidebar-mini) .nav-item::before,
   .body.sidebar-mini .sidebar:hover .nav-item::before,
   .body:not(.sidebar-mini) .sidebar-footer .nav-item::before,
   .body.sidebar-mini .sidebar:hover .sidebar-footer .nav-item::before {
-    width: calc(100% - 12px) !important; 
+    width: calc(100% - 12px) !important;
     left: 50% !important;
     border-radius: 8px !important;
   }
@@ -764,18 +766,18 @@ html.in-iframe .main {
   .body:not(.sidebar-mini) .nav-item span,
   .body.sidebar-mini .sidebar:hover .nav-item span,
   .body:not(.sidebar-mini) .sidebar-footer .nav-item span,
-  .body.sidebar-mini .sidebar:hover .sidebar-footer .nav-item span { 
+  .body.sidebar-mini .sidebar:hover .sidebar-footer .nav-item span {
     display: inline-block !important;
     opacity: 1 !important;
     width: auto !important;
-    margin-left: 48px !important; 
+    margin-left: 48px !important;
     white-space: nowrap !important;
     z-index: 1;
   }
 
   .body.sidebar-mini .sidebar:hover {
-    width: 200px !important; 
-    box-shadow: 2px 0 10px rgba(0,0,0,0.1); 
+    width: 200px !important;
+    box-shadow: 2px 0 10px rgba(0,0,0,0.1);
     z-index: 100;
   }
 }
@@ -804,7 +806,6 @@ html.in-iframe .main {
 @media (min-width: 769px) {
   [dir="rtl"] .nav-item i,
   [dir="rtl"] .sidebar-footer .nav-item i {
-    /* نضيف scaleX(-1) بجانب translate حتى لا تختل الأيقونة */
     transform: translate(-50%, -50%) scaleX(-1) !important;
   }
 }
@@ -818,12 +819,12 @@ html.in-iframe .main {
   [dir="rtl"] .body:not(.sidebar-mini) .nav-item i,
   [dir="rtl"] .body.sidebar-mini .sidebar:hover .nav-item i,
   [dir="rtl"] .body.sidebar-mini .sidebar-footer .nav-item i,
-  [dir="rtl"] .body:not(.sidebar-mini) .sidebar-footer .nav-item i { 
+  [dir="rtl"] .body:not(.sidebar-mini) .sidebar-footer .nav-item i {
     left: auto !important;
     right: 26.5px !important;
-    transform: translate(50%, -50%) scaleX(-1) !important; 
+    transform: translate(50%, -50%) scaleX(-1) !important;
   }
-  
+
   /* 2. نقل الخلفية الرمادية للأيقونة لليمين */
   [dir="rtl"] .body.sidebar-mini .nav-item::before,
   [dir="rtl"] .body.sidebar-mini .sidebar-footer .nav-item::before,
@@ -833,7 +834,7 @@ html.in-iframe .main {
     right: 26.5px !important;
     transform: translate(50%, -50%) !important;
   }
-  
+
   /* 3. توسيط الخلفية عند فتح القائمة */
   [dir="rtl"] .body:not(.sidebar-mini) .nav-item::before,
   [dir="rtl"] .body.sidebar-mini .sidebar:hover .nav-item::before,
@@ -847,8 +848,8 @@ html.in-iframe .main {
   [dir="rtl"] .body:not(.sidebar-mini) .nav-item span,
   [dir="rtl"] .body.sidebar-mini .sidebar:hover .nav-item span,
   [dir="rtl"] .body:not(.sidebar-mini) .sidebar-footer .nav-item span,
-  [dir="rtl"] .body.sidebar-mini .sidebar:hover .sidebar-footer .nav-item span { 
+  [dir="rtl"] .body.sidebar-mini .sidebar:hover .sidebar-footer .nav-item span {
     margin-left: 0 !important;
-    margin-right: 48px !important; 
+    margin-right: 48px !important;
   }
 }
