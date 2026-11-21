@@ -28,7 +28,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   main.innerHTML = `
     <!-- ترويسة عادية -->
     <div class="notifications-header">
-      <h2>${tr('ntf_title')}</h2>
+      <h1>${tr('ntf_title')}</h1>
     </div>
 
     <!-- ترويسة وضع التحديد -->
