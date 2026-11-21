@@ -1,8 +1,10 @@
+
 // ============================================
 // الهيكل المشترك (Header + Sidebar)
 // ✅ إصلاح زر الرجوع للعمل بشكل طبيعي مع الإطار
 // ✅ إضافة زر سلة المحذوفات
 // ✅ إخفاء العناصر المحذوفة (deleted_at) من البحث الشامل
+// ✅ إضافة شريط تحميل تدريجي عند التنقل بين الصفحات
 // ============================================
 
 const ALLOWED_PAGES = [
@@ -11,26 +13,35 @@ const ALLOWED_PAGES = [
   'join.html', '',
 ];
 
+// ============================================
+// ✅ التحقق من حالة البطاقة والاشتراك
+// ============================================
+
 async function autoCheckPaymentBlock() {
   const currentPage = window.location.pathname.split('/').pop() || 'index.html';
   if (ALLOWED_PAGES.includes(currentPage)) return;
+
   try {
     if (typeof db === 'undefined') return;
-    
+
     const { data: { session } } = await db.auth.getSession();
     const user = session?.user;
     if (!user) return;
-    
-    const { data: profile } = await db.from('profiles').select('role, organization_id, bank_card_last4, bank_card_active, bank_card_deactivated_at, card_warning_sent, full_name').eq('id', user.id).single();
+
+    const { data: profile } = await db.from('profiles')
+      .select('role, organization_id, bank_card_last4, bank_card_active, bank_card_deactivated_at, card_warning_sent, full_name')
+      .eq('id', user.id)
+      .single();
+
     if (!profile || profile.role !== 'admin' || !profile.organization_id) return;
-    
+
     if (profile.bank_card_last4) {
       if (profile.bank_card_active === false && profile.bank_card_deactivated_at) {
         const elapsed = Date.now() - new Date(profile.bank_card_deactivated_at).getTime();
-        
+
         if (elapsed >= 3 * 24 * 60 * 60 * 1000) {
-            window.location.replace('/bank-card.html?blocked=1');
-            return;
+          window.location.replace('/bank-card.html?blocked=1');
+          return;
         }
 
         const warningSent = profile.card_warning_sent || 0;
@@ -39,52 +50,106 @@ async function autoCheckPaymentBlock() {
         let warningMsg = '';
 
         if (elapsed >= 2.5 * 24 * 60 * 60 * 1000 && warningSent < 2) {
-            newWarningLevel = 2;
-            warningTitle = window.t ? window.t('warn_title_3') : '🚨 تبقى 12 ساعة';
-            warningMsg = window.t ? window.t('warn_msg_3') : 'تبقى 12 ساعة فقط! أعد تفعيل البطاقة أو أضف بطاقة جديدة الآن.';
+          newWarningLevel = 2;
+          warningTitle = window.t ? window.t('warn_title_3') : '🚨 تبقى 12 ساعة';
+          warningMsg = window.t ? window.t('warn_msg_3') : 'تبقى 12 ساعة فقط! أعد تفعيل البطاقة أو أضف بطاقة جديدة الآن.';
         } else if (elapsed >= 1 * 24 * 60 * 60 * 1000 && warningSent < 1) {
-            newWarningLevel = 1;
-            warningTitle = window.t ? window.t('warn_title_2') : '🔔 تبقى يومان';
-            warningMsg = window.t ? window.t('warn_msg_2') : 'مرّ يوم على إلغاء تفعيل البطاقة. تبقى يومان قبل إيقاف التطبيق.';
+          newWarningLevel = 1;
+          warningTitle = window.t ? window.t('warn_title_2') : '🔔 تبقى يومان';
+          warningMsg = window.t ? window.t('warn_msg_2') : 'مرّ يوم على إلغاء تفعيل البطاقة. تبقى يومان قبل إيقاف التطبيق.';
         }
 
         if (newWarningLevel > warningSent) {
-             if (typeof notifyOrganization === 'function') {
-                 notifyOrganization({
-                     orgId: profile.organization_id,
-                     title: warningTitle,
-                     message: warningMsg,
-                     type: 'warning',
-                     link: '/bank-card.html',
-                     userName: profile.full_name
-                 }).then(() => {
-                     db.from('profiles').update({ card_warning_sent: newWarningLevel }).eq('id', user.id);
-                 });
-             }
+          if (typeof notifyOrganization === 'function') {
+            notifyOrganization({
+              orgId: profile.organization_id,
+              title: warningTitle,
+              message: warningMsg,
+              type: 'warning',
+              link: '/bank-card.html',
+              userName: profile.full_name
+            }).then(() => {
+              db.from('profiles')
+                .update({ card_warning_sent: newWarningLevel })
+                .eq('id', user.id);
+            });
+          }
         }
       }
       return;
     }
-    const { data: sub } = await db.from('subscriptions').select('status, started_at').eq('organization_id', profile.organization_id).maybeSingle();
+
+    const { data: sub } = await db.from('subscriptions')
+      .select('status, started_at')
+      .eq('organization_id', profile.organization_id)
+      .maybeSingle();
+
     if (sub?.status === 'active' && sub.started_at) {
-      if (Date.now() - new Date(sub.started_at).getTime() >= 3 * 24 * 60 * 60 * 1000) window.location.replace('/bank-card.html?blocked=1');
+      if (Date.now() - new Date(sub.started_at).getTime() >= 3 * 24 * 60 * 60 * 1000) {
+        window.location.replace('/bank-card.html?blocked=1');
+      }
     }
-  } catch (err) { console.error(err); }
+
+  } catch (err) {
+    console.error(err);
+  }
 }
 
-if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', autoCheckPaymentBlock);
-else autoCheckPaymentBlock();
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', autoCheckPaymentBlock);
+} else {
+  autoCheckPaymentBlock();
+}
+
+// ============================================
+// ✅ شريط التحميل التدريجي
+// ============================================
+
+window.showPageProgress = function () {
+  const progress = document.getElementById('page-progress');
+  if (!progress) return;
+
+  progress.classList.remove('page-progress-done');
+
+  // إعادة تشغيل الحركة
+  progress.classList.remove('page-progress-loading');
+  void progress.offsetWidth;
+
+  progress.classList.add('page-progress-loading');
+};
+
+window.hidePageProgress = function () {
+  const progress = document.getElementById('page-progress');
+  if (!progress) return;
+
+  progress.classList.remove('page-progress-loading');
+  progress.classList.add('page-progress-done');
+
+  setTimeout(() => {
+    if (!progress.classList.contains('page-progress-loading')) {
+      progress.classList.remove('page-progress-done');
+    }
+  }, 300);
+};
+
+// ============================================
+// الهيكل الرئيسي
+// ============================================
 
 function renderLayout(activePage) {
   if (window.self !== window.top) {
     document.documentElement.classList.add('in-iframe');
+
     const app = document.querySelector('.app');
-    if (app) app.innerHTML = `<main class="main" id="main-content"></main>`;
+    if (app) {
+      app.innerHTML = `<main class="main" id="main-content"></main>`;
+    }
+
     return;
   }
 
   const tr = (key) => (window.t ? window.t(key) : key);
-  
+
   const navItems = [
     { href: '/dashboard.html', labelKey: 'nav_dashboard', icon: 'fa-house' },
     { href: '/products/add-workspace.html', labelKey: 'nav_add_product', icon: 'fa-circle-plus' },
@@ -95,7 +160,7 @@ function renderLayout(activePage) {
     { href: '/suppliers/list.html', labelKey: 'nav_suppliers', icon: 'fa-truck' },
     { href: '/invoices/list.html', labelKey: 'nav_invoices', icon: 'fa-file-invoice' },
     { href: '/settings.html', labelKey: 'nav_settings', icon: 'fa-gear' },
-    // ✅ إضافة زر سلة المحذوفات تحت الإعدادات
+    // ✅ زر سلة المحذوفات
     { href: '/trash.html', labelKey: 'nav_trash', icon: 'fa-trash-can' },
   ];
 
@@ -109,27 +174,132 @@ function renderLayout(activePage) {
   const currentPath = window.location.pathname + window.location.search;
 
   const layout = `
+    <style>
+      /* ========================================
+         شريط التحميل التدريجي
+         ======================================== */
+
+      #page-progress {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 3px;
+        z-index: 99999;
+        pointer-events: none;
+        opacity: 0;
+        overflow: hidden;
+        transition: opacity 0.2s ease;
+      }
+
+      #page-progress span {
+        display: block;
+        width: 35%;
+        height: 100%;
+        background: #2563eb;
+        border-radius: 0 5px 5px 0;
+        transform: translateX(-110%);
+      }
+
+      #page-progress.page-progress-loading {
+        opacity: 1;
+      }
+
+      #page-progress.page-progress-loading span {
+        animation: pageProgressMove 1.2s ease-in-out infinite;
+      }
+
+      #page-progress.page-progress-done {
+        opacity: 0;
+      }
+
+      #page-progress.page-progress-done span {
+        width: 100%;
+        transform: translateX(0);
+        transition: width 0.2s ease;
+        animation: none;
+      }
+
+      @keyframes pageProgressMove {
+        0% {
+          transform: translateX(-110%);
+          width: 35%;
+        }
+
+        50% {
+          transform: translateX(100%);
+          width: 45%;
+        }
+
+        100% {
+          transform: translateX(300%);
+          width: 35%;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        #page-progress.page-progress-loading span {
+          animation-duration: 2.5s;
+        }
+      }
+    </style>
+
+    <div id="page-progress" class="page-progress-loading">
+      <span></span>
+    </div>
+
     <header class="header">
-      <button type="button" class="sidebar-toggle" id="sidebar-toggle"><i class="fas fa-bars"></i></button>
-      <a href="/notifications.html" target="content-frame" class="notif" id="notif-btn"><i class="fas fa-bell"></i><span class="notif-count" id="notif-count">0</span></a>
+      <button type="button" class="sidebar-toggle" id="sidebar-toggle">
+        <i class="fas fa-bars"></i>
+      </button>
+
+      <a href="/notifications.html" target="content-frame" class="notif" id="notif-btn">
+        <i class="fas fa-bell"></i>
+        <span class="notif-count" id="notif-count">0</span>
+      </a>
+
       <div class="search">
         <i class="fas fa-search"></i>
-        <input type="text" id="global-search-input" data-i18n-placeholder="nav_search" placeholder="${tr('nav_search')}" autocomplete="off">
+        <input
+          type="text"
+          id="global-search-input"
+          data-i18n-placeholder="nav_search"
+          placeholder="${tr('nav_search')}"
+          autocomplete="off"
+        >
         <div class="global-search-dropdown" id="global-search-dropdown"></div>
       </div>
+
       <h1 class="logo">MyStock</h1>
     </header>
+
     <div class="body" id="app-body">
+
       <aside class="sidebar" id="app-sidebar">
-        <nav class="nav">${navHTML}</nav>
+        <nav class="nav">
+          ${navHTML}
+        </nav>
+
         <div class="sidebar-footer">
-          <a href="/profile.html" target="content-frame" class="nav-item ${activePage === '/profile.html' ? 'active' : ''}"><i class="fas fa-user"></i><span data-i18n="nav_profile">${tr('nav_profile')}</span></a>
-          <button class="nav-item logout" id="logout-btn"><i class="fas fa-right-from-bracket"></i><span data-i18n="nav_logout">${tr('nav_logout')}</span></button>
+          <a href="/profile.html" target="content-frame" class="nav-item ${activePage === '/profile.html' ? 'active' : ''}">
+            <i class="fas fa-user"></i>
+            <span data-i18n="nav_profile">${tr('nav_profile')}</span>
+          </a>
+
+          <button class="nav-item logout" id="logout-btn">
+            <i class="fas fa-right-from-bracket"></i>
+            <span data-i18n="nav_logout">${tr('nav_logout')}</span>
+          </button>
         </div>
       </aside>
-      
-      <iframe class="main-iframe" id="main-content" name="content-frame" src="${currentPath}"></iframe>
-      
+
+      <iframe
+        class="main-iframe"
+        id="main-content"
+        name="content-frame"
+        src="${currentPath}"
+      ></iframe>
+
     </div>
   `;
 
@@ -138,13 +308,38 @@ function renderLayout(activePage) {
 
   if (window.applyLanguage) window.applyLanguage();
 
+  // ============================================
+  // ✅ ربط شريط التحميل بالإطار
+  // ============================================
+
+  const mainIframe = document.getElementById('main-content');
+
+  if (mainIframe) {
+    mainIframe.addEventListener('load', () => {
+      window.hidePageProgress();
+    });
+  }
+
+  // ============================================
+  // تسجيل الخروج
+  // ============================================
+
   document.querySelectorAll('.logout').forEach(b => {
     b.addEventListener('click', async (e) => {
       e.preventDefault();
-      if (typeof logout === 'function') await logout();
-      else { await db.auth.signOut(); window.location.href = '/'; }
+
+      if (typeof logout === 'function') {
+        await logout();
+      } else {
+        await db.auth.signOut();
+        window.location.href = '/';
+      }
     });
   });
+
+  // ============================================
+  // القائمة الجانبية
+  // ============================================
 
   const toggleBtn = document.getElementById('sidebar-toggle');
   const bodyEl = document.getElementById('app-body');
@@ -156,7 +351,9 @@ function renderLayout(activePage) {
       bodyEl.classList.add('sidebar-hidden-mobile');
     } else {
       bodyEl.classList.remove('sidebar-hidden-mobile', 'sidebar-closed');
+
       const isMini = localStorage.getItem('sidebar_mini') !== 'false';
+
       if (isMini) bodyEl.classList.add('sidebar-mini');
       else bodyEl.classList.remove('sidebar-mini');
     }
@@ -167,24 +364,43 @@ function renderLayout(activePage) {
   if (toggleBtn) {
     toggleBtn.addEventListener('click', (e) => {
       e.stopPropagation();
+
       if (isMobile()) {
         bodyEl.classList.toggle('sidebar-hidden-mobile');
       } else {
         bodyEl.classList.toggle('sidebar-mini');
-        localStorage.setItem('sidebar_mini', bodyEl.classList.contains('sidebar-mini'));
+        localStorage.setItem(
+          'sidebar_mini',
+          bodyEl.classList.contains('sidebar-mini')
+        );
       }
     });
   }
 
+  // ============================================
+  // ✅ التنقل بين الصفحات
+  // ============================================
+
   document.querySelectorAll('.nav-item').forEach(link => {
     link.addEventListener('click', () => {
       if (link.id === 'logout-btn') return;
+
       const targetUrl = link.getAttribute('href');
+
       if (targetUrl && targetUrl !== '#') {
-        window.history.pushState({ path: targetUrl }, '', targetUrl);
+        window.showPageProgress();
+
+        window.history.pushState(
+          { path: targetUrl },
+          '',
+          targetUrl
+        );
       }
 
-      document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.nav-item').forEach(el => {
+        el.classList.remove('active');
+      });
+
       link.classList.add('active');
 
       if (isMobile()) {
@@ -196,31 +412,47 @@ function renderLayout(activePage) {
     });
   });
 
-  // ✅ دعم زر الرجوع في المتصفح للعمل مع الإطار
+  // ============================================
+  // ✅ دعم زر الرجوع في المتصفح
+  // ============================================
+
   window.addEventListener('popstate', (e) => {
     const iframe = document.getElementById('main-content');
     if (!iframe) return;
-    
-    const path = e.state && e.state.path ? e.state.path : (window.location.pathname + window.location.search);
+
+    const path = e.state && e.state.path
+      ? e.state.path
+      : (window.location.pathname + window.location.search);
+
+    window.showPageProgress();
     iframe.src = path;
 
-    document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(el => {
+      el.classList.remove('active');
+    });
+
     const activeLink = document.querySelector(`.nav-item[href="${path}"]`);
     if (activeLink) activeLink.classList.add('active');
   });
 
-  if (typeof startNotifPolling === 'function') startNotifPolling();
+  if (typeof startNotifPolling === 'function') {
+    startNotifPolling();
+  }
+
   initGlobalSearch();
 }
 
 // ============================================
 // ✅ البحث الذكي الشامل
 // ============================================
+
 async function initGlobalSearch() {
   const input = document.getElementById('global-search-input');
   const dropdown = document.getElementById('global-search-dropdown');
+
   if (!input || !dropdown) return;
   if (input.dataset.searchReady === '1') return;
+
   input.dataset.searchReady = '1';
 
   const tr = (key, fallback) => {
@@ -238,22 +470,27 @@ async function initGlobalSearch() {
   function normArabic(s) {
     return String(s || '')
       .toLowerCase()
-      .replace(/[\u064B-\u065F\u0670]/g, '')   
-      .replace(/[أإآٱ]/g, 'ا')                  
-      .replace(/ة/g, 'ه')                        
-      .replace(/ى/g, 'ي')                        
-      .replace(/ؤ/g, 'و')                        
-      .replace(/ئ/g, 'ي')                        
-      .replace(/ـ/g, '')                         
-      .replace(/[^\w\u0600-\u06FF\s]/g, ' ')    
+      .replace(/[\u064B-\u065F\u0670]/g, '')
+      .replace(/[أإآٱ]/g, 'ا')
+      .replace(/ة/g, 'ه')
+      .replace(/ى/g, 'ي')
+      .replace(/ؤ/g, 'و')
+      .replace(/ئ/g, 'ي')
+      .replace(/ـ/g, '')
+      .replace(/[^\w\u0600-\u06FF\s]/g, ' ')
       .replace(/\s+/g, ' ')
       .trim();
   }
 
   const escapeHtml = (str) => {
     if (str == null) return '';
-    return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
   };
 
   const hideDropdown = () => {
@@ -263,21 +500,24 @@ async function initGlobalSearch() {
 
   function scoreMatch(normQuery, text) {
     if (!text) return 0;
+
     const normText = normArabic(text);
     if (!normText || !normQuery) return 0;
 
-    if (normText === normQuery) return 100;              
-    if (normText.startsWith(normQuery)) return 85;       
+    if (normText === normQuery) return 100;
+    if (normText.startsWith(normQuery)) return 85;
 
     const words = normText.split(' ');
-    if (words.some(w => w === normQuery)) return 80;     
-    if (words.some(w => w.startsWith(normQuery))) return 70; 
 
-    if (normText.includes(normQuery)) return 50;         
+    if (words.some(w => w === normQuery)) return 80;
+    if (words.some(w => w.startsWith(normQuery))) return 70;
+
+    if (normText.includes(normQuery)) return 50;
 
     if (/^[a-z0-9]+$/.test(normQuery) && normQuery.length >= 3) {
       if (Math.abs(normText.length - normQuery.length) <= 3) {
         let i = 0;
+
         for (const ch of normText) {
           if (ch === normQuery[i]) i++;
           if (i === normQuery.length) return 30;
@@ -294,15 +534,20 @@ async function initGlobalSearch() {
   function getHistory() {
     try {
       return JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
-    } catch (e) { return []; }
+    } catch (e) {
+      return [];
+    }
   }
 
   function saveToHistory(query) {
     const q = query.trim();
     if (q.length < 2) return;
+
     let h = getHistory().filter(x => normArabic(x) !== normArabic(q));
+
     h.unshift(q);
     h = h.slice(0, MAX_HISTORY);
+
     localStorage.setItem(HISTORY_KEY, JSON.stringify(h));
   }
 
@@ -310,25 +555,38 @@ async function initGlobalSearch() {
     const h = getHistory();
     if (!h.length) return;
 
-    let html = `<div class="search-result-group">
-      <div class="search-result-group-title">${tr('search_recent', 'عمليات البحث الأخيرة')}</div>`;
+    let html = `
+      <div class="search-result-group">
+        <div class="search-result-group-title">
+          ${tr('search_recent', 'عمليات البحث الأخيرة')}
+        </div>
+    `;
 
     h.forEach(q => {
-      html += `<div class="search-result-item search-history-item" data-query="${escapeHtml(q)}">
-        <div class="search-result-icon" style="background:#f3f4f6;color:#6b7280;"><i class="fas fa-history"></i></div>
-        <div class="search-result-info">
-          <div class="search-result-title">${escapeHtml(q)}</div>
+      html += `
+        <div class="search-result-item search-history-item" data-query="${escapeHtml(q)}">
+          <div class="search-result-icon" style="background:#f3f4f6;color:#6b7280;">
+            <i class="fas fa-history"></i>
+          </div>
+
+          <div class="search-result-info">
+            <div class="search-result-title">${escapeHtml(q)}</div>
+          </div>
+
+          <i class="fas fa-arrow-left" style="color:#d4d4d4;font-size:12px;"></i>
         </div>
-        <i class="fas fa-arrow-left" style="color:#d4d4d4;font-size:12px;"></i>
-      </div>`;
+      `;
     });
+
     html += `</div>`;
+
     dropdown.innerHTML = html;
     dropdown.classList.add('show');
 
     dropdown.querySelectorAll('.search-history-item').forEach(el => {
       el.addEventListener('mousedown', (e) => {
         e.preventDefault();
+
         input.value = el.dataset.query;
         performSearch(el.dataset.query);
       });
@@ -337,6 +595,7 @@ async function initGlobalSearch() {
 
   function highlight(text, query) {
     if (!text) return '';
+
     const esc = escapeHtml(text);
     if (!query) return esc;
 
@@ -355,30 +614,56 @@ async function initGlobalSearch() {
     }
   }
 
+  // ============================================
+  // عرض نتائج البحث
+  // ============================================
+
   function renderResults(groups) {
     const total = groups.reduce((s, g) => s + g.items.length, 0);
+
     if (total === 0) {
-      dropdown.innerHTML = `<div class="search-no-results">
-        <i class="fas fa-search" style="display:block;font-size:24px;color:#d4d4d4;margin-bottom:8px;"></i>
-        ${tr('search_no_results', 'لا توجد نتائج لـ')} "${escapeHtml(currentQuery)}"
-      </div>`;
+      dropdown.innerHTML = `
+        <div class="search-no-results">
+          <i class="fas fa-search" style="display:block;font-size:24px;color:#d4d4d4;margin-bottom:8px;"></i>
+          ${tr('search_no_results', 'لا توجد نتائج لـ')}
+          "${escapeHtml(currentQuery)}"
+        </div>
+      `;
+
       dropdown.classList.add('show');
       return;
     }
 
     let html = '';
+
     groups.forEach(g => {
       if (!g.items.length) return;
-      html += `<div class="search-result-group"><div class="search-result-group-title">${g.title}</div>`;
+
+      html += `
+        <div class="search-result-group">
+          <div class="search-result-group-title">${g.title}</div>
+      `;
+
       g.items.forEach(item => {
-        html += `<a href="${escapeHtml(item.url)}" target="content-frame" class="search-result-item" style="text-decoration:none; color:inherit;">
-          <div class="search-result-icon ${item.type}"><i class="fas ${item.icon}"></i></div>
-          <div class="search-result-info">
-            <div class="search-result-title">${item.highlighted}</div>
-            <div class="search-result-subtitle">${escapeHtml(item.subtitle || '')}</div>
-          </div>
-        </a>`;
+        html += `
+          <a
+            href="${escapeHtml(item.url)}"
+            target="content-frame"
+            class="search-result-item"
+            style="text-decoration:none;color:inherit;"
+          >
+            <div class="search-result-icon ${item.type}">
+              <i class="fas ${item.icon}"></i>
+            </div>
+
+            <div class="search-result-info">
+              <div class="search-result-title">${item.highlighted}</div>
+              <div class="search-result-subtitle">${escapeHtml(item.subtitle || '')}</div>
+            </div>
+          </a>
+        `;
       });
+
       html += `</div>`;
     });
 
@@ -388,19 +673,29 @@ async function initGlobalSearch() {
 
     dropdown.querySelectorAll('.search-result-item').forEach(el => {
       el.addEventListener('mousedown', (e) => {
-        e.preventDefault(); 
+        e.preventDefault();
+
         const url = el.getAttribute('href');
+
         if (url) {
           saveToHistory(currentQuery);
           hideDropdown();
-          
+
           const iframe = document.getElementById('main-content');
-          if (iframe) iframe.src = url;
-          
+
+          if (iframe) {
+            window.showPageProgress();
+            iframe.src = url;
+          }
+
           window.history.pushState({ path: url }, '', url);
 
-          document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
+          document.querySelectorAll('.nav-item').forEach(nav => {
+            nav.classList.remove('active');
+          });
+
           const bodyEl = document.getElementById('app-body');
+
           if (bodyEl && !window.matchMedia('(max-width: 768px)').matches) {
             bodyEl.classList.add('sidebar-mini');
             localStorage.setItem('sidebar_mini', 'true');
@@ -412,14 +707,27 @@ async function initGlobalSearch() {
     });
   }
 
+  // ============================================
+  // تنفيذ البحث
+  // ============================================
+
   async function performSearch(query) {
     const q = query.trim();
     const normQ = normArabic(q);
 
-    if (normQ.length < 1) { hideDropdown(); return; }
+    if (normQ.length < 1) {
+      hideDropdown();
+      return;
+    }
 
     currentQuery = q;
-    dropdown.innerHTML = `<div class="search-loading"><i class="fas fa-spinner fa-spin"></i></div>`;
+
+    dropdown.innerHTML = `
+      <div class="search-loading">
+        <i class="fas fa-spinner fa-spin"></i>
+      </div>
+    `;
+
     dropdown.classList.add('show');
 
     try {
@@ -430,40 +738,56 @@ async function initGlobalSearch() {
         .select('organization_id, role')
         .eq('id', authUser.id)
         .single();
+
       if (!profile?.organization_id) return;
 
       const orgId = profile.organization_id;
       const canSeeWorkers = profile.role === 'admin' || profile.role === 'deputy';
 
       const safeQ = q.replace(/[%_,()]/g, '').trim();
-      if (!safeQ) { hideDropdown(); return; }
+      if (!safeQ) {
+        hideDropdown();
+        return;
+      }
 
       const term = `%${safeQ}%`;
       const isNumericQuery = /^\d{4,}$/.test(safeQ);
 
-      const [productsRes, suppliersRes, invoicesRes, receiptsRes, workersRes, barcodesRes] = await Promise.all([
+      const [
+        productsRes,
+        suppliersRes,
+        invoicesRes,
+        receiptsRes,
+        workersRes,
+        barcodesRes
+      ] = await Promise.all([
+
         db.from('products')
           .select('id, name, sku, qty, category, price')
           .eq('organization_id', orgId)
-          .is('deleted_at', null) // ✅ إخفاء المنتجات المحذوفة من البحث
+          .is('deleted_at', null)
           .or(`name.ilike.${term},sku.ilike.${term},category.ilike.${term}`)
           .limit(15),
+
         db.from('suppliers')
           .select('id, name, specialty, phone')
           .eq('organization_id', orgId)
-          .is('deleted_at', null) // ✅ إخفاء الموردين المحذوفين من البحث
+          .is('deleted_at', null)
           .or(`name.ilike.${term},specialty.ilike.${term},phone.ilike.${term}`)
           .limit(10),
+
         db.from('invoices')
           .select('id, invoice_number, created_at')
           .eq('organization_id', orgId)
           .ilike('invoice_number', term)
           .limit(10),
+
         db.from('receipts')
           .select('id, receipt_number, created_at')
           .eq('organization_id', orgId)
           .ilike('receipt_number', term)
           .limit(10),
+
         canSeeWorkers
           ? db.from('profiles')
               .select('id, full_name, role, phone')
@@ -471,6 +795,7 @@ async function initGlobalSearch() {
               .or(`full_name.ilike.${term},phone.ilike.${term}`)
               .limit(10)
           : Promise.resolve({ data: [] }),
+
         isNumericQuery
           ? db.from('product_barcodes')
               .select('product_id, barcode')
@@ -481,6 +806,7 @@ async function initGlobalSearch() {
       ]);
 
       const productMap = new Map();
+
       (productsRes.data || []).forEach(p => {
         productMap.set(p.id, { ...p, _scores: [] });
       });
@@ -492,14 +818,20 @@ async function initGlobalSearch() {
       if (missingIds.length > 0) {
         const { data: extraProducts } = await db.from('products')
           .select('id, name, sku, qty, category, price')
-          .is('deleted_at', null) // ✅ إخفاء المنتجات المحذوفة (البحث بالباركود)
+          .is('deleted_at', null)
           .in('id', missingIds);
+
         (extraProducts || []).forEach(p => {
-          productMap.set(p.id, { ...p, _scores: [], _viaBarcode: true });
+          productMap.set(p.id, {
+            ...p,
+            _scores: [],
+            _viaBarcode: true
+          });
         });
       }
 
       const scoredProducts = [];
+
       for (const p of productMap.values()) {
         const scores = [
           scoreMatch(normQ, p.name) * 1.0,
@@ -508,16 +840,23 @@ async function initGlobalSearch() {
         ];
 
         if (p._viaBarcode) {
-          scores.push(scoreMatch(normQ, (barcodesRes.data || [])
-            .find(b => b.product_id === p.id)?.barcode || '') * 0.9);
+          scores.push(
+            scoreMatch(
+              normQ,
+              (barcodesRes.data || []).find(b => b.product_id === p.id)?.barcode || ''
+            ) * 0.9
+          );
         }
 
         const best = Math.max(...scores);
+
         if (best > 0) {
           scoredProducts.push({ ...p, score: best });
         }
       }
+
       scoredProducts.sort((a, b) => b.score - a.score);
+
       const topProducts = scoredProducts.slice(0, 5);
 
       const scoredSuppliers = (suppliersRes.data || [])
@@ -598,37 +937,64 @@ async function initGlobalSearch() {
             type: 'worker',
             icon: 'fa-user',
             highlighted: highlight(w.full_name, q),
-            subtitle: (w.role === 'admin' ? tr('mp_role_admin', 'مدير') : tr('wk_role_worker', 'عامل')) + (w.phone ? ` • ${w.phone}` : ''),
+            subtitle:
+              (w.role === 'admin'
+                ? tr('mp_role_admin', 'مدير')
+                : tr('wk_role_worker', 'عامل')) +
+              (w.phone ? ` • ${w.phone}` : ''),
             url: `/member-profile.html?id=${w.id}`,
           })),
         });
       }
 
       if (groups.length === 0 && safeQ.length > 3) {
-        const shortQ = safeQ.slice(0, Math.max(3, Math.floor(safeQ.length * 0.6)));
-        return performShortSearch(shortQ, q, orgId, canSeeWorkers, groups);
+        const shortQ = safeQ.slice(
+          0,
+          Math.max(3, Math.floor(safeQ.length * 0.6))
+        );
+
+        return performShortSearch(
+          shortQ,
+          q,
+          orgId,
+          canSeeWorkers,
+          groups
+        );
       }
 
       renderResults(groups);
+
     } catch (err) {
       console.error('Search error:', err);
-      dropdown.innerHTML = `<div class="search-no-results">${tr('search_error', 'خطأ في البحث')}</div>`;
+
+      dropdown.innerHTML = `
+        <div class="search-no-results">
+          ${tr('search_error', 'خطأ في البحث')}
+        </div>
+      `;
     }
   }
+
+  // ============================================
+  // البحث التقريبي
+  // ============================================
 
   async function performShortSearch(shortQ, originalQuery, orgId, canSeeWorkers, existingGroups) {
     try {
       const term = `%${shortQ}%`;
+
       const { data: products } = await db.from('products')
         .select('id, name, sku, qty')
         .eq('organization_id', orgId)
-        .is('deleted_at', null) // ✅ إخفاء المنتجات المحذوفة (البحث التقريبي)
+        .is('deleted_at', null)
         .or(`name.ilike.${term},sku.ilike.${term}`)
         .limit(5);
 
       if (products?.length) {
         existingGroups.push({
-          title: tr('search_group_products', 'المنتجات') + ` (${tr('search_approx', 'قد تقصد')})`,
+          title: tr('search_group_products', 'المنتجات') +
+            ` (${tr('search_approx', 'قد تقصد')})`,
+
           items: products.map(p => ({
             type: 'product',
             icon: 'fa-box',
@@ -638,14 +1004,21 @@ async function initGlobalSearch() {
           })),
         });
       }
+
       renderResults(existingGroups);
+
     } catch (e) {
       renderResults(existingGroups);
     }
   }
 
+  // ============================================
+  // أحداث البحث
+  // ============================================
+
   input.addEventListener('input', (e) => {
     clearTimeout(debounceTimer);
+
     const q = e.target.value;
 
     if (q.trim().length === 0) {
@@ -653,7 +1026,10 @@ async function initGlobalSearch() {
       return;
     }
 
-    if (q.trim().length < 1) { hideDropdown(); return; }
+    if (q.trim().length < 1) {
+      hideDropdown();
+      return;
+    }
 
     debounceTimer = setTimeout(() => performSearch(q), 250);
   });
@@ -667,44 +1043,78 @@ async function initGlobalSearch() {
   });
 
   document.addEventListener('pointerdown', (e) => {
-    if (!e.target.closest('.search')) hideDropdown();
+    if (!e.target.closest('.search')) {
+      hideDropdown();
+    }
   });
 
   input.addEventListener('keydown', (e) => {
     const items = dropdown.querySelectorAll('.search-result-item');
-    if (e.key === 'Escape') { hideDropdown(); input.blur(); }
-    else if (e.key === 'ArrowDown') {
+
+    if (e.key === 'Escape') {
+      hideDropdown();
+      input.blur();
+
+    } else if (e.key === 'ArrowDown') {
       e.preventDefault();
+
       if (!items.length) return;
+
       activeIndex = (activeIndex + 1) % items.length;
-      items.forEach((el, i) => el.classList.toggle('active', i === activeIndex));
+
+      items.forEach((el, i) => {
+        el.classList.toggle('active', i === activeIndex);
+      });
+
       items[activeIndex]?.scrollIntoView({ block: 'nearest' });
+
     } else if (e.key === 'ArrowUp') {
       e.preventDefault();
+
       if (!items.length) return;
+
       activeIndex = (activeIndex - 1 + items.length) % items.length;
-      items.forEach((el, i) => el.classList.toggle('active', i === activeIndex));
+
+      items.forEach((el, i) => {
+        el.classList.toggle('active', i === activeIndex);
+      });
+
       items[activeIndex]?.scrollIntoView({ block: 'nearest' });
+
     } else if (e.key === 'Enter') {
       e.preventDefault();
+
       const target = items[activeIndex] || items[0];
+
       if (target) {
         const url = target.getAttribute('href');
+
         if (url) {
           saveToHistory(currentQuery || input.value);
           hideDropdown();
-          
+
           const iframe = document.getElementById('main-content');
-          if (iframe) iframe.src = url;
-          
+
+          if (iframe) {
+            window.showPageProgress();
+            iframe.src = url;
+          }
+
           window.history.pushState({ path: url }, '', url);
 
-          document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
+          document.querySelectorAll('.nav-item').forEach(nav => {
+            nav.classList.remove('active');
+          });
+
           const bodyEl = document.getElementById('app-body');
+
           if (bodyEl && !window.matchMedia('(max-width: 768px)').matches) {
             bodyEl.classList.add('sidebar-mini');
             localStorage.setItem('sidebar_mini', 'true');
+          } else if (bodyEl) {
+            bodyEl.classList.add('sidebar-hidden-mobile');
           }
+
         } else if (target.dataset.query) {
           input.value = target.dataset.query;
           performSearch(target.dataset.query);
@@ -716,15 +1126,25 @@ async function initGlobalSearch() {
   input.value = '';
 }
 
+// ============================================
 // ✅ استقبال الرسائل من الإطار الداخلي
+// ============================================
+
 window.addEventListener('message', (event) => {
   const data = event.data;
+
   if (!data || typeof data !== 'object') return;
 
   if (data.type === 'PRODUCT_SELECTED' && data.productId) {
     const url = `/products/detail.html?id=${encodeURIComponent(data.productId)}`;
+
     const iframe = document.getElementById('main-content');
-    if (iframe) iframe.src = url;
+
+    if (iframe) {
+      window.showPageProgress();
+      iframe.src = url;
+    }
+
     window.history.pushState({ path: url }, '', url);
   }
 });
@@ -732,15 +1152,24 @@ window.addEventListener('message', (event) => {
 // ============================================
 // ✅ محرك التنبيهات (نغمات متعددة + اهتزاز)
 // ============================================
+
 window.__audioCtx = null;
 
 function unlockAudio() {
   if (!window.__audioCtx) {
     try {
-      window.__audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      window.__audioCtx = new (
+        window.AudioContext || window.webkitAudioContext
+      )();
+
       console.log('🔊 AudioContext created:', window.__audioCtx.state);
-    } catch (e) { console.warn("Audio init failed:", e); return; }
+
+    } catch (e) {
+      console.warn('Audio init failed:', e);
+      return;
+    }
   }
+
   if (window.__audioCtx.state === 'suspended') {
     window.__audioCtx.resume().then(() => {
       console.log('🔊 AudioContext resumed:', window.__audioCtx.state);
@@ -752,16 +1181,21 @@ function unlockAudio() {
   document.addEventListener(evt, unlockAudio, { passive: true });
 });
 
-window.playNotificationAlerts = async function() {
+window.playNotificationAlerts = async function () {
   console.log('🎵 playNotificationAlerts called');
-  
+
   const masterOn = localStorage.getItem('notif_master') !== 'false';
   const soundOn = localStorage.getItem('notif_sound') !== 'false';
   const vibrateOn = localStorage.getItem('notif_vibrate') !== 'false';
   const selectedTone = localStorage.getItem('notif_tone') || 'default';
-  
-  console.log('⚙️ Settings:', { masterOn, soundOn, vibrateOn, selectedTone });
-  
+
+  console.log('⚙️ Settings:', {
+    masterOn,
+    soundOn,
+    vibrateOn,
+    selectedTone
+  });
+
   if (!masterOn) {
     console.log('⏸️ Master switch OFF, skipping');
     return;
@@ -770,15 +1204,20 @@ window.playNotificationAlerts = async function() {
   if (soundOn && selectedTone !== 'none') {
     try {
       if (!window.__audioCtx) {
-        window.__audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        window.__audioCtx = new (
+          window.AudioContext || window.webkitAudioContext
+        )();
       }
+
       if (window.__audioCtx.state === 'suspended') {
         await window.__audioCtx.resume();
       }
-      
+
       const now = window.__audioCtx.currentTime;
+
       const osc = window.__audioCtx.createOscillator();
       const gain = window.__audioCtx.createGain();
+
       osc.connect(gain);
       gain.connect(window.__audioCtx.destination);
 
@@ -786,39 +1225,52 @@ window.playNotificationAlerts = async function() {
         osc.type = 'sine';
         osc.frequency.setValueAtTime(880, now);
         osc.frequency.setValueAtTime(1320, now + 0.15);
+
         gain.gain.setValueAtTime(0.4, now);
         gain.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
-        osc.start(now); osc.stop(now + 0.4);
-      } 
-      else if (selectedTone === 'chime') {
+
+        osc.start(now);
+        osc.stop(now + 0.4);
+
+      } else if (selectedTone === 'chime') {
         osc.type = 'triangle';
         osc.frequency.setValueAtTime(600, now);
         osc.frequency.exponentialRampToValueAtTime(800, now + 0.2);
         osc.frequency.exponentialRampToValueAtTime(600, now + 0.4);
+
         gain.gain.setValueAtTime(0.3, now);
         gain.gain.exponentialRampToValueAtTime(0.001, now + 0.6);
-        osc.start(now); osc.stop(now + 0.6);
-      }
-      else if (selectedTone === 'alert') {
+
+        osc.start(now);
+        osc.stop(now + 0.6);
+
+      } else if (selectedTone === 'alert') {
         osc.type = 'square';
         osc.frequency.setValueAtTime(1000, now);
+
         gain.gain.setValueAtTime(0.1, now);
         gain.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
+
         for (let i = 0; i < 3; i++) {
           osc.start(now + (i * 0.2));
           osc.stop(now + (i * 0.2) + 0.1);
         }
-      }
-      else if (selectedTone === 'bell') {
+
+      } else if (selectedTone === 'bell') {
         osc.type = 'sine';
         osc.frequency.setValueAtTime(1200, now);
+
         gain.gain.setValueAtTime(0.4, now);
         gain.gain.exponentialRampToValueAtTime(0.001, now + 1.2);
-        osc.start(now); osc.stop(now + 1.2);
+
+        osc.start(now);
+        osc.stop(now + 1.2);
       }
+
       console.log('🎵 Sound played successfully:', selectedTone);
-    } catch (e) { 
-      console.error("❌ Sound error:", e); 
+
+    } catch (e) {
+      console.error('❌ Sound error:', e);
     }
   }
 
@@ -830,7 +1282,7 @@ window.playNotificationAlerts = async function() {
 
 // ============================================
 // ✅ دعم التنقل الذكي في التطبيق المثبت (PWA)
-// ✅ تم حذف الكود الذي كان يعترض زر الرجوع ويعيد التوجيه لصفحة الإشعارات
+// ✅ تم حذف الكود الذي كان يعترض زر الرجوع
 // ============================================
 
 if ('serviceWorker' in navigator) {
