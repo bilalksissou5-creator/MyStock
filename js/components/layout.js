@@ -196,7 +196,7 @@ function renderLayout(activePage) {
         display: block;
         width: 35%;
         height: 100%;
-        background: #2563eb;
+        background: #111827;
         border-radius: 0 5px 5px 0;
         transform: translateX(-110%);
       }
