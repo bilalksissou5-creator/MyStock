@@ -1,6 +1,7 @@
 
 /* ============================================
    صفحة الإعدادات - عرض متجاوب لجميع الشاشات
+   ✅ عرض كامل مثل باقي صفحات التطبيق
    ============================================ */
 
 .settings-wrapper {
@@ -8,8 +9,8 @@
   flex-direction: column;
   gap: 16px;
   width: 100% !important;
-  max-width: 850px !important;
-  margin: 0 auto !important;
+  max-width: none !important;
+  margin: 0 !important;
   box-sizing: border-box !important;
 }
 
@@ -20,6 +21,7 @@
   overflow: hidden;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
   width: 100% !important;
+  max-width: none !important;
   box-sizing: border-box !important;
 }
 
@@ -36,6 +38,8 @@
   transition: background 0.15s;
   -webkit-tap-highlight-color: transparent;
   position: relative;
+  box-sizing: border-box;
+  width: 100%;
 }
 
 .settings-item:not(:last-child)::after {
@@ -152,6 +156,11 @@
 
 /* ══════ Responsive ══════ */
 @media (max-width: 480px) {
+  .settings-wrapper {
+    width: 100% !important;
+    max-width: none !important;
+  }
+
   .settings-card {
     border-radius: 16px;
   }
