@@ -1,6 +1,7 @@
 // ============================================
 // صفحة إضافة عامل — بريد أو QR
 // ✅ دعم كامل للترجمة
+// ✅ تحميل كسول (Lazy Loading) لمكتبة QR
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   const user = await requireAuth();
@@ -152,9 +153,29 @@ document.addEventListener('DOMContentLoaded', async () => {
   const addAnotherSection = document.getElementById('add-another-section');
 
   let currentQrToken = null;
+  let qrLibLoaded = false;
+
+  // ✅ دالة جديدة: تحميل مكتبة QR فقط عند الحاجة (Lazy Load)
+  async function loadQRLibrary() {
+    if (qrLibLoaded || typeof QRCode !== 'undefined') {
+      qrLibLoaded = true;
+      return;
+    }
+    return new Promise((resolve, reject) => {
+      const script = document.createElement('script');
+      // استخدام CDN لتحميل المكتبة
+      script.src = 'https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js';
+      script.onload = () => {
+        qrLibLoaded = true;
+        resolve();
+      };
+      script.onerror = () => reject(new Error('Failed to load QR Library'));
+      document.head.appendChild(script);
+    });
+  }
 
   document.querySelectorAll('.method-card').forEach(card => {
-    card.addEventListener('click', () => {
+    card.addEventListener('click', async () => {
       const method = card.dataset.method;
       methodSection.style.display = 'none';
       addAnotherSection.style.display = 'none';
@@ -166,7 +187,17 @@ document.addEventListener('DOMContentLoaded', async () => {
       } else {
         emailPanel.style.display = 'none';
         qrPanel.style.display = 'block';
-        generateQR();
+        
+        // ✅ ننتظر تحميل المكتبة ثم نولد الـ QR
+        const container = document.getElementById('qr-container');
+        container.innerHTML = `<div class="qr-loading"><i class="fas fa-spinner fa-spin"></i><p>${tr('loading')}</p></div>`;
+        
+        try {
+          await loadQRLibrary();
+          generateQR(); // هذه الدالة ستقوم بالباقي
+        } catch (err) {
+          container.innerHTML = `<div class="alert alert-error">${tr('aw_qr_lib_missing')}</div>`;
+        }
       }
     });
   });
