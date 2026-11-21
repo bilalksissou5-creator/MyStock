@@ -4,7 +4,7 @@
 // ✅ دعم كامل للترجمة
 // ✅ إصلاح اتجاه العملة (LTR) لمنع انزياحها
 // ✅ إخفاء المنتجات المحذوفة (deleted_at)
-// ✅ Skeleton Loading للتحميل التدريجي
+// ✅ Skeleton Loading للعناصر فقط باللون الرمادي
 // ============================================
 
 let productsChannel = null;
@@ -28,7 +28,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (!main) return;
 
   // ============================================
-  // ✅ إضافة CSS الخاص بالتحميل التدريجي
+  // ✅ CSS الخاص بعناصر التحميل الرمادية فقط
   // ============================================
   if (!document.getElementById('products-skeleton-style')) {
     const style = document.createElement('style');
@@ -37,14 +37,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     style.textContent = `
       .product-skeleton {
         pointer-events: none;
-        overflow: hidden;
       }
 
       .skeleton-shape {
         position: relative;
         overflow: hidden;
-        background: #e9e9e9;
-        border-radius: 7px;
+        background: #e5e5e5;
+        border-radius: 5px;
       }
 
       .skeleton-shape::after {
@@ -86,14 +85,14 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
 
       .skeleton-stat {
-        width: 80%;
-        height: 12px;
+        width: 65%;
+        height: 11px;
         margin: 8px auto;
       }
 
       .skeleton-stat-value {
-        width: 55%;
-        height: 17px;
+        width: 45%;
+        height: 16px;
         margin: 8px auto;
       }
 
@@ -108,7 +107,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   // ============================================
-  // ✅ إظهار هيكل الصفحة فوراً
+  // ✅ عرض هيكل الصفحة
   // ============================================
   main.innerHTML = `
     <div class="page-header">
@@ -132,7 +131,9 @@ document.addEventListener('DOMContentLoaded', async () => {
       ${Array.from({ length: 6 }).map(() => `
         <div class="product-card product-skeleton" aria-hidden="true">
           <div class="skeleton-shape skeleton-image"></div>
+
           <div class="skeleton-shape skeleton-title"></div>
+
           <div class="skeleton-shape skeleton-line"></div>
 
           <div class="product-stats">
@@ -183,7 +184,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   // ============================================
-  // ✅ جلب المنتجات واستبدال Skeleton بالبيانات
+  // ✅ جلب المنتجات
   // ============================================
   await loadProductsFromDB();
 
@@ -209,7 +210,9 @@ document.addEventListener('DOMContentLoaded', async () => {
       { event: '*', schema: 'public', table: 'products' },
       async (payload) => {
         if (payload.eventType === 'UPDATE') {
-          const index = cachedProducts.findIndex(p => p.id === payload.new.id);
+          const index = cachedProducts.findIndex(
+            p => p.id === payload.new.id
+          );
 
           // إذا تم حذف المنتج
           if (payload.new.deleted_at) {
