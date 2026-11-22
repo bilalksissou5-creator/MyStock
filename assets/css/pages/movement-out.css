@@ -4,6 +4,7 @@
    ✅ تصميم مستقل للشاشات الكبيرة (سكرول داخل البطاقة)
    ✅ تمرير طبيعي للهواتف
    ✅ إلغاء المسافة السفلية في الهاتف الأفقي فقط
+   ✅ Skeleton Screen
    ============================================ */
 
 .add-form {
@@ -415,6 +416,153 @@
 }
 
 /* ============================================
+   Skeleton Screen - إخراج المنتجات
+   ============================================ */
+
+/* الحاويات الوهمية */
+.add-form.add-skeleton-loading .card-supplier,
+.add-form.add-skeleton-loading .card-fields,
+.add-form.add-skeleton-loading .card-summary,
+.add-form.add-skeleton-loading .card-actions,
+.add-form.add-skeleton-loading .card-added {
+  background: #f1f1f1 !important;
+  border: 1px solid #e8e8e8 !important;
+  border-radius: 10px;
+  box-shadow: none !important;
+  box-sizing: border-box;
+}
+
+/* إلغاء الخلفية البيضاء للبطاقات الوهمية */
+.add-form.add-skeleton-loading .product-input-card,
+.add-form.add-skeleton-loading .added-products-section {
+  background: #f1f1f1 !important;
+}
+
+/* العناصر الوهمية */
+.add-skeleton-shape {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  background: #dedede;
+  border-radius: 6px;
+  flex-shrink: 0;
+}
+
+/* تأثير اللمعان */
+.add-skeleton-shape::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.65),
+    transparent
+  );
+  animation: outSkeletonShimmer 1.4s infinite;
+}
+
+@keyframes outSkeletonShimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* عنوان الصفحة */
+.add-skeleton-heading {
+  width: 145px;
+  height: 25px;
+  border-radius: 6px;
+}
+
+/* أزرار وهمية */
+.add-skeleton-control {
+  width: 100%;
+  height: 42px;
+  border-radius: 8px;
+}
+
+.page-header .add-skeleton-control {
+  width: 115px;
+  flex-shrink: 0;
+}
+
+/* تسميات الحقول */
+.add-skeleton-label {
+  width: 75px;
+  height: 13px;
+  margin-bottom: 10px;
+}
+
+/* حقول الإدخال */
+.add-skeleton-input {
+  width: 100%;
+  height: 42px;
+  border-radius: 7px;
+}
+
+/* عناصر الملخص */
+.add-skeleton-summary-label {
+  width: 65px;
+  height: 12px;
+  margin: 0 auto;
+}
+
+.add-skeleton-summary-value {
+  width: 45px;
+  height: 18px;
+  margin: 0 auto;
+}
+
+/* عنوان السلة */
+.add-skeleton-section-title {
+  width: 110px;
+  height: 16px;
+  margin-bottom: 16px;
+}
+
+/* بطاقات السلة الوهمية */
+.add-skeleton-card {
+  width: 100%;
+  min-height: 85px;
+  padding: 14px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #f1f1f1;
+  border: 1px solid #e8e8e8;
+  border-radius: 10px;
+  box-sizing: border-box;
+}
+
+/* أيقونة وهمية */
+.add-skeleton-empty-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 8px;
+}
+
+/* نص وهمي */
+.add-skeleton-empty-text {
+  width: 45%;
+  height: 13px;
+}
+
+/* لا تعرض عناصر المحتوى الحقيقي أثناء Skeleton */
+.add-form.add-skeleton-loading .empty-added,
+.add-form.add-skeleton-loading .added-product-card {
+  display: none !important;
+}
+
+/* تقليل الحركة حسب إعدادات الجهاز */
+@media (prefers-reduced-motion: reduce) {
+  .add-skeleton-shape::after {
+    animation: none !important;
+  }
+}
+
+/* ============================================
    تعديلات الماسح الضوئي
    ============================================ */
 
@@ -574,6 +722,15 @@
   .form-actions .btn-secondary {
     width: 100%;
     justify-content: center;
+  }
+
+  /* Skeleton على الهاتف */
+  .add-form.add-skeleton-loading .card-supplier,
+  .add-form.add-skeleton-loading .card-fields,
+  .add-form.add-skeleton-loading .card-added,
+  .add-form.add-skeleton-loading .card-summary,
+  .add-form.add-skeleton-loading .card-actions {
+    width: 100%;
   }
 }
 
