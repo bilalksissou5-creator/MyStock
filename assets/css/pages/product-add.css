@@ -893,30 +893,46 @@ html.in-iframe .add-form {
 
 /* ============================================
    Skeleton Screen — صفحة إضافة المنتجات
+   ✅ الحاويات رمادي فاتح
+   ✅ العناصر الوهمية رمادي أوضح
    ✅ Shimmer أفقي بسرعة 1.4 ثانية
-   ✅ بطاقات بيضاء
-   ✅ الحفاظ على أبعاد العناصر
+   ✅ الألوان تطبق أثناء التحميل فقط
    ============================================ */
 
+/* الحاويات الرئيسية أثناء التحميل فقط */
+.add-form.add-skeleton-loading .card-supplier,
+.add-form.add-skeleton-loading .card-fields,
+.add-form.add-skeleton-loading .card-summary,
+.add-form.add-skeleton-loading .card-actions,
+.add-form.add-skeleton-loading .card-added {
+  background: #f1f1f1 !important;
+  border-color: #e8e8e8 !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+/* خلفية بطاقات Skeleton */
 .add-skeleton-card {
-  background: #ffffff;
+  background: #f1f1f1;
   border-radius: 10px;
   padding: 16px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
   box-sizing: border-box;
   min-width: 0;
   pointer-events: none;
 }
 
+/* العناصر الوهمية */
 .add-skeleton-shape {
   position: relative;
   display: block;
   overflow: hidden;
-  background: #e5e5e5;
-  border-radius: 4px;
   flex-shrink: 0;
+  background: #dedede;
+  border-radius: 4px;
+  pointer-events: none;
 }
 
+/* تأثير اللمعان */
 .add-skeleton-shape::after {
   content: "";
   position: absolute;
@@ -937,98 +953,93 @@ html.in-iframe .add-form {
   }
 }
 
-/* عنوان القسم */
-.add-skeleton-title {
-  width: 38%;
+/* عنوان الصفحة */
+.add-skeleton-heading {
+  width: 135px;
+  max-width: 45%;
   height: 19px;
-  margin-bottom: 16px;
+  border-radius: 4px;
 }
 
-/* الحقول */
-.add-skeleton-field {
-  display: flex;
-  flex-direction: column;
-  gap: 9px;
-  margin-bottom: 16px;
-  min-width: 0;
+/* عناصر التحكم الوهمية */
+.add-skeleton-control {
+  pointer-events: none !important;
+  color: transparent !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
 }
 
+/* النص الوهمي داخل الزر */
+.add-skeleton-button-text {
+  width: 65px;
+  height: 12px;
+  border-radius: 4px;
+}
+
+/* عناوين الحقول */
 .add-skeleton-label {
-  width: 28%;
+  display: block;
+  width: 75px;
+  max-width: 45%;
   height: 11px;
+  margin-bottom: 8px;
 }
 
+/* حقول الإدخال الوهمية */
 .add-skeleton-input {
   width: 100%;
   height: 40px;
   border-radius: 7px;
 }
 
-/* زر */
-.add-skeleton-button {
-  width: 100%;
-  height: 42px;
-  border-radius: 7px;
+/* عناوين الملخص */
+.add-skeleton-summary-label {
+  width: 65%;
+  max-width: 90px;
+  height: 10px;
+  border-radius: 3px;
 }
 
-/* ملخص المنتجات */
-.add-skeleton-summary {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 8px;
+/* قيم الملخص */
+.add-skeleton-summary-value {
+  width: 45%;
+  max-width: 65px;
+  height: 15px;
+  border-radius: 3px;
 }
 
-.add-skeleton-summary-item {
-  height: 65px;
-  border-radius: 8px;
+/* عنوان السلة */
+.add-skeleton-section-title {
+  width: 125px;
+  max-width: 65%;
+  height: 14px;
+  border-radius: 3px;
 }
 
-/* بطاقة السلة */
-.add-skeleton-cart-item {
-  display: grid;
-  grid-template-columns: 44px minmax(0, 1fr) auto;
-  align-items: center;
-  gap: 10px;
-  padding: 12px;
-  background: #fafafa;
-  border: 1px solid #f0f0f0;
-  border-radius: 10px;
+/* أيقونة السلة الوهمية */
+.add-skeleton-empty-icon {
+  width: 32px;
+  height: 32px;
   margin-bottom: 8px;
-  box-sizing: border-box;
-}
-
-.add-skeleton-image {
-  width: 44px;
-  height: 44px;
-  border-radius: 8px;
-}
-
-.add-skeleton-info {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  min-width: 0;
-}
-
-.add-skeleton-name {
-  width: 75%;
-  height: 11px;
-}
-
-.add-skeleton-detail {
-  width: 50%;
-  height: 8px;
-}
-
-.add-skeleton-stats {
-  display: flex;
-  gap: 6px;
-}
-
-.add-skeleton-stat {
-  width: 48px;
-  height: 39px;
   border-radius: 6px;
+}
+
+/* النص الوهمي للسلة */
+.add-skeleton-empty-text {
+  width: 125px;
+  max-width: 80%;
+  height: 13px;
+  border-radius: 3px;
+}
+
+/* خلفية منطقة السلة أثناء التحميل */
+.add-form.add-skeleton-loading .card-added .added-products {
+  background: transparent;
+}
+
+/* منع التفاعل مع Skeleton */
+.add-form.add-skeleton-loading {
+  pointer-events: none;
 }
 
 /* ظهور المحتوى الحقيقي */
@@ -1046,7 +1057,7 @@ html.in-iframe .add-form {
   }
 }
 
-/* احترام تقليل الحركة */
+/* احترام إعداد تقليل الحركة */
 @media (prefers-reduced-motion: reduce) {
   .add-skeleton-shape::after {
     animation: none;
@@ -1055,37 +1066,5 @@ html.in-iframe .add-form {
   .add-page-enter {
     animation: none;
     opacity: 1;
-  }
-}
-
-/* الهاتف */
-@media (max-width: 699px) {
-  .add-skeleton-summary {
-    grid-template-columns: 1fr;
-  }
-
-  .add-skeleton-summary-item {
-    height: 42px;
-  }
-
-  .add-skeleton-cart-item {
-    grid-template-columns: 40px minmax(0, 1fr);
-  }
-
-  .add-skeleton-stats {
-    grid-column: 1 / -1;
-    justify-content: flex-end;
-  }
-}
-
-/* الشاشات الكبيرة */
-@media (min-width: 700px) {
-  .add-skeleton-cart-item {
-    grid-template-columns: 40px minmax(0, 1fr) auto;
-  }
-
-  .add-skeleton-image {
-    width: 40px;
-    height: 40px;
   }
 }

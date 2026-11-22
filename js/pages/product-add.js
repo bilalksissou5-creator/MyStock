@@ -2,10 +2,10 @@
 // ============================================
 // صفحة إضافة منتجات
 // ✅ Skeleton Screen قبل تحميل البيانات
-// ✅ مطابقة Skeleton مع العناصر الحقيقية
-// ✅ الترتيب الصحيح للهاتف (السلة قبل الملخص والأزرار)
-// ✅ إعادة السلوك القديم: المسح يملأ الحقول فقط (الإضافة عبر زر "تم")
-// ✅ إصلاح تفريغ حقل الفئة (Category) بعد الإضافة
+// ✅ الحاويات الوهمية بلون مختلف عن العناصر الوهمية
+// ✅ الحفاظ على ترتيب الهاتف والشاشات الكبيرة
+// ✅ المسح يملأ الحقول فقط (الإضافة عبر زر "تم")
+// ✅ إصلاح تفريغ حقل الفئة بعد الإضافة
 // ✅ ربط حركة المخزون بالفاتورة (invoice_id)
 // ============================================
 
@@ -18,118 +18,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   renderLayout('products/add.html');
   if (window.applyLanguage) window.applyLanguage();
-
-  const main = document.getElementById('main-content');
-
-  // ============================================
-  // Skeleton Screen
-  // ============================================
-  function renderAddSkeleton() {
-    main.innerHTML = `
-      <div class="add-form">
-        <div class="form-left-col">
-
-          <div class="page-header">
-            <h2>
-              <span class="add-skeleton-shape add-skeleton-heading"></span>
-            </h2>
-            <button type="button" class="btn-primary scan-btn add-skeleton-control" disabled>
-              <span class="add-skeleton-shape add-skeleton-button-text"></span>
-            </button>
-          </div>
-
-          <div class="alert alert-error" style="display:none;"></div>
-          <div class="alert alert-success" style="display:none;"></div>
-
-          <div class="product-input-card card-supplier">
-            <div class="form-group supplier-group">
-              <label class="add-skeleton-label add-skeleton-shape"></label>
-              <div class="add-skeleton-shape add-skeleton-input"></div>
-            </div>
-          </div>
-
-          <div class="product-input-card card-fields">
-            <div class="form-grid">
-              <div class="form-group">
-                <label class="add-skeleton-label add-skeleton-shape"></label>
-                <div class="add-skeleton-shape add-skeleton-input"></div>
-              </div>
-
-              <div class="form-group">
-                <label class="add-skeleton-label add-skeleton-shape"></label>
-                <div class="add-skeleton-shape add-skeleton-input"></div>
-              </div>
-
-              <div class="form-group">
-                <label class="add-skeleton-label add-skeleton-shape"></label>
-                <div class="add-skeleton-shape add-skeleton-input"></div>
-              </div>
-            </div>
-
-            <div class="form-group">
-              <label class="add-skeleton-label add-skeleton-shape"></label>
-              <div class="add-skeleton-shape add-skeleton-input"></div>
-            </div>
-
-            <div class="form-group">
-              <label class="add-skeleton-label add-skeleton-shape"></label>
-              <div class="add-skeleton-shape add-skeleton-input"></div>
-            </div>
-
-            <button type="button" class="btn-primary add-product-btn add-skeleton-control" disabled>
-              <span class="add-skeleton-shape add-skeleton-button-text"></span>
-            </button>
-          </div>
-
-          <div class="form-summary card-summary">
-            <div class="summary-row">
-              <span class="add-skeleton-shape add-skeleton-summary-label"></span>
-              <strong class="add-skeleton-shape add-skeleton-summary-value"></strong>
-            </div>
-
-            <div class="summary-row">
-              <span class="add-skeleton-shape add-skeleton-summary-label"></span>
-              <strong class="add-skeleton-shape add-skeleton-summary-value"></strong>
-            </div>
-
-            <div class="summary-row highlight">
-              <span class="add-skeleton-shape add-skeleton-summary-label"></span>
-              <strong class="add-skeleton-shape add-skeleton-summary-value"></strong>
-            </div>
-          </div>
-
-          <div class="form-actions card-actions">
-            <button type="button" class="btn-primary add-skeleton-control" disabled>
-              <span class="add-skeleton-shape add-skeleton-button-text"></span>
-            </button>
-
-            <a class="btn-secondary add-skeleton-control">
-              <span class="add-skeleton-shape add-skeleton-button-text"></span>
-            </a>
-          </div>
-
-        </div>
-
-        <div class="form-right-col">
-          <div class="added-products-section card-added">
-            <label class="section-label">
-              <span class="add-skeleton-shape add-skeleton-section-title"></span>
-            </label>
-
-            <div class="added-products">
-              <div class="empty-added">
-                <span class="add-skeleton-shape add-skeleton-empty-icon"></span>
-                <span class="add-skeleton-shape add-skeleton-empty-text"></span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    `;
-  }
-
-  // إظهار Skeleton مباشرة قبل تحميل البيانات
-  renderAddSkeleton();
 
   const tr = (key, fallback) => {
     if (window.t) {
@@ -150,9 +38,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   };
 
   const normalizeName = (s) => String(s || '')
-    .trim()
-    .toLowerCase()
-    .replace(/\s+/g, ' ')
+    .trim().toLowerCase().replace(/\s+/g, ' ')
     .replace(/[\u0640\u064B-\u065F]/g, '');
 
   const pricesEqual = (a, b) =>
@@ -160,14 +46,131 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   document.title = tr('prod_add_title_full', 'Add Products');
 
-  const { data: userProfile, error: profileErr } = await db
+  // ============================================
+  // Skeleton Screen — صفحة إضافة المنتجات
+  // ============================================
+
+  const main = document.getElementById('main-content');
+  if (!main) return;
+
+  function renderAddSkeleton() {
+    const shape = (className = '') =>
+      `<span class="add-skeleton-shape ${className}"></span>`;
+
+    main.innerHTML = `
+      <div class="add-form add-skeleton-loading">
+
+        <div class="form-left-col">
+
+          <div class="page-header">
+            ${shape('add-skeleton-heading')}
+            ${shape('add-skeleton-scan')}
+          </div>
+
+          <div class="product-input-card card-supplier">
+            <div class="form-group supplier-group">
+              ${shape('add-skeleton-label')}
+              ${shape('add-skeleton-input')}
+            </div>
+          </div>
+
+          <div class="product-input-card card-fields">
+
+            <div class="form-grid">
+              <div class="form-group">
+                ${shape('add-skeleton-label')}
+                ${shape('add-skeleton-input')}
+              </div>
+
+              <div class="form-group">
+                ${shape('add-skeleton-label')}
+                ${shape('add-skeleton-input')}
+              </div>
+
+              <div class="form-group">
+                ${shape('add-skeleton-label')}
+                ${shape('add-skeleton-input')}
+              </div>
+            </div>
+
+            <div class="form-group">
+              ${shape('add-skeleton-label')}
+              ${shape('add-skeleton-input')}
+            </div>
+
+            <div class="form-group">
+              ${shape('add-skeleton-label')}
+              ${shape('add-skeleton-input')}
+            </div>
+
+            ${shape('add-skeleton-done')}
+          </div>
+
+          <div class="form-summary card-summary">
+            <div class="summary-row">
+              ${shape('add-skeleton-summary-label')}
+              ${shape('add-skeleton-summary-value')}
+            </div>
+
+            <div class="summary-row">
+              ${shape('add-skeleton-summary-label')}
+              ${shape('add-skeleton-summary-value')}
+            </div>
+
+            <div class="summary-row highlight">
+              ${shape('add-skeleton-summary-label')}
+              ${shape('add-skeleton-summary-value')}
+            </div>
+          </div>
+
+          <div class="form-actions card-actions">
+            ${shape('add-skeleton-action')}
+            ${shape('add-skeleton-action')}
+          </div>
+
+        </div>
+
+        <div class="form-right-col">
+          <div class="added-products-section card-added">
+
+            ${shape('add-skeleton-section-title')}
+
+            <div class="added-products">
+              <div class="add-skeleton-empty">
+                ${shape('add-skeleton-empty-icon')}
+                ${shape('add-skeleton-empty-text')}
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    `;
+  }
+
+  // إظهار Skeleton مباشرة قبل جلب البيانات
+  renderAddSkeleton();
+
+  // ============================================
+  // تحميل بيانات المؤسسة والموردين
+  // ============================================
+
+  const {
+    data: userProfile,
+    error: profileErr
+  } = await db
     .from('profiles')
     .select('organization_id, full_name')
     .eq('id', user.id)
     .single();
 
   if (profileErr || !userProfile?.organization_id) {
-    alert(tr('prod_add_err_org', 'Organization not found'));
+    main.innerHTML = `
+      <div class="alert alert-error">
+        ${escapeHtml(tr('prod_add_err_org', 'Organization not found'))}
+      </div>
+    `;
     return;
   }
 
@@ -193,12 +196,13 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   // ============================================
-  // الواجهة الحقيقية
+  // عرض الواجهة الحقيقية
+  // إزالة Skeleton تلقائياً باستبدال محتوى main
   // ============================================
+
   main.innerHTML = `
     <div class="add-form">
 
-      <!-- الحاوية اليسرى (النموذج) -->
       <div class="form-left-col">
 
         <div class="page-header">
@@ -228,6 +232,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         </div>
 
         <div class="product-input-card card-fields">
+
           <div class="form-grid">
 
             <div class="form-group">
@@ -280,6 +285,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             <i class="fas fa-check"></i>
             <span>${tr('prod_add_done')}</span>
           </button>
+
         </div>
 
         <div class="form-summary card-summary">
@@ -312,13 +318,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       </div>
 
-      <!-- الحاوية اليمنى (السلة) -->
       <div class="form-right-col">
         <div class="added-products-section card-added">
 
-          <label class="section-label">
-            ${tr('prod_add_added')}
-          </label>
+          <label class="section-label">${tr('prod_add_added')}</label>
 
           <div id="added-products" class="added-products">
             <div class="empty-added">
@@ -358,6 +361,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     </div>
   `;
 
+  // ============================================
+  // عناصر الصفحة
+  // ============================================
+
   const supplierInput = document.getElementById('supplier-input');
   const supplierIdInput = document.getElementById('supplier_id');
   const suggestions = document.getElementById('supplier-suggestions');
@@ -392,6 +399,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   let scannedImageUrl = null;
   let currentFacingMode = 'environment';
 
+  // ============================================
+  // التنبيهات
+  // ============================================
+
   function showErr(msg) {
     errBox.textContent = msg;
     errBox.style.display = 'block';
@@ -412,6 +423,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   // ============================================
   // الموردون والاقتراحات
   // ============================================
+
   function showSuggestions(filter) {
     const q = filter.trim().toLowerCase();
 
@@ -443,7 +455,8 @@ document.addEventListener('DOMContentLoaded', async () => {
           <strong>${escapeHtml(s.name)}</strong>
           ${s.specialty
             ? `<span class="suggestion-sku">${escapeHtml(s.specialty)}</span>`
-            : ''}
+            : ''
+          }
         </div>
       </div>
     `).join('');
@@ -455,13 +468,18 @@ document.addEventListener('DOMContentLoaded', async () => {
           data-new="true"
           data-name="${escapeHtml(filter.trim())}"
         >
-          <div class="suggestion-image" style="background:#dcfce7;color:#16a34a;">
+          <div
+            class="suggestion-image"
+            style="background:#dcfce7;color:#16a34a;"
+          >
             <i class="fas fa-plus"></i>
           </div>
 
           <div class="suggestion-info">
             <strong>${tr('prod_add_new_supplier')}</strong>
-            <span class="suggestion-sku">"${escapeHtml(filter.trim())}"</span>
+            <span class="suggestion-sku">
+              "${escapeHtml(filter.trim())}"
+            </span>
           </div>
         </div>
       `;
@@ -510,6 +528,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
           currentSupplierId = null;
           categoryInput.value = '';
+
         } else {
           selectedSupplier = (suppliers ?? [])
             .find(s => s.id === newId) || null;
@@ -551,6 +570,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   // ============================================
   // الماسح الضوئي
   // ============================================
+
   async function startCameraWithMode(mode) {
     if (html5QrCode) {
       try {
@@ -560,6 +580,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     scannerReader.innerHTML = '';
+
     html5QrCode = new Html5Qrcode('scanner-reader');
 
     const qrSize = Math.max(
@@ -606,6 +627,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     try {
       await startCameraWithMode(currentFacingMode);
+
     } catch (err) {
       showErr(
         tr('prod_add_camera_err', 'Camera error') +
@@ -641,20 +663,19 @@ document.addEventListener('DOMContentLoaded', async () => {
   scannerFlipBtn.addEventListener('click', async () => {
     if (!html5QrCode) return;
 
-    currentFacingMode =
-      currentFacingMode === 'environment'
-        ? 'user'
-        : 'environment';
+    currentFacingMode = currentFacingMode === 'environment'
+      ? 'user'
+      : 'environment';
 
     try {
       await startCameraWithMode(currentFacingMode);
+
     } catch (err) {
       console.error('Camera flip error:', err);
 
-      currentFacingMode =
-        currentFacingMode === 'environment'
-          ? 'user'
-          : 'environment';
+      currentFacingMode = currentFacingMode === 'environment'
+        ? 'user'
+        : 'environment';
 
       try {
         await startCameraWithMode(currentFacingMode);
@@ -702,6 +723,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       categoryInput.value = localProduct.category ?? '';
       qtyInput.value = '1';
       skuInput.value = value;
+
       scannedImageUrl = localProduct.image_url || null;
       return;
     }
@@ -724,9 +746,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           p.product_name_en ||
           '';
 
-        if (productName) {
-          nameInput.value = productName;
-        }
+        if (productName) nameInput.value = productName;
 
         if (p.categories) {
           const firstCategory = p.categories.split(',')[0].trim();
@@ -736,14 +756,13 @@ document.addEventListener('DOMContentLoaded', async () => {
           }
         }
 
-        if (p.image_url) {
-          scannedImageUrl = p.image_url;
-        }
+        if (p.image_url) scannedImageUrl = p.image_url;
 
         skuInput.value = value;
         qtyInput.value = '1';
         return;
       }
+
     } catch (err) {
       console.warn('Open Food Facts error:', err);
     }
@@ -756,14 +775,13 @@ document.addEventListener('DOMContentLoaded', async () => {
   scannerClose.addEventListener('click', stopScanner);
 
   scannerModal.addEventListener('click', (e) => {
-    if (e.target === scannerModal) {
-      stopScanner();
-    }
+    if (e.target === scannerModal) stopScanner();
   });
 
   // ============================================
-  // عرض المنتجات المضافة في السلة
+  // عرض المنتجات المضافة إلى السلة
   // ============================================
+
   function renderAddedProducts() {
     if (addedProducts.length === 0) {
       addedContainer.innerHTML = `
@@ -805,6 +823,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
           <div class="added-product-info">
             <strong>${escapeHtml(p.name)}</strong>
+
             <span>
               ${p.category ? escapeHtml(p.category) + ' • ' : ''}
               ${barcodeTags}
@@ -825,7 +844,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             <div class="stat-mini highlight">
               <span>${tr('products_total')}</span>
-              <b>${(Number(p.qty) * Number(p.price)).toFixed(2)}</b>
+              <b>
+                ${(Number(p.qty) * Number(p.price)).toFixed(2)}
+              </b>
             </div>
 
           </div>
@@ -861,6 +882,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   // ============================================
   // تحديث الملخص
   // ============================================
+
   function updateSummary() {
     let totalQty = 0;
     let totalValue = 0;
@@ -870,14 +892,20 @@ document.addEventListener('DOMContentLoaded', async () => {
       totalValue += Number(p.qty) * Number(p.price);
     });
 
-    document.getElementById('sum-rows').textContent = addedProducts.length;
-    document.getElementById('sum-qty').textContent = totalQty;
-    document.getElementById('sum-total').textContent = totalValue.toFixed(2);
+    document.getElementById('sum-rows').textContent =
+      addedProducts.length;
+
+    document.getElementById('sum-qty').textContent =
+      totalQty;
+
+    document.getElementById('sum-total').textContent =
+      totalValue.toFixed(2);
   }
 
   // ============================================
-  // إضافة منتج إلى السلة
+  // إضافة المنتج إلى السلة
   // ============================================
+
   function addToCart() {
     if (doneBtn.dataset.busy === '1' || doneBtn.disabled) return;
 
@@ -929,13 +957,12 @@ document.addEventListener('DOMContentLoaded', async () => {
           item.skus.push(skuValue);
         }
 
-        if (skuValue) {
-          item.sku = skuValue;
-        }
+        if (skuValue) item.sku = skuValue;
 
         if (scannedImageUrl && !item.image_url) {
           item.image_url = scannedImageUrl;
         }
+
       } else {
         const finalSku = skuValue ||
           ('SKU-' + Date.now() + '-' + Math.floor(Math.random() * 10000));
@@ -976,6 +1003,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   // ============================================
   // حفظ المنتجات والفاتورة
   // ============================================
+
   saveAllBtn.addEventListener('click', async (e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -996,27 +1024,28 @@ document.addEventListener('DOMContentLoaded', async () => {
       tr('prod_add_saving', '...');
 
     try {
-      const { data: authData, error: authErr } =
-        await db.auth.getUser();
+      const {
+        data: authData,
+        error: authErr
+      } = await db.auth.getUser();
 
       const authUser = authData?.user;
 
       if (authErr || !authUser) {
-        throw new Error(
-          tr('prod_add_err_auth', 'Authentication error')
-        );
+        throw new Error(tr('prod_add_err_auth', 'Authentication error'));
       }
 
-      const { data: profile, error: profErr } = await db
+      const {
+        data: profile,
+        error: profErr
+      } = await db
         .from('profiles')
         .select('organization_id, full_name')
         .eq('id', authUser.id)
         .single();
 
       if (profErr || !profile?.organization_id) {
-        throw new Error(
-          tr('prod_add_err_org', 'Organization not found')
-        );
+        throw new Error(tr('prod_add_err_org', 'Organization not found'));
       }
 
       let finalSupplierId = supplierIdInput.value || null;
@@ -1030,7 +1059,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         : typedSupplierName;
 
       if (!finalSupplierId && candidateNewName) {
-        const { data: existingSupplier, error: findSupErr } = await db
+        const {
+          data: existingSupplier,
+          error: findSupErr
+        } = await db
           .from('suppliers')
           .select('id')
           .eq('organization_id', profile.organization_id)
@@ -1046,8 +1078,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         if (existingSupplier) {
           finalSupplierId = existingSupplier.id;
+
         } else {
-          const { data: createdSupplier, error: supErr } = await db
+          const {
+            data: createdSupplier,
+            error: supErr
+          } = await db
             .from('suppliers')
             .insert({
               organization_id: profile.organization_id,
@@ -1109,9 +1145,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             .in('sku', allBarcodes)
             .limit(1);
 
-          if (bySku?.[0]) {
-            matchedProduct = bySku[0];
-          }
+          if (bySku?.[0]) matchedProduct = bySku[0];
         }
 
         if (!matchedProduct) {
@@ -1126,7 +1160,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             ? q.eq('supplier_id', finalSupplierId)
             : q.is('supplier_id', null);
 
-          const { data: byName, error: nameErr } = await q
+          const {
+            data: byName,
+            error: nameErr
+          } = await q
             .order('created_at', { ascending: true })
             .limit(1);
 
@@ -1136,9 +1173,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             );
           }
 
-          if (byName?.[0]) {
-            matchedProduct = byName[0];
-          }
+          if (byName?.[0]) matchedProduct = byName[0];
         }
 
         let productId;
@@ -1162,8 +1197,12 @@ document.addEventListener('DOMContentLoaded', async () => {
               tr('prod_add_err_link') + ' ' + updErr.message
             );
           }
+
         } else {
-          const { data: newProduct, error: insertError } = await db
+          const {
+            data: newProduct,
+            error: insertError
+          } = await db
             .from('products')
             .insert({
               organization_id: profile.organization_id,
@@ -1200,22 +1239,27 @@ document.addEventListener('DOMContentLoaded', async () => {
 
           await db
             .from('product_barcodes')
-            .upsert(aliasRows, {
-              onConflict: 'organization_id,barcode',
-              ignoreDuplicates: true
-            });
+            .upsert(
+              aliasRows,
+              {
+                onConflict: 'organization_id,barcode',
+                ignoreDuplicates: true
+              }
+            );
         }
 
-        // ربط حركة المخزون بالفاتورة
-        await db.from('stock_movements').insert({
-          organization_id: profile.organization_id,
-          product_id: productId,
-          invoice_id: invoiceNumber,
-          type: 'in',
-          method: 'manual',
-          quantity: Number(p.qty),
-          performed_by: authUser.id
-        });
+        // ربط حركة المخزون برقم الفاتورة
+        await db
+          .from('stock_movements')
+          .insert({
+            organization_id: profile.organization_id,
+            product_id: productId,
+            invoice_id: invoiceNumber,
+            type: 'in',
+            method: 'manual',
+            quantity: Number(p.qty),
+            performed_by: authUser.id
+          });
 
         itemResults.push({
           productId,
@@ -1236,7 +1280,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         0
       );
 
-      const { data: newInvoice, error: invoiceErr } = await db
+      const {
+        data: newInvoice,
+        error: invoiceErr
+      } = await db
         .from('invoices')
         .insert({
           invoice_number: invoiceNumber,
@@ -1283,12 +1330,13 @@ document.addEventListener('DOMContentLoaded', async () => {
             title: tr('prod_add_notif_title'),
             message:
               `${profile.full_name || tr('prod_detail_user')} ` +
-              `${tr('prod_add_notif_msg')} ${invoiceNumber} ` +
-              `(${totalQty} - ${totalValue.toFixed(2)})`,
+              `${tr('prod_add_notif_msg')} ` +
+              `${invoiceNumber} (${totalQty} - ${totalValue.toFixed(2)})`,
             type: 'success',
             link: `/invoice.html?id=${encodeURIComponent(invoiceNumber)}`,
             userName: profile.full_name || null
           });
+
         } catch (notifErr) {
           console.error('Notification error:', notifErr);
         }
@@ -1340,8 +1388,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
 
   // ============================================
-  // استقبال اختيار المنتج من iframe
+  // استقبال اختيار منتج من صفحة أخرى
   // ============================================
+
   window.addEventListener('message', (event) => {
     const data = event.data;
 
@@ -1357,5 +1406,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   });
 
+  // ============================================
+  // التهيئة النهائية
+  // ============================================
+
   renderAddedProducts();
+
 });
