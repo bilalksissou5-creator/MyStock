@@ -2,7 +2,7 @@
 // ============================================
 // صفحة إضافة منتجات
 // ✅ Skeleton Screen قبل تحميل البيانات
-// ✅ ظهور العناصر الحقيقية تدريجياً من الأعلى إلى الأسفل
+// ✅ مطابقة Skeleton مع العناصر الحقيقية
 // ✅ الترتيب الصحيح للهاتف (السلة قبل الملخص والأزرار)
 // ✅ إعادة السلوك القديم: المسح يملأ الحقول فقط (الإضافة عبر زر "تم")
 // ✅ إصلاح تفريغ حقل الفئة (Category) بعد الإضافة
@@ -17,137 +17,119 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (!user) return;
 
   renderLayout('products/add.html');
+  if (window.applyLanguage) window.applyLanguage();
 
   const main = document.getElementById('main-content');
-  if (!main) return;
 
   // ============================================
-  // Skeleton Screen — يظهر قبل تحميل بيانات الصفحة
+  // Skeleton Screen
   // ============================================
-
   function renderAddSkeleton() {
     main.innerHTML = `
       <div class="add-form">
-
         <div class="form-left-col">
 
-          <div class="page-header add-skeleton-card">
-            <span class="add-skeleton-shape add-skeleton-title"></span>
-            <span class="add-skeleton-shape add-skeleton-button"></span>
+          <div class="page-header">
+            <h2>
+              <span class="add-skeleton-shape add-skeleton-heading"></span>
+            </h2>
+            <button type="button" class="btn-primary scan-btn add-skeleton-control" disabled>
+              <span class="add-skeleton-shape add-skeleton-button-text"></span>
+            </button>
           </div>
 
           <div class="alert alert-error" style="display:none;"></div>
+          <div class="alert alert-success" style="display:none;"></div>
 
-          <div class="product-input-card card-supplier add-skeleton-card">
-            <div class="add-skeleton-field">
-              <span class="add-skeleton-shape add-skeleton-label"></span>
-              <span class="add-skeleton-shape add-skeleton-input"></span>
+          <div class="product-input-card card-supplier">
+            <div class="form-group supplier-group">
+              <label class="add-skeleton-label add-skeleton-shape"></label>
+              <div class="add-skeleton-shape add-skeleton-input"></div>
             </div>
           </div>
 
-          <div class="product-input-card card-fields add-skeleton-card">
-
+          <div class="product-input-card card-fields">
             <div class="form-grid">
-              <div class="add-skeleton-field">
-                <span class="add-skeleton-shape add-skeleton-label"></span>
-                <span class="add-skeleton-shape add-skeleton-input"></span>
+              <div class="form-group">
+                <label class="add-skeleton-label add-skeleton-shape"></label>
+                <div class="add-skeleton-shape add-skeleton-input"></div>
               </div>
 
-              <div class="add-skeleton-field">
-                <span class="add-skeleton-shape add-skeleton-label"></span>
-                <span class="add-skeleton-shape add-skeleton-input"></span>
+              <div class="form-group">
+                <label class="add-skeleton-label add-skeleton-shape"></label>
+                <div class="add-skeleton-shape add-skeleton-input"></div>
               </div>
 
-              <div class="add-skeleton-field">
-                <span class="add-skeleton-shape add-skeleton-label"></span>
-                <span class="add-skeleton-shape add-skeleton-input"></span>
+              <div class="form-group">
+                <label class="add-skeleton-label add-skeleton-shape"></label>
+                <div class="add-skeleton-shape add-skeleton-input"></div>
               </div>
             </div>
 
-            <div class="add-skeleton-field">
-              <span class="add-skeleton-shape add-skeleton-label"></span>
-              <span class="add-skeleton-shape add-skeleton-input"></span>
+            <div class="form-group">
+              <label class="add-skeleton-label add-skeleton-shape"></label>
+              <div class="add-skeleton-shape add-skeleton-input"></div>
             </div>
 
-            <div class="add-skeleton-field">
-              <span class="add-skeleton-shape add-skeleton-label"></span>
-              <span class="add-skeleton-shape add-skeleton-input"></span>
+            <div class="form-group">
+              <label class="add-skeleton-label add-skeleton-shape"></label>
+              <div class="add-skeleton-shape add-skeleton-input"></div>
             </div>
 
-            <span class="add-skeleton-shape add-skeleton-button"></span>
-
+            <button type="button" class="btn-primary add-product-btn add-skeleton-control" disabled>
+              <span class="add-skeleton-shape add-skeleton-button-text"></span>
+            </button>
           </div>
 
-          <div class="form-summary card-summary add-skeleton-card">
-            <div class="add-skeleton-summary">
-              <span class="add-skeleton-shape add-skeleton-summary-item"></span>
-              <span class="add-skeleton-shape add-skeleton-summary-item"></span>
-              <span class="add-skeleton-shape add-skeleton-summary-item"></span>
+          <div class="form-summary card-summary">
+            <div class="summary-row">
+              <span class="add-skeleton-shape add-skeleton-summary-label"></span>
+              <strong class="add-skeleton-shape add-skeleton-summary-value"></strong>
+            </div>
+
+            <div class="summary-row">
+              <span class="add-skeleton-shape add-skeleton-summary-label"></span>
+              <strong class="add-skeleton-shape add-skeleton-summary-value"></strong>
+            </div>
+
+            <div class="summary-row highlight">
+              <span class="add-skeleton-shape add-skeleton-summary-label"></span>
+              <strong class="add-skeleton-shape add-skeleton-summary-value"></strong>
             </div>
           </div>
 
-          <div class="form-actions card-actions add-skeleton-card">
-            <span class="add-skeleton-shape add-skeleton-button"></span>
-            <span class="add-skeleton-shape add-skeleton-button"></span>
+          <div class="form-actions card-actions">
+            <button type="button" class="btn-primary add-skeleton-control" disabled>
+              <span class="add-skeleton-shape add-skeleton-button-text"></span>
+            </button>
+
+            <a class="btn-secondary add-skeleton-control">
+              <span class="add-skeleton-shape add-skeleton-button-text"></span>
+            </a>
           </div>
 
         </div>
 
         <div class="form-right-col">
-
-          <div class="added-products-section card-added add-skeleton-card">
-
-            <span class="add-skeleton-shape add-skeleton-title"></span>
+          <div class="added-products-section card-added">
+            <label class="section-label">
+              <span class="add-skeleton-shape add-skeleton-section-title"></span>
+            </label>
 
             <div class="added-products">
-
-              <div class="add-skeleton-cart-item">
-                <span class="add-skeleton-shape add-skeleton-image"></span>
-                <div class="add-skeleton-info">
-                  <span class="add-skeleton-shape add-skeleton-name"></span>
-                  <span class="add-skeleton-shape add-skeleton-detail"></span>
-                </div>
-                <div class="add-skeleton-stats">
-                  <span class="add-skeleton-shape add-skeleton-stat"></span>
-                  <span class="add-skeleton-shape add-skeleton-stat"></span>
-                </div>
+              <div class="empty-added">
+                <span class="add-skeleton-shape add-skeleton-empty-icon"></span>
+                <span class="add-skeleton-shape add-skeleton-empty-text"></span>
               </div>
-
-              <div class="add-skeleton-cart-item">
-                <span class="add-skeleton-shape add-skeleton-image"></span>
-                <div class="add-skeleton-info">
-                  <span class="add-skeleton-shape add-skeleton-name"></span>
-                  <span class="add-skeleton-shape add-skeleton-detail"></span>
-                </div>
-                <div class="add-skeleton-stats">
-                  <span class="add-skeleton-shape add-skeleton-stat"></span>
-                  <span class="add-skeleton-shape add-skeleton-stat"></span>
-                </div>
-              </div>
-
-              <div class="add-skeleton-cart-item">
-                <span class="add-skeleton-shape add-skeleton-image"></span>
-                <div class="add-skeleton-info">
-                  <span class="add-skeleton-shape add-skeleton-name"></span>
-                  <span class="add-skeleton-shape add-skeleton-detail"></span>
-                </div>
-                <div class="add-skeleton-stats">
-                  <span class="add-skeleton-shape add-skeleton-stat"></span>
-                  <span class="add-skeleton-shape add-skeleton-stat"></span>
-                </div>
-              </div>
-
             </div>
           </div>
-
         </div>
       </div>
     `;
   }
 
+  // إظهار Skeleton مباشرة قبل تحميل البيانات
   renderAddSkeleton();
-
-  if (window.applyLanguage) window.applyLanguage();
 
   const tr = (key, fallback) => {
     if (window.t) {
@@ -159,24 +141,30 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   const escapeHtml = (str) => {
     if (str == null) return '';
-    return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
   };
 
   const normalizeName = (s) => String(s || '')
-    .trim().toLowerCase().replace(/\s+/g, ' ')
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, ' ')
     .replace(/[\u0640\u064B-\u065F]/g, '');
 
-  const pricesEqual = (a, b) => Math.abs(Number(a) - Number(b)) < 0.01;
+  const pricesEqual = (a, b) =>
+    Math.abs(Number(a) - Number(b)) < 0.01;
 
   document.title = tr('prod_add_title_full', 'Add Products');
 
-  // ============================================
-  // تحميل بيانات المؤسسة والموردين
-  // ============================================
-
   const { data: userProfile, error: profileErr } = await db
-    .from('profiles').select('organization_id, full_name').eq('id', user.id).single();
+    .from('profiles')
+    .select('organization_id, full_name')
+    .eq('id', user.id)
+    .single();
 
   if (profileErr || !userProfile?.organization_id) {
     alert(tr('prod_add_err_org', 'Organization not found'));
@@ -186,26 +174,36 @@ document.addEventListener('DOMContentLoaded', async () => {
   const organizationId = userProfile.organization_id;
 
   const { data: suppliers } = await db
-    .from('suppliers').select('*').eq('organization_id', organizationId).order('name');
+    .from('suppliers')
+    .select('*')
+    .eq('organization_id', organizationId)
+    .order('name');
 
   let hasBarcodeTable = false;
+
   try {
-    const { error } = await db.from('product_barcodes').select('id').limit(1);
+    const { error } = await db
+      .from('product_barcodes')
+      .select('id')
+      .limit(1);
+
     hasBarcodeTable = !error;
-  } catch (e) { hasBarcodeTable = false; }
+  } catch (e) {
+    hasBarcodeTable = false;
+  }
 
   // ============================================
-  // الصفحة الحقيقية
+  // الواجهة الحقيقية
   // ============================================
-
   main.innerHTML = `
     <div class="add-form">
 
       <!-- الحاوية اليسرى (النموذج) -->
       <div class="form-left-col">
 
-        <div class="page-header add-page-enter" style="animation-delay:0ms;">
+        <div class="page-header">
           <h2>${tr('prod_add_title')}</h2>
+
           <button type="button" class="btn-primary scan-btn" id="scan-btn">
             <i class="fas fa-barcode"></i>
             <span>${tr('prod_add_scan')}</span>
@@ -215,78 +213,133 @@ document.addEventListener('DOMContentLoaded', async () => {
         <div class="alert alert-error" id="form-error" style="display:none;"></div>
         <div class="alert alert-success" id="form-success" style="display:none;"></div>
 
-        <div class="product-input-card card-supplier add-page-enter" style="animation-delay:100ms;">
+        <div class="product-input-card card-supplier">
           <div class="form-group supplier-group">
             <label>${tr('prod_add_supplier')}</label>
-            <input type="text" id="supplier-input" placeholder="${tr('prod_add_supplier_ph')}" autocomplete="off">
+            <input
+              type="text"
+              id="supplier-input"
+              placeholder="${tr('prod_add_supplier_ph')}"
+              autocomplete="off"
+            >
             <div id="supplier-suggestions" class="suggestions-box"></div>
             <input type="hidden" id="supplier_id">
           </div>
         </div>
 
-        <div class="product-input-card card-fields add-page-enter" style="animation-delay:200ms;">
+        <div class="product-input-card card-fields">
           <div class="form-grid">
+
             <div class="form-group">
               <label>${tr('prod_add_name')}</label>
-              <input type="text" id="product-name" placeholder="${tr('prod_add_name_ph')}">
+              <input
+                type="text"
+                id="product-name"
+                placeholder="${tr('prod_add_name_ph')}"
+              >
             </div>
+
             <div class="form-group">
               <label>${tr('prod_add_qty')}</label>
               <input type="number" id="product-qty" value="1" min="1">
             </div>
+
             <div class="form-group">
               <label>${tr('prod_add_price')}</label>
-              <input type="number" id="product-price" value="0" min="0" step="0.01">
+              <input
+                type="number"
+                id="product-price"
+                value="0"
+                min="0"
+                step="0.01"
+              >
             </div>
+
           </div>
+
           <div class="form-group">
             <label>${tr('prod_add_category')}</label>
-            <input type="text" id="product-category" placeholder="${tr('prod_add_category_ph')}">
+            <input
+              type="text"
+              id="product-category"
+              placeholder="${tr('prod_add_category_ph')}"
+            >
           </div>
+
           <div class="form-group">
             <label>${tr('prod_add_barcode')}</label>
-            <input type="text" id="product-sku" placeholder="${tr('prod_add_barcode_ph')}" dir="ltr">
+            <input
+              type="text"
+              id="product-sku"
+              placeholder="${tr('prod_add_barcode_ph')}"
+              dir="ltr"
+            >
           </div>
+
           <button type="button" class="btn-primary add-product-btn" id="done-btn">
             <i class="fas fa-check"></i>
             <span>${tr('prod_add_done')}</span>
           </button>
         </div>
 
-        <div class="form-summary card-summary add-page-enter" style="animation-delay:400ms;">
-          <div class="summary-row"><span>${tr('prod_add_sum_count')}</span><strong id="sum-rows">0</strong></div>
-          <div class="summary-row"><span>${tr('prod_add_sum_qty')}</span><strong id="sum-qty">0</strong></div>
-          <div class="summary-row highlight"><span>${tr('prod_add_sum_total')}</span><strong id="sum-total">0.00</strong></div>
+        <div class="form-summary card-summary">
+          <div class="summary-row">
+            <span>${tr('prod_add_sum_count')}</span>
+            <strong id="sum-rows">0</strong>
+          </div>
+
+          <div class="summary-row">
+            <span>${tr('prod_add_sum_qty')}</span>
+            <strong id="sum-qty">0</strong>
+          </div>
+
+          <div class="summary-row highlight">
+            <span>${tr('prod_add_sum_total')}</span>
+            <strong id="sum-total">0.00</strong>
+          </div>
         </div>
 
-        <div class="form-actions card-actions add-page-enter" style="animation-delay:500ms;">
+        <div class="form-actions card-actions">
           <button type="button" class="btn-primary" id="save-all-btn">
-            <i class="fas fa-save"></i><span>${tr('prod_add_save')}</span>
+            <i class="fas fa-save"></i>
+            <span>${tr('prod_add_save')}</span>
           </button>
-          <a href="/products/list.html" class="btn-secondary">${tr('prod_add_cancel')}</a>
+
+          <a href="/products/list.html" class="btn-secondary">
+            ${tr('prod_add_cancel')}
+          </a>
         </div>
 
       </div>
 
       <!-- الحاوية اليمنى (السلة) -->
       <div class="form-right-col">
+        <div class="added-products-section card-added">
 
-        <div class="added-products-section card-added add-page-enter" style="animation-delay:300ms;">
-          <label class="section-label">${tr('prod_add_added')}</label>
+          <label class="section-label">
+            ${tr('prod_add_added')}
+          </label>
+
           <div id="added-products" class="added-products">
-            <div class="empty-added"><i class="fas fa-box-open"></i><p>${tr('prod_add_empty')}</p></div>
+            <div class="empty-added">
+              <i class="fas fa-box-open"></i>
+              <p>${tr('prod_add_empty')}</p>
+            </div>
           </div>
-        </div>
 
+        </div>
       </div>
 
     </div>
 
     <div class="scanner-modal" id="scanner-modal" style="display:none;">
       <div class="scanner-box">
+
         <div class="scanner-header">
           <h3>${tr('prod_add_scan_title')}</h3>
-          <button type="button" class="scanner-close" id="scanner-close"><i class="fas fa-xmark"></i></button>
+          <button type="button" class="scanner-close" id="scanner-close">
+            <i class="fas fa-xmark"></i>
+          </button>
         </div>
 
         <div id="scanner-reader" class="scanner-reader"></div>
@@ -297,36 +350,40 @@ document.addEventListener('DOMContentLoaded', async () => {
           </button>
         </div>
 
-        <p class="scanner-hint" id="scanner-hint">${tr('prod_add_scan_hint')}</p>
+        <p class="scanner-hint" id="scanner-hint">
+          ${tr('prod_add_scan_hint')}
+        </p>
+
       </div>
     </div>
   `;
-
-  // ============================================
-  // عناصر الصفحة
-  // ============================================
 
   const supplierInput = document.getElementById('supplier-input');
   const supplierIdInput = document.getElementById('supplier_id');
   const suggestions = document.getElementById('supplier-suggestions');
   const addedContainer = document.getElementById('added-products');
+
   const nameInput = document.getElementById('product-name');
   const qtyInput = document.getElementById('product-qty');
   const priceInput = document.getElementById('product-price');
   const categoryInput = document.getElementById('product-category');
   const skuInput = document.getElementById('product-sku');
+
   const doneBtn = document.getElementById('done-btn');
   const saveAllBtn = document.getElementById('save-all-btn');
   const scanBtn = document.getElementById('scan-btn');
+
   const scannerModal = document.getElementById('scanner-modal');
   const scannerReader = document.getElementById('scanner-reader');
   const scannerClose = document.getElementById('scanner-close');
   const scannerFlipBtn = document.getElementById('scanner-flip');
   const scannerHint = document.getElementById('scanner-hint');
+
   const errBox = document.getElementById('form-error');
   const successBox = document.getElementById('form-success');
 
   const addedProducts = [];
+
   let selectedSupplier = null;
   let currentSupplierId = null;
   let isSaving = false;
@@ -353,9 +410,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   // ============================================
-  // اقتراحات الموردين
+  // الموردون والاقتراحات
   // ============================================
-
   function showSuggestions(filter) {
     const q = filter.trim().toLowerCase();
 
@@ -373,27 +429,47 @@ document.addEventListener('DOMContentLoaded', async () => {
       .some(s => (s.name ?? '').toLowerCase() === q);
 
     let html = filtered.map(s => `
-      <div class="suggestion-card" data-id="${escapeHtml(s.id)}" data-name="${escapeHtml(s.name)}" data-specialty="${escapeHtml(s.specialty ?? '')}">
-        <div class="suggestion-image"><i class="fas fa-truck"></i></div>
+      <div
+        class="suggestion-card"
+        data-id="${escapeHtml(s.id)}"
+        data-name="${escapeHtml(s.name)}"
+        data-specialty="${escapeHtml(s.specialty ?? '')}"
+      >
+        <div class="suggestion-image">
+          <i class="fas fa-truck"></i>
+        </div>
+
         <div class="suggestion-info">
           <strong>${escapeHtml(s.name)}</strong>
-          ${s.specialty ? `<span class="suggestion-sku">${escapeHtml(s.specialty)}</span>` : ''}
+          ${s.specialty
+            ? `<span class="suggestion-sku">${escapeHtml(s.specialty)}</span>`
+            : ''}
         </div>
       </div>
     `).join('');
 
     if (!exactMatch && filter.trim()) {
       html += `
-        <div class="suggestion-card new-supplier" data-new="true" data-name="${escapeHtml(filter.trim())}">
-          <div class="suggestion-image" style="background:#dcfce7;color:#16a34a;"><i class="fas fa-plus"></i></div>
+        <div
+          class="suggestion-card new-supplier"
+          data-new="true"
+          data-name="${escapeHtml(filter.trim())}"
+        >
+          <div class="suggestion-image" style="background:#dcfce7;color:#16a34a;">
+            <i class="fas fa-plus"></i>
+          </div>
+
           <div class="suggestion-info">
             <strong>${tr('prod_add_new_supplier')}</strong>
             <span class="suggestion-sku">"${escapeHtml(filter.trim())}"</span>
           </div>
-        </div>`;
+        </div>
+      `;
     }
 
-    suggestions.innerHTML = html || `<div class="suggestion-empty">${tr('prod_add_no_results')}</div>`;
+    suggestions.innerHTML = html ||
+      `<div class="suggestion-empty">${tr('prod_add_no_results')}</div>`;
+
     suggestions.style.display = 'block';
 
     suggestions.querySelectorAll('.suggestion-card').forEach(card => {
@@ -401,11 +477,19 @@ document.addEventListener('DOMContentLoaded', async () => {
         e.preventDefault();
         e.stopPropagation();
 
-        const newId = card.dataset.new === 'true' ? null : card.dataset.id;
+        const newId = card.dataset.new === 'true'
+          ? null
+          : card.dataset.id;
+
         const newName = card.dataset.name;
 
         if (currentSupplierId !== newId && addedProducts.length > 0) {
-          const ok = confirm(tr('prod_add_supplier_change_warn', 'تغيير المورد سيمسح المنتجات المضافة. متابعة؟'));
+          const ok = confirm(
+            tr(
+              'prod_add_supplier_change_warn',
+              'تغيير المورد سيمسح المنتجات المضافة. متابعة؟'
+            )
+          );
 
           if (!ok) {
             suggestions.style.display = 'none';
@@ -420,16 +504,22 @@ document.addEventListener('DOMContentLoaded', async () => {
           selectedSupplier = null;
           supplierInput.value = newName;
           supplierIdInput.value = '';
+
           supplierInput.dataset.isNew = 'true';
           supplierInput.dataset.newName = newName;
+
           currentSupplierId = null;
           categoryInput.value = '';
         } else {
-          selectedSupplier = (suppliers ?? []).find(s => s.id === newId) || null;
+          selectedSupplier = (suppliers ?? [])
+            .find(s => s.id === newId) || null;
+
           supplierInput.value = newName;
           supplierIdInput.value = newId;
+
           supplierInput.dataset.isNew = 'false';
           supplierInput.dataset.newName = '';
+
           currentSupplierId = newId;
 
           if (selectedSupplier?.specialty) {
@@ -445,8 +535,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   supplierInput.addEventListener('input', () => {
     selectedSupplier = null;
     supplierIdInput.value = '';
+
     supplierInput.dataset.isNew = 'false';
     supplierInput.dataset.newName = '';
+
     showSuggestions(supplierInput.value);
   });
 
@@ -457,9 +549,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
 
   // ============================================
-  // ماسح الباركود
+  // الماسح الضوئي
   // ============================================
-
   async function startCameraWithMode(mode) {
     if (html5QrCode) {
       try {
@@ -469,7 +560,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     scannerReader.innerHTML = '';
-    html5QrCode = new Html5Qrcode("scanner-reader");
+    html5QrCode = new Html5Qrcode('scanner-reader');
 
     const qrSize = Math.max(
       125,
@@ -478,7 +569,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const config = {
       fps: 10,
-      qrbox: { width: qrSize, height: qrSize },
+      qrbox: {
+        width: qrSize,
+        height: qrSize
+      },
       aspectRatio: 1.0
     };
 
@@ -515,7 +609,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     } catch (err) {
       showErr(
         tr('prod_add_camera_err', 'Camera error') +
-        ' ' + (err.message || '')
+        ' ' +
+        (err.message || '')
       );
 
       scannerModal.style.display = 'none';
@@ -547,25 +642,25 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (!html5QrCode) return;
 
     currentFacingMode =
-      currentFacingMode === 'environment' ? 'user' : 'environment';
+      currentFacingMode === 'environment'
+        ? 'user'
+        : 'environment';
 
     try {
       await startCameraWithMode(currentFacingMode);
     } catch (err) {
-      console.error("Camera flip error:", err);
+      console.error('Camera flip error:', err);
 
       currentFacingMode =
-        currentFacingMode === 'environment' ? 'user' : 'environment';
+        currentFacingMode === 'environment'
+          ? 'user'
+          : 'environment';
 
       try {
         await startCameraWithMode(currentFacingMode);
       } catch (e) {}
     }
   });
-
-  // ============================================
-  // معالجة الباركود
-  // ============================================
 
   async function handleScan(barcode) {
     const value = String(barcode).trim();
@@ -629,14 +724,21 @@ document.addEventListener('DOMContentLoaded', async () => {
           p.product_name_en ||
           '';
 
-        if (productName) nameInput.value = productName;
+        if (productName) {
+          nameInput.value = productName;
+        }
 
         if (p.categories) {
           const firstCategory = p.categories.split(',')[0].trim();
-          if (firstCategory) categoryInput.value = firstCategory;
+
+          if (firstCategory) {
+            categoryInput.value = firstCategory;
+          }
         }
 
-        if (p.image_url) scannedImageUrl = p.image_url;
+        if (p.image_url) {
+          scannedImageUrl = p.image_url;
+        }
 
         skuInput.value = value;
         qtyInput.value = '1';
@@ -654,13 +756,14 @@ document.addEventListener('DOMContentLoaded', async () => {
   scannerClose.addEventListener('click', stopScanner);
 
   scannerModal.addEventListener('click', (e) => {
-    if (e.target === scannerModal) stopScanner();
+    if (e.target === scannerModal) {
+      stopScanner();
+    }
   });
 
   // ============================================
-  // عرض المنتجات المضافة
+  // عرض المنتجات المضافة في السلة
   // ============================================
-
   function renderAddedProducts() {
     if (addedProducts.length === 0) {
       addedContainer.innerHTML = `
@@ -684,12 +787,21 @@ document.addEventListener('DOMContentLoaded', async () => {
         .join(' ');
 
       const imgHtml = p.image_url
-        ? `<img src="${escapeHtml(p.image_url)}" alt="${escapeHtml(p.name)}"><i class="fas fa-box-open" style="display:none;"></i>`
+        ? `
+          <img
+            src="${escapeHtml(p.image_url)}"
+            alt="${escapeHtml(p.name)}"
+          >
+          <i class="fas fa-box-open" style="display:none;"></i>
+        `
         : `<i class="fas fa-box-open"></i>`;
 
       return `
         <div class="added-product-card">
-          <div class="added-product-image">${imgHtml}</div>
+
+          <div class="added-product-image">
+            ${imgHtml}
+          </div>
 
           <div class="added-product-info">
             <strong>${escapeHtml(p.name)}</strong>
@@ -700,6 +812,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           </div>
 
           <div class="added-product-stats">
+
             <div class="stat-mini">
               <span>${tr('products_qty')}</span>
               <b>${Number(p.qty)}</b>
@@ -714,6 +827,7 @@ document.addEventListener('DOMContentLoaded', async () => {
               <span>${tr('products_total')}</span>
               <b>${(Number(p.qty) * Number(p.price)).toFixed(2)}</b>
             </div>
+
           </div>
 
           <button
@@ -724,19 +838,22 @@ document.addEventListener('DOMContentLoaded', async () => {
           >
             <i class="fas fa-xmark"></i>
           </button>
+
         </div>
       `;
     }).join('');
 
-    addedContainer.querySelectorAll('.added-product-delete').forEach(btn => {
-      btn.addEventListener('pointerdown', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
+    addedContainer
+      .querySelectorAll('.added-product-delete')
+      .forEach(btn => {
+        btn.addEventListener('pointerdown', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
 
-        addedProducts.splice(Number(btn.dataset.index), 1);
-        renderAddedProducts();
+          addedProducts.splice(Number(btn.dataset.index), 1);
+          renderAddedProducts();
+        });
       });
-    });
 
     updateSummary();
   }
@@ -744,7 +861,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   // ============================================
   // تحديث الملخص
   // ============================================
-
   function updateSummary() {
     let totalQty = 0;
     let totalValue = 0;
@@ -762,7 +878,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   // ============================================
   // إضافة منتج إلى السلة
   // ============================================
-
   function addToCart() {
     if (doneBtn.dataset.busy === '1' || doneBtn.disabled) return;
 
@@ -814,12 +929,13 @@ document.addEventListener('DOMContentLoaded', async () => {
           item.skus.push(skuValue);
         }
 
-        if (skuValue) item.sku = skuValue;
+        if (skuValue) {
+          item.sku = skuValue;
+        }
 
         if (scannedImageUrl && !item.image_url) {
           item.image_url = scannedImageUrl;
         }
-
       } else {
         const finalSku = skuValue ||
           ('SKU-' + Date.now() + '-' + Math.floor(Math.random() * 10000));
@@ -831,7 +947,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           category,
           sku: finalSku,
           skus: skuValue ? [skuValue] : [finalSku],
-          image_url: scannedImageUrl,
+          image_url: scannedImageUrl
         });
       }
 
@@ -840,6 +956,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       priceInput.value = '0';
       skuInput.value = '';
       categoryInput.value = '';
+
       scannedImageUrl = null;
 
       renderAddedProducts();
@@ -857,9 +974,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
 
   // ============================================
-  // حفظ المنتجات والفاتورة وحركة المخزون
+  // حفظ المنتجات والفاتورة
   // ============================================
-
   saveAllBtn.addEventListener('click', async (e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -873,6 +989,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     isSaving = true;
     saveAllBtn.disabled = true;
+
     hideAlerts();
 
     saveAllBtn.querySelector('span').textContent =
@@ -885,7 +1002,9 @@ document.addEventListener('DOMContentLoaded', async () => {
       const authUser = authData?.user;
 
       if (authErr || !authUser) {
-        throw new Error(tr('prod_add_err_auth', 'Authentication error'));
+        throw new Error(
+          tr('prod_add_err_auth', 'Authentication error')
+        );
       }
 
       const { data: profile, error: profErr } = await db
@@ -895,7 +1014,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         .single();
 
       if (profErr || !profile?.organization_id) {
-        throw new Error(tr('prod_add_err_org', 'Organization not found'));
+        throw new Error(
+          tr('prod_add_err_org', 'Organization not found')
+        );
       }
 
       let finalSupplierId = supplierIdInput.value || null;
@@ -925,7 +1046,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         if (existingSupplier) {
           finalSupplierId = existingSupplier.id;
-
         } else {
           const { data: createdSupplier, error: supErr } = await db
             .from('suppliers')
@@ -933,7 +1053,7 @@ document.addEventListener('DOMContentLoaded', async () => {
               organization_id: profile.organization_id,
               name: candidateNewName,
               specialty: categoryInput.value.trim() || null,
-              created_by: authUser.id,
+              created_by: authUser.id
             })
             .select()
             .single();
@@ -989,7 +1109,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             .in('sku', allBarcodes)
             .limit(1);
 
-          if (bySku?.[0]) matchedProduct = bySku[0];
+          if (bySku?.[0]) {
+            matchedProduct = bySku[0];
+          }
         }
 
         if (!matchedProduct) {
@@ -1014,7 +1136,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             );
           }
 
-          if (byName?.[0]) matchedProduct = byName[0];
+          if (byName?.[0]) {
+            matchedProduct = byName[0];
+          }
         }
 
         let productId;
@@ -1029,7 +1153,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             .from('products')
             .update({
               invoice_id: invoiceNumber,
-              qty: newQty,
+              qty: newQty
             })
             .eq('id', productId);
 
@@ -1038,7 +1162,6 @@ document.addEventListener('DOMContentLoaded', async () => {
               tr('prod_add_err_link') + ' ' + updErr.message
             );
           }
-
         } else {
           const { data: newProduct, error: insertError } = await db
             .from('products')
@@ -1052,7 +1175,7 @@ document.addEventListener('DOMContentLoaded', async () => {
               category: p.category || null,
               image_url: p.image_url || null,
               invoice_id: invoiceNumber,
-              created_by: authUser.id,
+              created_by: authUser.id
             })
             .select()
             .single();
@@ -1072,7 +1195,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             product_id: productId,
             barcode: bc,
             is_primary: i === 0,
-            source: 'scan',
+            source: 'scan'
           }));
 
           await db
@@ -1091,7 +1214,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           type: 'in',
           method: 'manual',
           quantity: Number(p.qty),
-          performed_by: authUser.id,
+          performed_by: authUser.id
         });
 
         itemResults.push({
@@ -1099,16 +1222,18 @@ document.addEventListener('DOMContentLoaded', async () => {
           name: p.name,
           qty: Number(p.qty),
           price: Number(p.price),
-          inserted: !matchedProduct,
+          inserted: !matchedProduct
         });
       }
 
       const totalQty = addedProducts.reduce(
-        (s, p) => s + Number(p.qty), 0
+        (s, p) => s + Number(p.qty),
+        0
       );
 
       const totalValue = addedProducts.reduce(
-        (s, p) => s + Number(p.qty) * Number(p.price), 0
+        (s, p) => s + Number(p.qty) * Number(p.price),
+        0
       );
 
       const { data: newInvoice, error: invoiceErr } = await db
@@ -1119,7 +1244,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           supplier_id: finalSupplierId,
           created_by: authUser.id,
           total_qty: totalQty,
-          total_value: totalValue,
+          total_value: totalValue
         })
         .select()
         .single();
@@ -1136,7 +1261,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         product_name: r.name,
         qty: r.qty,
         price: r.price,
-        total: r.qty * r.price,
+        total: r.qty * r.price
       }));
 
       const { error: itemsErr } = await db
@@ -1146,7 +1271,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (itemsErr) {
         throw new Error(
           tr('prod_add_err_items', 'Failed to save invoice items') +
-          ' ' + itemsErr.message
+          ' ' +
+          itemsErr.message
         );
       }
 
@@ -1161,7 +1287,7 @@ document.addEventListener('DOMContentLoaded', async () => {
               `(${totalQty} - ${totalValue.toFixed(2)})`,
             type: 'success',
             link: `/invoice.html?id=${encodeURIComponent(invoiceNumber)}`,
-            userName: profile.full_name || null,
+            userName: profile.full_name || null
           });
         } catch (notifErr) {
           console.error('Notification error:', notifErr);
@@ -1190,7 +1316,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (window.self !== window.top && itemResults.length) {
         window.parent.postMessage({
           type: 'NEW_PRODUCTS_SAVED',
-          productIds: itemResults.map(r => r.productId),
+          productIds: itemResults.map(r => r.productId)
         }, '*');
       }
 
@@ -1214,9 +1340,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
 
   // ============================================
-  // استقبال اختيار منتج من صفحة أخرى
+  // استقبال اختيار المنتج من iframe
   // ============================================
-
   window.addEventListener('message', (event) => {
     const data = event.data;
 
@@ -1232,10 +1357,5 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   });
 
-  // ============================================
-  // إظهار السلة الفارغة والملخص بعد التحميل
-  // ============================================
-
   renderAddedProducts();
-
 });
