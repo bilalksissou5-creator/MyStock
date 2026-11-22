@@ -1,10 +1,14 @@
+
 // ============================================
 // صفحة إضافة منتجات
+// ✅ Skeleton Screen قبل تحميل البيانات
+// ✅ ظهور العناصر الحقيقية تدريجياً من الأعلى إلى الأسفل
 // ✅ الترتيب الصحيح للهاتف (السلة قبل الملخص والأزرار)
 // ✅ إعادة السلوك القديم: المسح يملأ الحقول فقط (الإضافة عبر زر "تم")
 // ✅ إصلاح تفريغ حقل الفئة (Category) بعد الإضافة
 // ✅ ربط حركة المخزون بالفاتورة (invoice_id)
 // ============================================
+
 document.addEventListener('DOMContentLoaded', async () => {
   if (window.__productAddLoaded) return;
   window.__productAddLoaded = true;
@@ -13,6 +17,136 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (!user) return;
 
   renderLayout('products/add.html');
+
+  const main = document.getElementById('main-content');
+  if (!main) return;
+
+  // ============================================
+  // Skeleton Screen — يظهر قبل تحميل بيانات الصفحة
+  // ============================================
+
+  function renderAddSkeleton() {
+    main.innerHTML = `
+      <div class="add-form">
+
+        <div class="form-left-col">
+
+          <div class="page-header add-skeleton-card">
+            <span class="add-skeleton-shape add-skeleton-title"></span>
+            <span class="add-skeleton-shape add-skeleton-button"></span>
+          </div>
+
+          <div class="alert alert-error" style="display:none;"></div>
+
+          <div class="product-input-card card-supplier add-skeleton-card">
+            <div class="add-skeleton-field">
+              <span class="add-skeleton-shape add-skeleton-label"></span>
+              <span class="add-skeleton-shape add-skeleton-input"></span>
+            </div>
+          </div>
+
+          <div class="product-input-card card-fields add-skeleton-card">
+
+            <div class="form-grid">
+              <div class="add-skeleton-field">
+                <span class="add-skeleton-shape add-skeleton-label"></span>
+                <span class="add-skeleton-shape add-skeleton-input"></span>
+              </div>
+
+              <div class="add-skeleton-field">
+                <span class="add-skeleton-shape add-skeleton-label"></span>
+                <span class="add-skeleton-shape add-skeleton-input"></span>
+              </div>
+
+              <div class="add-skeleton-field">
+                <span class="add-skeleton-shape add-skeleton-label"></span>
+                <span class="add-skeleton-shape add-skeleton-input"></span>
+              </div>
+            </div>
+
+            <div class="add-skeleton-field">
+              <span class="add-skeleton-shape add-skeleton-label"></span>
+              <span class="add-skeleton-shape add-skeleton-input"></span>
+            </div>
+
+            <div class="add-skeleton-field">
+              <span class="add-skeleton-shape add-skeleton-label"></span>
+              <span class="add-skeleton-shape add-skeleton-input"></span>
+            </div>
+
+            <span class="add-skeleton-shape add-skeleton-button"></span>
+
+          </div>
+
+          <div class="form-summary card-summary add-skeleton-card">
+            <div class="add-skeleton-summary">
+              <span class="add-skeleton-shape add-skeleton-summary-item"></span>
+              <span class="add-skeleton-shape add-skeleton-summary-item"></span>
+              <span class="add-skeleton-shape add-skeleton-summary-item"></span>
+            </div>
+          </div>
+
+          <div class="form-actions card-actions add-skeleton-card">
+            <span class="add-skeleton-shape add-skeleton-button"></span>
+            <span class="add-skeleton-shape add-skeleton-button"></span>
+          </div>
+
+        </div>
+
+        <div class="form-right-col">
+
+          <div class="added-products-section card-added add-skeleton-card">
+
+            <span class="add-skeleton-shape add-skeleton-title"></span>
+
+            <div class="added-products">
+
+              <div class="add-skeleton-cart-item">
+                <span class="add-skeleton-shape add-skeleton-image"></span>
+                <div class="add-skeleton-info">
+                  <span class="add-skeleton-shape add-skeleton-name"></span>
+                  <span class="add-skeleton-shape add-skeleton-detail"></span>
+                </div>
+                <div class="add-skeleton-stats">
+                  <span class="add-skeleton-shape add-skeleton-stat"></span>
+                  <span class="add-skeleton-shape add-skeleton-stat"></span>
+                </div>
+              </div>
+
+              <div class="add-skeleton-cart-item">
+                <span class="add-skeleton-shape add-skeleton-image"></span>
+                <div class="add-skeleton-info">
+                  <span class="add-skeleton-shape add-skeleton-name"></span>
+                  <span class="add-skeleton-shape add-skeleton-detail"></span>
+                </div>
+                <div class="add-skeleton-stats">
+                  <span class="add-skeleton-shape add-skeleton-stat"></span>
+                  <span class="add-skeleton-shape add-skeleton-stat"></span>
+                </div>
+              </div>
+
+              <div class="add-skeleton-cart-item">
+                <span class="add-skeleton-shape add-skeleton-image"></span>
+                <div class="add-skeleton-info">
+                  <span class="add-skeleton-shape add-skeleton-name"></span>
+                  <span class="add-skeleton-shape add-skeleton-detail"></span>
+                </div>
+                <div class="add-skeleton-stats">
+                  <span class="add-skeleton-shape add-skeleton-stat"></span>
+                  <span class="add-skeleton-shape add-skeleton-stat"></span>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+      </div>
+    `;
+  }
+
+  renderAddSkeleton();
+
   if (window.applyLanguage) window.applyLanguage();
 
   const tr = (key, fallback) => {
@@ -37,6 +171,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   document.title = tr('prod_add_title_full', 'Add Products');
 
+  // ============================================
+  // تحميل بيانات المؤسسة والموردين
+  // ============================================
+
   const { data: userProfile, error: profileErr } = await db
     .from('profiles').select('organization_id, full_name').eq('id', user.id).single();
 
@@ -56,14 +194,17 @@ document.addEventListener('DOMContentLoaded', async () => {
     hasBarcodeTable = !error;
   } catch (e) { hasBarcodeTable = false; }
 
-  const main = document.getElementById('main-content');
+  // ============================================
+  // الصفحة الحقيقية
+  // ============================================
 
   main.innerHTML = `
     <div class="add-form">
-      
-      <!-- ✅ الحاوية اليسرى (النموذج) -->
+
+      <!-- الحاوية اليسرى (النموذج) -->
       <div class="form-left-col">
-        <div class="page-header">
+
+        <div class="page-header add-page-enter" style="animation-delay:0ms;">
           <h2>${tr('prod_add_title')}</h2>
           <button type="button" class="btn-primary scan-btn" id="scan-btn">
             <i class="fas fa-barcode"></i>
@@ -74,7 +215,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         <div class="alert alert-error" id="form-error" style="display:none;"></div>
         <div class="alert alert-success" id="form-success" style="display:none;"></div>
 
-        <div class="product-input-card card-supplier">
+        <div class="product-input-card card-supplier add-page-enter" style="animation-delay:100ms;">
           <div class="form-group supplier-group">
             <label>${tr('prod_add_supplier')}</label>
             <input type="text" id="supplier-input" placeholder="${tr('prod_add_supplier_ph')}" autocomplete="off">
@@ -82,8 +223,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             <input type="hidden" id="supplier_id">
           </div>
         </div>
-        
-        <div class="product-input-card card-fields">
+
+        <div class="product-input-card card-fields add-page-enter" style="animation-delay:200ms;">
           <div class="form-grid">
             <div class="form-group">
               <label>${tr('prod_add_name')}</label>
@@ -111,42 +252,45 @@ document.addEventListener('DOMContentLoaded', async () => {
             <span>${tr('prod_add_done')}</span>
           </button>
         </div>
-        
-        <div class="form-summary card-summary">
+
+        <div class="form-summary card-summary add-page-enter" style="animation-delay:400ms;">
           <div class="summary-row"><span>${tr('prod_add_sum_count')}</span><strong id="sum-rows">0</strong></div>
           <div class="summary-row"><span>${tr('prod_add_sum_qty')}</span><strong id="sum-qty">0</strong></div>
           <div class="summary-row highlight"><span>${tr('prod_add_sum_total')}</span><strong id="sum-total">0.00</strong></div>
         </div>
-        
-        <div class="form-actions card-actions">
+
+        <div class="form-actions card-actions add-page-enter" style="animation-delay:500ms;">
           <button type="button" class="btn-primary" id="save-all-btn">
             <i class="fas fa-save"></i><span>${tr('prod_add_save')}</span>
           </button>
           <a href="/products/list.html" class="btn-secondary">${tr('prod_add_cancel')}</a>
         </div>
+
       </div>
 
-      <!-- ✅ الحاوية اليمنى (السلة) -->
+      <!-- الحاوية اليمنى (السلة) -->
       <div class="form-right-col">
-        <div class="added-products-section card-added">
+
+        <div class="added-products-section card-added add-page-enter" style="animation-delay:300ms;">
           <label class="section-label">${tr('prod_add_added')}</label>
           <div id="added-products" class="added-products">
             <div class="empty-added"><i class="fas fa-box-open"></i><p>${tr('prod_add_empty')}</p></div>
           </div>
         </div>
+
       </div>
-      
+
     </div>
-    
+
     <div class="scanner-modal" id="scanner-modal" style="display:none;">
       <div class="scanner-box">
         <div class="scanner-header">
           <h3>${tr('prod_add_scan_title')}</h3>
           <button type="button" class="scanner-close" id="scanner-close"><i class="fas fa-xmark"></i></button>
         </div>
-        
+
         <div id="scanner-reader" class="scanner-reader"></div>
-        
+
         <div class="scanner-actions">
           <button type="button" class="scanner-flip" id="scanner-flip">
             <i class="fas fa-camera-rotate"></i>
@@ -157,6 +301,10 @@ document.addEventListener('DOMContentLoaded', async () => {
       </div>
     </div>
   `;
+
+  // ============================================
+  // عناصر الصفحة
+  // ============================================
 
   const supplierInput = document.getElementById('supplier-input');
   const supplierIdInput = document.getElementById('supplier_id');
@@ -185,17 +333,44 @@ document.addEventListener('DOMContentLoaded', async () => {
   let isScanning = false;
   let html5QrCode = null;
   let scannedImageUrl = null;
-  let currentFacingMode = 'environment'; 
+  let currentFacingMode = 'environment';
 
-  function showErr(msg) { errBox.textContent = msg; errBox.style.display = 'block'; successBox.style.display = 'none'; }
-  function showSuccess(msg) { successBox.textContent = msg; successBox.style.display = 'block'; errBox.style.display = 'none'; }
-  function hideAlerts() { errBox.style.display = 'none'; successBox.style.display = 'none'; }
+  function showErr(msg) {
+    errBox.textContent = msg;
+    errBox.style.display = 'block';
+    successBox.style.display = 'none';
+  }
+
+  function showSuccess(msg) {
+    successBox.textContent = msg;
+    successBox.style.display = 'block';
+    errBox.style.display = 'none';
+  }
+
+  function hideAlerts() {
+    errBox.style.display = 'none';
+    successBox.style.display = 'none';
+  }
+
+  // ============================================
+  // اقتراحات الموردين
+  // ============================================
 
   function showSuggestions(filter) {
     const q = filter.trim().toLowerCase();
-    if (q.length < 1) { suggestions.innerHTML = ''; suggestions.style.display = 'none'; return; }
-    const filtered = (suppliers ?? []).filter(s => (s.name ?? '').toLowerCase().includes(q)).slice(0, 5);
-    const exactMatch = (suppliers ?? []).some(s => (s.name ?? '').toLowerCase() === q);
+
+    if (q.length < 1) {
+      suggestions.innerHTML = '';
+      suggestions.style.display = 'none';
+      return;
+    }
+
+    const filtered = (suppliers ?? [])
+      .filter(s => (s.name ?? '').toLowerCase().includes(q))
+      .slice(0, 5);
+
+    const exactMatch = (suppliers ?? [])
+      .some(s => (s.name ?? '').toLowerCase() === q);
 
     let html = filtered.map(s => `
       <div class="suggestion-card" data-id="${escapeHtml(s.id)}" data-name="${escapeHtml(s.name)}" data-specialty="${escapeHtml(s.specialty ?? '')}">
@@ -223,13 +398,20 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     suggestions.querySelectorAll('.suggestion-card').forEach(card => {
       card.addEventListener('pointerdown', (e) => {
-        e.preventDefault(); e.stopPropagation();
+        e.preventDefault();
+        e.stopPropagation();
+
         const newId = card.dataset.new === 'true' ? null : card.dataset.id;
         const newName = card.dataset.name;
 
         if (currentSupplierId !== newId && addedProducts.length > 0) {
           const ok = confirm(tr('prod_add_supplier_change_warn', 'تغيير المورد سيمسح المنتجات المضافة. متابعة؟'));
-          if (!ok) { suggestions.style.display = 'none'; return; }
+
+          if (!ok) {
+            suggestions.style.display = 'none';
+            return;
+          }
+
           addedProducts.length = 0;
           renderAddedProducts();
         }
@@ -249,8 +431,12 @@ document.addEventListener('DOMContentLoaded', async () => {
           supplierInput.dataset.isNew = 'false';
           supplierInput.dataset.newName = '';
           currentSupplierId = newId;
-          if (selectedSupplier?.specialty) categoryInput.value = selectedSupplier.specialty;
+
+          if (selectedSupplier?.specialty) {
+            categoryInput.value = selectedSupplier.specialty;
+          }
         }
+
         suggestions.style.display = 'none';
       });
     });
@@ -265,73 +451,152 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
 
   document.addEventListener('pointerdown', (e) => {
-    if (!e.target.closest('.supplier-group')) suggestions.style.display = 'none';
+    if (!e.target.closest('.supplier-group')) {
+      suggestions.style.display = 'none';
+    }
   });
+
+  // ============================================
+  // ماسح الباركود
+  // ============================================
 
   async function startCameraWithMode(mode) {
     if (html5QrCode) {
-      try { await html5QrCode.stop(); await html5QrCode.clear(); } catch (e) {}
+      try {
+        await html5QrCode.stop();
+        await html5QrCode.clear();
+      } catch (e) {}
     }
+
     scannerReader.innerHTML = '';
     html5QrCode = new Html5Qrcode("scanner-reader");
-    const qrSize = Math.max(125, Math.min(180, Math.floor(window.innerWidth * 0.6)));
-    const config = { fps: 10, qrbox: { width: qrSize, height: qrSize }, aspectRatio: 1.0 };
-    
-    await html5QrCode.start({ facingMode: mode }, config,
+
+    const qrSize = Math.max(
+      125,
+      Math.min(180, Math.floor(window.innerWidth * 0.6))
+    );
+
+    const config = {
+      fps: 10,
+      qrbox: { width: qrSize, height: qrSize },
+      aspectRatio: 1.0
+    };
+
+    await html5QrCode.start(
+      { facingMode: mode },
+      config,
       async (decodedText) => {
         if (isScanning) return;
+
         isScanning = true;
-        try { await handleScan(decodedText); }
-        finally { await stopScanner(); isScanning = false; }
-      }, () => {});
+
+        try {
+          await handleScan(decodedText);
+        } finally {
+          await stopScanner();
+          isScanning = false;
+        }
+      },
+      () => {}
+    );
   }
 
   async function startScanner() {
-    if (typeof Html5Qrcode === 'undefined') { showErr(tr('prod_add_scanner_err', 'Scanner library not loaded')); return; }
+    if (typeof Html5Qrcode === 'undefined') {
+      showErr(tr('prod_add_scanner_err', 'Scanner library not loaded'));
+      return;
+    }
+
     scannerModal.style.display = 'flex';
     scannerHint.textContent = tr('prod_add_scan_hint');
+
     try {
       await startCameraWithMode(currentFacingMode);
     } catch (err) {
-      showErr(tr('prod_add_camera_err', 'Camera error') + ' ' + (err.message || ''));
+      showErr(
+        tr('prod_add_camera_err', 'Camera error') +
+        ' ' + (err.message || '')
+      );
+
       scannerModal.style.display = 'none';
-      if (html5QrCode) { try { await html5QrCode.clear(); } catch (e) {} html5QrCode = null; }
+
+      if (html5QrCode) {
+        try {
+          await html5QrCode.clear();
+        } catch (e) {}
+
+        html5QrCode = null;
+      }
     }
   }
 
   async function stopScanner() {
     if (html5QrCode) {
-      try { await html5QrCode.stop(); await html5QrCode.clear(); } catch (e) {}
+      try {
+        await html5QrCode.stop();
+        await html5QrCode.clear();
+      } catch (e) {}
+
       html5QrCode = null;
     }
+
     scannerModal.style.display = 'none';
   }
 
   scannerFlipBtn.addEventListener('click', async () => {
     if (!html5QrCode) return;
-    currentFacingMode = currentFacingMode === 'environment' ? 'user' : 'environment';
+
+    currentFacingMode =
+      currentFacingMode === 'environment' ? 'user' : 'environment';
+
     try {
       await startCameraWithMode(currentFacingMode);
     } catch (err) {
       console.error("Camera flip error:", err);
-      currentFacingMode = currentFacingMode === 'environment' ? 'user' : 'environment';
-      try { await startCameraWithMode(currentFacingMode); } catch (e) {}
+
+      currentFacingMode =
+        currentFacingMode === 'environment' ? 'user' : 'environment';
+
+      try {
+        await startCameraWithMode(currentFacingMode);
+      } catch (e) {}
     }
   });
+
+  // ============================================
+  // معالجة الباركود
+  // ============================================
 
   async function handleScan(barcode) {
     const value = String(barcode).trim();
     if (!value) return;
+
     hideAlerts();
 
-    let { data: localProduct } = await db.from('products').select('*')
-      .eq('organization_id', organizationId).eq('sku', value).limit(1).maybeSingle();
+    let { data: localProduct } = await db
+      .from('products')
+      .select('*')
+      .eq('organization_id', organizationId)
+      .eq('sku', value)
+      .limit(1)
+      .maybeSingle();
 
     if (!localProduct && hasBarcodeTable) {
-      const { data: aliasRow } = await db.from('product_barcodes').select('product_id')
-        .eq('organization_id', organizationId).eq('barcode', value).limit(1).maybeSingle();
+      const { data: aliasRow } = await db
+        .from('product_barcodes')
+        .select('product_id')
+        .eq('organization_id', organizationId)
+        .eq('barcode', value)
+        .limit(1)
+        .maybeSingle();
+
       if (aliasRow?.product_id) {
-        const { data: prod } = await db.from('products').select('*').eq('id', aliasRow.product_id).single();
+        const { data: prod } = await db
+          .from('products')
+          .select('*')
+          .eq('id', aliasRow.product_id)
+          .single();
+
         if (prod) localProduct = prod;
       }
     }
@@ -347,23 +612,39 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     scannerHint.textContent = tr('prod_add_searching');
+
     try {
-      const res = await fetch(`https://world.openfoodfacts.org/api/v2/product/${encodeURIComponent(value)}.json`);
+      const res = await fetch(
+        `https://world.openfoodfacts.org/api/v2/product/${encodeURIComponent(value)}.json`
+      );
+
       const json = await res.json();
+
       if (json.status === 1 && json.product) {
         const p = json.product;
-        const productName = p.product_name_ar || p.product_name || p.product_name_en || '';
+
+        const productName =
+          p.product_name_ar ||
+          p.product_name ||
+          p.product_name_en ||
+          '';
+
         if (productName) nameInput.value = productName;
+
         if (p.categories) {
           const firstCategory = p.categories.split(',')[0].trim();
           if (firstCategory) categoryInput.value = firstCategory;
         }
+
         if (p.image_url) scannedImageUrl = p.image_url;
+
         skuInput.value = value;
         qtyInput.value = '1';
         return;
       }
-    } catch (err) { console.warn('Open Food Facts error:', err); }
+    } catch (err) {
+      console.warn('Open Food Facts error:', err);
+    }
 
     skuInput.value = value;
     scannedImageUrl = null;
@@ -371,18 +652,37 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   scanBtn.addEventListener('click', startScanner);
   scannerClose.addEventListener('click', stopScanner);
-  scannerModal.addEventListener('click', (e) => { if (e.target === scannerModal) stopScanner(); });
+
+  scannerModal.addEventListener('click', (e) => {
+    if (e.target === scannerModal) stopScanner();
+  });
+
+  // ============================================
+  // عرض المنتجات المضافة
+  // ============================================
 
   function renderAddedProducts() {
     if (addedProducts.length === 0) {
-      addedContainer.innerHTML = `<div class="empty-added"><i class="fas fa-box-open"></i><p>${tr('prod_add_empty')}</p></div>`;
+      addedContainer.innerHTML = `
+        <div class="empty-added">
+          <i class="fas fa-box-open"></i>
+          <p>${tr('prod_add_empty')}</p>
+        </div>
+      `;
+
       updateSummary();
       return;
     }
 
     addedContainer.innerHTML = addedProducts.map((p, index) => {
-      const barcodes = (p.skus && p.skus.length) ? p.skus : (p.sku ? [p.sku] : []);
-      const barcodeTags = barcodes.map(b => `<code class="barcode-tag">${escapeHtml(b)}</code>`).join(' ');
+      const barcodes = (p.skus && p.skus.length)
+        ? p.skus
+        : (p.sku ? [p.sku] : []);
+
+      const barcodeTags = barcodes
+        .map(b => `<code class="barcode-tag">${escapeHtml(b)}</code>`)
+        .join(' ');
+
       const imgHtml = p.image_url
         ? `<img src="${escapeHtml(p.image_url)}" alt="${escapeHtml(p.name)}"><i class="fas fa-box-open" style="display:none;"></i>`
         : `<i class="fas fa-box-open"></i>`;
@@ -390,76 +690,145 @@ document.addEventListener('DOMContentLoaded', async () => {
       return `
         <div class="added-product-card">
           <div class="added-product-image">${imgHtml}</div>
+
           <div class="added-product-info">
             <strong>${escapeHtml(p.name)}</strong>
-            <span>${p.category ? escapeHtml(p.category) + ' • ' : ''}${barcodeTags}</span>
+            <span>
+              ${p.category ? escapeHtml(p.category) + ' • ' : ''}
+              ${barcodeTags}
+            </span>
           </div>
+
           <div class="added-product-stats">
-            <div class="stat-mini"><span>${tr('products_qty')}</span><b>${Number(p.qty)}</b></div>
-            <div class="stat-mini"><span>${tr('products_price')}</span><b>${Number(p.price).toFixed(2)}</b></div>
-            <div class="stat-mini highlight"><span>${tr('products_total')}</span><b>${(Number(p.qty) * Number(p.price)).toFixed(2)}</b></div>
+            <div class="stat-mini">
+              <span>${tr('products_qty')}</span>
+              <b>${Number(p.qty)}</b>
+            </div>
+
+            <div class="stat-mini">
+              <span>${tr('products_price')}</span>
+              <b>${Number(p.price).toFixed(2)}</b>
+            </div>
+
+            <div class="stat-mini highlight">
+              <span>${tr('products_total')}</span>
+              <b>${(Number(p.qty) * Number(p.price)).toFixed(2)}</b>
+            </div>
           </div>
-          <button type="button" class="added-product-delete" data-index="${index}" title="${tr('prod_add_delete')}">
+
+          <button
+            type="button"
+            class="added-product-delete"
+            data-index="${index}"
+            title="${tr('prod_add_delete')}"
+          >
             <i class="fas fa-xmark"></i>
           </button>
-        </div>`;
+        </div>
+      `;
     }).join('');
 
     addedContainer.querySelectorAll('.added-product-delete').forEach(btn => {
       btn.addEventListener('pointerdown', (e) => {
-        e.preventDefault(); e.stopPropagation();
+        e.preventDefault();
+        e.stopPropagation();
+
         addedProducts.splice(Number(btn.dataset.index), 1);
         renderAddedProducts();
       });
     });
+
     updateSummary();
   }
 
+  // ============================================
+  // تحديث الملخص
+  // ============================================
+
   function updateSummary() {
-    let totalQty = 0, totalValue = 0;
+    let totalQty = 0;
+    let totalValue = 0;
+
     addedProducts.forEach(p => {
       totalQty += Number(p.qty);
       totalValue += Number(p.qty) * Number(p.price);
     });
+
     document.getElementById('sum-rows').textContent = addedProducts.length;
     document.getElementById('sum-qty').textContent = totalQty;
     document.getElementById('sum-total').textContent = totalValue.toFixed(2);
   }
 
+  // ============================================
+  // إضافة منتج إلى السلة
+  // ============================================
+
   function addToCart() {
     if (doneBtn.dataset.busy === '1' || doneBtn.disabled) return;
+
     doneBtn.dataset.busy = '1';
     doneBtn.disabled = true;
 
     try {
       hideAlerts();
+
       const name = nameInput.value.trim();
       const qty = Number(qtyInput.value) || 0;
       const price = Number(priceInput.value) || 0;
       const category = categoryInput.value.trim();
       const skuValue = skuInput.value.trim();
 
-      if (!name) { showErr(tr('prod_add_err_name')); nameInput.focus(); return; }
-      if (qty <= 0) { showErr(tr('prod_add_err_qty')); qtyInput.focus(); return; }
+      if (!name) {
+        showErr(tr('prod_add_err_name'));
+        nameInput.focus();
+        return;
+      }
+
+      if (qty <= 0) {
+        showErr(tr('prod_add_err_qty'));
+        qtyInput.focus();
+        return;
+      }
 
       const existingIndex = addedProducts.findIndex(p => {
-        const pSkus = (p.skus && p.skus.length) ? p.skus : (p.sku ? [p.sku] : []);
+        const pSkus = (p.skus && p.skus.length)
+          ? p.skus
+          : (p.sku ? [p.sku] : []);
+
         if (skuValue && pSkus.includes(skuValue)) return true;
         if (skuValue && p.sku === skuValue) return true;
-        return normalizeName(p.name) === normalizeName(name) && pricesEqual(p.price, price);
+
+        return (
+          normalizeName(p.name) === normalizeName(name) &&
+          pricesEqual(p.price, price)
+        );
       });
 
       if (existingIndex !== -1) {
         const item = addedProducts[existingIndex];
+
         item.qty = Number(item.qty || 0) + Number(qty);
         item.skus = item.skus || (item.sku ? [item.sku] : []);
-        if (skuValue && !item.skus.includes(skuValue)) item.skus.push(skuValue);
+
+        if (skuValue && !item.skus.includes(skuValue)) {
+          item.skus.push(skuValue);
+        }
+
         if (skuValue) item.sku = skuValue;
-        if (scannedImageUrl && !item.image_url) item.image_url = scannedImageUrl;
+
+        if (scannedImageUrl && !item.image_url) {
+          item.image_url = scannedImageUrl;
+        }
+
       } else {
-        const finalSku = skuValue || ('SKU-' + Date.now() + '-' + Math.floor(Math.random() * 10000));
+        const finalSku = skuValue ||
+          ('SKU-' + Date.now() + '-' + Math.floor(Math.random() * 10000));
+
         addedProducts.push({
-          name, qty: Number(qty), price: Number(price), category,
+          name,
+          qty: Number(qty),
+          price: Number(price),
+          category,
           sku: finalSku,
           skus: skuValue ? [skuValue] : [finalSku],
           image_url: scannedImageUrl,
@@ -470,92 +839,181 @@ document.addEventListener('DOMContentLoaded', async () => {
       qtyInput.value = '1';
       priceInput.value = '0';
       skuInput.value = '';
-      categoryInput.value = ''; // ✅ تفريغ حقل الفئة
+      categoryInput.value = '';
       scannedImageUrl = null;
+
       renderAddedProducts();
+
     } finally {
       doneBtn.dataset.busy = '';
       doneBtn.disabled = false;
     }
   }
 
-  doneBtn.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); addToCart(); });
+  doneBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    addToCart();
+  });
+
+  // ============================================
+  // حفظ المنتجات والفاتورة وحركة المخزون
+  // ============================================
 
   saveAllBtn.addEventListener('click', async (e) => {
-    e.preventDefault(); e.stopPropagation();
+    e.preventDefault();
+    e.stopPropagation();
+
     if (isSaving || saveAllBtn.disabled) return;
-    if (addedProducts.length === 0) { showErr(tr('prod_add_err_empty')); return; }
+
+    if (addedProducts.length === 0) {
+      showErr(tr('prod_add_err_empty'));
+      return;
+    }
 
     isSaving = true;
     saveAllBtn.disabled = true;
     hideAlerts();
-    saveAllBtn.querySelector('span').textContent = tr('prod_add_saving', '...');
+
+    saveAllBtn.querySelector('span').textContent =
+      tr('prod_add_saving', '...');
 
     try {
-      const { data: authData, error: authErr } = await db.auth.getUser();
+      const { data: authData, error: authErr } =
+        await db.auth.getUser();
+
       const authUser = authData?.user;
-      if (authErr || !authUser) throw new Error(tr('prod_add_err_auth', 'Authentication error'));
+
+      if (authErr || !authUser) {
+        throw new Error(tr('prod_add_err_auth', 'Authentication error'));
+      }
 
       const { data: profile, error: profErr } = await db
-        .from('profiles').select('organization_id, full_name').eq('id', authUser.id).single();
+        .from('profiles')
+        .select('organization_id, full_name')
+        .eq('id', authUser.id)
+        .single();
 
-      if (profErr || !profile?.organization_id) throw new Error(tr('prod_add_err_org', 'Organization not found'));
+      if (profErr || !profile?.organization_id) {
+        throw new Error(tr('prod_add_err_org', 'Organization not found'));
+      }
 
       let finalSupplierId = supplierIdInput.value || null;
+
       const typedSupplierName = supplierInput.value.trim();
       const isNewFlag = supplierInput.dataset.isNew === 'true';
       const savedNewName = supplierInput.dataset.newName || '';
-      const candidateNewName = isNewFlag ? (savedNewName || typedSupplierName) : typedSupplierName;
+
+      const candidateNewName = isNewFlag
+        ? (savedNewName || typedSupplierName)
+        : typedSupplierName;
 
       if (!finalSupplierId && candidateNewName) {
         const { data: existingSupplier, error: findSupErr } = await db
-          .from('suppliers').select('id').eq('organization_id', profile.organization_id)
-          .ilike('name', candidateNewName).limit(1).maybeSingle();
-        if (findSupErr) throw new Error(tr('prod_add_err_find') + ' ' + findSupErr.message);
+          .from('suppliers')
+          .select('id')
+          .eq('organization_id', profile.organization_id)
+          .ilike('name', candidateNewName)
+          .limit(1)
+          .maybeSingle();
+
+        if (findSupErr) {
+          throw new Error(
+            tr('prod_add_err_find') + ' ' + findSupErr.message
+          );
+        }
 
         if (existingSupplier) {
           finalSupplierId = existingSupplier.id;
+
         } else {
-          const { data: createdSupplier, error: supErr } = await db.from('suppliers').insert({
-            organization_id: profile.organization_id,
-            name: candidateNewName,
-            specialty: categoryInput.value.trim() || null,
-            created_by: authUser.id,
-          }).select().single();
-          if (supErr) throw new Error(tr('prod_add_err_supplier') + ' ' + supErr.message);
-          if (createdSupplier) finalSupplierId = createdSupplier.id;
+          const { data: createdSupplier, error: supErr } = await db
+            .from('suppliers')
+            .insert({
+              organization_id: profile.organization_id,
+              name: candidateNewName,
+              specialty: categoryInput.value.trim() || null,
+              created_by: authUser.id,
+            })
+            .select()
+            .single();
+
+          if (supErr) {
+            throw new Error(
+              tr('prod_add_err_supplier') + ' ' + supErr.message
+            );
+          }
+
+          if (createdSupplier) {
+            finalSupplierId = createdSupplier.id;
+          }
         }
       }
 
-      const invoiceNumber = 'INV-' + Date.now() + '-' + Math.floor(Math.random() * 1000);
+      const invoiceNumber =
+        'INV-' + Date.now() + '-' + Math.floor(Math.random() * 1000);
+
       const itemResults = [];
 
       for (const p of addedProducts) {
-        const allBarcodes = (p.skus && p.skus.length) ? p.skus : (p.sku ? [p.sku] : []);
+        const allBarcodes = (p.skus && p.skus.length)
+          ? p.skus
+          : (p.sku ? [p.sku] : []);
+
         let matchedProduct = null;
 
         if (hasBarcodeTable && allBarcodes.length) {
-          const { data: aliasRows } = await db.from('product_barcodes').select('product_id')
-            .eq('organization_id', profile.organization_id).in('barcode', allBarcodes).limit(1);
+          const { data: aliasRows } = await db
+            .from('product_barcodes')
+            .select('product_id')
+            .eq('organization_id', profile.organization_id)
+            .in('barcode', allBarcodes)
+            .limit(1);
+
           if (aliasRows?.[0]?.product_id) {
-            const { data: prod } = await db.from('products').select('*').eq('id', aliasRows[0].product_id).single();
+            const { data: prod } = await db
+              .from('products')
+              .select('*')
+              .eq('id', aliasRows[0].product_id)
+              .single();
+
             if (prod) matchedProduct = prod;
           }
         }
 
         if (!matchedProduct && allBarcodes.length) {
-          const { data: bySku } = await db.from('products').select('*')
-            .eq('organization_id', profile.organization_id).in('sku', allBarcodes).limit(1);
+          const { data: bySku } = await db
+            .from('products')
+            .select('*')
+            .eq('organization_id', profile.organization_id)
+            .in('sku', allBarcodes)
+            .limit(1);
+
           if (bySku?.[0]) matchedProduct = bySku[0];
         }
 
         if (!matchedProduct) {
-          let q = db.from('products').select('*')
+          let q = db
+            .from('products')
+            .select('*')
             .eq('organization_id', profile.organization_id)
-            .eq('price', Number(p.price)).ilike('name', p.name.trim());
-          q = finalSupplierId ? q.eq('supplier_id', finalSupplierId) : q.is('supplier_id', null);
-          const { data: byName, error: nameErr } = await q.order('created_at', { ascending: true }).limit(1);
-          if (nameErr) throw new Error(tr('prod_add_err_find') + ' ' + nameErr.message);
+            .eq('price', Number(p.price))
+            .ilike('name', p.name.trim());
+
+          q = finalSupplierId
+            ? q.eq('supplier_id', finalSupplierId)
+            : q.is('supplier_id', null);
+
+          const { data: byName, error: nameErr } = await q
+            .order('created_at', { ascending: true })
+            .limit(1);
+
+          if (nameErr) {
+            throw new Error(
+              tr('prod_add_err_find') + ' ' + nameErr.message
+            );
+          }
+
           if (byName?.[0]) matchedProduct = byName[0];
         }
 
@@ -563,26 +1021,48 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         if (matchedProduct) {
           productId = matchedProduct.id;
-          const newQty = Number(matchedProduct.qty || 0) + Number(p.qty);
-          const { error: updErr } = await db.from('products').update({
-            invoice_id: invoiceNumber,
-            qty: newQty,
-          }).eq('id', productId);
-          if (updErr) throw new Error(tr('prod_add_err_link') + ' ' + updErr.message);
+
+          const newQty =
+            Number(matchedProduct.qty || 0) + Number(p.qty);
+
+          const { error: updErr } = await db
+            .from('products')
+            .update({
+              invoice_id: invoiceNumber,
+              qty: newQty,
+            })
+            .eq('id', productId);
+
+          if (updErr) {
+            throw new Error(
+              tr('prod_add_err_link') + ' ' + updErr.message
+            );
+          }
+
         } else {
-          const { data: newProduct, error: insertError } = await db.from('products').insert({
-            organization_id: profile.organization_id,
-            name: p.name,
-            supplier_id: finalSupplierId,
-            sku: p.sku,
-            qty: Number(p.qty),
-            price: Number(p.price),
-            category: p.category || null,
-            image_url: p.image_url || null,
-            invoice_id: invoiceNumber,
-            created_by: authUser.id,
-          }).select().single();
-          if (insertError) throw new Error(tr('prod_add_err_insert') + ' ' + insertError.message);
+          const { data: newProduct, error: insertError } = await db
+            .from('products')
+            .insert({
+              organization_id: profile.organization_id,
+              name: p.name,
+              supplier_id: finalSupplierId,
+              sku: p.sku,
+              qty: Number(p.qty),
+              price: Number(p.price),
+              category: p.category || null,
+              image_url: p.image_url || null,
+              invoice_id: invoiceNumber,
+              created_by: authUser.id,
+            })
+            .select()
+            .single();
+
+          if (insertError) {
+            throw new Error(
+              tr('prod_add_err_insert') + ' ' + insertError.message
+            );
+          }
+
           productId = newProduct.id;
         }
 
@@ -594,15 +1074,20 @@ document.addEventListener('DOMContentLoaded', async () => {
             is_primary: i === 0,
             source: 'scan',
           }));
-          await db.from('product_barcodes')
-            .upsert(aliasRows, { onConflict: 'organization_id,barcode', ignoreDuplicates: true });
+
+          await db
+            .from('product_barcodes')
+            .upsert(aliasRows, {
+              onConflict: 'organization_id,barcode',
+              ignoreDuplicates: true
+            });
         }
 
-        // ✅ التعديل هنا: إضافة invoice_id لربط الحركة بالفاتورة
+        // ربط حركة المخزون بالفاتورة
         await db.from('stock_movements').insert({
           organization_id: profile.organization_id,
           product_id: productId,
-          invoice_id: invoiceNumber, 
+          invoice_id: invoiceNumber,
           type: 'in',
           method: 'manual',
           quantity: Number(p.qty),
@@ -618,19 +1103,32 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
       }
 
-      const totalQty = addedProducts.reduce((s, p) => s + Number(p.qty), 0);
-      const totalValue = addedProducts.reduce((s, p) => s + Number(p.qty) * Number(p.price), 0);
+      const totalQty = addedProducts.reduce(
+        (s, p) => s + Number(p.qty), 0
+      );
 
-      const { data: newInvoice, error: invoiceErr } = await db.from('invoices').insert({
-        invoice_number: invoiceNumber,
-        organization_id: profile.organization_id,
-        supplier_id: finalSupplierId,
-        created_by: authUser.id,
-        total_qty: totalQty,
-        total_value: totalValue,
-      }).select().single();
+      const totalValue = addedProducts.reduce(
+        (s, p) => s + Number(p.qty) * Number(p.price), 0
+      );
 
-      if (invoiceErr) throw new Error(tr('prod_add_err_invoice') + ' ' + invoiceErr.message);
+      const { data: newInvoice, error: invoiceErr } = await db
+        .from('invoices')
+        .insert({
+          invoice_number: invoiceNumber,
+          organization_id: profile.organization_id,
+          supplier_id: finalSupplierId,
+          created_by: authUser.id,
+          total_qty: totalQty,
+          total_value: totalValue,
+        })
+        .select()
+        .single();
+
+      if (invoiceErr) {
+        throw new Error(
+          tr('prod_add_err_invoice') + ' ' + invoiceErr.message
+        );
+      }
 
       const invoiceItems = itemResults.map(r => ({
         invoice_id: newInvoice.id,
@@ -641,32 +1139,53 @@ document.addEventListener('DOMContentLoaded', async () => {
         total: r.qty * r.price,
       }));
 
-      const { error: itemsErr } = await db.from('invoice_items').insert(invoiceItems);
-      if (itemsErr) throw new Error(tr('prod_add_err_items', 'Failed to save invoice items') + ' ' + itemsErr.message);
+      const { error: itemsErr } = await db
+        .from('invoice_items')
+        .insert(invoiceItems);
+
+      if (itemsErr) {
+        throw new Error(
+          tr('prod_add_err_items', 'Failed to save invoice items') +
+          ' ' + itemsErr.message
+        );
+      }
 
       if (typeof notifyOrganization === 'function') {
         try {
           await notifyOrganization({
             orgId: profile.organization_id,
             title: tr('prod_add_notif_title'),
-            message: `${profile.full_name || tr('prod_detail_user')} ${tr('prod_add_notif_msg')} ${invoiceNumber} (${totalQty} - ${totalValue.toFixed(2)})`,
+            message:
+              `${profile.full_name || tr('prod_detail_user')} ` +
+              `${tr('prod_add_notif_msg')} ${invoiceNumber} ` +
+              `(${totalQty} - ${totalValue.toFixed(2)})`,
             type: 'success',
             link: `/invoice.html?id=${encodeURIComponent(invoiceNumber)}`,
             userName: profile.full_name || null,
           });
-        } catch (notifErr) { console.error('Notification error:', notifErr); }
+        } catch (notifErr) {
+          console.error('Notification error:', notifErr);
+        }
       }
 
-      const insertedCount = itemResults.filter(r => r.inserted).length;
-      const updatedCount = itemResults.filter(r => !r.inserted).length;
+      const insertedCount =
+        itemResults.filter(r => r.inserted).length;
+
+      const updatedCount =
+        itemResults.filter(r => !r.inserted).length;
 
       addedProducts.length = 0;
       renderAddedProducts();
+
       supplierInput.dataset.newName = '';
       supplierInput.dataset.isNew = 'false';
       supplierIdInput.value = finalSupplierId || '';
 
-      showSuccess(`${tr('prod_add_new_count')} ${insertedCount} | ${tr('prod_add_upd_count')} ${updatedCount} | ${tr('prod_add_invoice_count')} ${invoiceNumber}`);
+      showSuccess(
+        `${tr('prod_add_new_count')} ${insertedCount} | ` +
+        `${tr('prod_add_upd_count')} ${updatedCount} | ` +
+        `${tr('prod_add_invoice_count')} ${invoiceNumber}`
+      );
 
       if (window.self !== window.top && itemResults.length) {
         window.parent.postMessage({
@@ -676,26 +1195,47 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
 
       setTimeout(() => {
-        window.location.replace(`/invoice.html?id=${encodeURIComponent(invoiceNumber)}`);
+        window.location.replace(
+          `/invoice.html?id=${encodeURIComponent(invoiceNumber)}`
+        );
       }, 1500);
 
     } catch (error) {
       console.error('Save error:', error);
+
       showErr(error.message || 'Save failed');
+
       saveAllBtn.disabled = false;
-      saveAllBtn.querySelector('span').textContent = tr('prod_add_save');
+      saveAllBtn.querySelector('span').textContent =
+        tr('prod_add_save');
+
       isSaving = false;
     }
   });
 
+  // ============================================
+  // استقبال اختيار منتج من صفحة أخرى
+  // ============================================
+
   window.addEventListener('message', (event) => {
     const data = event.data;
+
     if (!data || typeof data !== 'object') return;
+
     if (data.type === 'PRODUCT_SELECTED' && data.productId) {
       const detailIframe = document.getElementById('detail-iframe');
-      if (detailIframe) detailIframe.src = `/products/detail.html?id=${encodeURIComponent(data.productId)}`;
+
+      if (detailIframe) {
+        detailIframe.src =
+          `/products/detail.html?id=${encodeURIComponent(data.productId)}`;
+      }
     }
   });
 
+  // ============================================
+  // إظهار السلة الفارغة والملخص بعد التحميل
+  // ============================================
+
   renderAddedProducts();
+
 });

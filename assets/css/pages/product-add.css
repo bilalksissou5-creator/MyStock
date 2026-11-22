@@ -890,3 +890,202 @@ html.in-iframe .add-form {
     margin-bottom: 0 !important;
   }
 }
+
+/* ============================================
+   Skeleton Screen — صفحة إضافة المنتجات
+   ✅ Shimmer أفقي بسرعة 1.4 ثانية
+   ✅ بطاقات بيضاء
+   ✅ الحفاظ على أبعاد العناصر
+   ============================================ */
+
+.add-skeleton-card {
+  background: #ffffff;
+  border-radius: 10px;
+  padding: 16px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  box-sizing: border-box;
+  min-width: 0;
+  pointer-events: none;
+}
+
+.add-skeleton-shape {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  background: #e5e5e5;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+.add-skeleton-shape::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.65),
+    transparent
+  );
+  transform: translateX(-100%);
+  animation: addSkeletonShimmer 1.4s infinite;
+}
+
+@keyframes addSkeletonShimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* عنوان القسم */
+.add-skeleton-title {
+  width: 38%;
+  height: 19px;
+  margin-bottom: 16px;
+}
+
+/* الحقول */
+.add-skeleton-field {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  margin-bottom: 16px;
+  min-width: 0;
+}
+
+.add-skeleton-label {
+  width: 28%;
+  height: 11px;
+}
+
+.add-skeleton-input {
+  width: 100%;
+  height: 40px;
+  border-radius: 7px;
+}
+
+/* زر */
+.add-skeleton-button {
+  width: 100%;
+  height: 42px;
+  border-radius: 7px;
+}
+
+/* ملخص المنتجات */
+.add-skeleton-summary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.add-skeleton-summary-item {
+  height: 65px;
+  border-radius: 8px;
+}
+
+/* بطاقة السلة */
+.add-skeleton-cart-item {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  padding: 12px;
+  background: #fafafa;
+  border: 1px solid #f0f0f0;
+  border-radius: 10px;
+  margin-bottom: 8px;
+  box-sizing: border-box;
+}
+
+.add-skeleton-image {
+  width: 44px;
+  height: 44px;
+  border-radius: 8px;
+}
+
+.add-skeleton-info {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.add-skeleton-name {
+  width: 75%;
+  height: 11px;
+}
+
+.add-skeleton-detail {
+  width: 50%;
+  height: 8px;
+}
+
+.add-skeleton-stats {
+  display: flex;
+  gap: 6px;
+}
+
+.add-skeleton-stat {
+  width: 48px;
+  height: 39px;
+  border-radius: 6px;
+}
+
+/* ظهور المحتوى الحقيقي */
+.add-page-enter {
+  animation: addPageReveal 0.35s ease-out forwards;
+}
+
+@keyframes addPageReveal {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+/* احترام تقليل الحركة */
+@media (prefers-reduced-motion: reduce) {
+  .add-skeleton-shape::after {
+    animation: none;
+  }
+
+  .add-page-enter {
+    animation: none;
+    opacity: 1;
+  }
+}
+
+/* الهاتف */
+@media (max-width: 699px) {
+  .add-skeleton-summary {
+    grid-template-columns: 1fr;
+  }
+
+  .add-skeleton-summary-item {
+    height: 42px;
+  }
+
+  .add-skeleton-cart-item {
+    grid-template-columns: 40px minmax(0, 1fr);
+  }
+
+  .add-skeleton-stats {
+    grid-column: 1 / -1;
+    justify-content: flex-end;
+  }
+}
+
+/* الشاشات الكبيرة */
+@media (min-width: 700px) {
+  .add-skeleton-cart-item {
+    grid-template-columns: 40px minmax(0, 1fr) auto;
+  }
+
+  .add-skeleton-image {
+    width: 40px;
+    height: 40px;
+  }
+}
