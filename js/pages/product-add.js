@@ -1,4 +1,3 @@
-
 // ============================================
 // صفحة إضافة منتجات
 // ✅ Skeleton Screen قبل تحميل البيانات
@@ -144,7 +143,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
           </div>
         </div>
-
       </div>
     `;
   }
@@ -315,14 +313,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             ${tr('prod_add_cancel')}
           </a>
         </div>
-
       </div>
 
       <div class="form-right-col">
         <div class="added-products-section card-added">
-
           <label class="section-label">${tr('prod_add_added')}</label>
-
           <div id="added-products" class="added-products">
             <div class="empty-added">
               <i class="fas fa-box-open"></i>
@@ -1248,8 +1243,14 @@ document.addEventListener('DOMContentLoaded', async () => {
             );
         }
 
-        // ربط حركة المخزون برقم الفاتورة
-        await db
+        // ============================================
+        // إنشاء حركة المخزون وربطها بالفاتورة
+        // ============================================
+
+        const {
+          data: newMovement,
+          error: movementErr
+        } = await db
           .from('stock_movements')
           .insert({
             organization_id: profile.organization_id,
@@ -1259,7 +1260,45 @@ document.addEventListener('DOMContentLoaded', async () => {
             method: 'manual',
             quantity: Number(p.qty),
             performed_by: authUser.id
+          })
+          .select('id')
+          .single();
+
+        if (movementErr || !newMovement?.id) {
+          throw new Error(
+            'فشل تسجيل حركة المخزون: ' +
+            (movementErr?.message || 'لم يتم إرجاع معرّف الحركة')
+          );
+        }
+
+        // ============================================
+        // تسجيل العملية في سجل التقارير
+        // ============================================
+
+        const { error: logErr } = await db
+          .from('operation_logs')
+          .insert({
+            organization_id: profile.organization_id,
+            operation_type: 'add',
+            entity_type: 'stock_movement',
+            product_id: productId,
+            supplier_id: finalSupplierId,
+            movement_id: newMovement.id,
+            performed_by: authUser.id,
+            field_name: null,
+            old_value: null,
+            new_value: {
+              quantity: Number(p.qty),
+              invoice_number: invoiceNumber
+            }
           });
+
+        if (logErr) {
+          throw new Error(
+            'تم إنشاء حركة المخزون، لكن فشل تسجيلها في سجل التقارير: ' +
+            logErr.message
+          );
+        }
 
         itemResults.push({
           productId,

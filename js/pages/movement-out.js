@@ -1,10 +1,10 @@
-
 // ============================================
 // صفحة إخراج منتجات + طباعة حرارية (WebBluetooth/WebUSB)
 // ✅ بدون RawBT
 // ✅ الباركود الممسوح يظهر في خانة الإدخال والسلة
 // ✅ إشعار تلقائي عند انخفاض المخزون (مترجم)
 // ✅ Skeleton Screen قبل تحميل البيانات
+// ✅ تسجيل عمليات الإخراج في operation_logs
 // ============================================
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -89,7 +89,6 @@ document.addEventListener('DOMContentLoaded', async () => {
           this.device = await navigator.usb.requestDevice({
             filters: []
           });
-
           this.mode = 'usb';
           return 'usb';
         } catch (e) {}
@@ -102,7 +101,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       const ctx = canvas.getContext('2d');
       const w = canvas.width;
       const h = canvas.height;
-
       const img = ctx.getImageData(0, 0, w, h).data;
       const bytesPerRow = Math.ceil(w / 8);
       const buffer = new Uint8Array(bytesPerRow * h);
@@ -116,7 +114,6 @@ document.addEventListener('DOMContentLoaded', async () => {
           for (let bit = 0; bit < 8; bit++) {
             if (x + bit < w) {
               const i = (y * w + (x + bit)) * 4;
-
               if (img[i + 3] < 128) continue;
 
               const lum =
@@ -333,7 +330,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
           <!-- حاوية بيانات المنتج -->
           <div class="product-input-card card-fields">
-
             <div class="form-group">
               <div class="add-skeleton-shape add-skeleton-label"></div>
               <div class="add-skeleton-shape add-skeleton-input"></div>
@@ -563,7 +559,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         </div>
 
         <div class="form-summary card-summary">
-
           <div class="summary-row">
             <span>${tr('mout_sum_count')}</span>
             <strong id="sum-rows">0</strong>
@@ -649,7 +644,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   // ============================================
 
   const addedProducts = [];
-
   const productInput = document.getElementById('product-input');
   const hiddenId = document.getElementById('product_id');
   const suggestions = document.getElementById('product-suggestions');
@@ -657,13 +651,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   const quantityInput = document.getElementById('quantity');
   const priceInput = document.getElementById('price');
   const availableQtyInput = document.getElementById('available-qty');
-
   const addedContainer = document.getElementById('added-products');
-
   const addBtn = document.getElementById('add-product-btn');
   const saveBtn = document.getElementById('save-btn');
   const scanBtn = document.getElementById('scan-btn');
-
   const scannerModal = document.getElementById('scanner-modal');
   const scannerReader = document.getElementById('scanner-reader');
   const scannerClose = document.getElementById('scanner-close');
@@ -909,7 +900,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   scanBtn.addEventListener('click', startScanner);
-
   scannerClose.addEventListener('click', stopScanner);
 
   scannerModal.addEventListener('click', (e) => {
@@ -1033,7 +1023,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     addBtn.disabled = true;
 
     const errBox = document.getElementById('form-error');
-
     errBox.style.display = 'none';
 
     if (!selectedProduct) {
@@ -1294,14 +1283,47 @@ document.addEventListener('DOMContentLoaded', async () => {
         performed_by: authUser.id
       }));
 
-      const { error: moveError } = await db
+      const { data: savedMovements, error: moveError } = await db
         .from('stock_movements')
-        .insert(movements);
+        .insert(movements)
+        .select('id, product_id, quantity, receipt_id');
 
       if (moveError) {
         throw new Error(
           tr('mout_err_movements') + ' ' + moveError.message
         );
+      }
+
+      // ============================================
+      // تسجيل عمليات الإخراج في سجل العمليات
+      // ============================================
+
+      const operationLogs = savedMovements.map(movement => {
+        const product = (products ?? []).find(
+          p => p.id === movement.product_id
+        );
+
+        return {
+          organization_id: prof.organization_id,
+          operation_type: 'out',
+          entity_type: 'stock_movement',
+          product_id: movement.product_id,
+          supplier_id: product?.supplier_id || null,
+          movement_id: movement.id,
+          performed_by: authUser.id,
+          new_value: {
+            quantity: Number(movement.quantity),
+            receipt_number: receiptNumber
+          }
+        };
+      });
+
+      const { error: logError } = await db
+        .from('operation_logs')
+        .insert(operationLogs);
+
+      if (logError) {
+        console.error('فشل تسجيل عمليات الإخراج:', logError);
       }
 
       // ============================================

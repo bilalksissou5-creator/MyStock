@@ -1,4 +1,3 @@
-
 // ============================================
 // صفحة سجل المنتج (Product History)
 // ✅ حذف صف الفاتورة فعلياً
@@ -288,7 +287,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       // 2. جلب بيانات المنتج
       const { data: prod, error: prodError } = await db
         .from('products')
-        .select('qty, price')
+        .select('qty, price, supplier_id')
         .eq('id', productId)
         .single();
 
@@ -420,6 +419,31 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       if (!updatedMovement || updatedMovement.length === 0) {
         throw new Error('تعذر نقل الحركة إلى سلة المحذوفات.');
+      }
+
+      // 7.1 تسجيل عملية الحذف في سجل العمليات
+      const { error: logError } = await db
+        .from('operation_logs')
+        .insert({
+          organization_id: movement.organization_id,
+          operation_type: 'delete',
+          entity_type: 'stock_movement',
+          product_id: productId,
+          supplier_id: prod.supplier_id || null,
+          movement_id: movementId,
+          performed_by: user.id,
+          old_value: {
+            quantity: qty,
+            invoice_id: movement.invoice_id || null,
+            invoice_item: invoiceItem || null
+          },
+          new_value: {
+            deleted_at: deletedTime
+          }
+        });
+
+      if (logError) {
+        console.error('فشل تسجيل حذف حركة المخزون:', logError);
       }
 
       // 8. تحديث الكمية المحلية

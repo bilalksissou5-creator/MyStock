@@ -3,6 +3,7 @@
 // الهيكل المشترك (Header + Sidebar)
 // ✅ إصلاح زر الرجوع للعمل بشكل طبيعي مع الإطار
 // ✅ إضافة زر سلة المحذوفات
+// ✅ إضافة زر التقارير
 // ✅ إخفاء العناصر المحذوفة (deleted_at) من البحث الشامل
 // ✅ إضافة شريط تحميل تدريجي عند التنقل بين الصفحات
 // ============================================
@@ -159,7 +160,12 @@ function renderLayout(activePage) {
     { href: '/workers/list.html', labelKey: 'nav_workers', icon: 'fa-users' },
     { href: '/suppliers/list.html', labelKey: 'nav_suppliers', icon: 'fa-truck' },
     { href: '/invoices/list.html', labelKey: 'nav_invoices', icon: 'fa-file-invoice' },
+
+    // ✅ زر التقارير تحت زر الفواتير
+    { href: '/reports.html', labelKey: 'nav_reports', icon: 'fa-chart-line' },
+
     { href: '/settings.html', labelKey: 'nav_settings', icon: 'fa-gear' },
+
     // ✅ زر سلة المحذوفات
     { href: '/trash.html', labelKey: 'nav_trash', icon: 'fa-trash-can' },
   ];
