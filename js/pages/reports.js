@@ -1,6 +1,7 @@
 // ============================================
 // صفحة التقارير (Reports)
 // ✅ تقرير إضافة المنتجات (مفصل)
+// ✅ تصحيح اتجاه العملة في البطاقة الإجمالية
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   const user = await requireAuth();
@@ -169,7 +170,14 @@ document.addEventListener('DOMContentLoaded', async () => {
       });
 
       document.getElementById('sum-ops').textContent = totalItems.toLocaleString();
-      document.getElementById('sum-total').textContent = `${totalValue.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} DH`;
+      
+      // ✅ التصحيح هنا: تغليف الرقم والعملة بغلاف خارجي للتحكم في الاتجاه
+      document.getElementById('sum-total').innerHTML = `
+        <span dir="ltr" style="display: inline-flex; align-items: baseline; gap: 4px;">
+          ${totalValue.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+          <span class="summary-currency">DH</span>
+        </span>
+      `;
 
       if (totalItems === 0) {
         tbody.innerHTML = `<tr><td colspan="9"><div class="reports-empty"><i class="fas fa-chart-bar"></i><p>${tr('reports_no_data', 'No data for this period')}</p></div></td></tr>`;
@@ -182,7 +190,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       const startIndex = (currentPage - 1) * PAGE_SIZE;
       const pageItems = allItems.slice(startIndex, startIndex + PAGE_SIZE);
 
-      // ✅ رسم الجدول (مع تصحيح اتجاه العملة)
+      // ✅ رسم الجدول
       tbody.innerHTML = pageItems.map(m => {
         const p = m.products || {};
         const supplierName = p.suppliers?.name || '—';

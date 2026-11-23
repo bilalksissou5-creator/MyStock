@@ -118,6 +118,14 @@
   color: #16a34a;
 }
 
+/* ✅ تنسيق العملة داخل بطاقة الإجمالي */
+.summary-currency {
+  font-size: 16px;
+  font-weight: 700;
+  color: #16a34a;
+  margin-inline-start: 4px;
+}
+
 /* بطاقة الجدول */
 .table-card {
   background: #ffffff;
