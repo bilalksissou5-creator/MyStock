@@ -1,6 +1,7 @@
 // ============================================
 // صفحة التقارير (Reports)
-// ✅ ترتيب الأعمدة الجديد
+// ✅ تقرير إضافة المنتجات
+// ✅ إضافة صف المجموع الكلي (tfoot)
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   const user = await requireAuth();
@@ -28,7 +29,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   let totalItems = 0;
   let currentStartDate, currentEndDate;
 
-  // ✅ بناء هيكل الصفحة (مع رأس الجدول الجديد)
+  // ✅ بناء هيكل الصفحة
   main.innerHTML = `
     <div class="page-header">
       <h2>${tr('reports_title', 'Reports')}</h2>
@@ -87,6 +88,15 @@ document.addEventListener('DOMContentLoaded', async () => {
             <tbody id="reports-tbody">
               <tr><td colspan="8" style="text-align:center; padding:40px; color:#a3a3a3;">${tr('loading', 'Loading...')}</td></tr>
             </tbody>
+            <!-- ✅ صف المجموع الكلي -->
+            <tfoot id="reports-tfoot">
+              <tr>
+                <td colspan="5" class="footer-label">${tr('reports_grand_total', 'المجموع الكلي')}</td>
+                <td class="footer-total" id="footer-qty">0</td>
+                <td></td>
+                <td class="footer-total highlight" id="footer-value" dir="ltr">0.00 <span class="currency-symbol">DH</span></td>
+              </tr>
+            </tfoot>
           </table>
         </div>
         <div class="pagination" id="pagination"></div>
@@ -157,20 +167,25 @@ document.addEventListener('DOMContentLoaded', async () => {
       totalItems = allItems.length;
 
       let totalValue = 0;
+      let totalQtyAll = 0;
       allItems.forEach(m => {
         const qty = Number(m.quantity || 0);
         const price = Number(m.products?.price || 0);
         totalValue += qty * price;
+        totalQtyAll += qty;
       });
 
       document.getElementById('sum-ops').textContent = totalItems.toLocaleString();
-      
       document.getElementById('sum-total').innerHTML = `
         <span dir="ltr" style="display: inline-flex; align-items: baseline; gap: 4px;">
           ${totalValue.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
           <span class="summary-currency">DH</span>
         </span>
       `;
+
+      // ✅ تحديث صف المجموع الكلي
+      document.getElementById('footer-qty').textContent = totalQtyAll.toLocaleString();
+      document.getElementById('footer-value').innerHTML = `${totalValue.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <span class="currency-symbol">DH</span>`;
 
       if (totalItems === 0) {
         tbody.innerHTML = `<tr><td colspan="8"><div class="reports-empty"><i class="fas fa-chart-bar"></i><p>${tr('reports_no_data', 'No data for this period')}</p></div></td></tr>`;
@@ -182,7 +197,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       const startIndex = (currentPage - 1) * PAGE_SIZE;
       const pageItems = allItems.slice(startIndex, startIndex + PAGE_SIZE);
 
-      // ✅ رسم الجدول بالترتيب الجديد
       tbody.innerHTML = pageItems.map(m => {
         const p = m.products || {};
         const supplierName = p.suppliers?.name || '—';

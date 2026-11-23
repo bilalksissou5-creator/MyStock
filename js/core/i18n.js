@@ -1020,6 +1020,7 @@ const translations = {
     reports_time: 'الوقت',
     reports_date_only: 'التاريخ',
     reports_qty_unit: 'الكمية والوحدة',
+    reports_grand_total: 'المجموع الكلي',
   },
 
   fr: {
@@ -2031,6 +2032,7 @@ const translations = {
     reports_time: 'Heure',
     reports_date_only: 'Date',
     reports_qty_unit: 'Qté & Unité',
+    reports_grand_total: 'Total Général',
   },
 
   en: {
@@ -3043,6 +3045,8 @@ const translations = {
     reports_time: 'Time',
     reports_date_only: 'Date',
     reports_qty_unit: 'Qty & Unit',
+
+    reports_grand_total: 'Grand Total',
   },
 
   
