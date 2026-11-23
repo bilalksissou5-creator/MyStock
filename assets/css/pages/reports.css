@@ -32,7 +32,6 @@
   gap: 8px;
 }
 
-/* أزرار الفترة (اليوم، أسبوع، شهر، سنة) */
 .period-tabs {
   display: flex;
   background: #f5f5f5;
@@ -55,9 +54,7 @@
   transition: all 0.2s;
 }
 
-.period-tab:hover {
-  color: #171717;
-}
+.period-tab:hover { color: #171717; }
 
 .period-tab.active {
   background: #ffffff;
@@ -65,7 +62,6 @@
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
-/* حقل التاريخ المخصص */
 .date-range-display {
   display: flex;
   align-items: center;
@@ -80,11 +76,8 @@
   justify-content: center;
 }
 
-.date-range-display i {
-  font-size: 16px;
-}
+.date-range-display i { font-size: 16px; }
 
-/* بطاقات الإحصائيات (الملخص) */
 .summary-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -102,31 +95,11 @@
   gap: 6px;
 }
 
-.summary-label {
-  font-size: 13px;
-  color: #737373;
-  font-weight: 600;
-}
+.summary-label { font-size: 13px; color: #737373; font-weight: 600; }
+.summary-value { font-size: 26px; font-weight: 800; color: #171717; }
+.summary-value.highlight { color: #16a34a; }
+.summary-currency { font-size: 16px; font-weight: 700; color: #16a34a; margin-inline-start: 4px; }
 
-.summary-value {
-  font-size: 26px;
-  font-weight: 800;
-  color: #171717;
-}
-
-.summary-value.highlight {
-  color: #16a34a;
-}
-
-/* ✅ تنسيق العملة داخل بطاقة الإجمالي */
-.summary-currency {
-  font-size: 16px;
-  font-weight: 700;
-  color: #16a34a;
-  margin-inline-start: 4px;
-}
-
-/* بطاقة الجدول */
 .table-card {
   background: #ffffff;
   border-radius: 16px;
@@ -142,13 +115,8 @@
   align-items: center;
 }
 
-.table-title {
-  font-size: 16px;
-  font-weight: 700;
-  color: #171717;
-}
+.table-title { font-size: 16px; font-weight: 700; color: #171717; }
 
-/* ✅ حاوية الجدول (التمرير الأفقي) */
 .table-wrapper {
   width: 100%;
   overflow-x: auto;
@@ -156,64 +124,106 @@
   -webkit-overflow-scrolling: touch;
 }
 
-/* ✅ تنسيق الجدول */
+/* ✅ الجدول الأساسي */
 .reports-table {
   width: 100%;
   border-collapse: collapse;
   min-width: 1100px;
 }
 
-.reports-table th {
-  padding: 12px 16px;
+/* ============================================
+   ✅ 1. رأس الجدول (Header)
+   ============================================ */
+.reports-table thead th {
+  padding: 14px 16px;
   text-align: start;
-  font-size: 12px;
-  font-weight: 700;
-  color: #737373;
+  font-size: 11px;
+  font-weight: 800;
+  color: #404040;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
-  border-bottom: 1px solid #f0f0f0;
-  background: #fafafa;
+  letter-spacing: 0.8px;
+  background: #171717;      /* خلفية داكنة */
+  color: #ffffff;           /* نص أبيض */
+  border-bottom: 2px solid #171717;
   white-space: nowrap;
 }
 
-.reports-table td {
+/* ============================================
+   ✅ 2. وسط الجدول (Body)
+   ============================================ */
+.reports-table tbody td {
   padding: 14px 16px;
   font-size: 13px;
+  color: #404040;
+  border-bottom: 1px solid #f0f0f0;
+  white-space: nowrap;
+  vertical-align: middle;
+  font-weight: 500;
+}
+
+.reports-table tbody tr:nth-child(even) {
+  background: #fafafa; /* تظليل الصفوف الزوجية */
+}
+
+.reports-table tbody tr:hover {
+  background: #f0f7ff; /* لون أزرق فاتح عند التمرير */
+}
+
+/* تنسيقات خلايا معينة في الوسط */
+.time-cell { font-weight: 700; color: #2563eb; }
+.date-cell { font-size: 12px; color: #737373; }
+.user-cell { font-weight: 600; }
+.supplier-cell { font-weight: 700; color: #404040; }
+.product-cell { font-weight: 800; color: #2563eb; font-size: 14px; }
+.qty-unit-cell { font-weight: 700; }
+.price-cell { font-weight: 600; }
+.total-cell { font-weight: 800; color: #16a34a; font-size: 14px; }
+
+/* ============================================
+   ✅ 3. قاعدة الجدول (Footer)
+   ============================================ */
+.reports-table tfoot td {
+  padding: 16px 16px;
+  font-size: 14px;
+  font-weight: 800;
   color: #171717;
-  border-bottom: 1px solid #f5f5f5;
+  background: #f0f0f0;            /* خلفية رمادية داكنة */
+  border-top: 3px double #171717; /* خط مزدوج فاصل */
   white-space: nowrap;
 }
 
-.reports-table tr:last-child td {
-  border-bottom: none;
+.footer-label {
+  text-align: end;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
-.reports-table tr:hover {
-  background: #fafafa;
+[dir="ltr"] .footer-label { text-align: start; }
+
+.footer-total {
+  font-weight: 900;
+  font-size: 15px;
+  color: #171717;
 }
 
-/* ✅ تنسيق الخلايا الخاصة */
-.supplier-cell { font-weight: 600; color: #171717; }
-.product-cell { font-weight: 600; color: #2563eb; }
-.category-cell { color: #737373; }
-.qty-cell { font-weight: 700; color: #171717; }
-.unit-cell { color: #737373; }
-.price-cell { color: #171717; }
-.total-cell { font-weight: 700; color: #16a34a; }
-.user-cell { color: #737373; }
-.date-cell { color: #737373; font-size: 12px; }
-
-.category-badge {
-  display: inline-block;
-  padding: 2px 10px;
-  background: #f5f5f5;
-  color: #404040;
-  border-radius: 6px;
-  font-size: 12px;
-  font-weight: 600;
+.footer-total.highlight {
+  color: #16a34a;
+  font-size: 16px;
 }
 
-/* الترقيم (Pagination) */
+/* العملة */
+.currency-symbol {
+  font-size: 10px;
+  color: #a3a3a3;
+  font-weight: 500;
+  margin-inline-start: 2px;
+}
+
+.price-cell, .total-cell { direction: ltr; text-align: start; }
+[dir="rtl"] .price-cell, [dir="rtl"] .total-cell { text-align: right; }
+
+/* الترقيم */
 .pagination {
   display: flex;
   justify-content: space-between;
@@ -224,15 +234,8 @@
   flex-wrap: wrap;
 }
 
-.pagination-info {
-  font-size: 13px;
-  color: #737373;
-}
-
-.pagination-controls {
-  display: flex;
-  gap: 6px;
-}
+.pagination-info { font-size: 13px; color: #737373; }
+.pagination-controls { display: flex; gap: 6px; }
 
 .pagination-btn {
   width: 36px;
@@ -250,85 +253,22 @@
   transition: all 0.15s;
 }
 
-.pagination-btn:hover:not(:disabled) {
-  background: #f5f5f5;
-}
+.pagination-btn:hover:not(:disabled) { background: #f5f5f5; }
+.pagination-btn.active { background: #171717; color: #ffffff; border-color: #171717; }
+.pagination-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
-.pagination-btn.active {
-  background: #171717;
-  color: #ffffff;
-  border-color: #171717;
-}
-
-.pagination-btn:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-}
-
-/* حالة فارغة */
-.reports-empty {
-  padding: 60px 20px;
-  text-align: center;
-  color: #a3a3a3;
-}
-
-.reports-empty i {
-  font-size: 50px;
-  color: #e5e5e5;
-  margin-bottom: 16px;
-  display: block;
-}
+.reports-empty { padding: 60px 20px; text-align: center; color: #a3a3a3; }
+.reports-empty i { font-size: 50px; color: #e5e5e5; margin-bottom: 16px; display: block; }
 
 /* الهواتف */
 @media (max-width: 600px) {
-  .summary-grid {
-    grid-template-columns: 1fr;
-  }
-  .summary-value {
-    font-size: 22px;
-  }
-  .period-tab {
-    font-size: 12px;
-    padding: 8px 4px;
-  }
-  .date-range-display {
-    font-size: 12px;
-    padding: 10px 12px;
-    flex-direction: column;
-    text-align: center;
-    gap: 6px;
-  }
-  .reports-table th,
-  .reports-table td {
-    padding: 10px 14px;
-    font-size: 12px;
-  }
-  .pagination {
-    flex-direction: column;
-    align-items: center;
-  }
-}
-
-/* ============================================
-   ✅ تصحيح اتجاه العملة في الجدول
-   ============================================ */
-
-/* منع العملة من الالتصاق بالرقم وجعلها في الجهة الأخرى */
-.currency-symbol {
-  font-size: 11px;
-  color: #737373;
-  font-weight: 600;
-  margin-inline-start: 4px;
-}
-
-/* التأكد من عرض الرقم والعملة بشكل صحيح في الاتجاهين */
-.price-cell, .total-cell {
-  direction: ltr;
-  text-align: start;
-}
-
-/* في اللغة العربية، نجعل الخلية تبدأ من اليمين مع بقاء الأرقام بشكل صحيح */
-[dir="rtl"] .price-cell, 
-[dir="rtl"] .total-cell {
-  text-align: right;
+  .summary-grid { grid-template-columns: 1fr; }
+  .summary-value { font-size: 22px; }
+  .period-tab { font-size: 12px; padding: 8px 4px; }
+  .date-range-display { font-size: 12px; padding: 10px 12px; flex-direction: column; text-align: center; gap: 6px; }
+  .reports-table th, .reports-table td { padding: 10px 12px; }
+  .reports-table thead th { font-size: 10px; }
+  .product-cell { font-size: 13px; }
+  .total-cell { font-size: 13px; }
+  .pagination { flex-direction: column; align-items: center; }
 }
