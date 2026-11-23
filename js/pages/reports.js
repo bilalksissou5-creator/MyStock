@@ -1,7 +1,6 @@
 // ============================================
 // صفحة التقارير (Reports)
-// ✅ تقرير إضافة المنتجات (مفصل)
-// ✅ تصحيح اتجاه العملة في البطاقة الإجمالية
+// ✅ ترتيب الأعمدة الجديد
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   const user = await requireAuth();
@@ -29,7 +28,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   let totalItems = 0;
   let currentStartDate, currentEndDate;
 
-  // ✅ بناء هيكل الصفحة
+  // ✅ بناء هيكل الصفحة (مع رأس الجدول الجديد)
   main.innerHTML = `
     <div class="page-header">
       <h2>${tr('reports_title', 'Reports')}</h2>
@@ -75,19 +74,18 @@ document.addEventListener('DOMContentLoaded', async () => {
           <table class="reports-table">
             <thead>
               <tr>
+                <th>${tr('reports_time', 'الوقت')}</th>
+                <th>${tr('reports_date_only', 'التاريخ')}</th>
+                <th>${tr('reports_user', 'المستخدم')}</th>
                 <th>${tr('reports_supplier', 'المورد')}</th>
                 <th>${tr('reports_product', 'المنتج')}</th>
-                <th>${tr('reports_category', 'الفئة')}</th>
-                <th>${tr('reports_qty', 'الكمية')}</th>
-                <th>${tr('reports_unit', 'الوحدة')}</th>
-                <th>${tr('reports_unit_price', 'سعر الوحدة')}</th>
+                <th>${tr('reports_qty_unit', 'الكمية والوحدة')}</th>
+                <th>${tr('reports_unit_price', 'سعر الشراء')}</th>
                 <th>${tr('reports_total_value', 'إجمالي القيمة')}</th>
-                <th>${tr('reports_user', 'المستخدم')}</th>
-                <th>${tr('reports_date', 'التاريخ والوقت')}</th>
               </tr>
             </thead>
             <tbody id="reports-tbody">
-              <tr><td colspan="9" style="text-align:center; padding:40px; color:#a3a3a3;">${tr('loading', 'Loading...')}</td></tr>
+              <tr><td colspan="8" style="text-align:center; padding:40px; color:#a3a3a3;">${tr('loading', 'Loading...')}</td></tr>
             </tbody>
           </table>
         </div>
@@ -101,7 +99,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   const dateRangeText = document.getElementById('date-range-text');
   const paginationContainer = document.getElementById('pagination');
 
-  // ✅ حساب الفترة الزمنية
   function getDateRange(period) {
     const now = new Date();
     let start, end;
@@ -126,13 +123,12 @@ document.addEventListener('DOMContentLoaded', async () => {
   function formatDate(d) {
     return d.toLocaleDateString('fr-FR');
   }
-  function formatDateTime(d) {
-    return d.toLocaleDateString('fr-FR') + ' ' + d.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+  function formatTime(d) {
+    return d.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
   }
 
-  // ✅ جلب البيانات وعرضها
   async function loadReport() {
-    tbody.innerHTML = `<tr><td colspan="9" style="text-align:center; padding:40px; color:#a3a3a3;"><i class="fas fa-spinner fa-spin"></i> ${tr('loading', 'Loading...')}</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; padding:40px; color:#a3a3a3;"><i class="fas fa-spinner fa-spin"></i> ${tr('loading', 'Loading...')}</td></tr>`;
     paginationContainer.innerHTML = '';
 
     const { start, end } = getDateRange(currentPeriod);
@@ -141,7 +137,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     dateRangeText.textContent = `${formatDate(start)} — ${formatDate(end)}`;
 
     try {
-      // ✅ جلب الحركات مع بيانات المنتج والمورد والمستخدم
       const { data: movements, error } = await db
         .from('stock_movements')
         .select(`
@@ -161,7 +156,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       const allItems = movements || [];
       totalItems = allItems.length;
 
-      // حساب الإحصائيات
       let totalValue = 0;
       allItems.forEach(m => {
         const qty = Number(m.quantity || 0);
@@ -171,7 +165,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       document.getElementById('sum-ops').textContent = totalItems.toLocaleString();
       
-      // ✅ التصحيح هنا: تغليف الرقم والعملة بغلاف خارجي للتحكم في الاتجاه
       document.getElementById('sum-total').innerHTML = `
         <span dir="ltr" style="display: inline-flex; align-items: baseline; gap: 4px;">
           ${totalValue.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
@@ -180,54 +173,51 @@ document.addEventListener('DOMContentLoaded', async () => {
       `;
 
       if (totalItems === 0) {
-        tbody.innerHTML = `<tr><td colspan="9"><div class="reports-empty"><i class="fas fa-chart-bar"></i><p>${tr('reports_no_data', 'No data for this period')}</p></div></td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="8"><div class="reports-empty"><i class="fas fa-chart-bar"></i><p>${tr('reports_no_data', 'No data for this period')}</p></div></td></tr>`;
         paginationContainer.innerHTML = '';
         return;
       }
 
-      // ترقيم الصفحات
       const totalPages = Math.ceil(totalItems / PAGE_SIZE);
       const startIndex = (currentPage - 1) * PAGE_SIZE;
       const pageItems = allItems.slice(startIndex, startIndex + PAGE_SIZE);
 
-      // ✅ رسم الجدول
+      // ✅ رسم الجدول بالترتيب الجديد
       tbody.innerHTML = pageItems.map(m => {
         const p = m.products || {};
         const supplierName = p.suppliers?.name || '—';
         const productName = p.name || '—';
-        const category = p.category || '—';
         const qty = Number(m.quantity || 0);
         const unit = p.unit || '—';
         const price = Number(p.price || 0);
-        const totalValue = qty * price;
+        const total = qty * price;
         const userName = m.profiles?.full_name || '—';
-        const dateStr = formatDateTime(new Date(m.created_at));
+        const dateObj = new Date(m.created_at);
+        const dateStr = formatDate(dateObj);
+        const timeStr = formatTime(dateObj);
 
         return `
           <tr>
+            <td class="time-cell" dir="ltr">${timeStr}</td>
+            <td class="date-cell">${dateStr}</td>
+            <td class="user-cell">${userName}</td>
             <td class="supplier-cell">${supplierName}</td>
             <td class="product-cell">${productName}</td>
-            <td class="category-cell">${category}</td>
-            <td class="qty-cell">${qty}</td>
-            <td class="unit-cell">${unit}</td>
+            <td class="qty-unit-cell">${qty} ${unit}</td>
             <td class="price-cell" dir="ltr">${price.toFixed(2)} <span class="currency-symbol">DH</span></td>
-            <td class="total-cell" dir="ltr">${totalValue.toFixed(2)} <span class="currency-symbol">DH</span></td>
-            <td class="user-cell">${userName}</td>
-            <td class="date-cell">${dateStr}</td>
+            <td class="total-cell" dir="ltr">${total.toFixed(2)} <span class="currency-symbol">DH</span></td>
           </tr>
         `;
       }).join('');
 
-      // رسم الترقيم
       renderPagination(totalPages, startIndex, pageItems.length);
 
     } catch (err) {
       console.error(err);
-      tbody.innerHTML = `<tr><td colspan="9" class="alert alert-error">${err.message}</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="8" class="alert alert-error">${err.message}</td></tr>`;
     }
   }
 
-  // ✅ دالة الترقيم
   function renderPagination(totalPages, startIndex, pageItemsCount) {
     const startNum = startIndex + 1;
     const endNum = startIndex + pageItemsCount;
@@ -257,7 +247,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   }
 
-  // أحداث التبويبات
   document.querySelectorAll('.period-tab').forEach(tab => {
     tab.addEventListener('click', () => {
       document.querySelectorAll('.period-tab').forEach(t => t.classList.remove('active'));
