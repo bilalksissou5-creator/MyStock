@@ -1016,6 +1016,10 @@ const translations = {
     reports_showing: 'عرض',
     reports_of: 'من',
     reports_operations: 'عملية',
+
+    reports_time: 'الوقت',
+    reports_date_only: 'التاريخ',
+    reports_qty_unit: 'الكمية والوحدة',
   },
 
   fr: {
@@ -2023,6 +2027,10 @@ const translations = {
     reports_showing: 'Affichage',
     reports_of: 'sur',
     reports_operations: 'opérations',
+
+    reports_time: 'Heure',
+    reports_date_only: 'Date',
+    reports_qty_unit: 'Qté & Unité',
   },
 
   en: {
@@ -3031,6 +3039,10 @@ const translations = {
     reports_showing: 'Showing',
     reports_of: 'of',
     reports_operations: 'operations',
+
+    reports_time: 'Time',
+    reports_date_only: 'Date',
+    reports_qty_unit: 'Qty & Unit',
   },
 
   
