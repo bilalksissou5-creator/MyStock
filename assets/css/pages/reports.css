@@ -152,7 +152,7 @@
 .reports-table {
   width: 100%;
   border-collapse: collapse;
-  min-width: 1100px; /* ✅ عرض أدنى أكبر لاستيعاب الأعمدة */
+  min-width: 1100px;
 }
 
 .reports-table th {
@@ -299,295 +299,28 @@
     flex-direction: column;
     align-items: center;
   }
-}/* ============================================
-   صفحة التقارير (Reports)
+}
+
+/* ============================================
+   ✅ تصحيح اتجاه العملة في الجدول
    ============================================ */
 
-.reports-wrapper {
-  width: 100% !important;
-  max-width: 900px !important;
-  margin: 0 auto !important;
-  padding: 0 0 20px !important;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  box-sizing: border-box !important;
-}
-
-/* بطاقة الفلاتر */
-.filters-card {
-  background: #ffffff;
-  border-radius: 16px;
-  padding: 20px;
-  border: 1px solid #e5e5e5;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
-}
-
-.filters-title {
-  font-size: 16px;
-  font-weight: 700;
-  color: #171717;
-  margin-bottom: 16px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-/* أزرار الفترة (اليوم، أسبوع، شهر، سنة) */
-.period-tabs {
-  display: flex;
-  background: #f5f5f5;
-  border-radius: 12px;
-  padding: 4px;
-  margin-bottom: 20px;
-  gap: 4px;
-}
-
-.period-tab {
-  flex: 1;
-  padding: 10px;
-  border-radius: 8px;
-  border: none;
-  background: transparent;
-  font-size: 14px;
-  font-weight: 600;
-  color: #737373;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.period-tab:hover {
-  color: #171717;
-}
-
-.period-tab.active {
-  background: #ffffff;
-  color: #171717;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-}
-
-/* حقل التاريخ المخصص */
-.date-range-display {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  background: #f8faff;
-  border: 1px solid #dbeafe;
-  border-radius: 12px;
-  padding: 14px 16px;
-  font-size: 14px;
-  color: #2563eb;
-  font-weight: 600;
-  justify-content: center;
-}
-
-.date-range-display i {
-  font-size: 16px;
-}
-
-/* بطاقات الإحصائيات (الملخص) */
-.summary-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-}
-
-.summary-card {
-  background: #ffffff;
-  border-radius: 16px;
-  padding: 20px;
-  border: 1px solid #e5e5e5;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.summary-label {
-  font-size: 13px;
+/* منع العملة من الالتصاق بالرقم وجعلها في الجهة الأخرى */
+.currency-symbol {
+  font-size: 11px;
   color: #737373;
   font-weight: 600;
+  margin-inline-start: 4px;
 }
 
-.summary-value {
-  font-size: 26px;
-  font-weight: 800;
-  color: #171717;
-}
-
-.summary-value.highlight {
-  color: #16a34a;
-}
-
-/* بطاقة الجدول */
-.table-card {
-  background: #ffffff;
-  border-radius: 16px;
-  border: 1px solid #e5e5e5;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
-  overflow: hidden;
-}
-
-.table-header {
-  padding: 20px 20px 0;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.table-title {
-  font-size: 16px;
-  font-weight: 700;
-  color: #171717;
-}
-
-.table-wrapper {
-  width: 100%;
-  overflow-x: auto;
-  padding: 16px 0;
-}
-
-.reports-table {
-  width: 100%;
-  border-collapse: collapse;
-  min-width: 600px;
-}
-
-.reports-table th {
-  padding: 12px 20px;
+/* التأكد من عرض الرقم والعملة بشكل صحيح في الاتجاهين */
+.price-cell, .total-cell {
+  direction: ltr;
   text-align: start;
-  font-size: 12px;
-  font-weight: 700;
-  color: #737373;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  border-bottom: 1px solid #f0f0f0;
-  background: #fafafa;
-  white-space: nowrap;
 }
 
-.reports-table td {
-  padding: 14px 20px;
-  font-size: 14px;
-  color: #171717;
-  border-bottom: 1px solid #f5f5f5;
-  white-space: nowrap;
-}
-
-.reports-table tr:last-child td {
-  border-bottom: none;
-}
-
-.reports-table tr:hover {
-  background: #fafafa;
-}
-
-.reports-table .category-badge {
-  display: inline-block;
-  padding: 2px 10px;
-  background: #f5f5f5;
-  color: #404040;
-  border-radius: 6px;
-  font-size: 12px;
-  font-weight: 600;
-}
-
-.reports-table .qty-cell {
-  font-weight: 700;
-}
-
-.reports-table .unit-cell {
-  color: #737373;
-}
-
-/* الترقيم (Pagination) */
-.pagination {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 16px 20px;
-  border-top: 1px solid #f0f0f0;
-  gap: 12px;
-  flex-wrap: wrap;
-}
-
-.pagination-info {
-  font-size: 13px;
-  color: #737373;
-}
-
-.pagination-controls {
-  display: flex;
-  gap: 6px;
-}
-
-.pagination-btn {
-  width: 36px;
-  height: 36px;
-  border-radius: 8px;
-  border: 1px solid #e5e5e5;
-  background: #ffffff;
-  color: #171717;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 14px;
-  font-weight: 600;
-  transition: all 0.15s;
-}
-
-.pagination-btn:hover:not(:disabled) {
-  background: #f5f5f5;
-}
-
-.pagination-btn.active {
-  background: #171717;
-  color: #ffffff;
-  border-color: #171717;
-}
-
-.pagination-btn:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-}
-
-/* حالة فارغة */
-.reports-empty {
-  padding: 60px 20px;
-  text-align: center;
-  color: #a3a3a3;
-}
-
-.reports-empty i {
-  font-size: 50px;
-  color: #e5e5e5;
-  margin-bottom: 16px;
-  display: block;
-}
-
-/* الهواتف */
-@media (max-width: 600px) {
-  .summary-grid {
-    grid-template-columns: 1fr;
-  }
-  .summary-value {
-    font-size: 22px;
-  }
-  .period-tab {
-    font-size: 12px;
-    padding: 8px 4px;
-  }
-  .date-range-display {
-    font-size: 12px;
-    padding: 10px 12px;
-    flex-direction: column;
-    text-align: center;
-    gap: 6px;
-  }
-  .reports-table th,
-  .reports-table td {
-    padding: 10px 14px;
-    font-size: 13px;
-  }
+/* في اللغة العربية، نجعل الخلية تبدأ من اليمين مع بقاء الأرقام بشكل صحيح */
+[dir="rtl"] .price-cell, 
+[dir="rtl"] .total-cell {
+  text-align: right;
 }

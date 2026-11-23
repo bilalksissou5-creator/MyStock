@@ -28,7 +28,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   let totalItems = 0;
   let currentStartDate, currentEndDate;
 
-  // ✅ بناء هيكل الصفحة (كما في الصورة)
+  // ✅ بناء هيكل الصفحة
   main.innerHTML = `
     <div class="page-header">
       <h2>${tr('reports_title', 'Reports')}</h2>
@@ -182,7 +182,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       const startIndex = (currentPage - 1) * PAGE_SIZE;
       const pageItems = allItems.slice(startIndex, startIndex + PAGE_SIZE);
 
-      // ✅ رسم الجدول بالأعمدة المطلوبة
+      // ✅ رسم الجدول (مع تصحيح اتجاه العملة)
       tbody.innerHTML = pageItems.map(m => {
         const p = m.products || {};
         const supplierName = p.suppliers?.name || '—';
@@ -202,8 +202,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             <td class="category-cell">${category}</td>
             <td class="qty-cell">${qty}</td>
             <td class="unit-cell">${unit}</td>
-            <td class="price-cell">${price.toFixed(2)} DH</td>
-            <td class="total-cell">${totalValue.toFixed(2)} DH</td>
+            <td class="price-cell" dir="ltr">${price.toFixed(2)} <span class="currency-symbol">DH</span></td>
+            <td class="total-cell" dir="ltr">${totalValue.toFixed(2)} <span class="currency-symbol">DH</span></td>
             <td class="user-cell">${userName}</td>
             <td class="date-cell">${dateStr}</td>
           </tr>
@@ -219,7 +219,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
 
-  // ✅ دالة الترقيم (كما هي)
+  // ✅ دالة الترقيم
   function renderPagination(totalPages, startIndex, pageItemsCount) {
     const startNum = startIndex + 1;
     const endNum = startIndex + pageItemsCount;
