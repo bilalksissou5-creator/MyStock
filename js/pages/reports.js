@@ -1,6 +1,6 @@
 // ============================================
 // صفحة التقارير (Reports)
-// ✅ تقرير إضافة المنتجات
+// ✅ تقرير إضافة المنتجات (مفصل)
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   const user = await requireAuth();
@@ -22,13 +22,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   const orgId = profile.organization_id;
 
-  let currentPeriod = 'month'; // 'today', 'week', 'month', 'year'
+  let currentPeriod = 'month';
   let currentPage = 1;
   const PAGE_SIZE = 20;
   let totalItems = 0;
   let currentStartDate, currentEndDate;
 
-  // ✅ بناء هيكل الصفحة
+  // ✅ بناء هيكل الصفحة (كما في الصورة)
   main.innerHTML = `
     <div class="page-header">
       <h2>${tr('reports_title', 'Reports')}</h2>
@@ -36,7 +36,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     <div class="reports-wrapper">
       
-      <!-- بطاقة الفلاتر -->
       <div class="filters-card">
         <h3 class="filters-title">
           <i class="fas fa-chart-pie" style="color: #2563eb;"></i>
@@ -56,7 +55,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         </div>
       </div>
 
-      <!-- بطاقات الإحصائيات -->
       <div class="summary-grid">
         <div class="summary-card">
           <div class="summary-label">${tr('reports_ops_count', 'Number of Operations')}</div>
@@ -68,7 +66,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         </div>
       </div>
 
-      <!-- بطاقة الجدول -->
       <div class="table-card">
         <div class="table-header">
           <h3 class="table-title">${tr('reports_details_table', 'Details Table')}</h3>
@@ -77,21 +74,23 @@ document.addEventListener('DOMContentLoaded', async () => {
           <table class="reports-table">
             <thead>
               <tr>
-                <th>${tr('reports_supplier', 'Supplier')}</th>
-                <th>${tr('reports_product', 'Product')}</th>
-                <th>${tr('reports_category', 'Category')}</th>
-                <th>${tr('reports_qty', 'Quantity')}</th>
-                <th>${tr('reports_unit', 'Unit')}</th>
+                <th>${tr('reports_supplier', 'المورد')}</th>
+                <th>${tr('reports_product', 'المنتج')}</th>
+                <th>${tr('reports_category', 'الفئة')}</th>
+                <th>${tr('reports_qty', 'الكمية')}</th>
+                <th>${tr('reports_unit', 'الوحدة')}</th>
+                <th>${tr('reports_unit_price', 'سعر الوحدة')}</th>
+                <th>${tr('reports_total_value', 'إجمالي القيمة')}</th>
+                <th>${tr('reports_user', 'المستخدم')}</th>
+                <th>${tr('reports_date', 'التاريخ والوقت')}</th>
               </tr>
             </thead>
             <tbody id="reports-tbody">
-              <tr><td colspan="5" style="text-align:center; padding:40px; color:#a3a3a3;">${tr('loading', 'Loading...')}</td></tr>
+              <tr><td colspan="9" style="text-align:center; padding:40px; color:#a3a3a3;">${tr('loading', 'Loading...')}</td></tr>
             </tbody>
           </table>
         </div>
-        <div class="pagination" id="pagination">
-          <!-- سيتم بناؤه برمجياً -->
-        </div>
+        <div class="pagination" id="pagination"></div>
       </div>
 
     </div>
@@ -101,11 +100,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   const dateRangeText = document.getElementById('date-range-text');
   const paginationContainer = document.getElementById('pagination');
 
-  // ✅ دالة حساب الفترة الزمنية
+  // ✅ حساب الفترة الزمنية
   function getDateRange(period) {
     const now = new Date();
     let start, end;
-    
     if (period === 'today') {
       start = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0);
       end = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59);
@@ -121,32 +119,35 @@ document.addEventListener('DOMContentLoaded', async () => {
       start = new Date(now.getFullYear(), 0, 1, 0, 0, 0);
       end = new Date(now.getFullYear(), 11, 31, 23, 59, 59);
     }
-    
     return { start, end };
   }
 
-  // ✅ تنسيق التاريخ
   function formatDate(d) {
-    return d.toLocaleDateString('fr-FR'); // 01/11/2026
+    return d.toLocaleDateString('fr-FR');
+  }
+  function formatDateTime(d) {
+    return d.toLocaleDateString('fr-FR') + ' ' + d.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
   }
 
   // ✅ جلب البيانات وعرضها
   async function loadReport() {
-    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:40px; color:#a3a3a3;"><i class="fas fa-spinner fa-spin"></i> ${tr('loading', 'Loading...')}</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="9" style="text-align:center; padding:40px; color:#a3a3a3;"><i class="fas fa-spinner fa-spin"></i> ${tr('loading', 'Loading...')}</td></tr>`;
     paginationContainer.innerHTML = '';
 
     const { start, end } = getDateRange(currentPeriod);
     currentStartDate = start;
     currentEndDate = end;
-
-    // تحديث نص الفترة
     dateRangeText.textContent = `${formatDate(start)} — ${formatDate(end)}`;
 
     try {
-      // 1. جلب حركات الإضافة في الفترة المحددة
-      const { data: movements, error: movError } = await db
+      // ✅ جلب الحركات مع بيانات المنتج والمورد والمستخدم
+      const { data: movements, error } = await db
         .from('stock_movements')
-        .select('*, products(id, name, category, sku, suppliers(name))')
+        .select(`
+          id, quantity, created_at, performed_by,
+          products (id, name, category, sku, price, unit, suppliers (name)),
+          profiles (full_name)
+        `)
         .eq('organization_id', orgId)
         .eq('type', 'in')
         .is('deleted_at', null)
@@ -154,18 +155,16 @@ document.addEventListener('DOMContentLoaded', async () => {
         .lte('created_at', end.toISOString())
         .order('created_at', { ascending: false });
 
-      if (movError) throw movError;
+      if (error) throw error;
 
       const allItems = movements || [];
       totalItems = allItems.length;
 
-      // 2. حساب الإحصائيات
-      let totalQty = 0;
+      // حساب الإحصائيات
       let totalValue = 0;
       allItems.forEach(m => {
         const qty = Number(m.quantity || 0);
         const price = Number(m.products?.price || 0);
-        totalQty += qty;
         totalValue += qty * price;
       });
 
@@ -173,108 +172,84 @@ document.addEventListener('DOMContentLoaded', async () => {
       document.getElementById('sum-total').textContent = `${totalValue.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} DH`;
 
       if (totalItems === 0) {
-        tbody.innerHTML = `
-          <tr><td colspan="5">
-            <div class="reports-empty">
-              <i class="fas fa-chart-bar"></i>
-              <p>${tr('reports_no_data', 'No data for this period')}</p>
-            </div>
-          </td></tr>
-        `;
+        tbody.innerHTML = `<tr><td colspan="9"><div class="reports-empty"><i class="fas fa-chart-bar"></i><p>${tr('reports_no_data', 'No data for this period')}</p></div></td></tr>`;
         paginationContainer.innerHTML = '';
         return;
       }
 
-      // 3. ترقيم الصفحات
+      // ترقيم الصفحات
       const totalPages = Math.ceil(totalItems / PAGE_SIZE);
       const startIndex = (currentPage - 1) * PAGE_SIZE;
       const pageItems = allItems.slice(startIndex, startIndex + PAGE_SIZE);
 
-      // 4. رسم الجدول
+      // ✅ رسم الجدول بالأعمدة المطلوبة
       tbody.innerHTML = pageItems.map(m => {
         const p = m.products || {};
         const supplierName = p.suppliers?.name || '—';
         const productName = p.name || '—';
         const category = p.category || '—';
         const qty = Number(m.quantity || 0);
-        const unit = 'قطعة'; // افتراضي (يمكن جلبه من المنتج)
+        const unit = p.unit || '—';
+        const price = Number(p.price || 0);
+        const totalValue = qty * price;
+        const userName = m.profiles?.full_name || '—';
+        const dateStr = formatDateTime(new Date(m.created_at));
 
         return `
           <tr>
-            <td>${supplierName}</td>
-            <td>${productName}</td>
-            <td><span class="category-badge">${category}</span></td>
+            <td class="supplier-cell">${supplierName}</td>
+            <td class="product-cell">${productName}</td>
+            <td class="category-cell">${category}</td>
             <td class="qty-cell">${qty}</td>
             <td class="unit-cell">${unit}</td>
+            <td class="price-cell">${price.toFixed(2)} DH</td>
+            <td class="total-cell">${totalValue.toFixed(2)} DH</td>
+            <td class="user-cell">${userName}</td>
+            <td class="date-cell">${dateStr}</td>
           </tr>
         `;
       }).join('');
 
-      // 5. رسم الترقيم
+      // رسم الترقيم
       renderPagination(totalPages, startIndex, pageItems.length);
 
     } catch (err) {
       console.error(err);
-      tbody.innerHTML = `<tr><td colspan="5" class="alert alert-error">${err.message}</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="9" class="alert alert-error">${err.message}</td></tr>`;
     }
   }
 
-  // ✅ دالة رسم الترقيم
+  // ✅ دالة الترقيم (كما هي)
   function renderPagination(totalPages, startIndex, pageItemsCount) {
     const startNum = startIndex + 1;
     const endNum = startIndex + pageItemsCount;
-
-    let paginationHtml = `
-      <div class="pagination-info">
-        ${tr('reports_showing', 'Showing')} ${startNum}–${endNum} ${tr('reports_of', 'of')} ${totalItems} ${tr('reports_operations', 'operations')}
-      </div>
+    let html = `
+      <div class="pagination-info">${tr('reports_showing', 'عرض')} ${startNum}–${endNum} ${tr('reports_of', 'من')} ${totalItems} ${tr('reports_operations', 'عملية')}</div>
       <div class="pagination-controls">
-        <button class="pagination-btn" data-page="prev" ${currentPage === 1 ? 'disabled' : ''}>
-          <i class="fas fa-chevron-${window.getCurrentLang && window.getCurrentLang() === 'ar' ? 'right' : 'left'}"></i>
-        </button>
+        <button class="pagination-btn" data-page="prev" ${currentPage === 1 ? 'disabled' : ''}><i class="fas fa-chevron-${window.getCurrentLang && window.getCurrentLang() === 'ar' ? 'right' : 'left'}"></i></button>
     `;
-
-    // إظهار 5 صفحات كحد أقصى (مثل جوجل)
     let startPage = Math.max(1, currentPage - 2);
     let endPage = Math.min(totalPages, currentPage + 2);
-    
-    if (startPage > 1) {
-      paginationHtml += `<button class="pagination-btn" data-page="1">1</button>`;
-      if (startPage > 2) paginationHtml += `<span style="align-self:center; color:#737373;">...</span>`;
-    }
-    
-    for (let i = startPage; i <= endPage; i++) {
-      paginationHtml += `<button class="pagination-btn ${i === currentPage ? 'active' : ''}" data-page="${i}">${i}</button>`;
-    }
-    
-    if (endPage < totalPages) {
-      if (endPage < totalPages - 1) paginationHtml += `<span style="align-self:center; color:#737373;">...</span>`;
-      paginationHtml += `<button class="pagination-btn" data-page="${totalPages}">${totalPages}</button>`;
-    }
-
-    paginationHtml += `
-        <button class="pagination-btn" data-page="next" ${currentPage === totalPages ? 'disabled' : ''}>
-          <i class="fas fa-chevron-${window.getCurrentLang && window.getCurrentLang() === 'ar' ? 'left' : 'right'}"></i>
-        </button>
+    if (startPage > 1) { html += `<button class="pagination-btn" data-page="1">1</button>`; if (startPage > 2) html += `<span style="align-self:center; color:#737373;">...</span>`; }
+    for (let i = startPage; i <= endPage; i++) html += `<button class="pagination-btn ${i === currentPage ? 'active' : ''}" data-page="${i}">${i}</button>`;
+    if (endPage < totalPages) { if (endPage < totalPages - 1) html += `<span style="align-self:center; color:#737373;">...</span>`; html += `<button class="pagination-btn" data-page="${totalPages}">${totalPages}</button>`; }
+    html += `
+        <button class="pagination-btn" data-page="next" ${currentPage === totalPages ? 'disabled' : ''}><i class="fas fa-chevron-${window.getCurrentLang && window.getCurrentLang() === 'ar' ? 'left' : 'right'}"></i></button>
       </div>
     `;
-
-    paginationContainer.innerHTML = paginationHtml;
-
-    // ربط الأحداث
+    paginationContainer.innerHTML = html;
     paginationContainer.querySelectorAll('.pagination-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         const page = btn.dataset.page;
         if (page === 'prev') currentPage = Math.max(1, currentPage - 1);
         else if (page === 'next') currentPage = Math.min(totalPages, currentPage + 1);
         else currentPage = Number(page);
-        
         loadReport();
       });
     });
   }
 
-  // ✅ أحداث التبويبات
+  // أحداث التبويبات
   document.querySelectorAll('.period-tab').forEach(tab => {
     tab.addEventListener('click', () => {
       document.querySelectorAll('.period-tab').forEach(t => t.classList.remove('active'));
@@ -285,6 +260,5 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   });
 
-  // ✅ التحميل الأولي
   await loadReport();
 });
