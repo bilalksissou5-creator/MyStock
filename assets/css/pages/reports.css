@@ -1,5 +1,6 @@
 /* ============================================
    صفحة التقارير (Reports)
+   ✅ منع التفاف النص نهائياً (سطر واحد فقط)
    ============================================ */
 
 .reports-wrapper {
@@ -130,74 +131,57 @@
 }
 
 /* ============================================
-   ✅ الجدول: العرض يتكيف تماماً مع المحتوى
+   ✅ الجدول: العرض حسب المحتوى (سطر واحد فقط)
    ============================================ */
 .reports-table {
-  width: auto; /* ✅ العرض حسب المحتوى، وليس 100% */
-  min-width: 100%; /* يضمن أن الجدول يملأ الحاوية إذا كان المحتوى صغيراً */
-  table-layout: auto; /* ✅ التمدد التلقائي */
+  width: max-content; /* ✅ العرض يتمدد حسب المحتوى */
+  min-width: 100%; /* يضمن ملء الشاشة إذا كان المحتوى قليلاً */
   border-collapse: collapse;
+  table-layout: auto;
 }
 
 /* رأس الجدول */
 .reports-table thead th {
-  padding: 12px 16px;
+  padding: 10px 14px;
   text-align: start;
   font-size: 11px;
   font-weight: 800;
   text-transform: uppercase;
-  letter-spacing: 0.8px;
+  letter-spacing: 0.5px;
   background: #171717;
   color: #ffffff;
   border-bottom: 2px solid #171717;
-  white-space: nowrap; /* الرأس يبقى في سطر واحد */
+  white-space: nowrap; /* الرأس في سطر واحد */
 }
 
-/* وسط الجدول */
+/* وسط الجدول - منع الالتفاف نهائياً */
 .reports-table tbody td {
   padding: 8px 12px;
-  font-size: 13px;
+  font-size: 12px;
   color: #404040;
   border-bottom: 1px solid #f0f0f0;
   vertical-align: middle;
   font-weight: 500;
+  white-space: nowrap; /* ✅ منع الالتفاف لكل الخلايا */
 }
 
 .reports-table tbody tr:nth-child(even) { background: #fafafa; }
 .reports-table tbody tr:hover { background: #f0f7ff; }
 
-/* ✅ إزالة nowrap عن الخلايا التي قد تحتوي نصاً طويلاً لتتمدد حسب المحتوى */
-.product-cell,
-.supplier-cell,
-.user-cell {
-  white-space: normal; /* يسمح للنص الطويل بالنزول لسطر جديد إذا لزم الأمر */
-  word-break: break-word;
-  /* لا نضع min-width هنا */
-}
-
-/* الخلايا القصيرة (تبقى في سطر واحد) */
-.time-cell,
-.date-cell,
-.qty-unit-cell,
-.price-cell,
-.total-cell {
-  white-space: nowrap;
-}
-
-/* تنسيقات إضافية للخلايا */
-.time-cell { font-weight: 700; color: #2563eb; font-size: 12px; }
+/* تنسيقات الأعمدة (بدون الآنف) */
+.time-cell { font-weight: 700; color: #2563eb; }
 .date-cell { font-size: 11px; color: #737373; }
-.user-cell { font-weight: 600; font-size: 12px; }
-.supplier-cell { font-weight: 700; color: #404040; font-size: 12px; }
+.user-cell { font-weight: 600; }
+.supplier-cell { font-weight: 700; color: #404040; }
 .product-cell { font-weight: 800; color: #2563eb; font-size: 13px; }
-.qty-unit-cell { font-weight: 700; font-size: 13px; }
-.price-cell { font-weight: 600; font-size: 12px; }
+.qty-unit-cell { font-weight: 700; }
+.price-cell { font-weight: 600; }
 .total-cell { font-weight: 800; color: #16a34a; font-size: 13px; }
 
-/* قاعدة الجدول */
+/* قاعدة الجدول (المجموع) */
 .reports-table tfoot td {
-  padding: 14px 16px;
-  font-size: 14px;
+  padding: 12px 12px;
+  font-size: 13px;
   font-weight: 800;
   color: #171717;
   background: #f0f0f0;
@@ -205,11 +189,11 @@
   white-space: nowrap;
 }
 
-.footer-label { text-align: end; font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px; }
+.footer-label { text-align: end; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; }
 [dir="ltr"] .footer-label { text-align: start; }
 
-.footer-total { font-weight: 900; font-size: 15px; color: #171717; }
-.footer-total.highlight { color: #16a34a; font-size: 16px; }
+.footer-total { font-weight: 900; font-size: 14px; color: #171717; }
+.footer-total.highlight { color: #16a34a; font-size: 15px; }
 
 /* العملة */
 .currency-symbol { font-size: 10px; color: #a3a3a3; font-weight: 500; margin-inline-start: 2px; }
@@ -259,9 +243,10 @@
   .summary-value { font-size: 22px; }
   .period-tab { font-size: 12px; padding: 8px 4px; }
   .date-range-display { font-size: 12px; padding: 10px 12px; flex-direction: column; text-align: center; gap: 6px; }
-  .reports-table th, .reports-table td { padding: 8px 10px; }
-  .reports-table thead th { font-size: 10px; }
-  .product-cell { font-size: 12px; }
-  .total-cell { font-size: 12px; }
+  .reports-table th, .reports-table td { padding: 8px 8px; }
+  .reports-table thead th { font-size: 9px; padding: 8px 6px; }
+  .product-cell, .user-cell, .supplier-cell { font-size: 11px; }
+  .time-cell, .date-cell { font-size: 10px; }
+  .qty-unit-cell, .price-cell, .total-cell { font-size: 11px; }
   .pagination { flex-direction: column; align-items: center; }
 }
