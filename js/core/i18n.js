@@ -1021,6 +1021,9 @@ const translations = {
     reports_date_only: 'التاريخ',
     reports_qty_unit: 'الكمية والوحدة',
     reports_grand_total: 'المجموع الكلي',
+    reports_custom: 'مخصص',
+    reports_date_range: 'الفترة المخصصة',
+    reports_select_dates: 'اختر التاريخ...',
   },
 
   fr: {
@@ -2033,6 +2036,9 @@ const translations = {
     reports_date_only: 'Date',
     reports_qty_unit: 'Qté & Unité',
     reports_grand_total: 'Total Général',
+    reports_custom: 'Personnalisé',
+    reports_date_range: 'Période personnalisée',
+    reports_select_dates: 'Sélectionner les dates...',
   },
 
   en: {
@@ -3047,6 +3053,9 @@ const translations = {
     reports_qty_unit: 'Qty & Unit',
 
     reports_grand_total: 'Grand Total',
+    reports_custom: 'Custom',
+    reports_date_range: 'Custom Range',
+    reports_select_dates: 'Select dates...',
   },
 
   

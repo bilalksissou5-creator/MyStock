@@ -1,7 +1,6 @@
 // ============================================
 // صفحة التقارير (Reports)
-// ✅ تقرير إضافة المنتجات
-// ✅ إضافة صف المجموع الكلي (tfoot)
+// ✅ تقويم مخصص (Flatpickr)
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   const user = await requireAuth();
@@ -23,7 +22,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   const orgId = profile.organization_id;
 
-  let currentPeriod = 'month';
+  let currentPeriod = 'month'; // 'today', 'week', 'month', 'year', 'custom'
   let currentPage = 1;
   const PAGE_SIZE = 20;
   let totalItems = 0;
@@ -48,8 +47,19 @@ document.addEventListener('DOMContentLoaded', async () => {
           <button class="period-tab" data-period="week">${tr('reports_week', 'Week')}</button>
           <button class="period-tab active" data-period="month">${tr('reports_month', 'Month')}</button>
           <button class="period-tab" data-period="year">${tr('reports_year', 'Year')}</button>
+          <!-- زر التقويم المخصص -->
+          <button class="period-tab" data-period="custom">
+            <i class="fas fa-calendar-alt" style="margin-inline-end: 4px;"></i> ${tr('reports_custom', 'Custom')}
+          </button>
         </div>
 
+        <!-- ✅ حقل التقويم (يظهر فقط عند اختيار "مخصص") -->
+        <div class="custom-date-range" id="custom-date-range" style="display: none;">
+          <label>${tr('reports_date_range', 'Date Range')}</label>
+          <input type="text" id="date-picker" placeholder="${tr('reports_select_dates', 'Select dates...')}" readonly>
+        </div>
+
+        <!-- عرض الفترة الحالية -->
         <div class="date-range-display" id="date-range-display">
           <i class="fas fa-calendar-alt"></i>
           <span id="date-range-text">—</span>
@@ -88,7 +98,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             <tbody id="reports-tbody">
               <tr><td colspan="8" style="text-align:center; padding:40px; color:#a3a3a3;">${tr('loading', 'Loading...')}</td></tr>
             </tbody>
-            <!-- ✅ صف المجموع الكلي -->
             <tfoot id="reports-tfoot">
               <tr>
                 <td colspan="5" class="footer-label">${tr('reports_grand_total', 'المجموع الكلي')}</td>
@@ -108,8 +117,37 @@ document.addEventListener('DOMContentLoaded', async () => {
   const tbody = document.getElementById('reports-tbody');
   const dateRangeText = document.getElementById('date-range-text');
   const paginationContainer = document.getElementById('pagination');
+  const customDateRange = document.getElementById('custom-date-range');
+  const datePickerInput = document.getElementById('date-picker');
+
+  // ✅ إعداد تقويم Flatpickr
+  let fp = null;
+  function initDatePicker() {
+    if (fp) fp.destroy();
+    
+    const lang = window.getCurrentLang ? window.getCurrentLang() : 'ar';
+    const locale = (lang === 'ar' && flatpickr.l10ns.ar) ? flatpickr.l10ns.ar : 'default';
+
+    fp = flatpickr(datePickerInput, {
+      mode: "range",
+      dateFormat: "Y-m-d",
+      locale: locale,
+      onChange: function(selectedDates) {
+        if (selectedDates.length === 2) {
+          currentPeriod = 'custom';
+          currentPage = 1;
+          currentStartDate = selectedDates[0];
+          currentEndDate = new Date(selectedDates[1].setHours(23, 59, 59, 999));
+          loadReport();
+        }
+      }
+    });
+  }
 
   function getDateRange(period) {
+    if (period === 'custom') {
+      return { start: currentStartDate, end: currentEndDate };
+    }
     const now = new Date();
     let start, end;
     if (period === 'today') {
@@ -183,7 +221,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         </span>
       `;
 
-      // ✅ تحديث صف المجموع الكلي
       document.getElementById('footer-qty').textContent = totalQtyAll.toLocaleString();
       document.getElementById('footer-value').innerHTML = `${totalValue.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <span class="currency-symbol">DH</span>`;
 
@@ -261,15 +298,29 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   }
 
+  // ✅ أحداث التبويبات (بما فيها زر التقويم المخصص)
   document.querySelectorAll('.period-tab').forEach(tab => {
     tab.addEventListener('click', () => {
       document.querySelectorAll('.period-tab').forEach(t => t.classList.remove('active'));
       tab.classList.add('active');
       currentPeriod = tab.dataset.period;
       currentPage = 1;
-      loadReport();
+
+      if (currentPeriod === 'custom') {
+        customDateRange.style.display = 'block';
+        if (!fp) initDatePicker();
+        fp.open();
+      } else {
+        customDateRange.style.display = 'none';
+        loadReport();
+      }
     });
   });
+
+  // تهيئة التقويم مبدئياً (لمرة واحدة عند تحميل الصفحة)
+  if (typeof flatpickr !== 'undefined') {
+    initDatePicker();
+  }
 
   await loadReport();
 });

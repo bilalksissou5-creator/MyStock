@@ -250,3 +250,39 @@
   .qty-unit-cell, .price-cell, .total-cell { font-size: 11px; }
   .pagination { flex-direction: column; align-items: center; }
 }
+/* ✅ حقل التقويم المخصص */
+.custom-date-range {
+  margin-bottom: 16px;
+}
+
+.custom-date-range label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: #404040;
+  margin-bottom: 6px;
+}
+
+.custom-date-range input {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid #dbeafe;
+  border-radius: 10px;
+  background: #ffffff;
+  font-size: 14px;
+  color: #2563eb;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: center;
+  outline: none;
+}
+
+.custom-date-range input:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+/* تنسيق تقويم Flatpickr للعربية */
+.flatpickr-calendar {
+  font-family: 'Nunito', 'Cairo', sans-serif !important;
+}
