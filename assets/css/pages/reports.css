@@ -32,6 +32,7 @@
   gap: 8px;
 }
 
+/* أزرار الفترة */
 .period-tabs {
   display: flex;
   background: #f5f5f5;
@@ -62,6 +63,7 @@
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
+/* حقل التاريخ */
 .date-range-display {
   display: flex;
   align-items: center;
@@ -78,6 +80,7 @@
 
 .date-range-display i { font-size: 16px; }
 
+/* بطاقات الإحصائيات */
 .summary-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -100,6 +103,7 @@
 .summary-value.highlight { color: #16a34a; }
 .summary-currency { font-size: 16px; font-weight: 700; color: #16a34a; margin-inline-start: 4px; }
 
+/* بطاقة الجدول */
 .table-card {
   background: #ffffff;
   border-radius: 16px;
@@ -135,24 +139,23 @@
    ✅ 1. رأس الجدول (Header)
    ============================================ */
 .reports-table thead th {
-  padding: 14px 16px;
+  padding: 12px 16px;
   text-align: start;
   font-size: 11px;
   font-weight: 800;
-  color: #404040;
   text-transform: uppercase;
   letter-spacing: 0.8px;
-  background: #171717;      /* خلفية داكنة */
-  color: #ffffff;           /* نص أبيض */
+  background: #171717;
+  color: #ffffff;
   border-bottom: 2px solid #171717;
   white-space: nowrap;
 }
 
 /* ============================================
-   ✅ 2. وسط الجدول (Body)
+   ✅ 2. وسط الجدول (Body) - تقليل الارتفاع
    ============================================ */
 .reports-table tbody td {
-  padding: 14px 16px;
+  padding: 8px 12px; /* ✅ تم تقليل الحشوة العمودية */
   font-size: 13px;
   color: #404040;
   border-bottom: 1px solid #f0f0f0;
@@ -162,33 +165,33 @@
 }
 
 .reports-table tbody tr:nth-child(even) {
-  background: #fafafa; /* تظليل الصفوف الزوجية */
+  background: #fafafa;
 }
 
 .reports-table tbody tr:hover {
-  background: #f0f7ff; /* لون أزرق فاتح عند التمرير */
+  background: #f0f7ff;
 }
 
 /* تنسيقات خلايا معينة في الوسط */
-.time-cell { font-weight: 700; color: #2563eb; }
-.date-cell { font-size: 12px; color: #737373; }
-.user-cell { font-weight: 600; }
-.supplier-cell { font-weight: 700; color: #404040; }
-.product-cell { font-weight: 800; color: #2563eb; font-size: 14px; }
-.qty-unit-cell { font-weight: 700; }
-.price-cell { font-weight: 600; }
-.total-cell { font-weight: 800; color: #16a34a; font-size: 14px; }
+.time-cell { font-weight: 700; color: #2563eb; font-size: 12px; }
+.date-cell { font-size: 11px; color: #737373; }
+.user-cell { font-weight: 600; font-size: 12px; }
+.supplier-cell { font-weight: 700; color: #404040; font-size: 12px; }
+.product-cell { font-weight: 800; color: #2563eb; font-size: 13px; }
+.qty-unit-cell { font-weight: 700; font-size: 13px; }
+.price-cell { font-weight: 600; font-size: 12px; }
+.total-cell { font-weight: 800; color: #16a34a; font-size: 13px; }
 
 /* ============================================
    ✅ 3. قاعدة الجدول (Footer)
    ============================================ */
 .reports-table tfoot td {
-  padding: 16px 16px;
+  padding: 14px 16px;
   font-size: 14px;
   font-weight: 800;
   color: #171717;
-  background: #f0f0f0;            /* خلفية رمادية داكنة */
-  border-top: 3px double #171717; /* خط مزدوج فاصل */
+  background: #f0f0f0;
+  border-top: 3px double #171717;
   white-space: nowrap;
 }
 
@@ -266,9 +269,9 @@
   .summary-value { font-size: 22px; }
   .period-tab { font-size: 12px; padding: 8px 4px; }
   .date-range-display { font-size: 12px; padding: 10px 12px; flex-direction: column; text-align: center; gap: 6px; }
-  .reports-table th, .reports-table td { padding: 10px 12px; }
+  .reports-table th, .reports-table td { padding: 8px 10px; }
   .reports-table thead th { font-size: 10px; }
-  .product-cell { font-size: 13px; }
-  .total-cell { font-size: 13px; }
+  .product-cell { font-size: 12px; }
+  .total-cell { font-size: 12px; }
   .pagination { flex-direction: column; align-items: center; }
 }
