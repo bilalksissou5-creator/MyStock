@@ -1,9 +1,14 @@
+
 /* ============================================
    صفحة الموردين
    ✅ إصلاح شريط البحث والعرض داخل الإطار
+   ✅ دعم جميع أحجام الشاشات
    ============================================ */
 
-/* ✅ إصلاح شامل لشريط البحث ليمتد بعرض الشاشة */
+/* ============================================
+   شريط البحث
+   ============================================ */
+
 .search-bar {
   position: relative !important;
   width: 100% !important;
@@ -17,7 +22,7 @@
   padding-block: 0 !important;
   padding-inline: 14px 36px !important;
   border: 1px solid #d4d4d4 !important;
-  border-radius: 50px !important; /* إعادة الشكل الدائري */
+  border-radius: 50px !important;
   background: white !important;
   outline: none !important;
   font-size: 14px !important;
@@ -41,10 +46,13 @@
   pointer-events: none !important;
 }
 
-/* قائمة الموردين */
+/* ============================================
+   قائمة الموردين
+   ============================================ */
+
 .suppliers-grid {
   display: grid !important;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)) !important; /* عرض أدنى مناسب */
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)) !important;
   gap: 16px !important;
   width: 100% !important;
 }
@@ -62,7 +70,7 @@
   transition: box-shadow 0.15s, transform 0.15s !important;
   width: 100% !important;
   box-sizing: border-box !important;
-  min-width: 0 !important; /* منع تمدد البطاقة */
+  min-width: 0 !important;
 }
 
 .supplier-card:hover {
@@ -120,21 +128,37 @@
 
 /* ============================================
    نموذج إضافة مورد
+   ✅ Responsive لجميع الشاشات
    ============================================ */
+
 .add-form {
-  background: white;
+  display: block;
+  width: 100%;
+  max-width: 760px;
+  min-width: 0;
+  margin: 0 auto;
   padding: 24px;
+  box-sizing: border-box;
+  background: white;
   border-radius: 10px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
-  max-width: 600px;
-  margin: 0 auto;
+}
+
+.add-form,
+.add-form * {
   box-sizing: border-box;
 }
 
-.add-form .form-actions {
-  display: flex;
-  gap: 10px;
-  margin-top: 20px;
+.add-form .form-group {
+  width: 100%;
+  min-width: 0;
+}
+
+.add-form input,
+.add-form textarea {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
 }
 
 .add-form textarea {
@@ -142,9 +166,85 @@
   min-height: 80px;
 }
 
+.add-form .form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  width: 100%;
+  min-width: 0;
+}
+
+.add-form .form-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+  width: 100%;
+}
+
+.add-form .form-actions > * {
+  min-width: 0;
+}
+
+/* ============================================
+   الهاتف
+   ============================================ */
+
+@media (max-width: 768px) {
+
+  .add-form {
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    padding: 16px;
+  }
+
+  .add-form .form-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0;
+  }
+
+  .add-form .form-actions {
+    flex-direction: column;
+  }
+
+  .add-form .form-actions .btn-primary,
+  .add-form .form-actions .btn-secondary {
+    width: 100%;
+    justify-content: center;
+  }
+
+}
+
+/* ============================================
+   التابلت
+   ============================================ */
+
+@media (min-width: 769px) and (max-width: 1024px) {
+
+  .add-form {
+    max-width: 100%;
+    padding: 22px;
+  }
+
+}
+
+/* ============================================
+   الشاشات الكبيرة
+   ============================================ */
+
+@media (min-width: 1025px) {
+
+  .add-form {
+    max-width: 760px;
+    padding: 28px;
+  }
+
+}
+
 /* ============================================
    صفحة تفاصيل المورد
    ============================================ */
+
 .supplier-detail {
   max-width: 700px;
   margin: 0 auto;
@@ -154,6 +254,7 @@
 }
 
 /* بطاقة المورد */
+
 .supplier-card-detail {
   background: white;
   border-radius: 12px;
@@ -205,7 +306,10 @@
   color: #737373;
 }
 
-/* معلومات إضافية */
+/* ============================================
+   معلومات إضافية
+   ============================================ */
+
 .supplier-extra .row {
   display: flex;
   justify-content: space-between;
@@ -234,7 +338,10 @@
   text-overflow: ellipsis;
 }
 
-/* إحصاءات */
+/* ============================================
+   إحصاءات المورد
+   ============================================ */
+
 .supplier-stats {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -261,7 +368,10 @@
   color: #171717;
 }
 
-/* فواتير المورد */
+/* ============================================
+   فواتير المورد
+   ============================================ */
+
 .supplier-products {
   background: white;
   border-radius: 12px;
@@ -349,11 +459,13 @@
 }
 
 /* ============================================
-   الهاتف
+   تحسينات الهاتف لبقية صفحات الموردين
    ============================================ */
+
 @media (max-width: 768px) {
+
   .suppliers-grid {
-    grid-template-columns: 1fr !important;
+    grid-template-columns: minmax(0, 1fr) !important;
     gap: 10px !important;
   }
 
@@ -370,20 +482,6 @@
 
   .supplier-info strong {
     font-size: 14px !important;
-  }
-
-  .add-form {
-    padding: 16px;
-  }
-
-  .add-form .form-actions {
-    flex-direction: column;
-  }
-
-  .add-form .form-actions .btn-primary,
-  .add-form .form-actions .btn-secondary {
-    width: 100%;
-    justify-content: center;
   }
 
   .supplier-card-detail {
@@ -436,4 +534,5 @@
     gap: 2px;
     font-size: 10px;
   }
+
 }

@@ -1,8 +1,10 @@
+
 // ============================================
 // صفحة تفاصيل المورد (مع التحديث الفوري)
 // ✅ دعم كامل للترجمة
 // ✅ الحذف المنطقي (نقل المورد لسلة المحذوفات)
 // ✅ منع عرض الموردين المحذوفين
+// ✅ تسجيل حذف المورد في operation_logs
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   const user = await requireAuth();
@@ -26,12 +28,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // دالة لجلب بيانات المورد وعرضها
   async function fetchAndRenderSupplier() {
-    // ✅ التعديل هنا: إضافة .is('deleted_at', null) لمنع فتح مورد محذوف
+    // منع فتح مورد محذوف
     const { data: supplier, error } = await db
       .from('suppliers')
       .select('*')
       .eq('id', supplierId)
-      .is('deleted_at', null) // <--- السطر الجديد
+      .is('deleted_at', null)
       .single();
 
     if (error || !supplier) {
@@ -187,15 +189,44 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('delete-btn').addEventListener('click', async () => {
       if (!confirm(tr('sup_det_confirm_del'))) return;
 
-      // ✅ الحذف المنطقي
-      const { error } = await db.from('suppliers').update({ 
-        deleted_at: new Date().toISOString(),
-        deleted_by: user.id 
+      // استخدام التوقيت نفسه في الحذف وفي سجل العمليات
+      const deletedAt = new Date().toISOString();
+
+      // الحذف المنطقي
+      const { error } = await db.from('suppliers').update({
+        deleted_at: deletedAt,
+        deleted_by: user.id
       }).eq('id', supplierId);
 
       if (error) {
         alert(tr('prod_detail_err') + ' ' + error.message);
         return;
+      }
+
+      // تسجيل الحذف المؤقت في سجل العمليات بعد نجاح الحذف
+      const { error: logError } = await db
+        .from('operation_logs')
+        .insert({
+          organization_id: supplier.organization_id,
+          operation_type: 'delete',
+          entity_type: 'supplier',
+          supplier_id: supplierId,
+          performed_by: user.id,
+          old_value: {
+            name: supplier.name,
+            specialty: supplier.specialty,
+            phone: supplier.phone,
+            email: supplier.email,
+            address: supplier.address,
+            notes: supplier.notes
+          },
+          new_value: {
+            deleted_at: deletedAt
+          }
+        });
+
+      if (logError) {
+        console.error('فشل تسجيل حذف المورد:', logError);
       }
 
       if (typeof notifyOrganization === 'function' && profile?.organization_id) {
@@ -219,15 +250,15 @@ document.addEventListener('DOMContentLoaded', async () => {
   const initialSupplier = await fetchAndRenderSupplier();
   if (!initialSupplier) return;
 
-  // 2. ✅ التحديث الفوري: مراقبة التغييرات التي تطرأ على هذا المورد فقط
+  // 2. التحديث الفوري: مراقبة التغييرات التي تطرأ على هذا المورد فقط
   const supplierChannel = db.channel('supplier-detail-' + supplierId)
     .on(
       'postgres_changes',
-      { 
-        event: '*', 
-        schema: 'public', 
+      {
+        event: '*',
+        schema: 'public',
         table: 'suppliers',
-        filter: `id=eq.${supplierId}` 
+        filter: `id=eq.${supplierId}`
       },
       (payload) => {
         console.log('تحديث فوري لبيانات المورد:', payload);
@@ -235,8 +266,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         // إذا تم تعديل بيانات المورد
         if (payload.eventType === 'UPDATE') {
           const updated = payload.new;
-          
-          // ✅ التعديل هنا: إذا تم حذف المورد (تم وضع تاريخ في deleted_at)، نعرض رسالة الخطأ فوراً
+
+          // إذا تم حذف المورد
           if (updated.deleted_at) {
             main.innerHTML = `
               <div class="alert alert-error" style="margin-top: 16px;">
@@ -246,7 +277,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 ${tr('prod_detail_back')}
               </a>
             `;
-            return; // نوقف التنفيذ هنا لأن المورد لم يعد موجوداً
+            return;
           }
 
           // تحديث الحقول مباشرة دون إعادة بناء الصفحة بالكامل
@@ -255,22 +286,24 @@ document.addEventListener('DOMContentLoaded', async () => {
             const el = document.getElementById(`f-${field}`);
             if (el && el.dataset.value !== updated[field]) {
               el.dataset.value = updated[field] || '';
-              el.textContent = updated[field] || ''; 
+              el.textContent = updated[field] || '';
             }
           });
+
           // تحديث العناوين الثابتة
           const headerTitle = document.querySelector('.detail-title .edit-field');
           if (headerTitle && updated.name) {
             headerTitle.dataset.value = updated.name;
             headerTitle.textContent = updated.name;
           }
+
           const specialtyEl = document.querySelector('.supplier-specialty');
           if (specialtyEl && updated.specialty) {
             specialtyEl.innerHTML = `<i class="fas fa-tag"></i> ${updated.specialty}`;
           }
         }
 
-        // إذا تم حذف المورد نهائياً (Hard Delete)
+        // إذا تم حذف المورد نهائياً
         if (payload.eventType === 'DELETE') {
           main.innerHTML = `
             <div class="alert alert-error" style="margin-top: 16px;">
@@ -290,3 +323,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     db.removeChannel(supplierChannel);
   });
 });
+
+// ============================================
+// نهاية صفحة تفاصيل المورد
