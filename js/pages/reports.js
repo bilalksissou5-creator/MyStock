@@ -1,6 +1,8 @@
+
 // ============================================
 // صفحة التقارير (Reports)
 // ✅ تقويم مخصص (Flatpickr)
+// ✅ فتح التقرير افتراضياً على اليوم
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   const user = await requireAuth();
@@ -14,7 +16,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   const main = document.getElementById('main-content');
   const { data: profile } = await db.from('profiles').select('organization_id').eq('id', user.id).single();
-  
+
   if (!profile?.organization_id) {
     main.innerHTML = `<div class="alert alert-error">Organization not found</div>`;
     return;
@@ -22,44 +24,43 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   const orgId = profile.organization_id;
 
-  let currentPeriod = 'month'; // 'today', 'week', 'month', 'year', 'custom'
+  // ✅ الفترة الافتراضية: اليوم
+  let currentPeriod = 'today';
   let currentPage = 1;
   const PAGE_SIZE = 20;
   let totalItems = 0;
   let currentStartDate, currentEndDate;
 
-  // ✅ بناء هيكل الصفحة
+  // بناء هيكل الصفحة
   main.innerHTML = `
     <div class="page-header">
       <h2>${tr('reports_title', 'Reports')}</h2>
     </div>
 
     <div class="reports-wrapper">
-      
+
       <div class="filters-card">
         <h3 class="filters-title">
           <i class="fas fa-chart-pie" style="color: #2563eb;"></i>
           ${tr('reports_add_products', 'Product Addition Report')}
         </h3>
-        
+
         <div class="period-tabs">
-          <button class="period-tab" data-period="today">${tr('reports_today', 'Today')}</button>
+          <button class="period-tab active" data-period="today">${tr('reports_today', 'Today')}</button>
           <button class="period-tab" data-period="week">${tr('reports_week', 'Week')}</button>
-          <button class="period-tab active" data-period="month">${tr('reports_month', 'Month')}</button>
+          <button class="period-tab" data-period="month">${tr('reports_month', 'Month')}</button>
           <button class="period-tab" data-period="year">${tr('reports_year', 'Year')}</button>
-          <!-- زر التقويم المخصص -->
+
           <button class="period-tab" data-period="custom">
             <i class="fas fa-calendar-alt" style="margin-inline-end: 4px;"></i> ${tr('reports_custom', 'Custom')}
           </button>
         </div>
 
-        <!-- ✅ حقل التقويم (يظهر فقط عند اختيار "مخصص") -->
         <div class="custom-date-range" id="custom-date-range" style="display: none;">
           <label>${tr('reports_date_range', 'Date Range')}</label>
           <input type="text" id="date-picker" placeholder="${tr('reports_select_dates', 'Select dates...')}" readonly>
         </div>
 
-        <!-- عرض الفترة الحالية -->
         <div class="date-range-display" id="date-range-display">
           <i class="fas fa-calendar-alt"></i>
           <span id="date-range-text">—</span>
@@ -81,6 +82,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         <div class="table-header">
           <h3 class="table-title">${tr('reports_details_table', 'Details Table')}</h3>
         </div>
+
         <div class="table-wrapper">
           <table class="reports-table">
             <thead>
@@ -95,19 +97,28 @@ document.addEventListener('DOMContentLoaded', async () => {
                 <th>${tr('reports_total_value', 'إجمالي القيمة')}</th>
               </tr>
             </thead>
+
             <tbody id="reports-tbody">
-              <tr><td colspan="8" style="text-align:center; padding:40px; color:#a3a3a3;">${tr('loading', 'Loading...')}</td></tr>
+              <tr>
+                <td colspan="8" style="text-align:center; padding:40px; color:#a3a3a3;">
+                  ${tr('loading', 'Loading...')}
+                </td>
+              </tr>
             </tbody>
+
             <tfoot id="reports-tfoot">
               <tr>
                 <td colspan="5" class="footer-label">${tr('reports_grand_total', 'المجموع الكلي')}</td>
                 <td class="footer-total" id="footer-qty">0</td>
                 <td></td>
-                <td class="footer-total highlight" id="footer-value" dir="ltr">0.00 <span class="currency-symbol">DH</span></td>
+                <td class="footer-total highlight" id="footer-value" dir="ltr">
+                  0.00 <span class="currency-symbol">DH</span>
+                </td>
               </tr>
             </tfoot>
           </table>
         </div>
+
         <div class="pagination" id="pagination"></div>
       </div>
 
@@ -120,11 +131,12 @@ document.addEventListener('DOMContentLoaded', async () => {
   const customDateRange = document.getElementById('custom-date-range');
   const datePickerInput = document.getElementById('date-picker');
 
-  // ✅ إعداد تقويم Flatpickr
+  // إعداد تقويم Flatpickr
   let fp = null;
+
   function initDatePicker() {
     if (fp) fp.destroy();
-    
+
     const lang = window.getCurrentLang ? window.getCurrentLang() : 'ar';
     const locale = (lang === 'ar' && flatpickr.l10ns.ar) ? flatpickr.l10ns.ar : 'default';
 
@@ -132,6 +144,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       mode: "range",
       dateFormat: "Y-m-d",
       locale: locale,
+
       onChange: function(selectedDates) {
         if (selectedDates.length === 2) {
           currentPeriod = 'custom';
@@ -148,40 +161,59 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (period === 'custom') {
       return { start: currentStartDate, end: currentEndDate };
     }
+
     const now = new Date();
     let start, end;
+
     if (period === 'today') {
       start = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0);
       end = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59);
+
     } else if (period === 'week') {
       const dayOfWeek = now.getDay();
       const diff = now.getDate() - dayOfWeek;
       start = new Date(now.getFullYear(), now.getMonth(), diff, 0, 0, 0);
       end = new Date(now.getFullYear(), now.getMonth(), diff + 6, 23, 59, 59);
+
     } else if (period === 'month') {
       start = new Date(now.getFullYear(), now.getMonth(), 1, 0, 0, 0);
       end = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59);
+
     } else if (period === 'year') {
       start = new Date(now.getFullYear(), 0, 1, 0, 0, 0);
       end = new Date(now.getFullYear(), 11, 31, 23, 59, 59);
     }
+
     return { start, end };
   }
 
   function formatDate(d) {
     return d.toLocaleDateString('fr-FR');
   }
+
   function formatTime(d) {
-    return d.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+    return d.toLocaleTimeString('fr-FR', {
+      hour: '2-digit',
+      minute: '2-digit'
+    });
   }
 
   async function loadReport() {
-    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; padding:40px; color:#a3a3a3;"><i class="fas fa-spinner fa-spin"></i> ${tr('loading', 'Loading...')}</td></tr>`;
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="8" style="text-align:center; padding:40px; color:#a3a3a3;">
+          <i class="fas fa-spinner fa-spin"></i> ${tr('loading', 'Loading...')}
+        </td>
+      </tr>
+    `;
+
     paginationContainer.innerHTML = '';
 
     const { start, end } = getDateRange(currentPeriod);
+
     currentStartDate = start;
     currentEndDate = end;
+
     dateRangeText.textContent = `${formatDate(start)} — ${formatDate(end)}`;
 
     try {
@@ -206,26 +238,49 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       let totalValue = 0;
       let totalQtyAll = 0;
+
       allItems.forEach(m => {
         const qty = Number(m.quantity || 0);
         const price = Number(m.products?.price || 0);
+
         totalValue += qty * price;
         totalQtyAll += qty;
       });
 
       document.getElementById('sum-ops').textContent = totalItems.toLocaleString();
+
       document.getElementById('sum-total').innerHTML = `
         <span dir="ltr" style="display: inline-flex; align-items: baseline; gap: 4px;">
-          ${totalValue.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+          ${totalValue.toLocaleString('fr-FR', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+          })}
           <span class="summary-currency">DH</span>
         </span>
       `;
 
       document.getElementById('footer-qty').textContent = totalQtyAll.toLocaleString();
-      document.getElementById('footer-value').innerHTML = `${totalValue.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <span class="currency-symbol">DH</span>`;
+
+      document.getElementById('footer-value').innerHTML = `
+        ${totalValue.toLocaleString('fr-FR', {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2
+        })}
+        <span class="currency-symbol">DH</span>
+      `;
 
       if (totalItems === 0) {
-        tbody.innerHTML = `<tr><td colspan="8"><div class="reports-empty"><i class="fas fa-chart-bar"></i><p>${tr('reports_no_data', 'No data for this period')}</p></div></td></tr>`;
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="8">
+              <div class="reports-empty">
+                <i class="fas fa-chart-bar"></i>
+                <p>${tr('reports_no_data', 'No data for this period')}</p>
+              </div>
+            </td>
+          </tr>
+        `;
+
         paginationContainer.innerHTML = '';
         return;
       }
@@ -255,8 +310,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             <td class="supplier-cell">${supplierName}</td>
             <td class="product-cell">${productName}</td>
             <td class="qty-unit-cell">${qty} ${unit}</td>
-            <td class="price-cell" dir="ltr">${price.toFixed(2)} <span class="currency-symbol">DH</span></td>
-            <td class="total-cell" dir="ltr">${total.toFixed(2)} <span class="currency-symbol">DH</span></td>
+            <td class="price-cell" dir="ltr">
+              ${price.toFixed(2)} <span class="currency-symbol">DH</span>
+            </td>
+            <td class="total-cell" dir="ltr">
+              ${total.toFixed(2)} <span class="currency-symbol">DH</span>
+            </td>
           </tr>
         `;
       }).join('');
@@ -265,51 +324,96 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     } catch (err) {
       console.error(err);
-      tbody.innerHTML = `<tr><td colspan="8" class="alert alert-error">${err.message}</td></tr>`;
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="8" class="alert alert-error">${err.message}</td>
+        </tr>
+      `;
     }
   }
 
   function renderPagination(totalPages, startIndex, pageItemsCount) {
     const startNum = startIndex + 1;
     const endNum = startIndex + pageItemsCount;
+
     let html = `
-      <div class="pagination-info">${tr('reports_showing', 'عرض')} ${startNum}–${endNum} ${tr('reports_of', 'من')} ${totalItems} ${tr('reports_operations', 'عملية')}</div>
+      <div class="pagination-info">
+        ${tr('reports_showing', 'عرض')} ${startNum}–${endNum}
+        ${tr('reports_of', 'من')} ${totalItems}
+        ${tr('reports_operations', 'عملية')}
+      </div>
+
       <div class="pagination-controls">
-        <button class="pagination-btn" data-page="prev" ${currentPage === 1 ? 'disabled' : ''}><i class="fas fa-chevron-${window.getCurrentLang && window.getCurrentLang() === 'ar' ? 'right' : 'left'}"></i></button>
+        <button class="pagination-btn" data-page="prev" ${currentPage === 1 ? 'disabled' : ''}>
+          <i class="fas fa-chevron-${window.getCurrentLang && window.getCurrentLang() === 'ar' ? 'right' : 'left'}"></i>
+        </button>
     `;
+
     let startPage = Math.max(1, currentPage - 2);
     let endPage = Math.min(totalPages, currentPage + 2);
-    if (startPage > 1) { html += `<button class="pagination-btn" data-page="1">1</button>`; if (startPage > 2) html += `<span style="align-self:center; color:#737373;">...</span>`; }
-    for (let i = startPage; i <= endPage; i++) html += `<button class="pagination-btn ${i === currentPage ? 'active' : ''}" data-page="${i}">${i}</button>`;
-    if (endPage < totalPages) { if (endPage < totalPages - 1) html += `<span style="align-self:center; color:#737373;">...</span>`; html += `<button class="pagination-btn" data-page="${totalPages}">${totalPages}</button>`; }
+
+    if (startPage > 1) {
+      html += `<button class="pagination-btn" data-page="1">1</button>`;
+
+      if (startPage > 2) {
+        html += `<span style="align-self:center; color:#737373;">...</span>`;
+      }
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+      html += `
+        <button class="pagination-btn ${i === currentPage ? 'active' : ''}" data-page="${i}">
+          ${i}
+        </button>
+      `;
+    }
+
+    if (endPage < totalPages) {
+      if (endPage < totalPages - 1) {
+        html += `<span style="align-self:center; color:#737373;">...</span>`;
+      }
+
+      html += `<button class="pagination-btn" data-page="${totalPages}">${totalPages}</button>`;
+    }
+
     html += `
-        <button class="pagination-btn" data-page="next" ${currentPage === totalPages ? 'disabled' : ''}><i class="fas fa-chevron-${window.getCurrentLang && window.getCurrentLang() === 'ar' ? 'left' : 'right'}"></i></button>
+        <button class="pagination-btn" data-page="next" ${currentPage === totalPages ? 'disabled' : ''}>
+          <i class="fas fa-chevron-${window.getCurrentLang && window.getCurrentLang() === 'ar' ? 'left' : 'right'}"></i>
+        </button>
       </div>
     `;
+
     paginationContainer.innerHTML = html;
+
     paginationContainer.querySelectorAll('.pagination-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         const page = btn.dataset.page;
+
         if (page === 'prev') currentPage = Math.max(1, currentPage - 1);
         else if (page === 'next') currentPage = Math.min(totalPages, currentPage + 1);
         else currentPage = Number(page);
+
         loadReport();
       });
     });
   }
 
-  // ✅ أحداث التبويبات (بما فيها زر التقويم المخصص)
+  // أحداث التبويبات
   document.querySelectorAll('.period-tab').forEach(tab => {
     tab.addEventListener('click', () => {
       document.querySelectorAll('.period-tab').forEach(t => t.classList.remove('active'));
+
       tab.classList.add('active');
       currentPeriod = tab.dataset.period;
       currentPage = 1;
 
       if (currentPeriod === 'custom') {
         customDateRange.style.display = 'block';
+
         if (!fp) initDatePicker();
+
         fp.open();
+
       } else {
         customDateRange.style.display = 'none';
         loadReport();
@@ -317,10 +421,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   });
 
-  // تهيئة التقويم مبدئياً (لمرة واحدة عند تحميل الصفحة)
+  // تهيئة التقويم
   if (typeof flatpickr !== 'undefined') {
     initDatePicker();
   }
 
+  // ✅ تحميل تقرير اليوم مباشرة عند فتح الصفحة
   await loadReport();
 });
