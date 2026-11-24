@@ -3,6 +3,7 @@
 // صفحة التقارير (Reports)
 // ✅ تقويم مخصص (Flatpickr)
 // ✅ فتح التقرير افتراضياً على اليوم
+// ✅ السهمان للتنقل بين الفترات الزمنية
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   const user = await requireAuth();
@@ -10,12 +11,19 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   renderLayout('reports.html');
   if (window.applyLanguage) window.applyLanguage();
-  const tr = (key, fallback) => (window.t ? (window.t(key) || fallback) : (fallback || key));
+
+  const tr = (key, fallback) =>
+    window.t ? (window.t(key) || fallback) : (fallback || key);
 
   document.title = tr('reports_title', 'Reports');
 
   const main = document.getElementById('main-content');
-  const { data: profile } = await db.from('profiles').select('organization_id').eq('id', user.id).single();
+
+  const { data: profile } = await db
+    .from('profiles')
+    .select('organization_id')
+    .eq('id', user.id)
+    .single();
 
   if (!profile?.organization_id) {
     main.innerHTML = `<div class="alert alert-error">Organization not found</div>`;
@@ -24,14 +32,18 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   const orgId = profile.organization_id;
 
-  // ✅ الفترة الافتراضية: اليوم
   let currentPeriod = 'today';
   let currentPage = 1;
   const PAGE_SIZE = 20;
   let totalItems = 0;
-  let currentStartDate, currentEndDate;
 
-  // بناء هيكل الصفحة
+  // التاريخ المرجعي للفترات
+  let anchorDate = new Date();
+
+  // نطاق التاريخ المخصص
+  let currentStartDate;
+  let currentEndDate;
+
   main.innerHTML = `
     <div class="page-header">
       <h2>${tr('reports_title', 'Reports')}</h2>
@@ -41,24 +53,41 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       <div class="filters-card">
         <h3 class="filters-title">
-          <i class="fas fa-chart-pie" style="color: #2563eb;"></i>
+          <i class="fas fa-chart-pie" style="color:#2563eb;"></i>
           ${tr('reports_add_products', 'Product Addition Report')}
         </h3>
 
         <div class="period-tabs">
-          <button class="period-tab active" data-period="today">${tr('reports_today', 'Today')}</button>
-          <button class="period-tab" data-period="week">${tr('reports_week', 'Week')}</button>
-          <button class="period-tab" data-period="month">${tr('reports_month', 'Month')}</button>
-          <button class="period-tab" data-period="year">${tr('reports_year', 'Year')}</button>
+          <button class="period-tab active" data-period="today">
+            ${tr('reports_today', 'Today')}
+          </button>
+
+          <button class="period-tab" data-period="week">
+            ${tr('reports_week', 'Week')}
+          </button>
+
+          <button class="period-tab" data-period="month">
+            ${tr('reports_month', 'Month')}
+          </button>
+
+          <button class="period-tab" data-period="year">
+            ${tr('reports_year', 'Year')}
+          </button>
 
           <button class="period-tab" data-period="custom">
-            <i class="fas fa-calendar-alt" style="margin-inline-end: 4px;"></i> ${tr('reports_custom', 'Custom')}
+            <i class="fas fa-calendar-alt" style="margin-inline-end:4px;"></i>
+            ${tr('reports_custom', 'Custom')}
           </button>
         </div>
 
-        <div class="custom-date-range" id="custom-date-range" style="display: none;">
+        <div class="custom-date-range" id="custom-date-range" style="display:none;">
           <label>${tr('reports_date_range', 'Date Range')}</label>
-          <input type="text" id="date-picker" placeholder="${tr('reports_select_dates', 'Select dates...')}" readonly>
+          <input
+            type="text"
+            id="date-picker"
+            placeholder="${tr('reports_select_dates', 'Select dates...')}"
+            readonly
+          >
         </div>
 
         <div class="date-range-display" id="date-range-display">
@@ -69,18 +98,25 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       <div class="summary-grid">
         <div class="summary-card">
-          <div class="summary-label">${tr('reports_ops_count', 'Number of Operations')}</div>
+          <div class="summary-label">
+            ${tr('reports_ops_count', 'Number of Operations')}
+          </div>
           <div class="summary-value" id="sum-ops">—</div>
         </div>
+
         <div class="summary-card">
-          <div class="summary-label">${tr('reports_total_added', 'Total Additions')}</div>
+          <div class="summary-label">
+            ${tr('reports_total_added', 'Total Additions')}
+          </div>
           <div class="summary-value highlight" id="sum-total">—</div>
         </div>
       </div>
 
       <div class="table-card">
         <div class="table-header">
-          <h3 class="table-title">${tr('reports_details_table', 'Details Table')}</h3>
+          <h3 class="table-title">
+            ${tr('reports_details_table', 'Details Table')}
+          </h3>
         </div>
 
         <div class="table-wrapper">
@@ -100,7 +136,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             <tbody id="reports-tbody">
               <tr>
-                <td colspan="8" style="text-align:center; padding:40px; color:#a3a3a3;">
+                <td colspan="8" style="text-align:center;padding:40px;color:#a3a3a3;">
                   ${tr('loading', 'Loading...')}
                 </td>
               </tr>
@@ -108,7 +144,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             <tfoot id="reports-tfoot">
               <tr>
-                <td colspan="5" class="footer-label">${tr('reports_grand_total', 'المجموع الكلي')}</td>
+                <td colspan="5" class="footer-label">
+                  ${tr('reports_grand_total', 'المجموع الكلي')}
+                </td>
                 <td class="footer-total" id="footer-qty">0</td>
                 <td></td>
                 <td class="footer-total highlight" id="footer-value" dir="ltr">
@@ -131,57 +169,123 @@ document.addEventListener('DOMContentLoaded', async () => {
   const customDateRange = document.getElementById('custom-date-range');
   const datePickerInput = document.getElementById('date-picker');
 
-  // إعداد تقويم Flatpickr
+  // ============================================
+  // تقويم Flatpickr
+  // ============================================
+
   let fp = null;
 
   function initDatePicker() {
     if (fp) fp.destroy();
 
-    const lang = window.getCurrentLang ? window.getCurrentLang() : 'ar';
-    const locale = (lang === 'ar' && flatpickr.l10ns.ar) ? flatpickr.l10ns.ar : 'default';
+    const lang = window.getCurrentLang
+      ? window.getCurrentLang()
+      : 'ar';
+
+    const locale =
+      lang === 'ar' && flatpickr.l10ns.ar
+        ? flatpickr.l10ns.ar
+        : 'default';
 
     fp = flatpickr(datePickerInput, {
-      mode: "range",
-      dateFormat: "Y-m-d",
+      mode: 'range',
+      dateFormat: 'Y-m-d',
       locale: locale,
 
       onChange: function(selectedDates) {
         if (selectedDates.length === 2) {
           currentPeriod = 'custom';
           currentPage = 1;
-          currentStartDate = selectedDates[0];
-          currentEndDate = new Date(selectedDates[1].setHours(23, 59, 59, 999));
+
+          currentStartDate = new Date(selectedDates[0]);
+          currentStartDate.setHours(0, 0, 0, 0);
+
+          currentEndDate = new Date(selectedDates[1]);
+          currentEndDate.setHours(23, 59, 59, 999);
+
           loadReport();
         }
       }
     });
   }
 
+  // ============================================
+  // حساب نطاق التاريخ
+  // ============================================
+
   function getDateRange(period) {
     if (period === 'custom') {
-      return { start: currentStartDate, end: currentEndDate };
+      return {
+        start: currentStartDate,
+        end: currentEndDate
+      };
     }
 
-    const now = new Date();
+    const now = new Date(anchorDate);
     let start, end;
 
     if (period === 'today') {
-      start = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0);
-      end = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59);
+      start = new Date(
+        now.getFullYear(),
+        now.getMonth(),
+        now.getDate(),
+        0, 0, 0
+      );
+
+      end = new Date(
+        now.getFullYear(),
+        now.getMonth(),
+        now.getDate(),
+        23, 59, 59, 999
+      );
 
     } else if (period === 'week') {
       const dayOfWeek = now.getDay();
       const diff = now.getDate() - dayOfWeek;
-      start = new Date(now.getFullYear(), now.getMonth(), diff, 0, 0, 0);
-      end = new Date(now.getFullYear(), now.getMonth(), diff + 6, 23, 59, 59);
+
+      start = new Date(
+        now.getFullYear(),
+        now.getMonth(),
+        diff,
+        0, 0, 0
+      );
+
+      end = new Date(
+        now.getFullYear(),
+        now.getMonth(),
+        diff + 6,
+        23, 59, 59, 999
+      );
 
     } else if (period === 'month') {
-      start = new Date(now.getFullYear(), now.getMonth(), 1, 0, 0, 0);
-      end = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59);
+      start = new Date(
+        now.getFullYear(),
+        now.getMonth(),
+        1,
+        0, 0, 0
+      );
+
+      end = new Date(
+        now.getFullYear(),
+        now.getMonth() + 1,
+        0,
+        23, 59, 59, 999
+      );
 
     } else if (period === 'year') {
-      start = new Date(now.getFullYear(), 0, 1, 0, 0, 0);
-      end = new Date(now.getFullYear(), 11, 31, 23, 59, 59);
+      start = new Date(
+        now.getFullYear(),
+        0,
+        1,
+        0, 0, 0
+      );
+
+      end = new Date(
+        now.getFullYear(),
+        11,
+        31,
+        23, 59, 59, 999
+      );
     }
 
     return { start, end };
@@ -198,11 +302,76 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   }
 
+  // ============================================
+  // التنقل بين الفترات الزمنية بالسهمين
+  // ============================================
+
+  function movePeriod(direction) {
+    if (currentPeriod === 'custom') {
+      if (!currentStartDate || !currentEndDate) return;
+
+      const start = new Date(currentStartDate);
+      const end = new Date(currentEndDate);
+
+      const days = Math.round(
+        (new Date(
+          end.getFullYear(),
+          end.getMonth(),
+          end.getDate()
+        ) - new Date(
+          start.getFullYear(),
+          start.getMonth(),
+          start.getDate()
+        )) / 86400000
+      );
+
+      const shiftDays = days + 1;
+
+      start.setDate(start.getDate() + direction * shiftDays);
+      end.setDate(end.getDate() + direction * shiftDays);
+
+      currentStartDate = start;
+      currentEndDate = end;
+
+      if (fp) {
+        fp.setDate([start, end], false);
+      }
+
+    } else if (currentPeriod === 'today') {
+      anchorDate.setDate(
+        anchorDate.getDate() + direction
+      );
+
+    } else if (currentPeriod === 'week') {
+      anchorDate.setDate(
+        anchorDate.getDate() + (direction * 7)
+      );
+
+    } else if (currentPeriod === 'month') {
+      anchorDate.setMonth(
+        anchorDate.getMonth() + direction
+      );
+
+    } else if (currentPeriod === 'year') {
+      anchorDate.setFullYear(
+        anchorDate.getFullYear() + direction
+      );
+    }
+
+    currentPage = 1;
+    loadReport();
+  }
+
+  // ============================================
+  // تحميل التقرير
+  // ============================================
+
   async function loadReport() {
     tbody.innerHTML = `
       <tr>
-        <td colspan="8" style="text-align:center; padding:40px; color:#a3a3a3;">
-          <i class="fas fa-spinner fa-spin"></i> ${tr('loading', 'Loading...')}
+        <td colspan="8" style="text-align:center;padding:40px;color:#a3a3a3;">
+          <i class="fas fa-spinner fa-spin"></i>
+          ${tr('loading', 'Loading...')}
         </td>
       </tr>
     `;
@@ -211,10 +380,16 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const { start, end } = getDateRange(currentPeriod);
 
+    if (!start || !end) {
+      renderPagination(0, 0, 0);
+      return;
+    }
+
     currentStartDate = start;
     currentEndDate = end;
 
-    dateRangeText.textContent = `${formatDate(start)} — ${formatDate(end)}`;
+    dateRangeText.textContent =
+      `${formatDate(start)} — ${formatDate(end)}`;
 
     try {
       const { data: movements, error } = await db
@@ -247,10 +422,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         totalQtyAll += qty;
       });
 
-      document.getElementById('sum-ops').textContent = totalItems.toLocaleString();
+      document.getElementById('sum-ops').textContent =
+        totalItems.toLocaleString();
 
       document.getElementById('sum-total').innerHTML = `
-        <span dir="ltr" style="display: inline-flex; align-items: baseline; gap: 4px;">
+        <span dir="ltr" style="display:inline-flex;align-items:baseline;gap:4px;">
           ${totalValue.toLocaleString('fr-FR', {
             minimumFractionDigits: 2,
             maximumFractionDigits: 2
@@ -259,7 +435,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         </span>
       `;
 
-      document.getElementById('footer-qty').textContent = totalQtyAll.toLocaleString();
+      document.getElementById('footer-qty').textContent =
+        totalQtyAll.toLocaleString();
 
       document.getElementById('footer-value').innerHTML = `
         ${totalValue.toLocaleString('fr-FR', {
@@ -281,13 +458,23 @@ document.addEventListener('DOMContentLoaded', async () => {
           </tr>
         `;
 
-        paginationContainer.innerHTML = '';
+        // تبقى أسهم التنقل ظاهرة حتى بدون بيانات
+        renderPagination(0, 0, 0);
         return;
       }
 
       const totalPages = Math.ceil(totalItems / PAGE_SIZE);
+
+      if (currentPage > totalPages) {
+        currentPage = totalPages;
+      }
+
       const startIndex = (currentPage - 1) * PAGE_SIZE;
-      const pageItems = allItems.slice(startIndex, startIndex + PAGE_SIZE);
+
+      const pageItems = allItems.slice(
+        startIndex,
+        startIndex + PAGE_SIZE
+      );
 
       tbody.innerHTML = pageItems.map(m => {
         const p = m.products || {};
@@ -298,6 +485,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const price = Number(p.price || 0);
         const total = qty * price;
         const userName = m.profiles?.full_name || '—';
+
         const dateObj = new Date(m.created_at);
         const dateStr = formatDate(dateObj);
         const timeStr = formatTime(dateObj);
@@ -311,10 +499,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             <td class="product-cell">${productName}</td>
             <td class="qty-unit-cell">${qty} ${unit}</td>
             <td class="price-cell" dir="ltr">
-              ${price.toFixed(2)} <span class="currency-symbol">DH</span>
+              ${price.toFixed(2)}
+              <span class="currency-symbol">DH</span>
             </td>
             <td class="total-cell" dir="ltr">
-              ${total.toFixed(2)} <span class="currency-symbol">DH</span>
+              ${total.toFixed(2)}
+              <span class="currency-symbol">DH</span>
             </td>
           </tr>
         `;
@@ -324,108 +514,186 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     } catch (err) {
       console.error(err);
+
       tbody.innerHTML = `
         <tr>
-          <td colspan="8" class="alert alert-error">${err.message}</td>
+          <td colspan="8" class="alert alert-error">
+            ${err.message}
+          </td>
         </tr>
       `;
+
+      renderPagination(0, 0, 0);
     }
   }
 
+  // ============================================
+  // عرض الأسهم وأرقام صفحات الجدول
+  // ============================================
+
   function renderPagination(totalPages, startIndex, pageItemsCount) {
-    const startNum = startIndex + 1;
-    const endNum = startIndex + pageItemsCount;
+    const isArabic =
+      window.getCurrentLang &&
+      window.getCurrentLang() === 'ar';
+
+    const prevIcon = isArabic ? 'right' : 'left';
+    const nextIcon = isArabic ? 'left' : 'right';
 
     let html = `
-      <div class="pagination-info">
-        ${tr('reports_showing', 'عرض')} ${startNum}–${endNum}
-        ${tr('reports_of', 'من')} ${totalItems}
-        ${tr('reports_operations', 'عملية')}
-      </div>
-
       <div class="pagination-controls">
-        <button class="pagination-btn" data-page="prev" ${currentPage === 1 ? 'disabled' : ''}>
-          <i class="fas fa-chevron-${window.getCurrentLang && window.getCurrentLang() === 'ar' ? 'right' : 'left'}"></i>
+
+        <button
+          class="pagination-btn period-nav-btn"
+          data-period-nav="prev"
+          title="${tr('previous_period', 'الفترة السابقة')}"
+        >
+          <i class="fas fa-chevron-${prevIcon}"></i>
         </button>
     `;
 
-    let startPage = Math.max(1, currentPage - 2);
-    let endPage = Math.min(totalPages, currentPage + 2);
-
-    if (startPage > 1) {
-      html += `<button class="pagination-btn" data-page="1">1</button>`;
-
-      if (startPage > 2) {
-        html += `<span style="align-self:center; color:#737373;">...</span>`;
-      }
-    }
-
-    for (let i = startPage; i <= endPage; i++) {
+    // أرقام صفحات الجدول فقط، دون أسهم الصفحات
+    if (totalPages > 1) {
       html += `
-        <button class="pagination-btn ${i === currentPage ? 'active' : ''}" data-page="${i}">
-          ${i}
-        </button>
+        <div class="pagination-pages">
       `;
-    }
 
-    if (endPage < totalPages) {
-      if (endPage < totalPages - 1) {
-        html += `<span style="align-self:center; color:#737373;">...</span>`;
+      let startPage = Math.max(1, currentPage - 2);
+      let endPage = Math.min(totalPages, currentPage + 2);
+
+      if (startPage > 1) {
+        html += `
+          <button class="pagination-btn" data-page="1">1</button>
+        `;
+
+        if (startPage > 2) {
+          html += `<span style="align-self:center;color:#737373;">...</span>`;
+        }
       }
 
-      html += `<button class="pagination-btn" data-page="${totalPages}">${totalPages}</button>`;
+      for (let i = startPage; i <= endPage; i++) {
+        html += `
+          <button
+            class="pagination-btn ${i === currentPage ? 'active' : ''}"
+            data-page="${i}"
+          >
+            ${i}
+          </button>
+        `;
+      }
+
+      if (endPage < totalPages) {
+        if (endPage < totalPages - 1) {
+          html += `<span style="align-self:center;color:#737373;">...</span>`;
+        }
+
+        html += `
+          <button class="pagination-btn" data-page="${totalPages}">
+            ${totalPages}
+          </button>
+        `;
+      }
+
+      html += `</div>`;
     }
 
     html += `
-        <button class="pagination-btn" data-page="next" ${currentPage === totalPages ? 'disabled' : ''}>
-          <i class="fas fa-chevron-${window.getCurrentLang && window.getCurrentLang() === 'ar' ? 'left' : 'right'}"></i>
+        <button
+          class="pagination-btn period-nav-btn"
+          data-period-nav="next"
+          title="${tr('next_period', 'الفترة التالية')}"
+        >
+          <i class="fas fa-chevron-${nextIcon}"></i>
         </button>
+
       </div>
     `;
 
+    if (totalItems > 0) {
+      const startNum = startIndex + 1;
+      const endNum = startIndex + pageItemsCount;
+
+      html += `
+        <div class="pagination-info">
+          ${tr('reports_showing', 'عرض')}
+          ${startNum}–${endNum}
+          ${tr('reports_of', 'من')}
+          ${totalItems}
+          ${tr('reports_operations', 'عملية')}
+        </div>
+      `;
+    }
+
     paginationContainer.innerHTML = html;
 
-    paginationContainer.querySelectorAll('.pagination-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const page = btn.dataset.page;
-
-        if (page === 'prev') currentPage = Math.max(1, currentPage - 1);
-        else if (page === 'next') currentPage = Math.min(totalPages, currentPage + 1);
-        else currentPage = Number(page);
-
-        loadReport();
+    // السهم السابق والفترة السابقة
+    paginationContainer
+      .querySelector('[data-period-nav="prev"]')
+      .addEventListener('click', () => {
+        movePeriod(-1);
       });
-    });
+
+    // السهم التالي والفترة التالية
+    paginationContainer
+      .querySelector('[data-period-nav="next"]')
+      .addEventListener('click', () => {
+        movePeriod(1);
+      });
+
+    // أرقام صفحات الجدول
+    paginationContainer
+      .querySelectorAll('[data-page]')
+      .forEach(btn => {
+        btn.addEventListener('click', () => {
+          currentPage = Number(btn.dataset.page);
+          loadReport();
+        });
+      });
   }
 
-  // أحداث التبويبات
+  // ============================================
+  // أحداث اختيار الفترة
+  // ============================================
+
   document.querySelectorAll('.period-tab').forEach(tab => {
     tab.addEventListener('click', () => {
-      document.querySelectorAll('.period-tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.period-tab').forEach(t => {
+        t.classList.remove('active');
+      });
 
       tab.classList.add('active');
+
       currentPeriod = tab.dataset.period;
       currentPage = 1;
 
       if (currentPeriod === 'custom') {
         customDateRange.style.display = 'block';
 
-        if (!fp) initDatePicker();
+        if (!fp) {
+          if (typeof flatpickr === 'undefined') return;
+          initDatePicker();
+        }
 
         fp.open();
 
       } else {
         customDateRange.style.display = 'none';
+
+        // إعادة الفترة إلى التاريخ الحالي عند تغيير نوع التقرير
+        anchorDate = new Date();
+
         loadReport();
       }
     });
   });
 
+  // ============================================
   // تهيئة التقويم
+  // ============================================
+
   if (typeof flatpickr !== 'undefined') {
     initDatePicker();
   }
 
-  // ✅ تحميل تقرير اليوم مباشرة عند فتح الصفحة
+  // تحميل تقرير اليوم عند فتح الصفحة
   await loadReport();
 });
