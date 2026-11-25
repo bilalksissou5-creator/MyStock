@@ -4,13 +4,7 @@
 
 @page {
   size: A4 landscape;
-  margin: 10mm 15mm;
-  @bottom-center {
-    content: "Page " counter(page) " / " counter(pages);
-    font-size: 9pt;
-    color: #333;
-    font-family: sans-serif;
-  }
+  margin: 10mm 10mm 15mm 10mm; /* هوامش أقل لضمان عدم قص العناصر */
 }
 
 body {
@@ -31,9 +25,21 @@ body {
 
 .loading { text-align: center; padding: 50px; color: #737373; }
 
+/* إعدادات الطباعة */
 @media print {
-  body { background: #ffffff; padding: 0; }
-  .print-container { box-shadow: none; padding: 0; max-width: 100%; border-radius: 0; }
+  body { 
+    background: #ffffff; 
+    padding: 0; 
+    margin: 0;
+  }
+  .print-container { 
+    box-shadow: none; 
+    padding: 0; 
+    max-width: 100%; 
+    width: 100%;
+    border-radius: 0; 
+    margin: 0;
+  }
   .no-print { display: none !important; }
 }
 
@@ -100,43 +106,54 @@ body {
 }
 
 /* توزيع عرض الأعمدة */
-.report-table th:nth-child(1) { width: 8%; }  /* الوقت */
-.report-table th:nth-child(2) { width: 11%; } /* التاريخ */
-.report-table th:nth-child(3) { width: 13%; } /* المستخدم */
-.report-table th:nth-child(4) { width: 13%; } /* المورد */
-.report-table th:nth-child(5) { width: 18%; } /* المنتج */
-.report-table th:nth-child(6) { width: 12%; } /* الكمية */
-.report-table th:nth-child(7) { width: 12%; } /* السعر */
-.report-table th:nth-child(8) { width: 13%; } /* الإجمالي */
+.report-table th:nth-child(1) { width: 8%; }
+.report-table th:nth-child(2) { width: 11%; }
+.report-table th:nth-child(3) { width: 13%; }
+.report-table th:nth-child(4) { width: 13%; }
+.report-table th:nth-child(5) { width: 18%; }
+.report-table th:nth-child(6) { width: 12%; }
+.report-table th:nth-child(7) { width: 12%; }
+.report-table th:nth-child(8) { width: 13%; }
 
-/* منع تقسيم الصف بين صفحتين */
+/* منع تقسيم الصف */
 .report-table tr { page-break-inside: avoid !important; }
-
-/* تكرار الرأس في كل صفحة */
 .report-table thead { display: table-header-group; }
 .report-table tfoot { display: table-footer-group; font-weight: bold; background: #fafafa; }
 
 /* ============================================
-   ✅ التوقيعات (تم استخدام display: table لضمان الظهور)
+   ✅ التوقيعات (طريقة Float المضمونة للطباعة)
    ============================================ */
 .signatures {
-  display: table;
+  display: block;
   width: 100%;
-  margin-top: 40px;
-  page-break-inside: avoid;
+  margin-top: 30px; /* تقليل المسافة لضمان بقائها في الصفحة */
+  padding-top: 10px;
+  /* إزالة page-break-inside لمنع اختفائها */
+}
+
+.signatures::after {
+  content: "";
+  display: table;
+  clear: both;
 }
 
 .sig-box {
-  display: table-cell;
-  width: 50%;
+  width: 45%;
   text-align: center;
-  vertical-align: bottom;
 }
 
+/* في العربية: التوقيع يمين، الختم يسار */
+[dir="rtl"] .sig-box:first-child { float: right; }
+[dir="rtl"] .sig-box:last-child { float: left; }
+
+/* في الإنجليزية: التوقيع يسار، الختم يمين */
+[dir="ltr"] .sig-box:first-child { float: left; }
+[dir="ltr"] .sig-box:last-child { float: right; }
+
 .sig-box p {
-  font-size: 12pt;
+  font-size: 11pt;
   font-weight: bold;
-  margin: 0 0 60px 0;
+  margin: 0 0 50px 0; /* مساحة التوقيع */
   color: #000;
 }
 
@@ -149,8 +166,8 @@ body {
 .stamp-circle {
   border: 1px dashed #000;
   border-radius: 50%;
-  width: 100px;
-  height: 100px;
+  width: 80px;
+  height: 80px;
   margin: 0 auto;
 }
 
