@@ -1,6 +1,5 @@
 /* ============================================
    صفحة التقارير (Reports)
-   ✅ منع التفاف النص نهائياً (سطر واحد فقط)
    ============================================ */
 
 .reports-wrapper {
@@ -41,6 +40,7 @@
   padding: 4px;
   margin-bottom: 20px;
   gap: 4px;
+  overflow-x: auto; /* للسماح بالتمرير إذا كانت الأزرار كثيرة على الهاتف */
 }
 
 .period-tab {
@@ -54,6 +54,7 @@
   color: #737373;
   cursor: pointer;
   transition: all 0.2s;
+  white-space: nowrap;
 }
 
 .period-tab:hover { color: #171717; }
@@ -62,6 +63,38 @@
   background: #ffffff;
   color: #171717;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* حقل التقويم المخصص */
+.custom-date-range {
+  margin-bottom: 16px;
+}
+
+.custom-date-range label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: #404040;
+  margin-bottom: 6px;
+}
+
+.custom-date-range input {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid #dbeafe;
+  border-radius: 10px;
+  background: #ffffff;
+  font-size: 14px;
+  color: #2563eb;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: center;
+  outline: none;
+}
+
+.custom-date-range input:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
 }
 
 /* حقل التاريخ */
@@ -122,7 +155,6 @@
 
 .table-title { font-size: 16px; font-weight: 700; color: #171717; }
 
-/* ✅ حاوية الجدول للتمرير الأفقي */
 .table-wrapper {
   width: 100%;
   overflow-x: auto;
@@ -130,17 +162,14 @@
   -webkit-overflow-scrolling: touch;
 }
 
-/* ============================================
-   ✅ الجدول: العرض حسب المحتوى (سطر واحد فقط)
-   ============================================ */
+/* الجدول */
 .reports-table {
-  width: max-content; /* ✅ العرض يتمدد حسب المحتوى */
-  min-width: 100%; /* يضمن ملء الشاشة إذا كان المحتوى قليلاً */
+  width: max-content;
+  min-width: 100%;
   border-collapse: collapse;
   table-layout: auto;
 }
 
-/* رأس الجدول */
 .reports-table thead th {
   padding: 10px 14px;
   text-align: start;
@@ -151,10 +180,9 @@
   background: #171717;
   color: #ffffff;
   border-bottom: 2px solid #171717;
-  white-space: nowrap; /* الرأس في سطر واحد */
+  white-space: nowrap;
 }
 
-/* وسط الجدول - منع الالتفاف نهائياً */
 .reports-table tbody td {
   padding: 8px 12px;
   font-size: 12px;
@@ -162,13 +190,13 @@
   border-bottom: 1px solid #f0f0f0;
   vertical-align: middle;
   font-weight: 500;
-  white-space: nowrap; /* ✅ منع الالتفاف لكل الخلايا */
+  white-space: nowrap;
 }
 
 .reports-table tbody tr:nth-child(even) { background: #fafafa; }
 .reports-table tbody tr:hover { background: #f0f7ff; }
 
-/* تنسيقات الأعمدة (بدون الآنف) */
+/* تنسيقات الأعمدة */
 .time-cell { font-weight: 700; color: #2563eb; }
 .date-cell { font-size: 11px; color: #737373; }
 .user-cell { font-weight: 600; }
@@ -200,7 +228,9 @@
 .price-cell, .total-cell { direction: ltr; text-align: start; }
 [dir="rtl"] .price-cell, [dir="rtl"] .total-cell { text-align: right; }
 
-/* الترقيم */
+/* ============================================
+   ✅ الترقيم وأسهم التنقل بين الفترات
+   ============================================ */
 .pagination {
   display: flex;
   justify-content: space-between;
@@ -211,9 +241,20 @@
   flex-wrap: wrap;
 }
 
-.pagination-info { font-size: 13px; color: #737373; }
-.pagination-controls { display: flex; gap: 6px; }
+/* حاوية الأزرار (السهم + الصفحات + السهم) */
+.pagination-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
 
+/* حاوية أرقام الصفحات */
+.pagination-pages {
+  display: flex;
+  gap: 6px;
+}
+
+/* نمط الزر الأساسي */
 .pagination-btn {
   width: 36px;
   height: 36px;
@@ -234,6 +275,23 @@
 .pagination-btn.active { background: #171717; color: #ffffff; border-color: #171717; }
 .pagination-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
+/* تمييز أسهم التنقل بين الفترات بلون مختلف */
+.period-nav-btn {
+  background: #f0f7ff;
+  border-color: #dbeafe;
+  color: #2563eb;
+}
+.period-nav-btn:hover:not(:disabled) {
+  background: #e0f2fe;
+}
+
+/* معلومات العرض (عرض 1-20 من 128) */
+.pagination-info { 
+  font-size: 13px; 
+  color: #737373; 
+  font-weight: 600;
+}
+
 .reports-empty { padding: 60px 20px; text-align: center; color: #a3a3a3; }
 .reports-empty i { font-size: 50px; color: #e5e5e5; margin-bottom: 16px; display: block; }
 
@@ -248,41 +306,6 @@
   .product-cell, .user-cell, .supplier-cell { font-size: 11px; }
   .time-cell, .date-cell { font-size: 10px; }
   .qty-unit-cell, .price-cell, .total-cell { font-size: 11px; }
-  .pagination { flex-direction: column; align-items: center; }
-}
-/* ✅ حقل التقويم المخصص */
-.custom-date-range {
-  margin-bottom: 16px;
-}
-
-.custom-date-range label {
-  display: block;
-  font-size: 13px;
-  font-weight: 600;
-  color: #404040;
-  margin-bottom: 6px;
-}
-
-.custom-date-range input {
-  width: 100%;
-  padding: 12px 14px;
-  border: 1px solid #dbeafe;
-  border-radius: 10px;
-  background: #ffffff;
-  font-size: 14px;
-  color: #2563eb;
-  font-weight: 600;
-  cursor: pointer;
-  text-align: center;
-  outline: none;
-}
-
-.custom-date-range input:focus {
-  border-color: #2563eb;
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-}
-
-/* تنسيق تقويم Flatpickr للعربية */
-.flatpickr-calendar {
-  font-family: 'Nunito', 'Cairo', sans-serif !important;
+  .pagination { flex-direction: column; align-items: center; gap: 16px; }
+  .pagination-info { text-align: center; }
 }
