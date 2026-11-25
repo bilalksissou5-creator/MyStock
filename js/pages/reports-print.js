@@ -1,6 +1,7 @@
 // ============================================
 // صفحة طباعة التقارير (Reports Print)
-// ✅ تصحيح اتجاه العملة والترجمة
+// ✅ توقيعات مضمونة للطباعة (باستخدام الجداول)
+// ✅ تصحيح اتجاه العملة
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   const user = await requireAuth();
@@ -8,7 +9,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   if (window.applyLanguage) window.applyLanguage();
   
-  // ✅ دالة ترجمة محسنة (تتعامل مع المفاتيح الناقصة)
+  // دالة ترجمة محسنة
   const tr = (key, fallback) => {
     if (window.t) {
       const val = window.t(key);
@@ -96,7 +97,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         <td>${p.suppliers?.name || '—'}</td>
         <td>${p.name || '—'}</td>
         <td>${m.quantity} ${p.unit || ''}</td>
-        <!-- ✅ التصحيح: إضافة dir="ltr" للخلايا التي تحتوي على أرقام وعملة -->
         <td dir="ltr">${Number(p.price || 0).toFixed(2)} <span class="currency-symbol">DH</span></td>
         <td dir="ltr">${itemTotal.toFixed(2)} <span class="currency-symbol">DH</span></td>
       </tr>
@@ -125,7 +125,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       </div>
       <div class="summary-box">
         <div class="summary-title">${tr('reports_total_added', 'إجمالي الإضافات')}</div>
-        <!-- ✅ التصحيح: إضافة dir="ltr" هنا أيضاً -->
         <div class="summary-val" dir="ltr">${totalVal.toFixed(2)} <span class="currency-symbol">DH</span></div>
       </div>
     </div>
@@ -156,16 +155,21 @@ document.addEventListener('DOMContentLoaded', async () => {
       </tfoot>
     </table>
 
-    <div class="signatures">
-      <div class="sig-box">
-        <p>${tr('reports_manager_sig', 'توقيع المسؤول')}</p>
-        <div class="sig-line"></div>
-      </div>
-      <div class="sig-box">
-        <p>${tr('reports_org_stamp', 'ختم المؤسسة')}</p>
-        <div class="stamp-circle"></div>
-      </div>
-    </div>
+    <!-- ✅ التوقيعات باستخدام جدول مضمون للطباعة -->
+    <table class="sig-table">
+      <tr>
+        <td>
+          <p>${tr('reports_manager_sig', 'توقيع المسؤول')}</p>
+          <br><br><br><br>
+          <div class="sig-line"></div>
+        </td>
+        <td>
+          <p>${tr('reports_org_stamp', 'ختم المؤسسة')}</p>
+          <br><br>
+          <div class="stamp-circle"></div>
+        </td>
+      </tr>
+    </table>
   `;
 
   // فتح نافذة الطباعة تلقائياً بعد تحميل الصفحة

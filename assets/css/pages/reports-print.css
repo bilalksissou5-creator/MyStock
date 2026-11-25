@@ -4,7 +4,7 @@
 
 @page {
   size: A4 landscape;
-  margin: 10mm 10mm 15mm 10mm; /* هوامش أقل لضمان عدم قص العناصر */
+  margin: 10mm 10mm 15mm 10mm;
 }
 
 body {
@@ -23,24 +23,30 @@ body {
   border-radius: 8px;
 }
 
-.loading { text-align: center; padding: 50px; color: #737373; }
+.loading {
+  text-align: center;
+  padding: 50px;
+  color: #737373;
+}
 
 /* إعدادات الطباعة */
 @media print {
-  body { 
-    background: #ffffff; 
-    padding: 0; 
+  body {
+    background: #ffffff;
+    padding: 0;
     margin: 0;
   }
-  .print-container { 
-    box-shadow: none; 
-    padding: 0; 
-    max-width: 100%; 
+  .print-container {
+    box-shadow: none;
+    padding: 0;
+    max-width: 100%;
     width: 100%;
-    border-radius: 0; 
+    border-radius: 0;
     margin: 0;
   }
-  .no-print { display: none !important; }
+  .no-print {
+    display: none !important;
+  }
 }
 
 /* الرأس */
@@ -51,8 +57,18 @@ body {
   margin-bottom: 20px;
 }
 
-.print-header h1 { font-size: 22pt; margin: 0 0 5px 0; color: #000; }
-.print-header h2 { font-size: 14pt; margin: 0 0 10px 0; color: #000; font-weight: normal; }
+.print-header h1 {
+  font-size: 22pt;
+  margin: 0 0 5px 0;
+  color: #000;
+}
+
+.print-header h2 {
+  font-size: 14pt;
+  margin: 0 0 10px 0;
+  color: #000;
+  font-weight: normal;
+}
 
 .print-meta {
   display: flex;
@@ -62,7 +78,9 @@ body {
   color: #000;
 }
 
-.print-meta strong { font-weight: bold; }
+.print-meta strong {
+  font-weight: bold;
+}
 
 /* بطاقات الإحصائيات */
 .summary-row {
@@ -78,10 +96,23 @@ body {
   text-align: center;
 }
 
-.summary-title { font-size: 10pt; color: #000; margin-bottom: 5px; }
-.summary-val { font-size: 16pt; font-weight: bold; color: #000; display: flex; justify-content: center; align-items: baseline; gap: 4px;}
+.summary-title {
+  font-size: 10pt;
+  color: #000;
+  margin-bottom: 5px;
+}
 
-/* الجدول */
+.summary-val {
+  font-size: 16pt;
+  font-weight: bold;
+  color: #000;
+  display: flex;
+  justify-content: center;
+  align-items: baseline;
+  gap: 4px;
+}
+
+/* الجدول الرئيسي */
 .report-table {
   width: 100%;
   border-collapse: collapse;
@@ -115,61 +146,64 @@ body {
 .report-table th:nth-child(7) { width: 12%; }
 .report-table th:nth-child(8) { width: 13%; }
 
-/* منع تقسيم الصف */
-.report-table tr { page-break-inside: avoid !important; }
-.report-table thead { display: table-header-group; }
-.report-table tfoot { display: table-footer-group; font-weight: bold; background: #fafafa; }
+/* منع تقسيم الصف بين صفحتين */
+.report-table tr {
+  page-break-inside: avoid !important;
+}
+
+/* تكرار الرأس في كل صفحة */
+.report-table thead {
+  display: table-header-group;
+}
+
+.report-table tfoot {
+  display: table-footer-group;
+  font-weight: bold;
+  background: #fafafa;
+}
 
 /* ============================================
-   ✅ التوقيعات (طريقة Float المضمونة للطباعة)
+   ✅ التوقيعات (باستخدام جدول مضمون للطباعة)
    ============================================ */
-.signatures {
-  display: block;
+.sig-table {
   width: 100%;
-  margin-top: 30px; /* تقليل المسافة لضمان بقائها في الصفحة */
-  padding-top: 10px;
-  /* إزالة page-break-inside لمنع اختفائها */
+  margin-top: 40px;
+  page-break-inside: avoid; /* منع تقسيم التوقيعات بين صفحتين */
+  border-collapse: collapse;
 }
 
-.signatures::after {
-  content: "";
-  display: table;
-  clear: both;
-}
-
-.sig-box {
-  width: 45%;
+.sig-table td {
+  width: 50%;
   text-align: center;
+  vertical-align: top;
+  border: none;
+  padding: 10px;
 }
 
-/* في العربية: التوقيع يمين، الختم يسار */
-[dir="rtl"] .sig-box:first-child { float: right; }
-[dir="rtl"] .sig-box:last-child { float: left; }
-
-/* في الإنجليزية: التوقيع يسار، الختم يمين */
-[dir="ltr"] .sig-box:first-child { float: left; }
-[dir="ltr"] .sig-box:last-child { float: right; }
-
-.sig-box p {
-  font-size: 11pt;
+.sig-table p {
+  font-size: 12pt;
   font-weight: bold;
-  margin: 0 0 50px 0; /* مساحة التوقيع */
   color: #000;
+  margin: 0;
 }
 
 .sig-line {
-  border-bottom: 1px dashed #000;
-  width: 80%;
+  border-bottom: 1px solid #000; /* خط متصل ليكون واضحاً */
+  width: 70%;
   margin: 0 auto;
 }
 
 .stamp-circle {
-  border: 1px dashed #000;
+  border: 1px solid #000; /* دائرة متصلة */
   border-radius: 50%;
-  width: 80px;
-  height: 80px;
+  width: 90px;
+  height: 90px;
   margin: 0 auto;
 }
 
 /* العملة */
-.currency-symbol { font-size: 8pt; color: #555; font-weight: normal; }
+.currency-symbol {
+  font-size: 8pt;
+  color: #555;
+  font-weight: normal;
+}
