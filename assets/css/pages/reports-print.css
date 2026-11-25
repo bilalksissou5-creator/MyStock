@@ -1,6 +1,6 @@
 /* ============================================
    صفحة طباعة التقارير (A4 Landscape)
-   ✅ إصلاح ضغط الجدول على الهاتف
+   ✅ إصلاح التمرير على الشاشة والطباعة
    ============================================ */
 
 @page {
@@ -21,7 +21,7 @@ body {
 .print-container {
   background: #ffffff;
   max-width: 1100px;
-  min-width: 900px; /* ✅ يمنع ضغط المحتوى على الهاتف */
+  min-width: 900px; /* يمنع ضغط المحتوى على الهاتف */
   margin: 0 auto;
   padding: 30px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
@@ -35,23 +35,49 @@ body {
   color: #737373;
 }
 
-/* إعدادات الطباعة */
-@media print {
-  body {
-    background: #ffffff;
-    padding: 0;
-    margin: 0;
+/* ============================================
+   ✅ 1. إعدادات الشاشة (تجاهل overflow: hidden من common.css)
+   ============================================ */
+@media screen {
+  html, body {
+    height: auto !important;
+    min-height: 100% !important;
+    overflow-y: auto !important; /* ✅ السماح بالتمرير العمودي */
+    overflow-x: auto !important;
+    display: block !important;
   }
+
   .print-container {
-    box-shadow: none;
-    padding: 0;
-    max-width: 100%;
-    min-width: 100%;
-    width: 100%;
-    border-radius: 0;
-    margin: 0;
-    overflow-x: visible;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    height: auto !important;
+    min-height: min-content !important;
   }
+}
+
+/* ============================================
+   ✅ 2. إعدادات الطباعة
+   ============================================ */
+@media print {
+  html, body {
+    background: #ffffff !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
+  
+  .print-container {
+    box-shadow: none !important;
+    padding: 0 !important;
+    max-width: 100% !important;
+    min-width: 100% !important;
+    width: 100% !important;
+    border-radius: 0 !important;
+    margin: 0 !important;
+    overflow: visible !important;
+  }
+  
   .no-print {
     display: none !important;
   }
@@ -96,13 +122,13 @@ body {
 .summary-val { font-size: 16pt; font-weight: bold; color: #000; display: flex; justify-content: center; align-items: baseline; gap: 4px;}
 
 /* ============================================
-   ✅ الجدول: العرض حسب المحتوى ومنع الالتفاف
+   ✅ الجدول: العرض حسب المحتوى
    ============================================ */
 .report-table {
   width: 100%;
   border-collapse: collapse;
   font-size: 9pt;
-  table-layout: auto; /* ✅ التمدد التلقائي */
+  table-layout: auto; 
 }
 
 .report-table th,
@@ -111,7 +137,7 @@ body {
   padding: 6px 8px;
   text-align: start;
   color: #000;
-  white-space: nowrap; /* ✅ منع النص من النزول لسطر جديد */
+  white-space: nowrap; /* منع النص من النزول لسطر جديد */
 }
 
 .report-table th {
@@ -169,18 +195,3 @@ body {
 
 /* العملة */
 .currency-symbol { font-size: 8pt; color: #555; font-weight: normal; }
-
-/* ============================================
-   تعديلات الشاشة لضمان ظهور المحتوى كاملاً
-   ============================================ */
-@media screen {
-  body {
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-  }
-  .print-container {
-    margin-top: 20px;
-    margin-bottom: 20px;
-  }
-}
