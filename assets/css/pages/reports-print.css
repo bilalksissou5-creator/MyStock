@@ -118,8 +118,6 @@ body {
   border-spacing: 0;
   font-size: 8.5pt;
   table-layout: auto;
-
-  /* السماح للجدول بالاستمرار بين الصفحات */
   break-inside: auto;
   page-break-inside: auto;
 }
@@ -127,7 +125,7 @@ body {
 .report-table th,
 .report-table td {
   border: 1px solid #000;
-  padding: 5px 5px;
+  padding: 5px;
   text-align: center;
   color: #000;
   white-space: nowrap;
@@ -160,10 +158,13 @@ body {
   page-break-inside: avoid;
 }
 
-/* التوقيعات */
+/* ============================================
+   التوقيع والختم - حجم صغير
+   ============================================ */
+
 .sig-table {
   width: 100%;
-  margin-top: 25px;
+  margin-top: 12px;
   border-collapse: collapse;
   break-inside: avoid;
   page-break-inside: avoid;
@@ -176,31 +177,33 @@ body {
 
 .sig-table td {
   width: 50%;
+  height: 85px;
   text-align: center;
   vertical-align: top;
   border: none;
-  padding: 10px;
+  padding: 5px;
 }
 
 .sig-table p {
-  font-size: 11pt;
+  font-size: 9pt;
   font-weight: bold;
   color: #000;
-  margin: 0;
+  margin: 0 0 12px;
 }
 
 .sig-line {
   border-bottom: 1px solid #000;
-  width: 70%;
-  margin: 0 auto;
+  width: 55%;
+  margin: 25px auto 0;
 }
 
 .stamp-circle {
   border: 1px solid #000;
   border-radius: 50%;
-  width: 75px;
-  height: 75px;
-  margin: 0 auto;
+  width: 55px;
+  height: 55px;
+  margin: 5px auto 0;
+  box-sizing: border-box;
 }
 
 /* العملة */
