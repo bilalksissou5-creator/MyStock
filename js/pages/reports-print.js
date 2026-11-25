@@ -1,12 +1,21 @@
 // ============================================
 // صفحة طباعة التقارير (Reports Print)
+// ✅ تصحيح اتجاه العملة والترجمة
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   const user = await requireAuth();
   if (!user) return;
 
   if (window.applyLanguage) window.applyLanguage();
-  const tr = (key, fallback) => (window.t ? (window.t(key) || fallback) : (fallback || key));
+  
+  // ✅ دالة ترجمة محسنة (تتعامل مع المفاتيح الناقصة)
+  const tr = (key, fallback) => {
+    if (window.t) {
+      const val = window.t(key);
+      if (val && val !== key) return val;
+    }
+    return fallback || key;
+  };
 
   const params = new URLSearchParams(window.location.search);
   const startIso = params.get('start');
@@ -32,7 +41,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   
   const orgName = profile.organizations?.name || 'MyStock';
 
-  // جلب جميع البيانات في الفترة المحددة (بدون ترقيم)
+  // جلب جميع البيانات في الفترة المحددة
   const { data: movements, error } = await db
     .from('stock_movements')
     .select(`
@@ -87,8 +96,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         <td>${p.suppliers?.name || '—'}</td>
         <td>${p.name || '—'}</td>
         <td>${m.quantity} ${p.unit || ''}</td>
-        <td>${Number(p.price || 0).toFixed(2)} DH</td>
-        <td>${itemTotal.toFixed(2)} DH</td>
+        <!-- ✅ التصحيح: إضافة dir="ltr" للخلايا التي تحتوي على أرقام وعملة -->
+        <td dir="ltr">${Number(p.price || 0).toFixed(2)} <span class="currency-symbol">DH</span></td>
+        <td dir="ltr">${itemTotal.toFixed(2)} <span class="currency-symbol">DH</span></td>
       </tr>
     `;
   }).join('');
@@ -115,7 +125,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       </div>
       <div class="summary-box">
         <div class="summary-title">${tr('reports_total_added', 'إجمالي الإضافات')}</div>
-        <div class="summary-val">${totalVal.toFixed(2)} DH</div>
+        <!-- ✅ التصحيح: إضافة dir="ltr" هنا أيضاً -->
+        <div class="summary-val" dir="ltr">${totalVal.toFixed(2)} <span class="currency-symbol">DH</span></div>
       </div>
     </div>
 
@@ -140,7 +151,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           <td colspan="5" style="text-align:end;">${tr('reports_grand_total', 'المجموع الكلي')}</td>
           <td>${totalQty}</td>
           <td></td>
-          <td>${totalVal.toFixed(2)} DH</td>
+          <td dir="ltr">${totalVal.toFixed(2)} <span class="currency-symbol">DH</span></td>
         </tr>
       </tfoot>
     </table>
@@ -157,11 +168,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     </div>
   `;
 
-  // فتح نافذة الطباعة تلقائياً بعد تحميل الصفحة (تأخير بسيط لضمان تحميل الخطوط)
+  // فتح نافذة الطباعة تلقائياً بعد تحميل الصفحة
   setTimeout(() => {
     window.print();
-  }, 1000);
-
-  // يمكنك إغلاق النافذة تلقائياً بعد الطباعة (اختياري)
-  // window.onafterprint = () => { window.close(); };
+  }, 800);
 });
