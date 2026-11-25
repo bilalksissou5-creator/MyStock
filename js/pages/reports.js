@@ -1,6 +1,6 @@
 // ============================================
 // صفحة التقارير (Reports)
-// ✅ تصميم طباعة متكامل ومطابق للمواصفات
+// ✅ فتح صفحة الطباعة المستقلة
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   const user = await requireAuth();
@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   document.title = tr('reports_title', 'Reports');
 
   const main = document.getElementById('main-content');
-  const { data: profile } = await db.from('profiles').select('organization_id, organizations(name)').eq('id', user.id).single();
+  const { data: profile } = await db.from('profiles').select('organization_id').eq('id', user.id).single();
   
   if (!profile?.organization_id) {
     main.innerHTML = `<div class="alert alert-error">Organization not found</div>`;
@@ -21,26 +21,24 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   const orgId = profile.organization_id;
-  const orgName = profile.organizations?.name || 'MyStock';
 
   let currentPeriod = 'today';
   let currentPage = 1;
   const PAGE_SIZE = 20;
   let totalItems = 0;
-  let allReportItems = [];
   
   let anchorDate = new Date();
   let currentStartDate, currentEndDate;
   let fp = null;
 
   main.innerHTML = `
-    <div class="page-header no-print">
+    <div class="page-header">
       <h2>${tr('reports_title', 'Reports')}</h2>
     </div>
 
     <div class="reports-wrapper">
 
-      <div class="filters-card no-print">
+      <div class="filters-card">
         <h3 class="filters-title">
           <i class="fas fa-chart-pie" style="color:#2563eb;"></i>
           ${tr('reports_add_products', 'Product Addition Report')}
@@ -65,17 +63,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         </div>
       </div>
 
-      <!-- ✅ رأس التقرير للطباعة فقط (يظهر أولاً) -->
-      <div class="print-only-header">
-        <h1>${orgName}</h1>
-        <h2>${tr('reports_add_products', 'Product Addition Report')}</h2>
-        <div class="print-header-info">
-          <p><strong>${tr('reports_period_type', 'نوع الفترة')}:</strong> <span id="print-period-name">—</span></p>
-          <p><strong>${tr('reports_date_range', 'الفترة')}:</strong> <span id="print-date-range">—</span></p>
-        </div>
-      </div>
-
-      <!-- ✅ بطاقات الإحصائيات (تظهر في الشاشة والطباعة) -->
       <div class="summary-grid">
         <div class="summary-card">
           <div class="summary-label">${tr('reports_ops_count', 'Number of Operations')}</div>
@@ -88,8 +75,9 @@ document.addEventListener('DOMContentLoaded', async () => {
       </div>
 
       <div class="table-card">
-        <div class="table-header no-print">
+        <div class="table-header">
           <h3 class="table-title">${tr('reports_details_table', 'Details Table')}</h3>
+          <!-- زر الطباعة -->
           <button class="btn-primary" id="print-btn" style="display: flex; align-items: center; gap: 8px;">
             <i class="fas fa-print"></i> ${tr('reports_print', 'Print')}
           </button>
@@ -122,19 +110,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             </tfoot>
           </table>
         </div>
-        <div class="pagination no-print" id="pagination"></div>
-      </div>
-      
-      <!-- ✅ منطقة التوقيعات (تظهر فقط عند الطباعة) -->
-      <div class="print-only-signatures">
-        <div class="signature-box">
-          <p>${tr('reports_manager_sig', 'توقيع المسؤول')}</p>
-          <div class="sig-line"></div>
-        </div>
-        <div class="signature-box">
-          <p>${tr('reports_org_stamp', 'ختم المؤسسة')}</p>
-          <div class="stamp-circle"></div>
-        </div>
+        <div class="pagination" id="pagination"></div>
       </div>
 
     </div>
@@ -142,14 +118,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   const tbody = document.getElementById('reports-tbody');
   const dateRangeText = document.getElementById('date-range-text');
-  const printDateRange = document.getElementById('print-date-range');
-  const printPeriodName = document.getElementById('print-period-name');
   const paginationContainer = document.getElementById('pagination');
   const customDateRange = document.getElementById('custom-date-range');
   const datePickerInput = document.getElementById('date-picker');
   const printBtn = document.getElementById('print-btn');
 
-  // ... (دوال getDateRange, formatDate, formatTime, movePeriod تبقى كما هي) ...
   function getDateRange(period) {
     if (period === 'custom') return { start: currentStartDate, end: currentEndDate };
     const now = new Date(anchorDate);
@@ -175,18 +148,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   function formatDate(d) { return d.toLocaleDateString('fr-FR'); }
   function formatTime(d) { return d.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }); }
 
-  function getPeriodName(period) {
-    switch (period) {
-      case 'today': return tr('reports_today', 'Today');
-      case 'week': return tr('reports_week', 'Week');
-      case 'month': return tr('reports_month', 'Month');
-      case 'year': return tr('reports_year', 'Year');
-      case 'custom': return tr('reports_custom', 'Custom');
-      default: return '—';
-    }
-  }
-
-  // ✅ دالة بناء صف الجدول
   function buildTableRow(m) {
     const p = m.products || {};
     const supplierName = p.suppliers?.name || '—';
@@ -226,8 +187,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     const rangeStr = `${formatDate(start)} — ${formatDate(end)}`;
     dateRangeText.textContent = rangeStr;
-    if(printDateRange) printDateRange.textContent = rangeStr;
-    if(printPeriodName) printPeriodName.textContent = getPeriodName(currentPeriod);
 
     try {
       const { data: movements, error } = await db
@@ -246,12 +205,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       if (error) throw error;
 
-      allReportItems = movements || [];
-      totalItems = allReportItems.length;
+      const allItems = movements || [];
+      totalItems = allItems.length;
 
       let totalValue = 0;
       let totalQtyAll = 0;
-      allReportItems.forEach(m => {
+      allItems.forEach(m => {
         const qty = Number(m.quantity || 0);
         const price = Number(m.products?.price || 0);
         totalValue += qty * price;
@@ -279,7 +238,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (currentPage > totalPages) currentPage = totalPages;
       
       const startIndex = (currentPage - 1) * PAGE_SIZE;
-      const pageItems = allReportItems.slice(startIndex, startIndex + PAGE_SIZE);
+      const pageItems = allItems.slice(startIndex, startIndex + PAGE_SIZE);
 
       tbody.innerHTML = pageItems.map(buildTableRow).join('');
       renderPagination(totalPages, startIndex, pageItems.length);
@@ -372,37 +331,19 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   }
 
-  // ✅ دالة الطباعة الذكية
+  // ✅ دالة الطباعة: تفتح صفحة الطباعة المستقلة
   function printReport() {
-    if (!allReportItems || allReportItems.length === 0) {
+    if (!currentStartDate || !currentEndDate) {
       alert(tr('reports_no_data', 'No data to print'));
       return;
     }
 
-    const originalBody = tbody.innerHTML;
-    const originalPagination = paginationContainer.innerHTML;
-
-    // عرض كل الصفوف للطباعة
-    tbody.innerHTML = allReportItems.map(buildTableRow).join('');
-    paginationContainer.innerHTML = '';
-
-    document.body.classList.add('printing-mode');
-    window.print();
-
-    window.onafterprint = () => {
-      tbody.innerHTML = originalBody;
-      paginationContainer.innerHTML = originalPagination;
-      document.body.classList.remove('printing-mode');
-      
-      // إعادة ربط أحداث الترقيم
-      paginationContainer.querySelector('[data-period-nav="prev"]')?.addEventListener('click', () => movePeriod(-1));
-      paginationContainer.querySelector('[data-period-nav="next"]')?.addEventListener('click', () => movePeriod(1));
-      paginationContainer.querySelectorAll('[data-page]').forEach(btn => {
-        btn.addEventListener('click', () => { currentPage = Number(btn.dataset.page); loadReport(); });
-      });
-
-      window.onafterprint = null;
-    };
+    const startIso = currentStartDate.toISOString();
+    const endIso = currentEndDate.toISOString();
+    
+    // فتح الصفحة الجديدة في نافذة منفصلة
+    const url = `/reports-print.html?start=${encodeURIComponent(startIso)}&end=${encodeURIComponent(endIso)}&period=${encodeURIComponent(currentPeriod)}`;
+    window.open(url, '_blank');
   }
 
   printBtn.addEventListener('click', printReport);
