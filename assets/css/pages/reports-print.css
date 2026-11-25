@@ -80,7 +80,7 @@ body {
   width: 100%;
   border-collapse: collapse;
   font-size: 9pt;
-  table-layout: fixed; /* ✅ إجبار الجدول على احتواء الأعمدة */
+  table-layout: fixed;
 }
 
 .report-table th,
@@ -89,7 +89,7 @@ body {
   padding: 6px 8px;
   text-align: start;
   color: #000;
-  word-break: break-word; /* منع خروج النص الطويل */
+  word-break: break-word;
 }
 
 .report-table th {
@@ -99,7 +99,7 @@ body {
   print-color-adjust: exact;
 }
 
-/* توزيع عرض الأعمدة لضمان تناسق الجدول */
+/* توزيع عرض الأعمدة */
 .report-table th:nth-child(1) { width: 8%; }  /* الوقت */
 .report-table th:nth-child(2) { width: 11%; } /* التاريخ */
 .report-table th:nth-child(3) { width: 13%; } /* المستخدم */
@@ -116,18 +116,43 @@ body {
 .report-table thead { display: table-header-group; }
 .report-table tfoot { display: table-footer-group; font-weight: bold; background: #fafafa; }
 
-/* التوقيعات */
+/* ============================================
+   ✅ التوقيعات (تم استخدام display: table لضمان الظهور)
+   ============================================ */
 .signatures {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 50px;
+  display: table;
+  width: 100%;
+  margin-top: 40px;
   page-break-inside: avoid;
 }
 
-.sig-box { width: 45%; text-align: center; }
-.sig-box p { font-size: 12pt; font-weight: bold; margin-bottom: 60px; color: #000; }
-.sig-line { border-bottom: 1px dashed #000; width: 80%; margin: 0 auto; }
-.stamp-circle { border: 1px dashed #000; border-radius: 50%; width: 100px; height: 100px; margin: 0 auto; }
+.sig-box {
+  display: table-cell;
+  width: 50%;
+  text-align: center;
+  vertical-align: bottom;
+}
+
+.sig-box p {
+  font-size: 12pt;
+  font-weight: bold;
+  margin: 0 0 60px 0;
+  color: #000;
+}
+
+.sig-line {
+  border-bottom: 1px dashed #000;
+  width: 80%;
+  margin: 0 auto;
+}
+
+.stamp-circle {
+  border: 1px dashed #000;
+  border-radius: 50%;
+  width: 100px;
+  height: 100px;
+  margin: 0 auto;
+}
 
 /* العملة */
 .currency-symbol { font-size: 8pt; color: #555; font-weight: normal; }
