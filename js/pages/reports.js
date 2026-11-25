@@ -1,6 +1,6 @@
 // ============================================
 // صفحة التقارير (Reports)
-// ✅ إضافة طباعة التقرير (مع كافة البيانات)
+// ✅ تصميم طباعة متكامل ومطابق للمواصفات
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
   const user = await requireAuth();
@@ -27,19 +27,19 @@ document.addEventListener('DOMContentLoaded', async () => {
   let currentPage = 1;
   const PAGE_SIZE = 20;
   let totalItems = 0;
-  let allReportItems = []; // ✅ لتخزين كل البيانات للطباعة
+  let allReportItems = [];
   
   let anchorDate = new Date();
   let currentStartDate, currentEndDate;
   let fp = null;
 
-  // ✅ بناء الهيكل مع إضافة زر الطباعة والتوقيعات
   main.innerHTML = `
     <div class="page-header no-print">
       <h2>${tr('reports_title', 'Reports')}</h2>
     </div>
 
     <div class="reports-wrapper">
+
       <div class="filters-card no-print">
         <h3 class="filters-title">
           <i class="fas fa-chart-pie" style="color:#2563eb;"></i>
@@ -65,14 +65,18 @@ document.addEventListener('DOMContentLoaded', async () => {
         </div>
       </div>
 
-      <!-- ✅ معلومات للطباعة فقط (تظهر في الأعلى) -->
+      <!-- ✅ رأس التقرير للطباعة فقط (يظهر أولاً) -->
       <div class="print-only-header">
         <h1>${orgName}</h1>
         <h2>${tr('reports_add_products', 'Product Addition Report')}</h2>
-        <p>${tr('reports_date_range', 'Date Range')}: <span id="print-date-range">—</span></p>
+        <div class="print-header-info">
+          <p><strong>${tr('reports_period_type', 'نوع الفترة')}:</strong> <span id="print-period-name">—</span></p>
+          <p><strong>${tr('reports_date_range', 'الفترة')}:</strong> <span id="print-date-range">—</span></p>
+        </div>
       </div>
 
-      <div class="summary-grid no-print">
+      <!-- ✅ بطاقات الإحصائيات (تظهر في الشاشة والطباعة) -->
+      <div class="summary-grid">
         <div class="summary-card">
           <div class="summary-label">${tr('reports_ops_count', 'Number of Operations')}</div>
           <div class="summary-value" id="sum-ops">—</div>
@@ -86,7 +90,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       <div class="table-card">
         <div class="table-header no-print">
           <h3 class="table-title">${tr('reports_details_table', 'Details Table')}</h3>
-          <!-- ✅ زر الطباعة -->
           <button class="btn-primary" id="print-btn" style="display: flex; align-items: center; gap: 8px;">
             <i class="fas fa-print"></i> ${tr('reports_print', 'Print')}
           </button>
@@ -140,6 +143,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const tbody = document.getElementById('reports-tbody');
   const dateRangeText = document.getElementById('date-range-text');
   const printDateRange = document.getElementById('print-date-range');
+  const printPeriodName = document.getElementById('print-period-name');
   const paginationContainer = document.getElementById('pagination');
   const customDateRange = document.getElementById('custom-date-range');
   const datePickerInput = document.getElementById('date-picker');
@@ -171,7 +175,18 @@ document.addEventListener('DOMContentLoaded', async () => {
   function formatDate(d) { return d.toLocaleDateString('fr-FR'); }
   function formatTime(d) { return d.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }); }
 
-  // ✅ دالة بناء صف الجدول (لتجنب تكرار الكود)
+  function getPeriodName(period) {
+    switch (period) {
+      case 'today': return tr('reports_today', 'Today');
+      case 'week': return tr('reports_week', 'Week');
+      case 'month': return tr('reports_month', 'Month');
+      case 'year': return tr('reports_year', 'Year');
+      case 'custom': return tr('reports_custom', 'Custom');
+      default: return '—';
+    }
+  }
+
+  // ✅ دالة بناء صف الجدول
   function buildTableRow(m) {
     const p = m.products || {};
     const supplierName = p.suppliers?.name || '—';
@@ -212,6 +227,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const rangeStr = `${formatDate(start)} — ${formatDate(end)}`;
     dateRangeText.textContent = rangeStr;
     if(printDateRange) printDateRange.textContent = rangeStr;
+    if(printPeriodName) printPeriodName.textContent = getPeriodName(currentPeriod);
 
     try {
       const { data: movements, error } = await db
@@ -230,7 +246,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       if (error) throw error;
 
-      allReportItems = movements || []; // ✅ حفظ البيانات للطباعة
+      allReportItems = movements || [];
       totalItems = allReportItems.length;
 
       let totalValue = 0;
@@ -275,9 +291,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
 
-  // ... (دالة renderPagination تبقى كما هي) ...
   function renderPagination(totalPages, startIndex, pageItemsCount) {
-    // نفس الكود السابق الخاص بك
     const isArabic = window.getCurrentLang && window.getCurrentLang() === 'ar';
     const prevIcon = isArabic ? 'right' : 'left';
     const nextIcon = isArabic ? 'left' : 'right';
@@ -365,21 +379,16 @@ document.addEventListener('DOMContentLoaded', async () => {
       return;
     }
 
-    // 1. حفظ حالة الجدول الأصلية
     const originalBody = tbody.innerHTML;
     const originalPagination = paginationContainer.innerHTML;
 
-    // 2. عرض كل الصفوف للطباعة (تجاوز الترقيم)
+    // عرض كل الصفوف للطباعة
     tbody.innerHTML = allReportItems.map(buildTableRow).join('');
-    paginationContainer.innerHTML = ''; // إخفاء الترقيم
+    paginationContainer.innerHTML = '';
 
-    // 3. إضافة كلاس للجسم لتطبيق تنسيقات الطباعة
     document.body.classList.add('printing-mode');
-
-    // 4. استدعاء نافذة الطباعة
     window.print();
 
-    // 5. استعادة الجدول الأصلي بعد إغلاق نافذة الطباعة
     window.onafterprint = () => {
       tbody.innerHTML = originalBody;
       paginationContainer.innerHTML = originalPagination;
