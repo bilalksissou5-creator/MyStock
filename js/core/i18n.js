@@ -1024,6 +1024,10 @@ const translations = {
     reports_custom: 'مخصص',
     reports_date_range: 'الفترة المخصصة',
     reports_select_dates: 'اختر التاريخ...',
+
+    reports_print: 'طباعة التقرير',
+    reports_manager_sig: 'توقيع المسؤول',
+    reports_org_stamp: 'ختم المؤسسة',
   },
 
   fr: {
@@ -2039,6 +2043,10 @@ const translations = {
     reports_custom: 'Personnalisé',
     reports_date_range: 'Période personnalisée',
     reports_select_dates: 'Sélectionner les dates...',
+
+    reports_print: 'Imprimer le rapport',
+    reports_manager_sig: 'Signature du responsable',
+    reports_org_stamp: 'Cachet de l\'organisme',
   },
 
   en: {
@@ -3056,6 +3064,10 @@ const translations = {
     reports_custom: 'Custom',
     reports_date_range: 'Custom Range',
     reports_select_dates: 'Select dates...',
+
+    reports_print: 'Print Report',
+    reports_manager_sig: 'Manager Signature',
+    reports_org_stamp: 'Organization Stamp',
   },
 
   
