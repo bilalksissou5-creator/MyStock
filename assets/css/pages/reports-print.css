@@ -2,7 +2,7 @@
 /* ============================================
    صفحة طباعة التقارير
    A4 Portrait
-   إصلاح حدود الجدول ومنع قطعه
+   تحسين الجدول والتوقيع والختم
    ============================================ */
 
 @page {
@@ -143,13 +143,12 @@ body {
   word-break: normal;
 }
 
-/* تأكيد ظهور الحد الأيمن */
+/* تأكيد ظهور الحدود الجانبية */
 .report-table th:last-child,
 .report-table td:last-child {
   border-right: 1px solid #000 !important;
 }
 
-/* تأكيد الحد الأيسر */
 .report-table th:first-child,
 .report-table td:first-child {
   border-left: 1px solid #000 !important;
@@ -183,7 +182,7 @@ body {
 }
 
 /* ============================================
-   التوقيع والختم
+   التوقيع والختم - مستطيلات
    ============================================ */
 
 .sig-table {
@@ -215,16 +214,19 @@ body {
   margin: 0 0 12px;
 }
 
+/* مستطيل توقيع المسؤول */
 .sig-line {
-  border-bottom: 1px solid #000;
+  border: 1px solid #000;
   width: 55%;
-  margin: 25px auto 0;
+  height: 35px;
+  margin: 10px auto 0;
 }
 
+/* مستطيل ختم المؤسسة */
 .stamp-circle {
   border: 1px solid #000;
-  border-radius: 50%;
-  width: 55px;
+  border-radius: 0;
+  width: 85px;
   height: 55px;
   margin: 5px auto 0;
   box-sizing: border-box;
@@ -279,6 +281,7 @@ body {
     display: none !important;
   }
 
+  /* الجدول أثناء الطباعة */
   .report-table {
     width: 100% !important;
     max-width: 100% !important;
@@ -312,8 +315,21 @@ body {
     page-break-inside: avoid;
   }
 
+  /* التوقيع والختم */
   .sig-table {
     break-inside: avoid;
     page-break-inside: avoid;
+  }
+
+  .sig-line {
+    border: 1px solid #000 !important;
+    height: 35px !important;
+  }
+
+  .stamp-circle {
+    border: 1px solid #000 !important;
+    border-radius: 0 !important;
+    width: 85px !important;
+    height: 55px !important;
   }
 }
