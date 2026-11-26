@@ -47,7 +47,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           </p>
 
           <span class="report-arrow">
-            <i class="fa-solid fa-arrow-left"></i>
+            <i class="fa-solid fa-chevron-left"></i>
           </span>
         </a>
 
@@ -70,7 +70,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           </p>
 
           <span class="report-arrow">
-            <i class="fa-solid fa-arrow-left"></i>
+            <i class="fa-solid fa-chevron-left"></i>
           </span>
         </a>
 
@@ -93,7 +93,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           </p>
 
           <span class="report-arrow">
-            <i class="fa-solid fa-arrow-left"></i>
+            <i class="fa-solid fa-chevron-left"></i>
           </span>
         </a>
 
@@ -105,4 +105,13 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (window.applyLanguage) {
     window.applyLanguage();
   }
+
+  // ضبط اتجاه الأسهم حسب لغة الصفحة
+  const isArabic = document.documentElement.dir === 'rtl';
+
+  document.querySelectorAll('.report-arrow i').forEach(icon => {
+    icon.className = isArabic
+      ? 'fa-solid fa-chevron-left'
+      : 'fa-solid fa-chevron-right';
+  });
 });

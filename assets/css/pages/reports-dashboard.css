@@ -46,7 +46,7 @@
   min-height: 210px;
   padding: 25px;
   overflow: hidden;
-  border: 1px solid #e9edf3;
+  border: none;
   border-radius: 16px;
   background: #ffffff;
   box-shadow: 0 4px 15px rgba(15, 23, 42, 0.04);
@@ -56,9 +56,14 @@
   box-sizing: border-box;
 }
 
-.report-dashboard-card:not(.is-disabled):hover {
+.report-dashboard-card:hover {
   transform: translateY(-5px);
   box-shadow: 0 10px 25px rgba(15, 23, 42, 0.09);
+}
+
+.report-dashboard-card:focus-visible {
+  outline: 2px solid #2878e8;
+  outline-offset: 4px;
 }
 
 .report-dashboard-card .report-icon {
@@ -92,13 +97,15 @@
   bottom: 24px;
   color: #9aa3b2;
   font-size: 16px;
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.report-dashboard-card:hover .report-arrow {
+  color: #202b3c;
+  transform: translateX(-4px);
 }
 
 /* تقارير الإضافة - أزرق */
-
-.report-dashboard-card.add-report {
-  border-top: 4px solid #2878e8;
-}
 
 .report-dashboard-card.add-report .report-icon {
   color: #2878e8;
@@ -107,10 +114,6 @@
 
 /* تقارير الإخراج - برتقالي */
 
-.report-dashboard-card.remove-report {
-  border-top: 4px solid #ed8a25;
-}
-
 .report-dashboard-card.remove-report .report-icon {
   color: #ed8a25;
   background: #fff3e5;
@@ -118,34 +121,12 @@
 
 /* تقارير الأرباح - أخضر */
 
-.report-dashboard-card.profit-report {
-  border-top: 4px solid #16a36a;
-}
-
 .report-dashboard-card.profit-report .report-icon {
   color: #16a36a;
   background: #e7f8ef;
 }
 
-/* البطاقات غير المتاحة حالياً */
-
-.report-dashboard-card.is-disabled {
-  cursor: default;
-  opacity: 0.75;
-}
-
-.report-dashboard-card.is-disabled .coming-soon {
-  display: inline-block;
-  margin-top: 14px;
-  padding: 5px 11px;
-  border-radius: 20px;
-  background: #f1f3f6;
-  color: #727c8d;
-  font-size: 11px;
-  font-weight: 700;
-}
-
-/* دعم الإنجليزية */
+/* دعم الإنجليزية والفرنسية */
 
 html[dir="ltr"] .reports-dashboard-header {
   text-align: left;
@@ -154,6 +135,10 @@ html[dir="ltr"] .reports-dashboard-header {
 html[dir="ltr"] .report-dashboard-card .report-arrow {
   left: auto;
   right: 22px;
+}
+
+html[dir="ltr"] .report-dashboard-card:hover .report-arrow {
+  transform: translateX(4px);
 }
 
 /* الأجهزة اللوحية */
