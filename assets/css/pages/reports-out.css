@@ -1,304 +1,578 @@
-
 /* ============================================
-   تقرير إخراج المنتجات
-   MyStock - Reports Out
+   MyStock - تقرير إخراج المنتجات
+   Reports Out - Screen Design
+   نفس تصميم تقرير إضافة المنتجات
    ============================================ */
 
 .reports-wrapper {
-  width: 100%;
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 16px;
-  box-sizing: border-box;
-}
-
-.reports-header {
+  width: 100% !important;
+  max-width: 1000px !important;
+  margin: 0 auto !important;
+  padding: 0 0 20px !important;
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  flex-wrap: wrap;
-  margin-bottom: 20px;
+  flex-direction: column;
+  gap: 20px;
+  box-sizing: border-box !important;
 }
 
-.reports-header h2 {
-  margin: 0;
-  font-size: 22px;
+/* ============================================
+   بطاقة الفلاتر
+   ============================================ */
+
+.filters-card {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 20px;
+  border: 1px solid #e5e5e5;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+}
+
+.filters-title {
+  font-size: 16px;
   font-weight: 700;
-  color: #222;
-}
-
-.reports-filters {
+  color: #171717;
+  margin-bottom: 16px;
   display: flex;
   align-items: center;
-  flex-wrap: wrap;
   gap: 8px;
-  margin-bottom: 18px;
 }
 
-.period-btn {
-  border: 1px solid #ddd;
-  background: #fff;
-  color: #333;
-  border-radius: 8px;
-  padding: 9px 15px;
-  font-size: 13px;
-  cursor: pointer;
-  transition: 0.2s;
-}
+/* ============================================
+   أزرار الفترة
+   ============================================ */
 
-.period-btn:hover {
-  background: #f5f5f5;
-}
-
-.period-btn.active {
-  background: #111;
-  border-color: #111;
-  color: #fff;
-}
-
-.custom-date {
-  min-width: 190px;
-  height: 38px;
-  padding: 0 10px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  background: #fff;
-  font-size: 13px;
-  color: #333;
-}
-
-.period-navigation {
+.period-tabs {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  flex-wrap: wrap;
-  margin-bottom: 18px;
+  background: #f5f5f5;
+  border-radius: 12px;
+  padding: 4px;
+  margin-bottom: 20px;
+  gap: 4px;
+  overflow-x: auto;
 }
 
-.period-navigation button {
-  width: 38px;
-  height: 38px;
-  border: 1px solid #ddd;
+.period-tab {
+  flex: 1;
+  padding: 10px;
   border-radius: 8px;
-  background: #fff;
-  color: #222;
-  cursor: pointer;
-}
-
-.period-navigation button:hover {
-  background: #f3f3f3;
-}
-
-.period-label {
+  border: none;
+  background: transparent;
   font-size: 14px;
   font-weight: 600;
-  color: #333;
-  text-align: center;
-}
-
-.reports-summary {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
-  margin-bottom: 20px;
-}
-
-.summary-card {
-  min-width: 0;
-  padding: 16px;
-  background: #fff;
-  border: 1px solid #e8e8e8;
-  border-radius: 10px;
-}
-
-.summary-card h4 {
-  margin: 0 0 10px;
-  font-size: 13px;
-  font-weight: 500;
-  color: #777;
-}
-
-.summary-card .summary-value {
-  font-size: 21px;
-  font-weight: 700;
-  color: #222;
-  overflow-wrap: anywhere;
-}
-
-.reports-table-container {
-  width: 100%;
-  overflow-x: auto;
-  background: #fff;
-  border: 1px solid #e5e5e5;
-  border-radius: 10px;
-  -webkit-overflow-scrolling: touch;
-}
-
-.reports-table {
-  width: 100%;
-  min-width: 850px;
-  border-collapse: collapse;
-  text-align: center;
+  color: #737373;
+  cursor: pointer;
+  transition: all 0.2s;
   white-space: nowrap;
 }
 
-.reports-table th,
-.reports-table td {
-  padding: 12px 10px;
-  border-bottom: 1px solid #eee;
+.period-tab:hover {
+  color: #171717;
+}
+
+.period-tab.active {
+  background: #ffffff;
+  color: #171717;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* ============================================
+   التقويم المخصص
+   ============================================ */
+
+.custom-date-range {
+  margin-bottom: 16px;
+}
+
+.custom-date-range label {
+  display: block;
   font-size: 13px;
+  font-weight: 600;
+  color: #404040;
+  margin-bottom: 6px;
 }
 
-.reports-table th {
-  background: #f7f7f7;
-  color: #333;
+.custom-date-range input {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid #dbeafe;
+  border-radius: 10px;
+  background: #ffffff;
+  font-size: 14px;
+  color: #2563eb;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: center;
+  outline: none;
+}
+
+.custom-date-range input:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+/* ============================================
+   عرض الفترة المحددة
+   ============================================ */
+
+.date-range-display {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #f8faff;
+  border: 1px solid #dbeafe;
+  border-radius: 12px;
+  padding: 14px 16px;
+  font-size: 14px;
+  color: #2563eb;
+  font-weight: 600;
+  justify-content: center;
+}
+
+.date-range-display i {
+  font-size: 16px;
+}
+
+/* ============================================
+   بطاقات الإجماليات
+   ============================================ */
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.summary-card {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 20px;
+  border: 1px solid #e5e5e5;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.summary-label {
+  font-size: 13px;
+  color: #737373;
+  font-weight: 600;
+}
+
+.summary-value {
+  font-size: 26px;
+  font-weight: 800;
+  color: #171717;
+}
+
+.summary-value.highlight {
+  color: #16a34a;
+}
+
+.summary-currency {
+  font-size: 16px;
   font-weight: 700;
+  color: #16a34a;
+  margin-inline-start: 4px;
 }
 
-.reports-table td {
-  color: #444;
+/* ============================================
+   بطاقة الجدول
+   ============================================ */
+
+.table-card {
+  background: #ffffff;
+  border-radius: 16px;
+  border: 1px solid #e5e5e5;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+  overflow: hidden;
 }
 
-.reports-table tbody tr:hover {
+.table-header {
+  padding: 20px 20px 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.table-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #171717;
+}
+
+.table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  padding: 16px 0;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* ============================================
+   جدول إخراج المنتجات
+   ============================================ */
+
+.reports-table {
+  width: max-content;
+  min-width: 100%;
+  border-collapse: collapse;
+  table-layout: auto;
+}
+
+.reports-table thead th {
+  padding: 10px 14px;
+  text-align: start;
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  background: #171717;
+  color: #ffffff;
+  border-bottom: 2px solid #171717;
+  white-space: nowrap;
+}
+
+.reports-table tbody td {
+  padding: 8px 12px;
+  font-size: 12px;
+  color: #404040;
+  border-bottom: 1px solid #f0f0f0;
+  vertical-align: middle;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.reports-table tbody tr:nth-child(even) {
   background: #fafafa;
 }
 
-.reports-table tbody tr:last-child td {
-  border-bottom: none;
+.reports-table tbody tr:hover {
+  background: #f0f7ff;
 }
 
-.reports-empty {
-  padding: 30px 15px;
-  text-align: center;
-  color: #888;
-  font-size: 14px;
+/* ============================================
+   تنسيقات أعمدة التقرير
+   أسماء الأصناف مطابقة لـ reports-out.js
+   ============================================ */
+
+.time-cell {
+  font-weight: 700;
+  color: #2563eb;
 }
 
-.reports-pagination {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  margin: 20px 0;
+.date-cell {
+  font-size: 11px;
+  color: #737373;
 }
 
-.reports-pagination button {
-  min-width: 38px;
-  height: 36px;
-  padding: 0 12px;
-  border: 1px solid #ddd;
-  border-radius: 7px;
-  background: #fff;
-  color: #333;
-  cursor: pointer;
+.user-cell {
+  font-weight: 600;
 }
 
-.reports-pagination button:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-}
-
-.reports-pagination button:hover:not(:disabled) {
-  background: #f3f3f3;
-}
-
-.reports-page-info {
+.product-cell {
+  font-weight: 800;
+  color: #2563eb;
   font-size: 13px;
-  color: #666;
 }
 
-.reports-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 8px;
-  margin-bottom: 15px;
+/* الكمية */
+.qty-cell {
+  font-weight: 700;
 }
 
-.reports-print-btn {
+/* الوحدة */
+.unit-cell {
+  font-weight: 700;
+}
+
+/* دعم الاسم القديم أيضاً */
+.qty-unit-cell {
+  font-weight: 700;
+}
+
+/* سعر البيع */
+.price-cell {
+  font-weight: 600;
+}
+
+/* إجمالي القيمة */
+.total-cell {
+  font-weight: 800;
+  color: #16a34a;
+  font-size: 13px;
+}
+
+/* ============================================
+   إجمالي الجدول
+   ============================================ */
+
+.reports-table tfoot td {
+  padding: 12px 12px;
+  font-size: 13px;
+  font-weight: 800;
+  color: #171717;
+  background: #f0f0f0;
+  border-top: 3px double #171717;
+  white-space: nowrap;
+}
+
+.footer-label {
+  text-align: end;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+[dir="ltr"] .footer-label {
+  text-align: start;
+}
+
+.footer-total {
+  font-weight: 900;
+  font-size: 14px;
+  color: #171717;
+}
+
+.footer-total.highlight {
+  color: #16a34a;
+  font-size: 15px;
+}
+
+/* ============================================
+   العملة والأسعار
+   ============================================ */
+
+.currency-symbol {
+  font-size: 10px;
+  color: #a3a3a3;
+  font-weight: 500;
+  margin-inline-start: 2px;
+}
+
+.price-cell,
+.total-cell {
+  direction: ltr;
+  text-align: start;
+}
+
+[dir="rtl"] .price-cell,
+[dir="rtl"] .total-cell {
+  text-align: right;
+}
+
+/* ============================================
+   زر الطباعة
+   ============================================ */
+
+.btn-primary {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  padding: 10px 16px;
+  padding: 9px 16px;
   border: none;
   border-radius: 8px;
-  background: #111;
-  color: #fff;
+  background: #171717;
+  color: #ffffff;
   font-size: 13px;
+  font-weight: 700;
   cursor: pointer;
+  transition: background 0.2s;
+  text-decoration: none;
+  white-space: nowrap;
 }
 
-.reports-print-btn:hover {
-  background: #333;
+.btn-primary:hover {
+  background: #404040;
 }
 
 /* ============================================
-   تجاوب الهاتف
+   ترقيم الصفحات والتنقل بين الفترات
    ============================================ */
 
-@media (max-width: 768px) {
-  .reports-wrapper {
-    padding: 12px;
-  }
+.pagination {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  border-top: 1px solid #f0f0f0;
+  gap: 12px;
+  flex-wrap: wrap;
+}
 
-  .reports-header h2 {
-    font-size: 19px;
-  }
+.pagination-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
 
-  .reports-filters {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
+.pagination-pages {
+  display: flex;
+  gap: 6px;
+}
 
-  .period-btn {
-    width: 100%;
-    padding: 10px 6px;
-  }
+.pagination-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  border: 1px solid #e5e5e5;
+  background: #ffffff;
+  color: #171717;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 600;
+  transition: all 0.15s;
+}
 
-  .custom-date {
-    width: 100%;
-    min-width: 0;
-    grid-column: 1 / -1;
-    box-sizing: border-box;
-  }
+.pagination-btn:hover:not(:disabled) {
+  background: #f5f5f5;
+}
 
-  .reports-summary {
+.pagination-btn.active {
+  background: #171717;
+  color: #ffffff;
+  border-color: #171717;
+}
+
+.pagination-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.period-nav-btn {
+  background: #f0f7ff;
+  border-color: #dbeafe;
+  color: #2563eb;
+}
+
+.period-nav-btn:hover:not(:disabled) {
+  background: #e0f2fe;
+}
+
+.pagination-info {
+  font-size: 13px;
+  color: #737373;
+  font-weight: 600;
+}
+
+/* ============================================
+   حالة عدم وجود بيانات
+   ============================================ */
+
+.reports-empty {
+  padding: 60px 20px;
+  text-align: center;
+  color: #a3a3a3;
+}
+
+.reports-empty i {
+  font-size: 50px;
+  color: #e5e5e5;
+  margin-bottom: 16px;
+  display: block;
+}
+
+/* ============================================
+   الهواتف
+   ============================================ */
+
+@media screen and (max-width: 600px) {
+
+  .summary-grid {
     grid-template-columns: 1fr;
   }
 
-  .summary-card {
-    padding: 13px;
+  .summary-value {
+    font-size: 22px;
   }
 
-  .summary-card .summary-value {
-    font-size: 19px;
+  .period-tab {
+    font-size: 12px;
+    padding: 8px 4px;
   }
 
-  .period-navigation {
-    justify-content: space-between;
+  .date-range-display {
+    font-size: 12px;
+    padding: 10px 12px;
+    flex-direction: column;
+    text-align: center;
+    gap: 6px;
   }
 
-  .reports-actions {
-    justify-content: stretch;
+  .reports-table th,
+  .reports-table td {
+    padding: 8px;
   }
 
-  .reports-print-btn {
-    width: 100%;
+  .reports-table thead th {
+    font-size: 9px;
+    padding: 8px 6px;
+  }
+
+  .product-cell,
+  .user-cell {
+    font-size: 11px;
+  }
+
+  .time-cell,
+  .date-cell {
+    font-size: 10px;
+  }
+
+  .qty-cell,
+  .unit-cell,
+  .qty-unit-cell,
+  .price-cell,
+  .total-cell {
+    font-size: 11px;
+  }
+
+  .table-header {
+    flex-wrap: wrap;
+  }
+
+  .pagination {
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .pagination-info {
+    text-align: center;
   }
 }
 
-@media (max-width: 380px) {
+/* ============================================
+   التابلت
+   ============================================ */
+
+@media screen and (min-width: 601px) and (max-width: 900px) {
+
   .reports-wrapper {
-    padding: 9px;
+    padding-inline: 10px !important;
   }
 
-  .period-btn {
-    font-size: 12px;
+  .summary-card {
+    padding: 16px;
+  }
+}
+
+/* ============================================
+   إخفاء الصفحة عند الطباعة المباشرة
+   استخدام صفحة الطباعة المستقلة
+   ============================================ */
+
+@media print {
+
+  .app {
+    display: none !important;
   }
 
-  .period-label {
-    font-size: 12px;
+  body {
+    background: #ffffff;
   }
 }

@@ -2,13 +2,42 @@
 // ============================================
 // طباعة تقرير إخراج المنتجات
 // MyStock - Reports Out Print
+// ✅ نفس تنسيق تقرير إضافة المنتجات
+// ✅ A4 Portrait
+// ✅ ملخص العمليات
+// ✅ جدول الإخراج
+// ✅ التوقيع والختم
 // ============================================
 
 document.addEventListener('DOMContentLoaded', async () => {
   const container = document.getElementById('print-container');
 
+  if (!container) return;
+
+  // ============================================
+  // الترجمة
+  // ============================================
+
   const tr = (key, fallback) =>
     (window.t ? (window.t(key) || fallback) : (fallback || key));
+
+  // ============================================
+  // حماية النصوص
+  // ============================================
+
+  function escapeHTML(value) {
+    return String(value ?? '').replace(/[&<>"']/g, char => ({
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#39;'
+    })[char]);
+  }
+
+  // ============================================
+  // قراءة الفترة من الرابط
+  // ============================================
 
   const params = new URLSearchParams(window.location.search);
 
@@ -37,6 +66,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   try {
+    // ============================================
+    // التحقق من تسجيل الدخول
+    // ============================================
+
     const user = await requireAuth();
 
     if (!user) return;
@@ -44,6 +77,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (window.applyLanguage) {
       window.applyLanguage();
     }
+
+    // ============================================
+    // جلب المؤسسة
+    // ============================================
 
     const { data: profile, error: profileError } = await db
       .from('profiles')
@@ -103,7 +140,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     // ============================================
-    // تنسيق الأرقام والتواريخ
+    // تنسيق التاريخ والوقت والأرقام
     // ============================================
 
     function formatDate(date) {
@@ -124,14 +161,10 @@ document.addEventListener('DOMContentLoaded', async () => {
       });
     }
 
-    function escapeHTML(value) {
-      return String(value ?? '').replace(/[&<>"']/g, char => ({
-        '&': '&amp;',
-        '<': '&lt;',
-        '>': '&gt;',
-        '"': '&quot;',
-        "'": '&#39;'
-      })[char]);
+    function formatQuantity(number) {
+      return Number(number || 0).toLocaleString('fr-FR', {
+        maximumFractionDigits: 2
+      });
     }
 
     // ============================================
@@ -148,145 +181,261 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       return `
         <tr>
-          <td class="number-cell">${formatTime(date)}</td>
+          <td>${formatTime(date)}</td>
 
           <td>${formatDate(date)}</td>
 
-          <td>${escapeHTML(m.profiles?.full_name || '—')}</td>
+          <td>
+            ${escapeHTML(m.profiles?.full_name || '—')}
+          </td>
 
           <td class="product-name">
             ${escapeHTML(product.name || '—')}
           </td>
 
-          <td class="number-cell">${qty.toLocaleString('fr-FR')}</td>
+          <td>${formatQuantity(qty)}</td>
 
-          <td>${escapeHTML(product.unit || '—')}</td>
+          <td>
+            ${escapeHTML(product.unit || '—')}
+          </td>
 
-          <td class="number-cell">${formatNumber(price)} DH</td>
+          <td>
+            ${formatNumber(price)}
+            <span class="currency-symbol">DH</span>
+          </td>
 
-          <td class="number-cell">${formatNumber(total)} DH</td>
+          <td>
+            ${formatNumber(total)}
+            <span class="currency-symbol">DH</span>
+          </td>
         </tr>
       `;
     }).join('');
 
     // ============================================
     // عرض التقرير
+    // نفس هيكل تصميم تقرير الإضافة
     // ============================================
 
     container.innerHTML = `
-      <div class="report-header">
-        <h1>
-          ${tr('reports_out_title', 'Outgoing Products Report')}
-        </h1>
+      <!-- رأس التقرير -->
 
-        <p>${tr('reports_period', 'Report Period')}</p>
+      <div class="print-header">
 
-        <div class="report-period">
-          ${formatDate(start)} — ${formatDate(end)}
+        <h1>MyStock</h1>
+
+        <h2>
+          ${tr(
+            'reports_out_title',
+            'Outgoing Products Report'
+          )}
+        </h2>
+
+        <div class="print-meta">
+
+          <span>
+            <strong>
+              ${tr('reports_period', 'Report Period')}:
+            </strong>
+
+            ${formatDate(start)} — ${formatDate(end)}
+          </span>
+
+          <span>
+            <strong>
+              ${tr('reports_print_date', 'Print Date')}:
+            </strong>
+
+            ${formatDate(new Date())}
+          </span>
+
         </div>
 
-        <p>
-          ${tr('reports_print_date', 'Print Date')}:
-          ${formatDate(new Date())}
-        </p>
       </div>
 
-      <div class="report-summary">
+      <!-- ملخص التقرير -->
+
+      <div class="summary-row">
+
         <div class="summary-box">
-          <div class="summary-label">
-            ${tr('reports_out_total_qty', 'Total Outgoing Quantity')}
+
+          <div class="summary-title">
+            ${tr(
+              'reports_out_total_qty',
+              'Total Outgoing Quantity'
+            )}
           </div>
 
-          <div class="summary-value">
-            ${totalQty.toLocaleString('fr-FR')}
+          <div class="summary-val">
+            ${formatQuantity(totalQty)}
           </div>
+
         </div>
 
         <div class="summary-box">
-          <div class="summary-label">
-            ${tr('reports_out_total_value', 'Total Outgoing Value')}
+
+          <div class="summary-title">
+            ${tr(
+              'reports_out_total_value',
+              'Total Outgoing Value'
+            )}
           </div>
 
-          <div class="summary-value" dir="ltr">
-            ${formatNumber(totalValue)} DH
+          <div class="summary-val" dir="ltr">
+            ${formatNumber(totalValue)}
+
+            <span class="currency-symbol">DH</span>
           </div>
+
         </div>
+
       </div>
 
-      <div class="report-table-wrapper">
-        <table class="report-table">
-          <thead>
-            <tr>
-              <th>${tr('reports_time', 'الوقت')}</th>
-              <th>${tr('reports_date_only', 'التاريخ')}</th>
-              <th>${tr('reports_user', 'المستخدم')}</th>
-              <th>${tr('reports_product', 'المنتج')}</th>
-              <th>${tr('reports_qty', 'الكمية')}</th>
-              <th>${tr('reports_unit', 'الوحدة')}</th>
-              <th>${tr('reports_sell_price', 'سعر البيع')}</th>
-              <th>${tr('reports_total_value', 'إجمالي القيمة')}</th>
-            </tr>
-          </thead>
+      <!-- جدول العمليات -->
 
-          <tbody>
-            ${
-              rows ||
-              `<tr>
-                <td colspan="8" class="no-data">
-                  ${tr('reports_no_data', 'No data for this period')}
-                </td>
-              </tr>`
-            }
-          </tbody>
+      <table class="report-table">
 
-          <tfoot>
-            <tr>
-              <td colspan="4">
-                ${tr('reports_grand_total', 'المجموع الكلي')}
-              </td>
-
-              <td>${totalQty.toLocaleString('fr-FR')}</td>
-
-              <td></td>
-              <td></td>
-
-              <td dir="ltr">
-                ${formatNumber(totalValue)} DH
-              </td>
-            </tr>
-          </tfoot>
-        </table>
-      </div>
-
-      <div class="signature-section">
-        <table class="sig-table">
+        <thead>
           <tr>
-            <td>
-              <div class="sig-line">
-                <p>
-                  ${tr('reports_manager_sig', 'توقيع المسؤول')}
-                </p>
-              </div>
-            </td>
+            <th>
+              ${tr('reports_time', 'الوقت')}
+            </th>
 
-            <td>
-              <div class="stamp-circle">
-                <p>
-                  ${tr('reports_org_stamp', 'ختم المؤسسة')}
-                </p>
-              </div>
-            </td>
+            <th>
+              ${tr('reports_date_only', 'التاريخ')}
+            </th>
+
+            <th>
+              ${tr('reports_user', 'المستخدم')}
+            </th>
+
+            <th>
+              ${tr('reports_product', 'المنتج')}
+            </th>
+
+            <th>
+              ${tr('reports_qty', 'الكمية')}
+            </th>
+
+            <th>
+              ${tr('reports_unit', 'الوحدة')}
+            </th>
+
+            <th>
+              ${tr('reports_sell_price', 'سعر البيع')}
+            </th>
+
+            <th>
+              ${tr('reports_total_value', 'إجمالي القيمة')}
+            </th>
           </tr>
-        </table>
-      </div>
+        </thead>
 
-      <div class="print-actions">
-        <button onclick="window.print()">
+        <tbody>
+          ${
+            rows ||
+            `
+              <tr>
+                <td colspan="8" class="no-data">
+                  ${tr(
+                    'reports_no_data',
+                    'No data for this period'
+                  )}
+                </td>
+              </tr>
+            `
+          }
+        </tbody>
+
+        <tfoot>
+          <tr>
+
+            <td colspan="4">
+              ${tr(
+                'reports_grand_total',
+                'المجموع الكلي'
+              )}
+            </td>
+
+            <td>
+              ${formatQuantity(totalQty)}
+            </td>
+
+            <td></td>
+
+            <td></td>
+
+            <td>
+              ${formatNumber(totalValue)}
+              <span class="currency-symbol">DH</span>
+            </td>
+
+          </tr>
+        </tfoot>
+
+      </table>
+
+      <!-- التوقيع والختم -->
+
+      <table class="sig-table">
+
+        <tr>
+
+          <td>
+            <div class="sig-line">
+              <p>
+                ${tr(
+                  'reports_manager_sig',
+                  'توقيع المسؤول'
+                )}
+              </p>
+            </div>
+          </td>
+
+          <td>
+            <div class="stamp-circle">
+              <p>
+                ${tr(
+                  'reports_org_stamp',
+                  'ختم المؤسسة'
+                )}
+              </p>
+            </div>
+          </td>
+
+        </tr>
+
+      </table>
+
+      <!-- زر الطباعة -->
+
+      <div class="no-print" style="text-align:center; margin-top:20px;">
+
+        <button
+          type="button"
+          onclick="window.print()"
+          style="
+            border:none;
+            background:#000;
+            color:#fff;
+            padding:10px 25px;
+            cursor:pointer;
+            border-radius:4px;
+            font-size:14px;
+          "
+        >
           <i class="fas fa-print"></i>
+
           ${tr('reports_print', 'Print')}
+
         </button>
+
       </div>
     `;
+
+    // ============================================
+    // عنوان الصفحة
+    // ============================================
 
     document.title = tr(
       'reports_out_title',
@@ -294,13 +443,21 @@ document.addEventListener('DOMContentLoaded', async () => {
     );
 
   } catch (err) {
+
     console.error('Reports Out Print Error:', err);
 
     container.innerHTML = `
       <div class="no-data">
-        ${tr('reports_error_loading', 'Error loading report')}
+
+        ${tr(
+          'reports_error_loading',
+          'Error loading report'
+        )}
+
         <br>
+
         ${escapeHTML(err.message)}
+
       </div>
     `;
   }
