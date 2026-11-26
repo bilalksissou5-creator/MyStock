@@ -1038,6 +1038,7 @@ const translations = {
     reports_remove_description: 'عرض ومتابعة عمليات إخراج المنتجات من المخزون.',
     reports_profit_title: 'تقارير الأرباح',
     reports_profit_description: 'متابعة الأرباح الناتجة عن عمليات البيع.',
+    period_type: 'نوع الفترة',
 
   },
 
@@ -2067,6 +2068,7 @@ const translations = {
     reports_remove_description: 'Consulter et suivre les opérations de sortie de produits du stock.',
     reports_profit_title: 'Rapports des bénéfices',
     reports_profit_description: 'Suivre les bénéfices générés par les opérations de vente.',
+    period_type: 'Period Type',
   },
 
   en: {
@@ -3097,6 +3099,7 @@ const translations = {
     reports_remove_description: 'View and track product removals from inventory.', 
     reports_profit_title: 'Profit Reports',
     reports_profit_description: 'Track profits generated from sales.',
+    period_type: 'Type de période',
   },
 
   
