@@ -1,3 +1,4 @@
+
 // ============================================
 // صفحة تفاصيل المنتج - الكود الكامل
 // ✅ تقسيم الصفحة إلى عمودين (بطاقة المنتج | بطاقات الإعدادات)
@@ -34,7 +35,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (!unit) return '';
     const lang = window.getCurrentLang ? window.getCurrentLang() : 'ar';
     if (lang === 'ar') return unit;
-    
+
     const translations = {
       'قطعة': { en: 'Piece', fr: 'Pièce' },
       'كرتونة': { en: 'Carton', fr: 'Carton' },
@@ -44,7 +45,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       'متر': { en: 'Meter', fr: 'Mètre' },
       'علبة': { en: 'Box', fr: 'Boîte' }
     };
-    
+
     return translations[unit] && translations[unit][lang] ? translations[unit][lang] : unit;
   }
 
@@ -66,8 +67,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     .eq('product_id', productId)
     .limit(1);
 
-  const mainBarcode = (barcodes && barcodes.length > 0) 
-      ? barcodes[0].barcode 
+  const mainBarcode = (barcodes && barcodes.length > 0)
+      ? barcodes[0].barcode
       : (product.qr_code || product.sku || '');
 
   const { data: profile } = await db
@@ -111,7 +112,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       <!-- ✅ العمود الأول: بطاقة المنتج الأساسية -->
       <div class="main-col">
         <div class="product-card-detail">
-          
+
           <div class="product-image" id="product-image-container">
             ${product.image_url
               ? `<img src="${product.image_url}" alt="${product.name ?? tr('products_no_name')}">`
@@ -175,7 +176,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       <!-- ✅ العمود الثاني: بطاقات الإعدادات (سعر البيع + المخزون) -->
       <div class="side-col">
-        
+
         <!-- بطاقة سعر البيع -->
         <div class="product-card-detail">
           <div class="sell-price-section" style="border: none; padding-top: 0; margin-top: 0;">
@@ -219,7 +220,7 @@ document.addEventListener('DOMContentLoaded', async () => {
               <small class="field-hint">${tr('low_stock_field_hint')}</small>
             </div>
           </div>
-          
+
           <!-- ✅ زر الحذف أصبح الآن داخل البطاقة الأخيرة -->
           <div style="margin-top: 20px; padding-top: 16px; border-top: 1px solid #f0f0f0;">
             <button class="btn-danger" id="delete-btn" style="width: 100%; display: flex; justify-content: center; gap: 8px;">
@@ -279,29 +280,29 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (typeof notifyOrganization !== 'function' || !profile?.organization_id) return;
     const threshold = Number(product.low_stock_threshold ?? 10);
     const isLow = field === 'qty' && Number(value) <= threshold;
-    
+
     try {
       if (isLow) {
         await notifyOrganization({
-          orgId: profile.organization_id, 
+          orgId: profile.organization_id,
           title: tr('low_stock_alert_title'),
           message: tr('low_stock_alert_single').replace('{name}', product.name).replace('{qty}', value).replace('{threshold}', threshold),
-          type: 'warning', 
-          link: `/products/detail.html?id=${productId}`, 
+          type: 'warning',
+          link: `/products/detail.html?id=${productId}`,
           userName: profile.full_name || null,
         });
       } else {
         await notifyOrganization({
-          orgId: profile.organization_id, 
+          orgId: profile.organization_id,
           title: tr('prod_detail_notif_edit_title'),
           message: `${profile.full_name || tr('prod_detail_user')} ${tr('prod_detail_notif_edit_msg')} ${fieldLabels[field] || field} "${product.name}" ${tr('prod_detail_to')} "${value}"`,
-          type: 'info', 
-          link: `/products/detail.html?id=${productId}`, 
+          type: 'info',
+          link: `/products/detail.html?id=${productId}`,
           userName: profile.full_name || null,
         });
       }
-    } catch (e) { 
-      console.warn(e); 
+    } catch (e) {
+      console.warn(e);
     }
   }
 
@@ -322,23 +323,23 @@ document.addEventListener('DOMContentLoaded', async () => {
     initialFieldValues[field] = String(el.dataset.value || '');
 
     inlineEdit({
-      el, 
-      table: 'products', 
-      id: productId, 
-      field, 
+      el,
+      table: 'products',
+      id: productId,
+      field,
       type,
       // ✅ السطر السحري: تمرير دالة الترجمة لحقل الوحدة فقط
       displayFormatter: field === 'unit' ? translateUnit : null,
       onSave: async (savedField, newValue) => {
         if (savedField === 'qty' || savedField === 'price') recalcTotal();
-        if (savedField === 'qty') { 
-          el.dataset.value = newValue; 
-          updateQtyStyle(); 
+        if (savedField === 'qty') {
+          el.dataset.value = newValue;
+          updateQtyStyle();
         }
 
         if (String(newValue) !== String(initialFieldValues[field])) {
           await sendNotification(field, newValue);
-          initialFieldValues[field] = String(newValue); 
+          initialFieldValues[field] = String(newValue);
         }
       },
     });
@@ -355,23 +356,23 @@ document.addEventListener('DOMContentLoaded', async () => {
         try {
           const { error: updateError } = await db.from('products').update({ low_stock_threshold: newThreshold }).eq('id', productId);
           if (updateError) throw new Error(updateError.message);
-          
+
           product.low_stock_threshold = newThreshold;
           updateQtyStyle();
 
           const currentQty = Number(product.qty ?? 0);
           if (currentQty <= newThreshold && typeof notifyOrganization === 'function' && profile?.organization_id) {
             await notifyOrganization({
-              orgId: profile.organization_id, 
+              orgId: profile.organization_id,
               title: tr('low_stock_alert_title'),
               message: tr('low_stock_alert_already').replace('{name}', product.name).replace('{qty}', currentQty).replace('{threshold}', newThreshold),
-              type: 'warning', 
-              link: `/products/detail.html?id=${productId}`, 
+              type: 'warning',
+              link: `/products/detail.html?id=${productId}`,
               userName: profile.full_name || null,
             });
           }
-        } catch (err) { 
-          console.error('فشل حفظ حد التنبيه:', err); 
+        } catch (err) {
+          console.error('فشل حفظ حد التنبيه:', err);
         }
       }, 800);
     });
@@ -401,11 +402,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         if (typeof notifyOrganization === 'function' && profile?.organization_id) {
           await notifyOrganization({
-            orgId: profile.organization_id, 
+            orgId: profile.organization_id,
             title: tr('prod_detail_notif_sell_title'),
             message: `${profile.full_name || tr('prod_detail_user')} ${newValue ? tr('prod_detail_notif_sell_on') : tr('prod_detail_notif_sell_off')} "${product.name}"`,
-            type: 'info', 
-            link: `/products/detail.html?id=${productId}`, 
+            type: 'info',
+            link: `/products/detail.html?id=${productId}`,
             userName: profile.full_name || null,
           });
         }
@@ -430,46 +431,75 @@ document.addEventListener('DOMContentLoaded', async () => {
 
           if (typeof notifyOrganization === 'function' && profile?.organization_id) {
             await notifyOrganization({
-              orgId: profile.organization_id, 
+              orgId: profile.organization_id,
               title: tr('prod_detail_notif_sell_title'),
               message: `${profile.full_name || tr('prod_detail_user')} ${tr('prod_detail_notif_sell_edit')} "${product.name}" ${tr('prod_detail_to')} "${newPrice}"`,
-              type: 'info', 
-              link: `/products/detail.html?id=${productId}`, 
+              type: 'info',
+              link: `/products/detail.html?id=${productId}`,
               userName: profile.full_name || null,
             });
           }
-        } catch (err) { 
-          console.error('فشل حفظ سعر البيع:', err); 
+        } catch (err) {
+          console.error('فشل حفظ سعر البيع:', err);
         }
       }, 800);
     });
   }
 
   const deleteBtn = document.getElementById('delete-btn');
-if (deleteBtn) {
-  deleteBtn.addEventListener('click', async () => {
-    if (!confirm(tr('prod_detail_confirm_delete'))) return;
+  if (deleteBtn) {
+    deleteBtn.addEventListener('click', async () => {
+      if (!confirm(tr('prod_detail_confirm_delete'))) return;
 
-    console.log("زر الحذف يعمل! جاري التحديث..."); // ✅ أضف هذا السطر
+      console.log("زر الحذف يعمل! جاري التحديث...");
 
-    const { error } = await db.from('products').update({ 
-      deleted_at: new Date().toISOString(),
-      deleted_by: user.id 
-    }).eq('id', productId);
+      // استخدام التوقيت نفسه في الحذف وفي سجل العمليات
+      const deletedAt = new Date().toISOString();
 
-    if (error) {
-      console.error("خطأ أثناء التحديث:", error); // ✅ أضف هذا السطر
-      alert(tr('prod_detail_err') + ' ' + error.message);
-      return;
-    }
+      const { error } = await db.from('products').update({
+        deleted_at: deletedAt,
+        deleted_by: user.id
+      }).eq('id', productId);
+
+      if (error) {
+        console.error("خطأ أثناء التحديث:", error);
+        alert(tr('prod_detail_err') + ' ' + error.message);
+        return;
+      }
+
+      // تسجيل الحذف المؤقت في سجل العمليات بعد نجاح الحذف
+      const { error: logError } = await db
+        .from('operation_logs')
+        .insert({
+          organization_id: product.organization_id,
+          operation_type: 'delete',
+          entity_type: 'product',
+          product_id: productId,
+          performed_by: user.id,
+          old_value: {
+            name: product.name,
+            sku: product.sku,
+            category: product.category,
+            unit: product.unit,
+            qty: product.qty,
+            price: product.price
+          },
+          new_value: {
+            deleted_at: deletedAt
+          }
+        });
+
+      if (logError) {
+        console.error('فشل تسجيل حذف المنتج:', logError);
+      }
 
       if (typeof notifyOrganization === 'function' && profile?.organization_id) {
         await notifyOrganization({
-          orgId: profile.organization_id, 
+          orgId: profile.organization_id,
           title: tr('prod_detail_notif_del_title'),
           message: `${profile.full_name || tr('prod_detail_user')} ${tr('prod_detail_notif_del_msg')} "${product.name}"`,
-          type: 'danger', 
-          link: '/products/list.html', 
+          type: 'danger',
+          link: '/products/list.html',
           userName: profile.full_name || null,
         });
       }
@@ -481,4 +511,3 @@ if (deleteBtn) {
 
 // ============================================
 // نهاية صفحة تفاصيل المنتج
-// ============================================

@@ -1040,6 +1040,17 @@ const translations = {
     reports_profit_description: 'متابعة الأرباح الناتجة عن عمليات البيع.',
     reports_period_type: 'نوع الفترة',
 
+    reports_out_title: 'تقرير إخراج المنتجات',
+    reports_out_products: 'المنتجات المُخرجة',
+    reports_out_total_qty: 'إجمالي الكميات المُخرجة',
+    reports_out_total_value: 'إجمالي قيمة المنتجات المُخرجة',
+    reports_qty: 'الكمية',
+    reports_unit: 'الوحدة',
+    reports_sell_price: 'سعر البيع',
+    reports_period: 'الفترة',
+    reports_print_date: 'تاريخ الطباعة',
+    reports_error_loading: 'حدث خطأ أثناء تحميل التقرير',
+
   },
 
   fr: {
@@ -2069,6 +2080,17 @@ const translations = {
     reports_profit_title: 'Rapports des bénéfices',
     reports_profit_description: 'Suivre les bénéfices générés par les opérations de vente.',
     reports_period_type: 'Period Type',
+
+    reports_out_title: 'Rapport des sorties de produits',
+    reports_out_products: 'Produits sortis',
+    reports_out_total_qty: 'Quantité totale sortie',
+    reports_out_total_value: 'Valeur totale des produits sortis',
+    reports_qty: 'Quantité',
+    reports_unit: 'Unité',
+    reports_sell_price: 'Prix de vente',
+    reports_period: 'Période',
+    reports_print_date: "Date d'impression",
+    reports_error_loading: 'Une erreur est survenue lors du chargement du rapport',
     
   },
 
@@ -3101,6 +3123,17 @@ const translations = {
     reports_profit_title: 'Profit Reports',
     reports_profit_description: 'Track profits generated from sales.',
     reports_period_type: 'Type de période',
+
+    reports_out_title: 'Product Out Report',
+    reports_out_products: 'Products Out',
+    reports_out_total_qty: 'Total Quantity Out',
+    reports_out_total_value: 'Total Value of Products Out',
+    reports_qty: 'Quantity',
+    reports_unit: 'Unit',
+    reports_sell_price: 'Selling Price',
+    reports_period: 'Period',
+    reports_print_date: 'Print Date',
+    reports_error_loading: 'An error occurred while loading the report',
   },
 
   

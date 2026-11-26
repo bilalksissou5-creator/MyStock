@@ -1,0 +1,305 @@
+
+/* ============================================
+   طباعة تقرير إخراج المنتجات
+   MyStock - A4 Portrait
+   ============================================ */
+
+@page {
+  size: A4 portrait;
+  margin: 10mm;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Nunito', 'Cairo', sans-serif;
+  background: #fff;
+  color: #222;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+.print-container {
+  width: 100%;
+  max-width: 190mm;
+  margin: 0 auto;
+  padding: 10px;
+}
+
+.loading {
+  padding: 40px;
+  text-align: center;
+  color: #777;
+  font-size: 14px;
+}
+
+/* ============================================
+   رأس التقرير
+   ============================================ */
+
+.report-header {
+  text-align: center;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid #222;
+}
+
+.report-header h1 {
+  margin: 0 0 8px;
+  font-size: 21px;
+  font-weight: 800;
+  color: #111;
+}
+
+.report-header p {
+  margin: 4px 0;
+  font-size: 12px;
+  color: #555;
+}
+
+.report-period {
+  margin-top: 10px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* ============================================
+   ملخص التقرير
+   ============================================ */
+
+.report-summary {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.summary-box {
+  border: 1px solid #bbb;
+  border-radius: 5px;
+  padding: 10px;
+  text-align: center;
+}
+
+.summary-box .summary-label {
+  font-size: 11px;
+  color: #666;
+  margin-bottom: 6px;
+}
+
+.summary-box .summary-value {
+  font-size: 16px;
+  font-weight: 800;
+  color: #111;
+}
+
+/* ============================================
+   جدول التقرير
+   ============================================ */
+
+.report-table-wrapper {
+  width: 100%;
+  overflow: visible;
+}
+
+.report-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: auto;
+}
+
+.report-table th,
+.report-table td {
+  border: 1px solid #aaa;
+  padding: 7px 5px;
+  font-size: 10px;
+  text-align: center;
+  vertical-align: middle;
+}
+
+.report-table th {
+  background: #eee !important;
+  color: #111;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.report-table td {
+  color: #333;
+}
+
+.report-table tbody tr {
+  page-break-inside: avoid;
+  break-inside: avoid;
+}
+
+.report-table tfoot td {
+  font-weight: 800;
+  background: #f4f4f4 !important;
+}
+
+.report-table .product-name {
+  text-align: right;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.report-table .number-cell {
+  direction: ltr;
+  white-space: nowrap;
+}
+
+/* ============================================
+   التوقيع والختم
+   ============================================ */
+
+.signature-section {
+  width: 100%;
+  margin-top: 35px;
+  page-break-inside: avoid;
+  break-inside: avoid;
+}
+
+.sig-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.sig-table td {
+  width: 50%;
+  border: none;
+  text-align: center;
+  vertical-align: top;
+  padding: 0 15px;
+}
+
+.sig-line {
+  width: 100%;
+  height: 65px;
+  border: 1px solid #aaa;
+  border-radius: 5px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 7px 3px;
+}
+
+.stamp-circle {
+  width: 95px;
+  height: 65px;
+  margin: 0 auto;
+  border: 1px solid #aaa;
+  border-radius: 5px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 7px 3px;
+}
+
+.sig-line p,
+.stamp-circle p {
+  margin: 0;
+  font-size: 10px;
+  font-weight: 700;
+  color: #555;
+}
+
+/* ============================================
+   رسالة عدم وجود بيانات
+   ============================================ */
+
+.no-data {
+  text-align: center;
+  padding: 30px 10px;
+  color: #777;
+  font-size: 13px;
+}
+
+/* ============================================
+   أزرار الشاشة
+   ============================================ */
+
+.print-actions {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin: 20px 0;
+}
+
+.print-actions button {
+  border: none;
+  border-radius: 6px;
+  padding: 10px 18px;
+  background: #111;
+  color: #fff;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+/* ============================================
+   تجاوب الشاشة
+   ============================================ */
+
+@media screen and (max-width: 600px) {
+  .print-container {
+    padding: 8px;
+  }
+
+  .report-header h1 {
+    font-size: 18px;
+  }
+
+  .report-table th,
+  .report-table td {
+    font-size: 9px;
+    padding: 6px 3px;
+  }
+}
+
+/* ============================================
+   إعدادات الطباعة
+   ============================================ */
+
+@media print {
+  html,
+  body {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    background: #fff;
+  }
+
+  .print-container {
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .print-actions,
+  .loading {
+    display: none !important;
+  }
+
+  .report-header,
+  .report-summary,
+  .report-table-wrapper,
+  .signature-section {
+    page-break-inside: avoid;
+  }
+
+  .report-table th {
+    background: #eee !important;
+  }
+
+  .report-table tfoot td {
+    background: #f4f4f4 !important;
+  }
+}

@@ -1,0 +1,304 @@
+
+/* ============================================
+   تقرير إخراج المنتجات
+   MyStock - Reports Out
+   ============================================ */
+
+.reports-wrapper {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 16px;
+  box-sizing: border-box;
+}
+
+.reports-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+.reports-header h2 {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 700;
+  color: #222;
+}
+
+.reports-filters {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+
+.period-btn {
+  border: 1px solid #ddd;
+  background: #fff;
+  color: #333;
+  border-radius: 8px;
+  padding: 9px 15px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.period-btn:hover {
+  background: #f5f5f5;
+}
+
+.period-btn.active {
+  background: #111;
+  border-color: #111;
+  color: #fff;
+}
+
+.custom-date {
+  min-width: 190px;
+  height: 38px;
+  padding: 0 10px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background: #fff;
+  font-size: 13px;
+  color: #333;
+}
+
+.period-navigation {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 18px;
+}
+
+.period-navigation button {
+  width: 38px;
+  height: 38px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background: #fff;
+  color: #222;
+  cursor: pointer;
+}
+
+.period-navigation button:hover {
+  background: #f3f3f3;
+}
+
+.period-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+  text-align: center;
+}
+
+.reports-summary {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.summary-card {
+  min-width: 0;
+  padding: 16px;
+  background: #fff;
+  border: 1px solid #e8e8e8;
+  border-radius: 10px;
+}
+
+.summary-card h4 {
+  margin: 0 0 10px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #777;
+}
+
+.summary-card .summary-value {
+  font-size: 21px;
+  font-weight: 700;
+  color: #222;
+  overflow-wrap: anywhere;
+}
+
+.reports-table-container {
+  width: 100%;
+  overflow-x: auto;
+  background: #fff;
+  border: 1px solid #e5e5e5;
+  border-radius: 10px;
+  -webkit-overflow-scrolling: touch;
+}
+
+.reports-table {
+  width: 100%;
+  min-width: 850px;
+  border-collapse: collapse;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.reports-table th,
+.reports-table td {
+  padding: 12px 10px;
+  border-bottom: 1px solid #eee;
+  font-size: 13px;
+}
+
+.reports-table th {
+  background: #f7f7f7;
+  color: #333;
+  font-weight: 700;
+}
+
+.reports-table td {
+  color: #444;
+}
+
+.reports-table tbody tr:hover {
+  background: #fafafa;
+}
+
+.reports-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.reports-empty {
+  padding: 30px 15px;
+  text-align: center;
+  color: #888;
+  font-size: 14px;
+}
+
+.reports-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin: 20px 0;
+}
+
+.reports-pagination button {
+  min-width: 38px;
+  height: 36px;
+  padding: 0 12px;
+  border: 1px solid #ddd;
+  border-radius: 7px;
+  background: #fff;
+  color: #333;
+  cursor: pointer;
+}
+
+.reports-pagination button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.reports-pagination button:hover:not(:disabled) {
+  background: #f3f3f3;
+}
+
+.reports-page-info {
+  font-size: 13px;
+  color: #666;
+}
+
+.reports-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-bottom: 15px;
+}
+
+.reports-print-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 8px;
+  background: #111;
+  color: #fff;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.reports-print-btn:hover {
+  background: #333;
+}
+
+/* ============================================
+   تجاوب الهاتف
+   ============================================ */
+
+@media (max-width: 768px) {
+  .reports-wrapper {
+    padding: 12px;
+  }
+
+  .reports-header h2 {
+    font-size: 19px;
+  }
+
+  .reports-filters {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .period-btn {
+    width: 100%;
+    padding: 10px 6px;
+  }
+
+  .custom-date {
+    width: 100%;
+    min-width: 0;
+    grid-column: 1 / -1;
+    box-sizing: border-box;
+  }
+
+  .reports-summary {
+    grid-template-columns: 1fr;
+  }
+
+  .summary-card {
+    padding: 13px;
+  }
+
+  .summary-card .summary-value {
+    font-size: 19px;
+  }
+
+  .period-navigation {
+    justify-content: space-between;
+  }
+
+  .reports-actions {
+    justify-content: stretch;
+  }
+
+  .reports-print-btn {
+    width: 100%;
+  }
+}
+
+@media (max-width: 380px) {
+  .reports-wrapper {
+    padding: 9px;
+  }
+
+  .period-btn {
+    font-size: 12px;
+  }
+
+  .period-label {
+    font-size: 12px;
+  }
+}
