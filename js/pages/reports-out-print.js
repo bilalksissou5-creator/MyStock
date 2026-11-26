@@ -2,6 +2,7 @@
 // ============================================
 // طباعة تقرير إخراج المنتجات
 // MyStock - Reports Out Print
+// ✅ اسم المؤسسة في أعلى التقرير
 // ✅ نفس تنسيق تقرير إضافة المنتجات
 // ✅ A4 Portrait
 // ✅ ملخص العمليات
@@ -79,7 +80,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // ============================================
-    // جلب المؤسسة
+    // جلب المؤسسة المرتبطة بالمستخدم
     // ============================================
 
     const { data: profile, error: profileError } = await db
@@ -93,6 +94,20 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     const orgId = profile.organization_id;
+
+    // ============================================
+    // جلب اسم المؤسسة
+    // ============================================
+
+    const { data: organization, error: orgError } = await db
+      .from('organizations')
+      .select('name')
+      .eq('id', orgId)
+      .single();
+
+    if (orgError) throw orgError;
+
+    const organizationName = organization?.name || '—';
 
     // ============================================
     // جلب عمليات إخراج المنتجات
@@ -214,7 +229,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // ============================================
     // عرض التقرير
-    // نفس هيكل تصميم تقرير الإضافة
     // ============================================
 
     container.innerHTML = `
@@ -222,7 +236,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       <div class="print-header">
 
-        <h1>MyStock</h1>
+        <h1>${escapeHTML(organizationName)}</h1>
 
         <h2>
           ${tr(
