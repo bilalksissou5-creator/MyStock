@@ -217,8 +217,8 @@ body {
 /* المستطيلان */
 .sig-line,
 .stamp-circle {
-  width: 85px;
-  height: 55px;
+  width: 100px;
+  height: 60px;
   border: 1px solid #000;
   border-radius: 0;
   margin: 5px auto 0;
