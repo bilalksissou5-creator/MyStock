@@ -1,10 +1,11 @@
 
-// ============================================
-// صفحة طباعة التقارير (Reports Print)
-// ✅ جلب جميع عمليات الإضافة
-// ✅ حساب إجمالي الكمية والقيمة
-// ✅ توقيع وختم داخل مستطيلين متطابقين
-// ============================================
+ // ============================================
+ // صفحة طباعة التقارير (Reports Print)
+ // ✅ جلب جميع عمليات الإضافة
+ // ✅ حساب إجمالي الكمية والقيمة
+ // ✅ توقيع وختم داخل مستطيلين متطابقين
+ // ✅ زر الطباعة أسفل التقرير
+ // ============================================
 
 document.addEventListener('DOMContentLoaded', async () => {
   const user = await requireAuth();
@@ -28,6 +29,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   const container = document.getElementById('print-content');
 
+  if (!container) return;
+
   if (!startIso || !endIso) {
     container.innerHTML =
       '<h2 style="text-align:center;color:red;">خطأ: تواريخ غير صالحة</h2>';
@@ -43,220 +46,289 @@ document.addEventListener('DOMContentLoaded', async () => {
     return;
   }
 
-  // جلب اسم المنظمة
-  const { data: profile, error: profileError } = await db
-    .from('profiles')
-    .select('organization_id, organizations(name)')
-    .eq('id', user.id)
-    .single();
+  try {
+    // ============================================
+    // جلب اسم المؤسسة
+    // ============================================
 
-  if (profileError || !profile?.organization_id) {
-    container.innerHTML =
-      '<h2 style="text-align:center;color:red;">Organization not found</h2>';
-    return;
-  }
+    const { data: profile, error: profileError } = await db
+      .from('profiles')
+      .select('organization_id, organizations(name)')
+      .eq('id', user.id)
+      .single();
 
-  const orgName = profile.organizations?.name || 'MyStock';
+    if (profileError || !profile?.organization_id) {
+      throw new Error('Organization not found');
+    }
 
-  // جلب جميع البيانات في الفترة المحددة
-  const { data: movements, error } = await db
-    .from('stock_movements')
-    .select(`
-      id, quantity, created_at, performed_by,
-      products (name, price, unit, suppliers (name)),
-      profiles (full_name)
-    `)
-    .eq('organization_id', profile.organization_id)
-    .eq('type', 'in')
-    .is('deleted_at', null)
-    .gte('created_at', start.toISOString())
-    .lte('created_at', end.toISOString())
-    .order('created_at', { ascending: false });
+    const orgName = profile.organizations?.name || 'MyStock';
 
-  if (error) {
-    container.innerHTML =
-      `<h2 style="text-align:center;color:red;">${error.message}</h2>`;
-    return;
-  }
+    // ============================================
+    // جلب جميع البيانات في الفترة المحددة
+    // ============================================
 
-  const items = movements || [];
+    const { data: movements, error } = await db
+      .from('stock_movements')
+      .select(`
+        id, quantity, created_at, performed_by,
+        products (name, price, unit, suppliers (name)),
+        profiles (full_name)
+      `)
+      .eq('organization_id', profile.organization_id)
+      .eq('type', 'in')
+      .is('deleted_at', null)
+      .gte('created_at', start.toISOString())
+      .lte('created_at', end.toISOString())
+      .order('created_at', { ascending: false });
 
-  // حساب المجاميع
-  let totalQty = 0;
-  let totalVal = 0;
+    if (error) throw error;
 
-  items.forEach(m => {
-    const q = Number(m.quantity || 0);
-    const p = Number(m.products?.price || 0);
+    const items = movements || [];
 
-    totalQty += q;
-    totalVal += q * p;
-  });
+    // ============================================
+    // حساب المجاميع
+    // ============================================
 
-  // تنسيق التاريخ والوقت
-  const formatDate = d => d.toLocaleDateString('fr-FR');
+    let totalQty = 0;
+    let totalVal = 0;
 
-  const formatTime = d => d.toLocaleTimeString('fr-FR', {
-    hour: '2-digit',
-    minute: '2-digit'
-  });
+    items.forEach(m => {
+      const q = Number(m.quantity || 0);
+      const p = Number(m.products?.price || 0);
 
-  // أسماء الفترات
-  const periodMap = {
-    today: tr('reports_today', 'اليوم'),
-    week: tr('reports_week', 'أسبوع'),
-    month: tr('reports_month', 'شهر'),
-    year: tr('reports_year', 'سنة'),
-    custom: tr('reports_custom', 'مخصص')
-  };
+      totalQty += q;
+      totalVal += q * p;
+    });
 
-  // بناء صفوف الجدول
-  let rowsHtml = items.map(m => {
-    const p = m.products || {};
-    const date = new Date(m.created_at);
-    const quantity = Number(m.quantity || 0);
-    const price = Number(p.price || 0);
-    const itemTotal = quantity * price;
+    // ============================================
+    // تنسيق التاريخ والوقت
+    // ============================================
 
-    return `
-      <tr>
-        <td>${formatTime(date)}</td>
-        <td>${formatDate(date)}</td>
-        <td>${m.profiles?.full_name || '—'}</td>
-        <td>${p.suppliers?.name || '—'}</td>
-        <td>${p.name || '—'}</td>
-        <td>${m.quantity} ${p.unit || ''}</td>
-        <td dir="ltr">
-          ${price.toFixed(2)}
-          <span class="currency-symbol">DH</span>
-        </td>
-        <td dir="ltr">
-          ${itemTotal.toFixed(2)}
-          <span class="currency-symbol">DH</span>
-        </td>
-      </tr>
-    `;
-  }).join('');
+    const formatDate = d => d.toLocaleDateString('fr-FR');
 
-  if (items.length === 0) {
-    rowsHtml = `
-      <tr>
-        <td colspan="8" style="text-align:center;padding:20px;">
-          ${tr('reports_no_data', 'لا توجد بيانات')}
-        </td>
-      </tr>
-    `;
-  }
+    const formatTime = d => d.toLocaleTimeString('fr-FR', {
+      hour: '2-digit',
+      minute: '2-digit'
+    });
 
-  // بناء صفحة التقرير
-  container.innerHTML = `
-    <div class="print-header">
-      <h1>${orgName}</h1>
+    // ============================================
+    // أسماء الفترات
+    // ============================================
 
-      <h2>
-        ${tr('reports_add_products', 'تقرير إضافة المنتجات')}
-      </h2>
+    const periodMap = {
+      today: tr('reports_today', 'اليوم'),
+      week: tr('reports_week', 'أسبوع'),
+      month: tr('reports_month', 'شهر'),
+      year: tr('reports_year', 'سنة'),
+      custom: tr('reports_custom', 'مخصص')
+    };
 
-      <div class="print-meta">
-        <span>
-          <strong>
-            ${tr('reports_period_type', 'نوع الفترة')}:
-          </strong>
-          ${periodMap[periodKey] || '—'}
-        </span>
+    // ============================================
+    // حماية النصوص
+    // ============================================
 
-        <span>
-          <strong>
-            ${tr('reports_date_range', 'الفترة المختارة')}:
-          </strong>
-          ${formatDate(start)} — ${formatDate(end)}
-        </span>
-      </div>
-    </div>
+    function escapeHTML(value) {
+      return String(value ?? '').replace(/[&<>"']/g, char => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;'
+      })[char]);
+    }
 
-    <div class="summary-row">
-      <div class="summary-box">
-        <div class="summary-title">
-          ${tr('reports_ops_count', 'عدد العمليات')}
-        </div>
+    // ============================================
+    // بناء صفوف الجدول
+    // ============================================
 
-        <div class="summary-val">
-          ${items.length}
-        </div>
-      </div>
+    let rowsHtml = items.map(m => {
+      const p = m.products || {};
+      const date = new Date(m.created_at);
+      const quantity = Number(m.quantity || 0);
+      const price = Number(p.price || 0);
+      const itemTotal = quantity * price;
 
-      <div class="summary-box">
-        <div class="summary-title">
-          ${tr('reports_total_added', 'إجمالي الإضافات')}
-        </div>
-
-        <div class="summary-val" dir="ltr">
-          ${totalVal.toFixed(2)}
-          <span class="currency-symbol">DH</span>
-        </div>
-      </div>
-    </div>
-
-    <table class="report-table">
-      <thead>
+      return `
         <tr>
-          <th>${tr('reports_time', 'الوقت')}</th>
-          <th>${tr('reports_date_only', 'التاريخ')}</th>
-          <th>${tr('reports_user', 'المستخدم')}</th>
-          <th>${tr('reports_supplier', 'المورد')}</th>
-          <th>${tr('reports_product', 'المنتج')}</th>
-          <th>${tr('reports_qty_unit', 'الكمية والوحدة')}</th>
-          <th>${tr('reports_unit_price', 'سعر الشراء')}</th>
-          <th>${tr('reports_total_value', 'إجمالي القيمة')}</th>
-        </tr>
-      </thead>
-
-      <tbody>
-        ${rowsHtml}
-      </tbody>
-
-      <tfoot>
-        <tr>
-          <td colspan="5" style="text-align:end;">
-            ${tr('reports_grand_total', 'المجموع الكلي')}
-          </td>
-
-          <td>${totalQty}</td>
-
-          <td></td>
-
+          <td>${formatTime(date)}</td>
+          <td>${formatDate(date)}</td>
+          <td>${escapeHTML(m.profiles?.full_name || '—')}</td>
+          <td>${escapeHTML(p.suppliers?.name || '—')}</td>
+          <td>${escapeHTML(p.name || '—')}</td>
+          <td>${quantity} ${escapeHTML(p.unit || '')}</td>
           <td dir="ltr">
-            ${totalVal.toFixed(2)}
+            ${price.toFixed(2)}
+            <span class="currency-symbol">DH</span>
+          </td>
+          <td dir="ltr">
+            ${itemTotal.toFixed(2)}
             <span class="currency-symbol">DH</span>
           </td>
         </tr>
-      </tfoot>
-    </table>
+      `;
+    }).join('');
 
-    <!-- التوقيع والختم -->
-    <table class="sig-table">
-      <tr>
-        <td>
-          <div class="sig-line">
-            <p>
-              ${tr('reports_manager_sig', 'توقيع المسؤول')}
-            </p>
+    if (items.length === 0) {
+      rowsHtml = `
+        <tr>
+          <td colspan="8" style="text-align:center;padding:20px;">
+            ${tr('reports_no_data', 'لا توجد بيانات')}
+          </td>
+        </tr>
+      `;
+    }
+
+    // ============================================
+    // بناء صفحة التقرير
+    // ============================================
+
+    container.innerHTML = `
+      <div class="print-header">
+        <h1>${escapeHTML(orgName)}</h1>
+
+        <h2>
+          ${tr('reports_add_products', 'تقرير إضافة المنتجات')}
+        </h2>
+
+        <div class="print-meta">
+          <span>
+            <strong>
+              ${tr('reports_period_type', 'نوع الفترة')}:
+            </strong>
+            ${periodMap[periodKey] || '—'}
+          </span>
+
+          <span>
+            <strong>
+              ${tr('reports_date_range', 'الفترة المختارة')}:
+            </strong>
+            ${formatDate(start)} — ${formatDate(end)}
+          </span>
+        </div>
+      </div>
+
+      <div class="summary-row">
+        <div class="summary-box">
+          <div class="summary-title">
+            ${tr('reports_ops_count', 'عدد العمليات')}
           </div>
-        </td>
 
-        <td>
-          <div class="stamp-circle">
-            <p>
-              ${tr('reports_org_stamp', 'ختم المؤسسة')}
-            </p>
+          <div class="summary-val">
+            ${items.length}
           </div>
-        </td>
-      </tr>
-    </table>
-  `;
+        </div>
 
-  // فتح نافذة الطباعة بعد اكتمال بناء التقرير
-  setTimeout(() => {
-    window.print();
-  }, 800);
+        <div class="summary-box">
+          <div class="summary-title">
+            ${tr('reports_total_added', 'إجمالي الإضافات')}
+          </div>
+
+          <div class="summary-val" dir="ltr">
+            ${totalVal.toFixed(2)}
+            <span class="currency-symbol">DH</span>
+          </div>
+        </div>
+      </div>
+
+      <table class="report-table">
+        <thead>
+          <tr>
+            <th>${tr('reports_time', 'الوقت')}</th>
+            <th>${tr('reports_date_only', 'التاريخ')}</th>
+            <th>${tr('reports_user', 'المستخدم')}</th>
+            <th>${tr('reports_supplier', 'المورد')}</th>
+            <th>${tr('reports_product', 'المنتج')}</th>
+            <th>${tr('reports_qty_unit', 'الكمية والوحدة')}</th>
+            <th>${tr('reports_unit_price', 'سعر الشراء')}</th>
+            <th>${tr('reports_total_value', 'إجمالي القيمة')}</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          ${rowsHtml}
+        </tbody>
+
+        <tfoot>
+          <tr>
+            <td colspan="5" style="text-align:end;">
+              ${tr('reports_grand_total', 'المجموع الكلي')}
+            </td>
+
+            <td>${totalQty}</td>
+
+            <td></td>
+
+            <td dir="ltr">
+              ${totalVal.toFixed(2)}
+              <span class="currency-symbol">DH</span>
+            </td>
+          </tr>
+        </tfoot>
+      </table>
+
+      <!-- التوقيع والختم -->
+
+      <table class="sig-table">
+        <tr>
+          <td>
+            <div class="sig-line">
+              <p>
+                ${tr('reports_manager_sig', 'توقيع المسؤول')}
+              </p>
+            </div>
+          </td>
+
+          <td>
+            <div class="stamp-circle">
+              <p>
+                ${tr('reports_org_stamp', 'ختم المؤسسة')}
+              </p>
+            </div>
+          </td>
+        </tr>
+      </table>
+
+      <!-- زر الطباعة -->
+
+      <div class="no-print" style="text-align:center; margin-top:20px;">
+        <button
+          type="button"
+          onclick="window.print()"
+          style="
+            border:none;
+            background:#000;
+            color:#fff;
+            padding:10px 25px;
+            cursor:pointer;
+            border-radius:4px;
+            font-size:14px;
+          "
+        >
+          <i class="fas fa-print"></i>
+          ${tr('reports_print', 'Print')}
+        </button>
+      </div>
+    `;
+
+    // ============================================
+    // عنوان الصفحة
+    // ============================================
+
+    document.title = tr(
+      'reports_add_products',
+      'تقرير إضافة المنتجات'
+    );
+
+  } catch (err) {
+    console.error('Reports Print Error:', err);
+
+    container.innerHTML = `
+      <h2 style="text-align:center;color:red;">
+        ${tr('reports_error_loading', 'Error loading report')}
+      </h2>
+      <p style="text-align:center;">
+        ${escapeHTML(err.message)}
+      </p>
+    `;
+  }
 });
