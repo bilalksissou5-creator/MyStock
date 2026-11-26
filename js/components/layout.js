@@ -162,7 +162,7 @@ function renderLayout(activePage) {
     { href: '/invoices/list.html', labelKey: 'nav_invoices', icon: 'fa-file-invoice' },
 
     // ✅ زر التقارير تحت زر الفواتير
-    { href: '/reports.html', labelKey: 'nav_reports', icon: 'fa-chart-line' },
+    { href: '/reports-dashboard.html', labelKey: 'nav_reports', icon: 'fa-chart-line' },
 
     { href: '/settings.html', labelKey: 'nav_settings', icon: 'fa-gear' },
 
