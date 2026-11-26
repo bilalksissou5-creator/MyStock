@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -7,10 +8,10 @@
   <title>MyStock - مركز التقارير</title>
 
   <script>
-    (function () {
-      const lang = localStorage.getItem('app_lang') || 'ar';
+    (function() {
+      var lang = localStorage.getItem('app_lang') || 'ar';
       document.documentElement.lang = lang;
-      document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+      document.documentElement.dir = (lang === 'ar') ? 'rtl' : 'ltr';
     })();
   </script>
 
@@ -28,6 +29,7 @@
   <script src="/js/core/auth.js"></script>
   <script src="/js/core/notifications.js"></script>
   <script src="/js/components/layout.js"></script>
+
   <script src="/js/pages/reports-dashboard.js"></script>
 </body>
 </html>
