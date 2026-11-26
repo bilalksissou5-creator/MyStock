@@ -143,7 +143,6 @@ body {
   word-break: normal;
 }
 
-/* تأكيد ظهور الحدود الجانبية */
 .report-table th:last-child,
 .report-table td:last-child {
   border-right: 1px solid #000 !important;
@@ -159,13 +158,11 @@ body {
   font-weight: bold;
 }
 
-/* منع تقسيم صف العملية */
 .report-table tr {
   break-inside: avoid;
   page-break-inside: avoid;
 }
 
-/* تكرار رأس الجدول */
 .report-table thead {
   display: table-header-group;
 }
@@ -182,7 +179,8 @@ body {
 }
 
 /* ============================================
-   التوقيع والختم - مستطيلات
+   التوقيع والختم
+   مستطيلان متطابقان
    ============================================ */
 
 .sig-table {
@@ -200,26 +198,30 @@ body {
 
 .sig-table td {
   width: 50%;
-  height: 85px;
   text-align: center;
   vertical-align: top;
   border: none;
   padding: 5px;
 }
 
+/* عنوان التوقيع والختم */
 .sig-table p {
-  font-size: 9pt;
+  font-size: 8pt;
   font-weight: bold;
   color: #000;
-  margin: 0 0 12px;
+  margin: 0;
+  padding: 5px 2px;
+  text-align: center;
 }
 
 /* مستطيل توقيع المسؤول */
 .sig-line {
   border: 1px solid #000;
-  width: 55%;
-  height: 35px;
-  margin: 10px auto 0;
+  border-radius: 0;
+  width: 85px;
+  height: 55px;
+  margin: 5px auto 0;
+  box-sizing: border-box;
 }
 
 /* مستطيل ختم المؤسسة */
@@ -321,15 +323,17 @@ body {
     page-break-inside: avoid;
   }
 
-  .sig-line {
-    border: 1px solid #000 !important;
-    height: 35px !important;
+  .sig-table p {
+    font-size: 8pt !important;
+    padding: 5px 2px !important;
   }
 
+  .sig-line,
   .stamp-circle {
-    border: 1px solid #000 !important;
-    border-radius: 0 !important;
     width: 85px !important;
     height: 55px !important;
+    border: 1px solid #000 !important;
+    border-radius: 0 !important;
+    margin: 5px auto 0 !important;
   }
 }
