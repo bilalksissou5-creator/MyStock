@@ -3,8 +3,8 @@
 // طباعة تقرير إخراج المنتجات
 // MyStock - Reports Out Print
 // ✅ اسم المؤسسة في أعلى التقرير
-// ✅ نفس تنسيق تقرير إضافة المنتجات
-// ✅ A4 Portrait
+// ✅ نوع الفترة: يوم / أسبوع / شهر / سنة / مخصص
+// ✅ الفترة المختارة وتاريخ الطباعة
 // ✅ ملخص العمليات
 // ✅ جدول الإخراج
 // ✅ التوقيع والختم
@@ -44,6 +44,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   const startParam = params.get('start');
   const endParam = params.get('end');
+  const periodKey = params.get('period');
 
   if (!startParam || !endParam) {
     container.innerHTML = `
@@ -78,6 +79,20 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (window.applyLanguage) {
       window.applyLanguage();
     }
+
+    // ============================================
+    // أسماء الفترات
+    // ============================================
+
+    const periodMap = {
+      today: tr('reports_today', 'اليوم'),
+      week: tr('reports_week', 'أسبوع'),
+      month: tr('reports_month', 'شهر'),
+      year: tr('reports_year', 'سنة'),
+      custom: tr('reports_custom', 'مخصص')
+    };
+
+    const periodName = periodMap[periodKey] || '—';
 
     // ============================================
     // جلب المؤسسة المرتبطة بالمستخدم
@@ -232,6 +247,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // ============================================
 
     container.innerHTML = `
+
       <!-- رأس التقرير -->
 
       <div class="print-header">
@@ -249,7 +265,15 @@ document.addEventListener('DOMContentLoaded', async () => {
 
           <span>
             <strong>
-              ${tr('reports_period', 'Report Period')}:
+              ${tr('reports_period_type', 'نوع الفترة')}:
+            </strong>
+
+            ${escapeHTML(periodName)}
+          </span>
+
+          <span>
+            <strong>
+              ${tr('reports_date_range', 'الفترة المختارة')}:
             </strong>
 
             ${formatDate(start)} — ${formatDate(end)}
