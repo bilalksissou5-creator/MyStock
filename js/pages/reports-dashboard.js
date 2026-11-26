@@ -2,6 +2,8 @@
 /* ============================================
    MyStock - Reports Dashboard
    مركز التقارير
+   ✅ إصلاح ظهور البطاقات
+   ✅ إصلاح التنقل بين صفحات التقارير
    ============================================ */
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -10,11 +12,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   renderLayout('reports-dashboard.html');
 
-  // التأكد من أن الصفحة تعمل داخل إطار التطبيق
-  if (window.self === window.top) return;
-
   const main = document.getElementById('main-content');
-  if (!main) return;
+  if (!main) {
+    console.error('Reports Dashboard: main-content غير موجود');
+    return;
+  }
 
   main.innerHTML = `
     <section class="reports-dashboard">
@@ -31,7 +33,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         <!-- تقارير الإضافة -->
         <a
           href="/reports.html"
-          target="content-frame"
           class="report-dashboard-card add-report"
         >
           <div class="report-icon">
@@ -54,7 +55,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         <!-- تقارير الإخراج -->
         <a
           href="/reports-out.html"
-          target="content-frame"
           class="report-dashboard-card remove-report"
         >
           <div class="report-icon">
@@ -77,7 +77,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         <!-- تقارير الأرباح -->
         <a
           href="/reports-profit.html"
-          target="content-frame"
           class="report-dashboard-card profit-report"
         >
           <div class="report-icon">
@@ -101,15 +100,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     </section>
   `;
 
-  // تطبيق الترجمات من i18n.js
+  // تطبيق الترجمات
   if (window.applyLanguage) {
     window.applyLanguage();
   }
 
-  // ضبط اتجاه الأسهم حسب لغة الصفحة
+  // ضبط اتجاه الأسهم حسب اللغة
   const isArabic = document.documentElement.dir === 'rtl';
 
-  document.querySelectorAll('.report-arrow i').forEach(icon => {
+  main.querySelectorAll('.report-arrow i').forEach(icon => {
     icon.className = isArabic
       ? 'fa-solid fa-chevron-left'
       : 'fa-solid fa-chevron-right';
