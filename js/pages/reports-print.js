@@ -1,6 +1,7 @@
 
  // ============================================
  // صفحة طباعة التقارير (Reports Print)
+ // MyStock - Product Additions Report
  // ✅ جلب جميع عمليات الإضافة
  // ✅ حساب إجمالي الكمية والقيمة
  // ✅ توقيع وختم داخل مستطيلين متطابقين
@@ -8,18 +9,25 @@
  // ============================================
 
 document.addEventListener('DOMContentLoaded', async () => {
-  const user = await requireAuth();
-  if (!user) return;
 
-  if (window.applyLanguage) window.applyLanguage();
+  const container = document.getElementById('print-content');
+  if (!container) return;
+
+  // ============================================
+  // الترجمة
+  // ============================================
 
   const tr = (key, fallback) => {
     if (window.t) {
-      const val = window.t(key);
-      if (val && val !== key) return val;
+      const value = window.t(key);
+      if (value && value !== key) return value;
     }
     return fallback || key;
   };
+
+  // ============================================
+  // حماية النصوص
+  // ============================================
 
   function escapeHTML(value) {
     return String(value ?? '').replace(/[&<>"']/g, char => ({
@@ -31,13 +39,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     })[char]);
   }
 
+  // ============================================
+  // قراءة الفترة من الرابط
+  // ============================================
+
   const params = new URLSearchParams(window.location.search);
+
   const startIso = params.get('start');
   const endIso = params.get('end');
   const periodKey = params.get('period');
-
-  const container = document.getElementById('print-content');
-  if (!container) return;
 
   if (!startIso || !endIso) {
     container.innerHTML =
@@ -55,8 +65,20 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   try {
+
     // ============================================
-    // جلب اسم المؤسسة
+    // التحقق من تسجيل الدخول
+    // ============================================
+
+    const user = await requireAuth();
+    if (!user) return;
+
+    if (window.applyLanguage) {
+      window.applyLanguage();
+    }
+
+    // ============================================
+    // جلب المؤسسة
     // ============================================
 
     const { data: profile, error: profileError } = await db
@@ -65,7 +87,9 @@ document.addEventListener('DOMContentLoaded', async () => {
       .eq('id', user.id)
       .single();
 
-    if (profileError || !profile?.organization_id) {
+    if (profileError) throw profileError;
+
+    if (!profile?.organization_id) {
       throw new Error('Organization not found');
     }
 
@@ -78,8 +102,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     const { data: movements, error } = await db
       .from('stock_movements')
       .select(`
-        id, quantity, created_at, performed_by,
-        products (name, price, unit, suppliers (name)),
+        id,
+        quantity,
+        created_at,
+        performed_by,
+        products (
+          name,
+          price,
+          unit,
+          suppliers (name)
+        ),
         profiles (full_name)
       `)
       .eq('organization_id', profile.organization_id)
@@ -94,7 +126,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const items = movements || [];
 
     // ============================================
-    // حساب المجاميع
+    // حساب الإجماليات
     // ============================================
 
     let totalQty = 0;
@@ -112,12 +144,29 @@ document.addEventListener('DOMContentLoaded', async () => {
     // تنسيق التاريخ والوقت
     // ============================================
 
-    const formatDate = d => d.toLocaleDateString('fr-FR');
+    function formatDate(date) {
+      return date.toLocaleDateString('fr-FR');
+    }
 
-    const formatTime = d => d.toLocaleTimeString('fr-FR', {
-      hour: '2-digit',
-      minute: '2-digit'
-    });
+    function formatTime(date) {
+      return date.toLocaleTimeString('fr-FR', {
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    }
+
+    function formatNumber(number) {
+      return Number(number || 0).toLocaleString('fr-FR', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      });
+    }
+
+    function formatQuantity(number) {
+      return Number(number || 0).toLocaleString('fr-FR', {
+        maximumFractionDigits: 2
+      });
+    }
 
     // ============================================
     // أسماء الفترات
@@ -136,26 +185,44 @@ document.addEventListener('DOMContentLoaded', async () => {
     // ============================================
 
     let rowsHtml = items.map(m => {
-      const p = m.products || {};
+
+      const product = m.products || {};
       const date = new Date(m.created_at);
+
       const quantity = Number(m.quantity || 0);
-      const price = Number(p.price || 0);
+      const price = Number(product.price || 0);
       const itemTotal = quantity * price;
 
       return `
         <tr>
           <td>${formatTime(date)}</td>
+
           <td>${formatDate(date)}</td>
-          <td>${escapeHTML(m.profiles?.full_name || '—')}</td>
-          <td>${escapeHTML(p.suppliers?.name || '—')}</td>
-          <td>${escapeHTML(p.name || '—')}</td>
-          <td>${quantity} ${escapeHTML(p.unit || '')}</td>
+
+          <td>
+            ${escapeHTML(m.profiles?.full_name || '—')}
+          </td>
+
+          <td>
+            ${escapeHTML(product.suppliers?.name || '—')}
+          </td>
+
+          <td>
+            ${escapeHTML(product.name || '—')}
+          </td>
+
+          <td>
+            ${formatQuantity(quantity)}
+            ${escapeHTML(product.unit || '')}
+          </td>
+
           <td dir="ltr">
-            ${price.toFixed(2)}
+            ${formatNumber(price)}
             <span class="currency-symbol">DH</span>
           </td>
+
           <td dir="ltr">
-            ${itemTotal.toFixed(2)}
+            ${formatNumber(itemTotal)}
             <span class="currency-symbol">DH</span>
           </td>
         </tr>
@@ -177,7 +244,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     // ============================================
 
     container.innerHTML = `
+
       <div class="print-header">
+
         <h1>${escapeHTML(orgName)}</h1>
 
         <h2>
@@ -185,38 +254,55 @@ document.addEventListener('DOMContentLoaded', async () => {
         </h2>
 
         <div class="print-meta">
+
           <span>
-            <strong>${tr('reports_period_type', 'نوع الفترة')}:</strong>
+            <strong>
+              ${tr('reports_period_type', 'نوع الفترة')}:
+            </strong>
             ${periodMap[periodKey] || '—'}
           </span>
 
           <span>
-            <strong>${tr('reports_date_range', 'الفترة المختارة')}:</strong>
+            <strong>
+              ${tr('reports_date_range', 'الفترة المختارة')}:
+            </strong>
             ${formatDate(start)} — ${formatDate(end)}
           </span>
+
         </div>
       </div>
 
       <div class="summary-row">
+
         <div class="summary-box">
+
           <div class="summary-title">
             ${tr('reports_ops_count', 'عدد العمليات')}
           </div>
-          <div class="summary-val">${items.length}</div>
+
+          <div class="summary-val">
+            ${items.length}
+          </div>
+
         </div>
 
         <div class="summary-box">
+
           <div class="summary-title">
             ${tr('reports_total_added', 'إجمالي الإضافات')}
           </div>
+
           <div class="summary-val" dir="ltr">
-            ${totalVal.toFixed(2)}
+            ${formatNumber(totalVal)}
             <span class="currency-symbol">DH</span>
           </div>
+
         </div>
+
       </div>
 
       <table class="report-table">
+
         <thead>
           <tr>
             <th>${tr('reports_time', 'الوقت')}</th>
@@ -240,38 +326,51 @@ document.addEventListener('DOMContentLoaded', async () => {
               ${tr('reports_grand_total', 'المجموع الكلي')}
             </td>
 
-            <td>${totalQty}</td>
+            <td>${formatQuantity(totalQty)}</td>
+
             <td></td>
 
             <td dir="ltr">
-              ${totalVal.toFixed(2)}
+              ${formatNumber(totalVal)}
               <span class="currency-symbol">DH</span>
             </td>
           </tr>
         </tfoot>
+
       </table>
 
+      <!-- التوقيع والختم -->
+
       <table class="sig-table">
+
         <tr>
           <td>
             <div class="sig-line">
-              <p>${tr('reports_manager_sig', 'توقيع المسؤول')}</p>
+              <p>
+                ${tr('reports_manager_sig', 'توقيع المسؤول')}
+              </p>
             </div>
           </td>
 
           <td>
             <div class="stamp-circle">
-              <p>${tr('reports_org_stamp', 'ختم المؤسسة')}</p>
+              <p>
+                ${tr('reports_org_stamp', 'ختم المؤسسة')}
+              </p>
             </div>
           </td>
         </tr>
+
       </table>
 
       <!-- زر الطباعة -->
-      <div class="no-print" style="text-align:center; margin-top:20px;">
+
+      <div class="no-print" style="text-align:center;margin-top:20px;">
+
         <button
           type="button"
           id="print-report-btn"
+          onclick="window.print()"
           style="
             border:none;
             background:#000;
@@ -283,23 +382,11 @@ document.addEventListener('DOMContentLoaded', async () => {
           "
         >
           <i class="fas fa-print"></i>
-          ${tr('reports_print', 'طباعة')}
+          ${tr('reports_print', 'Print')}
         </button>
+
       </div>
     `;
-
-    // ============================================
-    // ربط زر الطباعة بعد إنشاء التقرير
-    // ============================================
-
-    const printButton = document.getElementById('print-report-btn');
-
-    if (printButton) {
-      printButton.addEventListener('click', function () {
-        window.focus();
-        window.print();
-      });
-    }
 
     // ============================================
     // عنوان الصفحة
@@ -311,15 +398,18 @@ document.addEventListener('DOMContentLoaded', async () => {
     );
 
   } catch (err) {
+
     console.error('Reports Print Error:', err);
 
     container.innerHTML = `
       <h2 style="text-align:center;color:red;">
-        ${tr('reports_error_loading', 'خطأ في تحميل التقرير')}
+        ${tr('reports_error_loading', 'Error loading report')}
       </h2>
+
       <p style="text-align:center;">
         ${escapeHTML(err.message)}
       </p>
     `;
   }
+
 });
