@@ -1,285 +1,202 @@
+
 /* ============================================
-   مركز التقارير - MyStock
+   MyStock - Reports Dashboard
+   مركز التقارير
    ============================================ */
 
 .reports-dashboard {
   width: 100%;
   max-width: 1100px;
   margin: 0 auto;
-  padding: 24px 20px 35px;
+  padding: 28px 20px;
   box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
+  font-family: inherit;
 }
-
-/* رأس الصفحة */
 
 .reports-dashboard-header {
-  display: flex;
-  flex-direction: column;
-  gap: 7px;
+  margin-bottom: 30px;
+  text-align: right;
 }
 
-.reports-dashboard-title {
-  display: flex;
-  align-items: center;
-  gap: 11px;
-  margin: 0;
-  color: #171717;
-  font-size: 23px;
+.reports-dashboard-header h1 {
+  margin: 0 0 10px;
+  color: #172033;
+  font-size: 25px;
   font-weight: 800;
 }
 
-.reports-dashboard-title i {
-  color: #2563eb;
-  font-size: 22px;
-}
-
-.reports-dashboard-description {
+.reports-dashboard-header p {
   margin: 0;
-  color: #737373;
+  color: #7b8494;
   font-size: 14px;
-  line-height: 1.7;
+  line-height: 1.8;
 }
-
-/* شبكة البطاقات */
 
 .reports-dashboard-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 18px;
+  gap: 20px;
 }
 
-/* البطاقة */
-
-.report-category-card {
+.report-dashboard-card {
   position: relative;
-  min-width: 0;
-  min-height: 190px;
-  padding: 22px;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  justify-content: space-between;
-  gap: 22px;
-  background: #ffffff;
-  border: 1px solid #e5e5e5;
+  min-height: 210px;
+  padding: 25px;
+  overflow: hidden;
+  border: 1px solid #e9edf3;
   border-radius: 16px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.025);
+  background: #ffffff;
+  box-shadow: 0 4px 15px rgba(15, 23, 42, 0.04);
   text-decoration: none;
   color: inherit;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
   box-sizing: border-box;
-  transition:
-    transform 0.2s ease,
-    box-shadow 0.2s ease,
-    border-color 0.2s ease;
 }
 
-.report-category-card:not(.is-disabled):hover {
-  transform: translateY(-3px);
-  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.07);
-  border-color: #d4d4d4;
+.report-dashboard-card:not(.is-disabled):hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(15, 23, 42, 0.09);
 }
 
-.report-category-card:focus-visible {
-  outline: 3px solid rgba(37, 99, 235, 0.2);
-  outline-offset: 3px;
-}
-
-/* الأيقونة */
-
-.report-card-icon {
-  width: 52px;
-  height: 52px;
-  flex-shrink: 0;
+.report-dashboard-card .report-icon {
   display: flex;
   align-items: center;
   justify-content: center;
+  width: 55px;
+  height: 55px;
+  margin-bottom: 22px;
   border-radius: 14px;
-  font-size: 22px;
+  font-size: 23px;
 }
 
-/* محتوى البطاقة */
-
-.report-card-content {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 7px;
-}
-
-.report-card-title {
-  margin: 0;
-  color: #171717;
-  font-size: 16px;
+.report-dashboard-card h2 {
+  margin: 0 0 10px;
+  color: #202b3c;
+  font-size: 18px;
   font-weight: 800;
-  line-height: 1.5;
 }
 
-.report-card-description {
+.report-dashboard-card p {
   margin: 0;
-  color: #737373;
-  font-size: 12px;
-  line-height: 1.7;
-}
-
-/* سهم الانتقال */
-
-.report-card-footer {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-}
-
-.report-card-action {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  color: #525252;
-  font-size: 12px;
-  font-weight: 700;
-}
-
-.report-card-arrow {
-  color: #a3a3a3;
+  color: #7b8494;
   font-size: 13px;
-  transition: transform 0.2s ease;
+  line-height: 1.8;
 }
 
-.report-category-card:not(.is-disabled):hover .report-card-arrow {
-  transform: translateX(-4px);
+.report-dashboard-card .report-arrow {
+  position: absolute;
+  left: 22px;
+  bottom: 24px;
+  color: #9aa3b2;
+  font-size: 16px;
 }
 
-[dir="ltr"] .report-category-card:not(.is-disabled):hover .report-card-arrow {
-  transform: translateX(4px);
+/* تقارير الإضافة - أزرق */
+
+.report-dashboard-card.add-report {
+  border-top: 4px solid #2878e8;
 }
 
-/* بطاقة الإضافات - أزرق */
-
-.report-card-add .report-card-icon {
-  background: #eff6ff;
-  color: #2563eb;
+.report-dashboard-card.add-report .report-icon {
+  color: #2878e8;
+  background: #eaf2ff;
 }
 
-.report-card-add:hover {
-  border-color: #bfdbfe;
+/* تقارير الإخراج - برتقالي */
+
+.report-dashboard-card.remove-report {
+  border-top: 4px solid #ed8a25;
 }
 
-.report-card-add .report-card-action {
-  color: #2563eb;
+.report-dashboard-card.remove-report .report-icon {
+  color: #ed8a25;
+  background: #fff3e5;
 }
 
-/* بطاقة الإخراج - برتقالي */
+/* تقارير الأرباح - أخضر */
 
-.report-card-out .report-card-icon {
-  background: #fff7ed;
-  color: #ea580c;
+.report-dashboard-card.profit-report {
+  border-top: 4px solid #16a36a;
 }
 
-.report-card-out .report-card-action {
-  color: #ea580c;
+.report-dashboard-card.profit-report .report-icon {
+  color: #16a36a;
+  background: #e7f8ef;
 }
 
-/* بطاقة الأرباح - أخضر */
+/* البطاقات غير المتاحة حالياً */
 
-.report-card-profit .report-card-icon {
-  background: #f0fdf4;
-  color: #16a34a;
-}
-
-.report-card-profit .report-card-action {
-  color: #16a34a;
-}
-
-/* الصفحات التي لم يتم إنشاؤها بعد */
-
-.report-category-card.is-disabled {
+.report-dashboard-card.is-disabled {
   cursor: default;
-  background: #fdfdfd;
+  opacity: 0.75;
 }
 
-.report-category-card.is-disabled .report-card-content {
-  opacity: 0.85;
-}
-
-.report-coming-soon {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  padding: 5px 9px;
+.report-dashboard-card.is-disabled .coming-soon {
+  display: inline-block;
+  margin-top: 14px;
+  padding: 5px 11px;
   border-radius: 20px;
-  background: #f5f5f5;
-  color: #737373;
-  font-size: 10px;
+  background: #f1f3f6;
+  color: #727c8d;
+  font-size: 11px;
   font-weight: 700;
-  white-space: nowrap;
+}
+
+/* دعم الإنجليزية */
+
+html[dir="ltr"] .reports-dashboard-header {
+  text-align: left;
+}
+
+html[dir="ltr"] .report-dashboard-card .report-arrow {
+  left: auto;
+  right: 22px;
 }
 
 /* الأجهزة اللوحية */
 
-@media screen and (max-width: 850px) {
+@media (max-width: 900px) {
   .reports-dashboard-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .report-category-card:last-child {
-    grid-column: 1 / -1;
   }
 }
 
 /* الهواتف */
 
-@media screen and (max-width: 600px) {
+@media (max-width: 600px) {
   .reports-dashboard {
-    padding: 18px 12px 25px;
-    gap: 20px;
+    padding: 20px 14px;
   }
 
-  .reports-dashboard-title {
-    font-size: 20px;
+  .reports-dashboard-header {
+    margin-bottom: 22px;
   }
 
-  .reports-dashboard-description {
-    font-size: 13px;
+  .reports-dashboard-header h1 {
+    font-size: 21px;
   }
 
   .reports-dashboard-grid {
     grid-template-columns: 1fr;
-    gap: 12px;
+    gap: 14px;
   }
 
-  .report-category-card,
-  .report-category-card:last-child {
-    grid-column: auto;
-    min-height: 155px;
-    padding: 17px;
-    gap: 15px;
+  .report-dashboard-card {
+    min-height: 185px;
+    padding: 20px;
   }
 
-  .report-card-icon {
-    width: 46px;
-    height: 46px;
+  .report-dashboard-card .report-icon {
+    width: 48px;
+    height: 48px;
+    margin-bottom: 17px;
     font-size: 20px;
-    border-radius: 12px;
   }
 
-  .report-card-title {
-    font-size: 15px;
-  }
-
-  .report-card-description {
-    font-size: 12px;
-  }
-}
-
-/* تقليل الحركة */
-
-@media (prefers-reduced-motion: reduce) {
-  .report-category-card,
-  .report-card-arrow {
-    transition: none;
+  .report-dashboard-card h2 {
+    font-size: 16px;
   }
 }

@@ -1028,6 +1028,17 @@ const translations = {
     reports_print: 'طباعة التقرير',
     reports_manager_sig: 'توقيع المسؤول',
     reports_org_stamp: 'ختم المؤسسة',
+
+    
+    reports_dashboard_title: 'مركز التقارير',
+    reports_dashboard_subtitle: 'اختر نوع التقرير الذي تريد الاطلاع عليه',  
+    reports_add_title: 'تقارير إضافة المنتجات',
+    reports_add_description: 'عرض ومتابعة عمليات إضافة المنتجات إلى المخزون.', 
+    reports_remove_title: 'تقارير إخراج المنتجات',
+    reports_remove_description: 'عرض ومتابعة عمليات إخراج المنتجات من المخزون.',
+    reports_profit_title: 'تقارير الأرباح',
+    reports_profit_description: 'متابعة الأرباح الناتجة عن عمليات البيع.',
+
   },
 
   fr: {
@@ -2047,6 +2058,15 @@ const translations = {
     reports_print: 'Imprimer le rapport',
     reports_manager_sig: 'Signature du responsable',
     reports_org_stamp: 'Cachet de l\'organisme',
+
+    reports_dashboard_title: 'Centre des rapports',
+    reports_dashboard_subtitle: 'Choisissez le type de rapport que vous souhaitez consulter', 
+    reports_add_title: 'Rapports des entrées de stock',
+    reports_add_description: 'Consulter et suivre les opérations d’ajout de produits au stock.',
+    reports_remove_title: 'Rapports des sorties de stock',
+    reports_remove_description: 'Consulter et suivre les opérations de sortie de produits du stock.',
+    reports_profit_title: 'Rapports des bénéfices',
+    reports_profit_description: 'Suivre les bénéfices générés par les opérations de vente.',
   },
 
   en: {
@@ -3068,6 +3088,15 @@ const translations = {
     reports_print: 'Print Report',
     reports_manager_sig: 'Manager Signature',
     reports_org_stamp: 'Organization Stamp',
+
+    reports_dashboard_title: 'Reports Center',
+    reports_dashboard_subtitle: 'Choose the type of report you want to view',
+    reports_add_title: 'Product Addition Reports',
+    reports_add_description: 'View and track product additions to inventory.',
+    reports_remove_title: 'Product Removal Reports',
+    reports_remove_description: 'View and track product removals from inventory.', 
+    reports_profit_title: 'Profit Reports',
+    reports_profit_description: 'Track profits generated from sales.',
   },
 
   
