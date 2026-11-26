@@ -13,7 +13,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   if (window.applyLanguage) window.applyLanguage();
 
-  // دالة الترجمة
   const tr = (key, fallback) => {
     if (window.t) {
       const val = window.t(key);
@@ -22,13 +21,22 @@ document.addEventListener('DOMContentLoaded', async () => {
     return fallback || key;
   };
 
+  function escapeHTML(value) {
+    return String(value ?? '').replace(/[&<>"']/g, char => ({
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#39;'
+    })[char]);
+  }
+
   const params = new URLSearchParams(window.location.search);
   const startIso = params.get('start');
   const endIso = params.get('end');
   const periodKey = params.get('period');
 
   const container = document.getElementById('print-content');
-
   if (!container) return;
 
   if (!startIso || !endIso) {
@@ -64,7 +72,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const orgName = profile.organizations?.name || 'MyStock';
 
     // ============================================
-    // جلب جميع البيانات في الفترة المحددة
+    // جلب عمليات الإضافة
     // ============================================
 
     const { data: movements, error } = await db
@@ -93,11 +101,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     let totalVal = 0;
 
     items.forEach(m => {
-      const q = Number(m.quantity || 0);
-      const p = Number(m.products?.price || 0);
+      const quantity = Number(m.quantity || 0);
+      const price = Number(m.products?.price || 0);
 
-      totalQty += q;
-      totalVal += q * p;
+      totalQty += quantity;
+      totalVal += quantity * price;
     });
 
     // ============================================
@@ -122,20 +130,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       year: tr('reports_year', 'سنة'),
       custom: tr('reports_custom', 'مخصص')
     };
-
-    // ============================================
-    // حماية النصوص
-    // ============================================
-
-    function escapeHTML(value) {
-      return String(value ?? '').replace(/[&<>"']/g, char => ({
-        '&': '&amp;',
-        '<': '&lt;',
-        '>': '&gt;',
-        '"': '&quot;',
-        "'": '&#39;'
-      })[char]);
-    }
 
     // ============================================
     // بناء صفوف الجدول
@@ -179,7 +173,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // ============================================
-    // بناء صفحة التقرير
+    // بناء التقرير
     // ============================================
 
     container.innerHTML = `
@@ -192,16 +186,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         <div class="print-meta">
           <span>
-            <strong>
-              ${tr('reports_period_type', 'نوع الفترة')}:
-            </strong>
+            <strong>${tr('reports_period_type', 'نوع الفترة')}:</strong>
             ${periodMap[periodKey] || '—'}
           </span>
 
           <span>
-            <strong>
-              ${tr('reports_date_range', 'الفترة المختارة')}:
-            </strong>
+            <strong>${tr('reports_date_range', 'الفترة المختارة')}:</strong>
             ${formatDate(start)} — ${formatDate(end)}
           </span>
         </div>
@@ -212,17 +202,13 @@ document.addEventListener('DOMContentLoaded', async () => {
           <div class="summary-title">
             ${tr('reports_ops_count', 'عدد العمليات')}
           </div>
-
-          <div class="summary-val">
-            ${items.length}
-          </div>
+          <div class="summary-val">${items.length}</div>
         </div>
 
         <div class="summary-box">
           <div class="summary-title">
             ${tr('reports_total_added', 'إجمالي الإضافات')}
           </div>
-
           <div class="summary-val" dir="ltr">
             ${totalVal.toFixed(2)}
             <span class="currency-symbol">DH</span>
@@ -255,7 +241,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             </td>
 
             <td>${totalQty}</td>
-
             <td></td>
 
             <td dir="ltr">
@@ -266,34 +251,27 @@ document.addEventListener('DOMContentLoaded', async () => {
         </tfoot>
       </table>
 
-      <!-- التوقيع والختم -->
-
       <table class="sig-table">
         <tr>
           <td>
             <div class="sig-line">
-              <p>
-                ${tr('reports_manager_sig', 'توقيع المسؤول')}
-              </p>
+              <p>${tr('reports_manager_sig', 'توقيع المسؤول')}</p>
             </div>
           </td>
 
           <td>
             <div class="stamp-circle">
-              <p>
-                ${tr('reports_org_stamp', 'ختم المؤسسة')}
-              </p>
+              <p>${tr('reports_org_stamp', 'ختم المؤسسة')}</p>
             </div>
           </td>
         </tr>
       </table>
 
       <!-- زر الطباعة -->
-
       <div class="no-print" style="text-align:center; margin-top:20px;">
         <button
           type="button"
-          onclick="window.print()"
+          id="print-report-btn"
           style="
             border:none;
             background:#000;
@@ -305,10 +283,23 @@ document.addEventListener('DOMContentLoaded', async () => {
           "
         >
           <i class="fas fa-print"></i>
-          ${tr('reports_print', 'Print')}
+          ${tr('reports_print', 'طباعة')}
         </button>
       </div>
     `;
+
+    // ============================================
+    // ربط زر الطباعة بعد إنشاء التقرير
+    // ============================================
+
+    const printButton = document.getElementById('print-report-btn');
+
+    if (printButton) {
+      printButton.addEventListener('click', function () {
+        window.focus();
+        window.print();
+      });
+    }
 
     // ============================================
     // عنوان الصفحة
@@ -324,7 +315,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     container.innerHTML = `
       <h2 style="text-align:center;color:red;">
-        ${tr('reports_error_loading', 'Error loading report')}
+        ${tr('reports_error_loading', 'خطأ في تحميل التقرير')}
       </h2>
       <p style="text-align:center;">
         ${escapeHTML(err.message)}
