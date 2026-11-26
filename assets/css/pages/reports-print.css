@@ -1,7 +1,7 @@
 
 /* ============================================
    صفحة طباعة التقارير
-   A4 Portrait - استغلال مساحة الورقة
+   A4 Portrait - تحسين عرض الأعمدة
    ============================================ */
 
 @page {
@@ -111,12 +111,17 @@ body {
   gap: 4px;
 }
 
-/* الجدول */
+/* ============================================
+   الجدول
+   عرض الأعمدة حسب المحتوى
+   ============================================ */
+
 .report-table {
   width: 100%;
+  max-width: 100%;
   border-collapse: collapse;
   border-spacing: 0;
-  font-size: 8.5pt;
+  font-size: 7pt;
   table-layout: auto;
   break-inside: auto;
   page-break-inside: auto;
@@ -125,10 +130,12 @@ body {
 .report-table th,
 .report-table td {
   border: 1px solid #000;
-  padding: 5px;
+  padding: 2px 2px;
   text-align: center;
   color: #000;
-  white-space: nowrap;
+  white-space: normal;
+  overflow-wrap: break-word;
+  word-break: normal;
 }
 
 .report-table th {
@@ -159,7 +166,7 @@ body {
 }
 
 /* ============================================
-   التوقيع والختم - حجم صغير
+   التوقيع والختم
    ============================================ */
 
 .sig-table {
@@ -226,7 +233,10 @@ body {
   }
 }
 
-/* إعدادات الطباعة */
+/* ============================================
+   إعدادات الطباعة
+   ============================================ */
+
 @media print {
   html,
   body {
@@ -254,6 +264,17 @@ body {
 
   .report-table {
     width: 100% !important;
+    max-width: 100% !important;
+    table-layout: auto !important;
+    font-size: 6.5pt !important;
+  }
+
+  .report-table th,
+  .report-table td {
+    padding: 2px 1px !important;
+    font-size: 6.5pt !important;
+    white-space: normal !important;
+    overflow-wrap: anywhere;
   }
 
   .report-table thead {
