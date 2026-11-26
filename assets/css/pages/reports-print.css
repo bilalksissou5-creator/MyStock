@@ -1,7 +1,8 @@
 
 /* ============================================
    صفحة طباعة التقارير
-   A4 Portrait - تحسين عرض الأعمدة
+   A4 Portrait
+   إصلاح حدود الجدول ومنع قطعه
    ============================================ */
 
 @page {
@@ -113,14 +114,18 @@ body {
 
 /* ============================================
    الجدول
-   عرض الأعمدة حسب المحتوى
    ============================================ */
 
 .report-table {
-  width: 100%;
-  max-width: 100%;
+  display: table;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
   border-collapse: collapse;
   border-spacing: 0;
+  border: 1px solid #000 !important;
+  outline: 1px solid #000;
+  outline-offset: -1px;
   font-size: 7pt;
   table-layout: auto;
   break-inside: auto;
@@ -129,13 +134,25 @@ body {
 
 .report-table th,
 .report-table td {
-  border: 1px solid #000;
+  border: 1px solid #000 !important;
   padding: 2px 2px;
   text-align: center;
   color: #000;
   white-space: normal;
-  overflow-wrap: break-word;
+  overflow-wrap: anywhere;
   word-break: normal;
+}
+
+/* تأكيد ظهور الحد الأيمن */
+.report-table th:last-child,
+.report-table td:last-child {
+  border-right: 1px solid #000 !important;
+}
+
+/* تأكيد الحد الأيسر */
+.report-table th:first-child,
+.report-table td:first-child {
+  border-left: 1px solid #000 !important;
 }
 
 .report-table th {
@@ -265,8 +282,11 @@ body {
   .report-table {
     width: 100% !important;
     max-width: 100% !important;
+    min-width: 0 !important;
     table-layout: auto !important;
-    font-size: 6.5pt !important;
+    border: 1px solid #000 !important;
+    outline: 1px solid #000 !important;
+    outline-offset: -1px;
   }
 
   .report-table th,
@@ -274,7 +294,13 @@ body {
     padding: 2px 1px !important;
     font-size: 6.5pt !important;
     white-space: normal !important;
-    overflow-wrap: anywhere;
+    overflow-wrap: anywhere !important;
+    border: 1px solid #000 !important;
+  }
+
+  .report-table th:last-child,
+  .report-table td:last-child {
+    border-right: 1px solid #000 !important;
   }
 
   .report-table thead {
