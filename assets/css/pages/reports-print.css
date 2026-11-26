@@ -180,7 +180,7 @@ body {
 
 /* ============================================
    التوقيع والختم
-   مستطيلان متطابقان
+   مستطيلان متطابقان والعنوان داخلهما
    ============================================ */
 
 .sig-table {
@@ -204,34 +204,30 @@ body {
   padding: 5px;
 }
 
-/* عنوان التوقيع والختم */
+/* إلغاء المسافات الخارجية للعنوان */
 .sig-table p {
   font-size: 8pt;
   font-weight: bold;
   color: #000;
   margin: 0;
-  padding: 5px 2px;
+  padding: 0;
   text-align: center;
 }
 
-/* مستطيل توقيع المسؤول */
-.sig-line {
-  border: 1px solid #000;
-  border-radius: 0;
-  width: 85px;
-  height: 55px;
-  margin: 5px auto 0;
-  box-sizing: border-box;
-}
-
-/* مستطيل ختم المؤسسة */
+/* المستطيلان */
+.sig-line,
 .stamp-circle {
-  border: 1px solid #000;
-  border-radius: 0;
   width: 85px;
   height: 55px;
+  border: 1px solid #000;
+  border-radius: 0;
   margin: 5px auto 0;
   box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 5px 2px;
 }
 
 /* العملة */
@@ -325,7 +321,7 @@ body {
 
   .sig-table p {
     font-size: 8pt !important;
-    padding: 5px 2px !important;
+    padding: 0 !important;
   }
 
   .sig-line,
