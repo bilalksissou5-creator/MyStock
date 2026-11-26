@@ -3,8 +3,8 @@
 // الهيكل المشترك (Header + Sidebar)
 // ✅ إصلاح زر الرجوع للعمل بشكل طبيعي مع الإطار
 // ✅ إضافة زر سلة المحذوفات
-// ✅ إضافة زر التقارير
-// ✅ إخفاء العناصر المحذوفة (deleted_at) من البحث الشامل
+// ✅ إضافة زر التقارير الرئيسية
+// ✅ إخفاء العناصر المحذوفة من البحث الشامل
 // ✅ إضافة شريط تحميل تدريجي عند التنقل بين الصفحات
 // ============================================
 
@@ -15,7 +15,7 @@ const ALLOWED_PAGES = [
 ];
 
 // ============================================
-// ✅ التحقق من حالة البطاقة والاشتراك
+// التحقق من حالة البطاقة والاشتراك
 // ============================================
 
 async function autoCheckPaymentBlock() {
@@ -103,7 +103,7 @@ if (document.readyState === 'loading') {
 }
 
 // ============================================
-// ✅ شريط التحميل التدريجي
+// شريط التحميل التدريجي
 // ============================================
 
 window.showPageProgress = function () {
@@ -111,11 +111,8 @@ window.showPageProgress = function () {
   if (!progress) return;
 
   progress.classList.remove('page-progress-done');
-
-  // إعادة تشغيل الحركة
   progress.classList.remove('page-progress-loading');
   void progress.offsetWidth;
-
   progress.classList.add('page-progress-loading');
 };
 
@@ -161,12 +158,12 @@ function renderLayout(activePage) {
     { href: '/suppliers/list.html', labelKey: 'nav_suppliers', icon: 'fa-truck' },
     { href: '/invoices/list.html', labelKey: 'nav_invoices', icon: 'fa-file-invoice' },
 
-    // ✅ زر التقارير تحت زر الفواتير
-    { href: '/reports.html', labelKey: 'nav_reports', icon: 'fa-chart-line' },
+    // ✅ فتح مركز التقارير الرئيسي الذي يحتوي على البطاقات الثلاثة
+    { href: '/reports-dashboard.html', labelKey: 'nav_reports', icon: 'fa-chart-line' },
 
     { href: '/settings.html', labelKey: 'nav_settings', icon: 'fa-gear' },
 
-    // ✅ زر سلة المحذوفات
+    // سلة المحذوفات
     { href: '/trash.html', labelKey: 'nav_trash', icon: 'fa-trash-can' },
   ];
 
@@ -181,10 +178,6 @@ function renderLayout(activePage) {
 
   const layout = `
     <style>
-      /* ========================================
-         شريط التحميل التدريجي
-         ======================================== */
-
       #page-progress {
         position: fixed;
         top: 0;
@@ -315,7 +308,7 @@ function renderLayout(activePage) {
   if (window.applyLanguage) window.applyLanguage();
 
   // ============================================
-  // ✅ ربط شريط التحميل بالإطار
+  // ربط شريط التحميل بالإطار
   // ============================================
 
   const mainIframe = document.getElementById('main-content');
@@ -384,7 +377,7 @@ function renderLayout(activePage) {
   }
 
   // ============================================
-  // ✅ التنقل بين الصفحات
+  // التنقل بين الصفحات
   // ============================================
 
   document.querySelectorAll('.nav-item').forEach(link => {
@@ -419,7 +412,7 @@ function renderLayout(activePage) {
   });
 
   // ============================================
-  // ✅ دعم زر الرجوع في المتصفح
+  // دعم زر الرجوع في المتصفح
   // ============================================
 
   window.addEventListener('popstate', (e) => {
@@ -449,7 +442,7 @@ function renderLayout(activePage) {
 }
 
 // ============================================
-// ✅ البحث الذكي الشامل
+// البحث الذكي الشامل
 // ============================================
 
 async function initGlobalSearch() {
@@ -1133,7 +1126,7 @@ async function initGlobalSearch() {
 }
 
 // ============================================
-// ✅ استقبال الرسائل من الإطار الداخلي
+// استقبال الرسائل من الإطار الداخلي
 // ============================================
 
 window.addEventListener('message', (event) => {
@@ -1156,7 +1149,7 @@ window.addEventListener('message', (event) => {
 });
 
 // ============================================
-// ✅ محرك التنبيهات (نغمات متعددة + اهتزاز)
+// محرك التنبيهات (نغمات متعددة + اهتزاز)
 // ============================================
 
 window.__audioCtx = null;
@@ -1287,8 +1280,7 @@ window.playNotificationAlerts = async function () {
 };
 
 // ============================================
-// ✅ دعم التنقل الذكي في التطبيق المثبت (PWA)
-// ✅ تم حذف الكود الذي كان يعترض زر الرجوع
+// دعم التنقل الذكي في التطبيق المثبت (PWA)
 // ============================================
 
 if ('serviceWorker' in navigator) {
