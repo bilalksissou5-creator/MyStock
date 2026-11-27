@@ -1,9 +1,8 @@
 
 /* ============================================
-   صفحة طباعة التقارير
+   MyStock - Reports Print
    A4 Portrait
-   تحسين تقسيم الجداول الطويلة
-   MyStock
+   Automatic Multi-page Table
    ============================================ */
 
 @page {
@@ -28,7 +27,10 @@ body {
   background: #e5e5e5;
 }
 
-/* حاوية التقرير */
+/* ============================================
+   حاوية التقرير
+   ============================================ */
+
 .print-container {
   background: #fff;
   width: 100%;
@@ -47,7 +49,10 @@ body {
   color: #737373;
 }
 
-/* الرأس */
+/* ============================================
+   رأس التقرير
+   ============================================ */
+
 .print-header {
   text-align: center;
   border-bottom: 2px solid #000;
@@ -81,7 +86,10 @@ body {
   font-weight: bold;
 }
 
-/* الإحصائيات */
+/* ============================================
+   ملخص التقرير
+   ============================================ */
+
 .summary-row {
   display: flex;
   gap: 12px;
@@ -92,6 +100,7 @@ body {
 
 .summary-box {
   flex: 1;
+  min-width: 0;
   border: 1px solid #000;
   padding: 8px;
   text-align: center;
@@ -114,57 +123,62 @@ body {
 }
 
 /* ============================================
-   الجدول
-   دعم تعدد صفحات A4
+   جدول التقرير
    ============================================ */
 
 .report-table {
-  width: 100% !important;
-  max-width: 100% !important;
-  min-width: 0 !important;
+  display: table;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
   border-collapse: collapse;
   border-spacing: 0;
-  border: 1px solid #000 !important;
+  border: 1px solid #000;
   font-size: 7pt;
   table-layout: fixed;
+
+  /* السماح باستمرار الجدول بين الصفحات */
   break-inside: auto;
   page-break-inside: auto;
 }
 
 .report-table th,
 .report-table td {
-  border: 1px solid #000 !important;
+  border: 1px solid #000;
   padding: 2px;
   text-align: center;
   color: #000;
   white-space: normal;
   overflow-wrap: anywhere;
   word-break: normal;
+  vertical-align: middle;
 }
 
+/* عناوين الأعمدة */
 .report-table th {
-  background: #f0f0f0 !important;
+  background: #f0f0f0;
   font-weight: bold;
 }
 
-/* تكرار رأس الجدول في الصفحات التالية */
+/* تكرار العناوين في كل صفحة */
 .report-table thead {
   display: table-header-group;
 }
 
-/* السماح بتقسيم الجدول بين الصفحات */
+/* جسم الجدول */
 .report-table tbody {
   display: table-row-group;
   break-inside: auto;
   page-break-inside: auto;
 }
 
+/* منع انقسام الصف الواحد */
 .report-table tbody tr {
   break-inside: avoid;
   page-break-inside: avoid;
 }
 
-/* الإجمالي في نهاية الجدول */
+/* الإجمالي */
 .report-table tfoot {
   display: table-row-group;
   font-weight: bold;
@@ -178,7 +192,6 @@ body {
 
 /* ============================================
    التوقيع والختم
-   مستطيلان متطابقان
    ============================================ */
 
 .sig-table {
@@ -211,7 +224,7 @@ body {
   text-align: center;
 }
 
-/* المستطيلان */
+/* مستطيل التوقيع والختم */
 .sig-line,
 .stamp-circle {
   width: 120px;
@@ -235,7 +248,7 @@ body {
 }
 
 /* ============================================
-   إعدادات الشاشة
+   الشاشة
    ============================================ */
 
 @media screen {
@@ -251,10 +264,11 @@ body {
 }
 
 /* ============================================
-   إعدادات الطباعة A4
+   الطباعة
    ============================================ */
 
 @media print {
+
   html,
   body {
     background: #fff !important;
@@ -265,7 +279,12 @@ body {
     overflow: visible !important;
   }
 
+  body {
+    width: 100% !important;
+  }
+
   .print-container {
+    display: block !important;
     width: 100% !important;
     max-width: none !important;
     min-width: 0 !important;
@@ -281,46 +300,66 @@ body {
     display: none !important;
   }
 
-  /* الجدول أثناء الطباعة */
+  /* رأس التقرير */
+  .print-header {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  /* ملخص التقرير */
+  .summary-row {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+
+  /* الجدول */
   .report-table {
     display: table !important;
     width: 100% !important;
     max-width: 100% !important;
     min-width: 0 !important;
-    table-layout: fixed !important;
+
     border-collapse: collapse !important;
     border-spacing: 0 !important;
     border: 1px solid #000 !important;
-    outline: none !important;
+
+    table-layout: fixed !important;
+
+    /* لا تمنع انتقال الجدول إلى الصفحة التالية */
     break-inside: auto !important;
     page-break-inside: auto !important;
   }
 
   .report-table th,
   .report-table td {
+    border: 1px solid #000 !important;
     padding: 2px 1px !important;
     font-size: 6.5pt !important;
     white-space: normal !important;
     overflow-wrap: anywhere !important;
     word-break: normal !important;
-    border: 1px solid #000 !important;
+    color: #000 !important;
   }
 
+  /* إعادة عناوين الأعمدة في كل ورقة */
   .report-table thead {
     display: table-header-group !important;
   }
 
+  /* استمرار الصفوف على الأوراق التالية */
   .report-table tbody {
     display: table-row-group !important;
     break-inside: auto !important;
     page-break-inside: auto !important;
   }
 
+  /* لا تقسم صف المنتج بين ورقتين */
   .report-table tbody tr {
     break-inside: avoid !important;
     page-break-inside: avoid !important;
   }
 
+  /* إجمالي التقرير */
   .report-table tfoot {
     display: table-row-group !important;
   }
