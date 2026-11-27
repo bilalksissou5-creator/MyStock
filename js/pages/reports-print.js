@@ -6,6 +6,7 @@
  // ✅ حساب إجمالي الكمية والقيمة
  // ✅ توقيع وختم داخل مستطيلين متطابقين
  // ✅ زر الطباعة أسفل التقرير
+ // ✅ عرض تاريخ الطباعة
  // ============================================
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -181,6 +182,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     };
 
     // ============================================
+    // تاريخ الطباعة
+    // ============================================
+
+    const printDate = new Date();
+
+    // ============================================
     // بناء صفوف الجدول
     // ============================================
 
@@ -267,6 +274,13 @@ document.addEventListener('DOMContentLoaded', async () => {
               ${tr('reports_date_range', 'الفترة المختارة')}:
             </strong>
             ${formatDate(start)} — ${formatDate(end)}
+          </span>
+
+          <span>
+            <strong>
+              ${tr('reports_print_date', 'تاريخ الطباعة')}:
+            </strong>
+            ${formatDate(printDate)} ${formatTime(printDate)}
           </span>
 
         </div>
