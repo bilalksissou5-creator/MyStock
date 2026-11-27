@@ -4,7 +4,7 @@
 // ✅ جلب جميع عمليات الإضافة
 // ✅ حساب إجمالي الكمية والقيمة
 // ✅ توقيع وختم داخل مستطيلين متطابقين
-// ✅ زر الطباعة عبر onclick مثل تقرير الإخراج
+// ✅ زر الطباعة مع مهلة قصيرة قبل فتح المعاينة
 // ✅ عرض تاريخ ووقت الطباعة
 // ============================================
 
@@ -285,6 +285,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         </div>
       </div>
 
+      <!-- ملخص التقرير -->
+
       <div class="summary-row">
 
         <div class="summary-box">
@@ -313,6 +315,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         </div>
 
       </div>
+
+      <!-- جدول العمليات -->
 
       <table class="report-table">
 
@@ -382,7 +386,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         <button
           type="button"
-          onclick="window.print()"
+          onclick="setTimeout(function(){ window.print(); }, 300)"
           style="
             border:none;
             background:#000;
