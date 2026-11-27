@@ -1,13 +1,13 @@
 
- // ============================================
- // صفحة طباعة التقارير (Reports Print)
- // MyStock - Product Additions Report
- // ✅ جلب جميع عمليات الإضافة
- // ✅ حساب إجمالي الكمية والقيمة
- // ✅ توقيع وختم داخل مستطيلين متطابقين
- // ✅ زر الطباعة أسفل التقرير
- // ✅ عرض تاريخ الطباعة
- // ============================================
+// ============================================
+// صفحة طباعة التقارير (Reports Print)
+// MyStock - Product Additions Report
+// ✅ جلب جميع عمليات الإضافة
+// ✅ حساب إجمالي الكمية والقيمة
+// ✅ توقيع وختم داخل مستطيلين متطابقين
+// ✅ زر الطباعة يعمل عبر addEventListener
+// ✅ عرض تاريخ ووقت الطباعة
+// ============================================
 
 document.addEventListener('DOMContentLoaded', async () => {
 
@@ -182,7 +182,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     };
 
     // ============================================
-    // تاريخ الطباعة
+    // تاريخ ووقت الطباعة
     // ============================================
 
     const printDate = new Date();
@@ -384,7 +384,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         <button
           type="button"
           id="print-report-btn"
-          onclick="window.print()"
           style="
             border:none;
             background:#000;
@@ -401,6 +400,18 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       </div>
     `;
+
+    // ============================================
+    // ربط زر الطباعة
+    // ============================================
+
+    const printButton = document.getElementById('print-report-btn');
+
+    if (printButton) {
+      printButton.addEventListener('click', () => {
+        window.print();
+      });
+    }
 
     // ============================================
     // عنوان الصفحة
