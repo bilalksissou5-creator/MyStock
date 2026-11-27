@@ -1,10 +1,13 @@
+
 // ============================================
 // صفحة طباعة التقارير (Reports Print)
 // MyStock - Product Additions Report
-// ✅ جلب جميع عمليات الإضافة
-// ✅ حساب إجمالي الكمية والقيمة
+// ✅ جلب جميع عمليات الإضافة على دفعات
+// ✅ عدم التقيد بالحد الافتراضي لنتائج Supabase
+// ✅ حساب إجمالي الكمية والقيمة لجميع العمليات
+// ✅ إنشاء صفوف الجدول تدريجياً لتخفيف ضغط المتصفح
 // ✅ توقيع وختم داخل مستطيلين متطابقين
-// ✅ زر الطباعة مع مهلة قصيرة قبل فتح المعاينة
+// ✅ زر الطباعة في أسفل التقرير
 // ✅ عرض تاريخ ووقت الطباعة
 // ============================================
 
@@ -22,6 +25,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       const value = window.t(key);
       if (value && value !== key) return value;
     }
+
     return fallback || key;
   };
 
@@ -37,6 +41,16 @@ document.addEventListener('DOMContentLoaded', async () => {
       '"': '&quot;',
       "'": '&#39;'
     })[char]);
+  }
+
+  // ============================================
+  // انتظار إطار المتصفح
+  // ============================================
+
+  function nextFrame() {
+    return new Promise(resolve => {
+      requestAnimationFrame(resolve);
+    });
   }
 
   // ============================================
@@ -96,48 +110,79 @@ document.addEventListener('DOMContentLoaded', async () => {
     const orgName = profile.organizations?.name || 'MyStock';
 
     // ============================================
-    // جلب عمليات الإضافة
+    // جلب جميع عمليات الإضافة على دفعات
+    // حجم الدفعة: 500 عملية
     // ============================================
 
-    const { data: movements, error } = await db
-      .from('stock_movements')
-      .select(`
-        id,
-        quantity,
-        created_at,
-        performed_by,
-        products (
-          name,
-          price,
-          unit,
-          suppliers (name)
-        ),
-        profiles (full_name)
-      `)
-      .eq('organization_id', profile.organization_id)
-      .eq('type', 'in')
-      .is('deleted_at', null)
-      .gte('created_at', start.toISOString())
-      .lte('created_at', end.toISOString())
-      .order('created_at', { ascending: false });
+    const batchSize = 500;
+    let from = 0;
+    let items = [];
+    let hasMore = true;
 
-    if (error) throw error;
+    container.innerHTML = `
+      <div class="loading" style="text-align:center;padding:30px;">
+        <i class="fas fa-spinner fa-spin"
+           style="font-size:30px;color:#2563eb;"></i>
+        <p>${tr('reports_loading', 'جاري تحميل التقرير...')}</p>
+      </div>
+    `;
 
-    const items = movements || [];
+    while (hasMore) {
+
+      const to = from + batchSize - 1;
+
+      const { data: movements, error } = await db
+        .from('stock_movements')
+        .select(`
+          id,
+          quantity,
+          created_at,
+          performed_by,
+          products (
+            name,
+            price,
+            unit,
+            suppliers (name)
+          ),
+          profiles (full_name)
+        `)
+        .eq('organization_id', profile.organization_id)
+        .eq('type', 'in')
+        .is('deleted_at', null)
+        .gte('created_at', start.toISOString())
+        .lte('created_at', end.toISOString())
+        .order('created_at', { ascending: false })
+        .range(from, to);
+
+      if (error) throw error;
+
+      const batch = movements || [];
+
+      items.push(...batch);
+
+      from += batchSize;
+
+      hasMore = batch.length === batchSize;
+
+      // إعطاء المتصفح فرصة للتنفس بين الطلبات
+      await nextFrame();
+    }
 
     // ============================================
-    // حساب الإجماليات
+    // حساب الإجماليات لجميع العمليات
     // ============================================
 
     let totalQty = 0;
     let totalVal = 0;
 
     items.forEach(m => {
+
       const quantity = Number(m.quantity || 0);
       const price = Number(m.products?.price || 0);
 
       totalQty += quantity;
       totalVal += quantity * price;
+
     });
 
     // ============================================
@@ -187,66 +232,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const printDate = new Date();
 
     // ============================================
-    // بناء صفوف الجدول
-    // ============================================
-
-    let rowsHtml = items.map(m => {
-
-      const product = m.products || {};
-      const date = new Date(m.created_at);
-
-      const quantity = Number(m.quantity || 0);
-      const price = Number(product.price || 0);
-      const itemTotal = quantity * price;
-
-      return `
-        <tr>
-          <td>${formatTime(date)}</td>
-
-          <td>${formatDate(date)}</td>
-
-          <td>
-            ${escapeHTML(m.profiles?.full_name || '—')}
-          </td>
-
-          <td>
-            ${escapeHTML(product.suppliers?.name || '—')}
-          </td>
-
-          <td>
-            ${escapeHTML(product.name || '—')}
-          </td>
-
-          <td>
-            ${formatQuantity(quantity)}
-            ${escapeHTML(product.unit || '')}
-          </td>
-
-          <td dir="ltr">
-            ${formatNumber(price)}
-            <span class="currency-symbol">DH</span>
-          </td>
-
-          <td dir="ltr">
-            ${formatNumber(itemTotal)}
-            <span class="currency-symbol">DH</span>
-          </td>
-        </tr>
-      `;
-    }).join('');
-
-    if (items.length === 0) {
-      rowsHtml = `
-        <tr>
-          <td colspan="8" style="text-align:center;padding:20px;">
-            ${tr('reports_no_data', 'لا توجد بيانات')}
-          </td>
-        </tr>
-      `;
-    }
-
-    // ============================================
-    // بناء التقرير
+    // إنشاء هيكل التقرير أولاً
     // ============================================
 
     container.innerHTML = `
@@ -333,9 +319,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           </tr>
         </thead>
 
-        <tbody>
-          ${rowsHtml}
-        </tbody>
+        <tbody id="report-rows"></tbody>
 
         <tfoot>
           <tr>
@@ -382,11 +366,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       <!-- زر الطباعة -->
 
-      <div class="no-print" style="text-align:center;margin-top:20px;">
+      <div class="no-print"
+           style="text-align:center;margin-top:20px;">
 
         <button
           type="button"
-          onclick="setTimeout(function(){ window.print(); }, 300)"
+          id="print-report-btn"
           style="
             border:none;
             background:#000;
@@ -405,6 +390,91 @@ document.addEventListener('DOMContentLoaded', async () => {
     `;
 
     // ============================================
+    // إنشاء صفوف الجدول تدريجياً
+    // كل دفعة 100 صف
+    // ============================================
+
+    const tbody = document.getElementById('report-rows');
+
+    if (items.length === 0) {
+
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="8" style="text-align:center;padding:20px;">
+            ${tr('reports_no_data', 'لا توجد بيانات')}
+          </td>
+        </tr>
+      `;
+
+    } else {
+
+      const renderBatchSize = 100;
+
+      for (
+        let i = 0;
+        i < items.length;
+        i += renderBatchSize
+      ) {
+
+        const batch = items.slice(
+          i,
+          i + renderBatchSize
+        );
+
+        const rowsHtml = batch.map(m => {
+
+          const product = m.products || {};
+          const date = new Date(m.created_at);
+
+          const quantity = Number(m.quantity || 0);
+          const price = Number(product.price || 0);
+          const itemTotal = quantity * price;
+
+          return `
+            <tr>
+              <td>${formatTime(date)}</td>
+
+              <td>${formatDate(date)}</td>
+
+              <td>
+                ${escapeHTML(m.profiles?.full_name || '—')}
+              </td>
+
+              <td>
+                ${escapeHTML(product.suppliers?.name || '—')}
+              </td>
+
+              <td>
+                ${escapeHTML(product.name || '—')}
+              </td>
+
+              <td>
+                ${formatQuantity(quantity)}
+                ${escapeHTML(product.unit || '')}
+              </td>
+
+              <td dir="ltr">
+                ${formatNumber(price)}
+                <span class="currency-symbol">DH</span>
+              </td>
+
+              <td dir="ltr">
+                ${formatNumber(itemTotal)}
+                <span class="currency-symbol">DH</span>
+              </td>
+            </tr>
+          `;
+
+        }).join('');
+
+        tbody.insertAdjacentHTML('beforeend', rowsHtml);
+
+        // إتاحة فرصة للمتصفح لعرض الدفعة الحالية
+        await nextFrame();
+      }
+    }
+
+    // ============================================
     // عنوان الصفحة
     // ============================================
 
@@ -412,6 +482,25 @@ document.addEventListener('DOMContentLoaded', async () => {
       'reports_add_products',
       'تقرير إضافة المنتجات'
     );
+
+    // ============================================
+    // زر الطباعة
+    // ============================================
+
+    const printButton = document.getElementById('print-report-btn');
+
+    if (printButton) {
+
+      printButton.addEventListener('click', () => {
+
+        // استدعاء الطباعة مباشرة من حدث الضغط
+        // دون مهلة قد تؤثر على سلوك Android
+
+        window.print();
+
+      });
+
+    }
 
   } catch (err) {
 
@@ -426,6 +515,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         ${escapeHTML(err.message)}
       </p>
     `;
+
   }
 
 });
