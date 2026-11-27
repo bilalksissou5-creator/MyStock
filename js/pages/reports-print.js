@@ -5,9 +5,10 @@
 // ✅ جلب جميع عمليات الإضافة على دفعات
 // ✅ عدم التقيد بالحد الافتراضي لنتائج Supabase
 // ✅ حساب إجمالي الكمية والقيمة لجميع العمليات
-// ✅ إنشاء صفوف الجدول تدريجياً لتخفيف ضغط المتصفح
+// ✅ إنشاء صفوف الجدول تدريجياً
 // ✅ توقيع وختم داخل مستطيلين متطابقين
 // ✅ زر الطباعة في أسفل التقرير
+// ✅ نفس طريقة زر الطباعة في تقرير الإخراج
 // ✅ عرض تاريخ ووقت الطباعة
 // ============================================
 
@@ -111,12 +112,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // ============================================
     // جلب جميع عمليات الإضافة على دفعات
-    // حجم الدفعة: 500 عملية
     // ============================================
 
     const batchSize = 500;
     let from = 0;
-    let items = [];
+    const items = [];
     let hasMore = true;
 
     container.innerHTML = `
@@ -161,28 +161,24 @@ document.addEventListener('DOMContentLoaded', async () => {
       items.push(...batch);
 
       from += batchSize;
-
       hasMore = batch.length === batchSize;
 
-      // إعطاء المتصفح فرصة للتنفس بين الطلبات
       await nextFrame();
     }
 
     // ============================================
-    // حساب الإجماليات لجميع العمليات
+    // حساب الإجماليات
     // ============================================
 
     let totalQty = 0;
     let totalVal = 0;
 
     items.forEach(m => {
-
       const quantity = Number(m.quantity || 0);
       const price = Number(m.products?.price || 0);
 
       totalQty += quantity;
       totalVal += quantity * price;
-
     });
 
     // ============================================
@@ -232,7 +228,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const printDate = new Date();
 
     // ============================================
-    // إنشاء هيكل التقرير أولاً
+    // إنشاء هيكل التقرير
     // ============================================
 
     container.innerHTML = `
@@ -271,12 +267,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         </div>
       </div>
 
-      <!-- ملخص التقرير -->
-
       <div class="summary-row">
 
         <div class="summary-box">
-
           <div class="summary-title">
             ${tr('reports_ops_count', 'عدد العمليات')}
           </div>
@@ -284,11 +277,9 @@ document.addEventListener('DOMContentLoaded', async () => {
           <div class="summary-val">
             ${items.length}
           </div>
-
         </div>
 
         <div class="summary-box">
-
           <div class="summary-title">
             ${tr('reports_total_added', 'إجمالي الإضافات')}
           </div>
@@ -297,12 +288,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             ${formatNumber(totalVal)}
             <span class="currency-symbol">DH</span>
           </div>
-
         </div>
 
       </div>
-
-      <!-- جدول العمليات -->
 
       <table class="report-table">
 
@@ -340,10 +328,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       </table>
 
-      <!-- التوقيع والختم -->
-
       <table class="sig-table">
-
         <tr>
           <td>
             <div class="sig-line">
@@ -361,7 +346,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             </div>
           </td>
         </tr>
-
       </table>
 
       <!-- زر الطباعة -->
@@ -372,6 +356,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         <button
           type="button"
           id="print-report-btn"
+          onclick="window.print()"
           style="
             border:none;
             background:#000;
@@ -386,12 +371,15 @@ document.addEventListener('DOMContentLoaded', async () => {
           ${tr('reports_print', 'Print')}
         </button>
 
+        <p id="print-status"
+           style="display:none;margin-top:10px;color:#b91c1c;">
+        </p>
+
       </div>
     `;
 
     // ============================================
     // إنشاء صفوف الجدول تدريجياً
-    // كل دفعة 100 صف
     // ============================================
 
     const tbody = document.getElementById('report-rows');
@@ -416,10 +404,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         i += renderBatchSize
       ) {
 
-        const batch = items.slice(
-          i,
-          i + renderBatchSize
-        );
+        const batch = items.slice(i, i + renderBatchSize);
 
         const rowsHtml = batch.map(m => {
 
@@ -433,7 +418,6 @@ document.addEventListener('DOMContentLoaded', async () => {
           return `
             <tr>
               <td>${formatTime(date)}</td>
-
               <td>${formatDate(date)}</td>
 
               <td>
@@ -469,7 +453,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         tbody.insertAdjacentHTML('beforeend', rowsHtml);
 
-        // إتاحة فرصة للمتصفح لعرض الدفعة الحالية
         await nextFrame();
       }
     }
@@ -484,22 +467,35 @@ document.addEventListener('DOMContentLoaded', async () => {
     );
 
     // ============================================
-    // زر الطباعة
+    // التحقق من زر الطباعة
     // ============================================
 
     const printButton = document.getElementById('print-report-btn');
+    const printStatus = document.getElementById('print-status');
 
     if (printButton) {
 
-      printButton.addEventListener('click', () => {
+      // إظهار رسالة فقط إذا لم تكن الطباعة مدعومة
+      printButton.onclick = function () {
 
-        // استدعاء الطباعة مباشرة من حدث الضغط
-        // دون مهلة قد تؤثر على سلوك Android
+        if (typeof window.print !== 'function') {
+
+          if (printStatus) {
+            printStatus.textContent =
+              'الطباعة غير مدعومة في المتصفح الحالي.';
+            printStatus.style.display = 'block';
+          }
+
+          return false;
+        }
+
+        if (printStatus) {
+          printStatus.style.display = 'none';
+        }
 
         window.print();
 
-      });
-
+      };
     }
 
   } catch (err) {
