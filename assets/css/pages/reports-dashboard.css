@@ -2,13 +2,16 @@
 /* ============================================
    MyStock - Reports Dashboard
    مركز التقارير
+   ✅ الحشوة الخارجية 0px من الجهات الأربع
+   ✅ الحفاظ على تصميم البطاقات
+   ✅ دعم الهاتف واللوحي
    ============================================ */
 
 .reports-dashboard {
   width: 100%;
   max-width: 1100px;
   margin: 0 auto;
-  padding: 28px 20px;
+  padding: 0px;
   box-sizing: border-box;
   font-family: inherit;
 }
@@ -152,10 +155,6 @@ html[dir="ltr"] .report-dashboard-card:hover .report-arrow {
 /* الهواتف */
 
 @media (max-width: 600px) {
-  .reports-dashboard {
-    padding: 20px 14px;
-  }
-
   .reports-dashboard-header {
     margin-bottom: 22px;
   }
