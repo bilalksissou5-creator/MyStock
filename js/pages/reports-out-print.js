@@ -4,7 +4,7 @@
 // MyStock - Reports Out Print
 // ✅ اسم المؤسسة في أعلى التقرير
 // ✅ نوع الفترة: يوم / أسبوع / شهر / سنة / مخصص
-// ✅ الفترة المختارة وتاريخ الطباعة
+// ✅ الفترة المختارة وتاريخ ووقت الطباعة
 // ✅ ملخص العمليات
 // ✅ جدول الإخراج
 // ✅ التوقيع والختم
@@ -198,6 +198,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // ============================================
+    // تاريخ ووقت الطباعة
+    // ============================================
+
+    const printDate = new Date();
+
+    // ============================================
     // بناء صفوف الجدول
     // ============================================
 
@@ -284,7 +290,7 @@ document.addEventListener('DOMContentLoaded', async () => {
               ${tr('reports_print_date', 'Print Date')}:
             </strong>
 
-            ${formatDate(new Date())}
+            ${formatDate(printDate)} ${formatTime(printDate)}
           </span>
 
         </div>
