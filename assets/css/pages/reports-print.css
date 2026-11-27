@@ -2,7 +2,8 @@
 /* ============================================
    صفحة طباعة التقارير
    A4 Portrait
-   تحسين الجدول والتوقيع والختم
+   تحسين تقسيم الجداول الطويلة
+   MyStock
    ============================================ */
 
 @page {
@@ -114,20 +115,18 @@ body {
 
 /* ============================================
    الجدول
+   دعم تعدد صفحات A4
    ============================================ */
 
 .report-table {
-  display: table;
   width: 100% !important;
   max-width: 100% !important;
   min-width: 0 !important;
   border-collapse: collapse;
   border-spacing: 0;
   border: 1px solid #000 !important;
-  outline: 1px solid #000;
-  outline-offset: -1px;
   font-size: 7pt;
-  table-layout: auto;
+  table-layout: fixed;
   break-inside: auto;
   page-break-inside: auto;
 }
@@ -135,7 +134,7 @@ body {
 .report-table th,
 .report-table td {
   border: 1px solid #000 !important;
-  padding: 2px 2px;
+  padding: 2px;
   text-align: center;
   color: #000;
   white-space: normal;
@@ -143,30 +142,29 @@ body {
   word-break: normal;
 }
 
-.report-table th:last-child,
-.report-table td:last-child {
-  border-right: 1px solid #000 !important;
-}
-
-.report-table th:first-child,
-.report-table td:first-child {
-  border-left: 1px solid #000 !important;
-}
-
 .report-table th {
   background: #f0f0f0 !important;
   font-weight: bold;
 }
 
-.report-table tr {
-  break-inside: avoid;
-  page-break-inside: avoid;
-}
-
+/* تكرار رأس الجدول في الصفحات التالية */
 .report-table thead {
   display: table-header-group;
 }
 
+/* السماح بتقسيم الجدول بين الصفحات */
+.report-table tbody {
+  display: table-row-group;
+  break-inside: auto;
+  page-break-inside: auto;
+}
+
+.report-table tbody tr {
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+
+/* الإجمالي في نهاية الجدول */
 .report-table tfoot {
   display: table-row-group;
   font-weight: bold;
@@ -180,7 +178,7 @@ body {
 
 /* ============================================
    التوقيع والختم
-   مستطيلان متطابقان والعنوان داخلهما
+   مستطيلان متطابقان
    ============================================ */
 
 .sig-table {
@@ -204,7 +202,6 @@ body {
   padding: 5px;
 }
 
-/* إلغاء المسافات الخارجية للعنوان */
 .sig-table p {
   font-size: 8pt;
   font-weight: bold;
@@ -237,7 +234,10 @@ body {
   font-weight: normal;
 }
 
-/* إعدادات الشاشة */
+/* ============================================
+   إعدادات الشاشة
+   ============================================ */
+
 @media screen {
   html,
   body {
@@ -251,7 +251,7 @@ body {
 }
 
 /* ============================================
-   إعدادات الطباعة
+   إعدادات الطباعة A4
    ============================================ */
 
 @media print {
@@ -261,6 +261,7 @@ body {
     margin: 0 !important;
     padding: 0 !important;
     height: auto !important;
+    min-height: 0 !important;
     overflow: visible !important;
   }
 
@@ -268,6 +269,7 @@ body {
     width: 100% !important;
     max-width: none !important;
     min-width: 0 !important;
+    min-height: 0 !important;
     margin: 0 !important;
     padding: 0 !important;
     box-shadow: none !important;
@@ -281,13 +283,17 @@ body {
 
   /* الجدول أثناء الطباعة */
   .report-table {
+    display: table !important;
     width: 100% !important;
     max-width: 100% !important;
     min-width: 0 !important;
-    table-layout: auto !important;
+    table-layout: fixed !important;
+    border-collapse: collapse !important;
+    border-spacing: 0 !important;
     border: 1px solid #000 !important;
-    outline: 1px solid #000 !important;
-    outline-offset: -1px;
+    outline: none !important;
+    break-inside: auto !important;
+    page-break-inside: auto !important;
   }
 
   .report-table th,
@@ -296,27 +302,43 @@ body {
     font-size: 6.5pt !important;
     white-space: normal !important;
     overflow-wrap: anywhere !important;
+    word-break: normal !important;
     border: 1px solid #000 !important;
   }
 
-  .report-table th:last-child,
-  .report-table td:last-child {
-    border-right: 1px solid #000 !important;
-  }
-
   .report-table thead {
-    display: table-header-group;
+    display: table-header-group !important;
   }
 
-  .report-table tr {
-    break-inside: avoid;
-    page-break-inside: avoid;
+  .report-table tbody {
+    display: table-row-group !important;
+    break-inside: auto !important;
+    page-break-inside: auto !important;
+  }
+
+  .report-table tbody tr {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+
+  .report-table tfoot {
+    display: table-row-group !important;
+  }
+
+  .report-table tfoot tr {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
   }
 
   /* التوقيع والختم */
   .sig-table {
-    break-inside: avoid;
-    page-break-inside: avoid;
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+
+  .sig-table tr {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
   }
 
   .sig-table p {
