@@ -1017,6 +1017,8 @@ const translations = {
     reports_of: 'من',
     reports_operations: 'عملية',
 
+    reports_title: "تقرير إضافة المنتجات",
+
     reports_time: 'الوقت',
     reports_date_only: 'التاريخ',
     reports_qty_unit: 'الكمية والوحدة',
@@ -2067,6 +2069,8 @@ const translations = {
     reports_date_range: 'Période personnalisée',
     reports_select_dates: 'Sélectionner les dates...',
 
+    reports_title: "Rapport des ajouts de produits",
+    
     reports_print: 'Imprimer le rapport',
     reports_manager_sig: 'Signature du responsable',
     reports_org_stamp: 'Cachet de l\'organisme',
@@ -3100,6 +3104,8 @@ const translations = {
     reports_showing: 'Showing',
     reports_of: 'of',
     reports_operations: 'operations',
+
+    reports_title: "Product Additions Report",
 
     reports_time: 'Time',
     reports_date_only: 'Date',
